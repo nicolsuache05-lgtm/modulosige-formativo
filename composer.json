@@ -25,6 +25,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
+            "Modules\\Direccion\\": "Modules/Direccion/app/",
+            "Modules\\Egresados\\": "Modules/Egresados/app/",
+            "Modules\\SICA\\": "Modules/SICA/",
+            "Modules\\Egresados\\Database\\Factories\\": "Modules/Egresados/database/factories/",
+            "Modules\\Egresados\\Database\\Seeders\\": "Modules/Egresados/database/seeders/"
         }
     },
     "autoload-dev": {
