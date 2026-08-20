@@ -1,0 +1,11 @@
+{
+    "name": "Egresados",
+    "alias": "egresados",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Egresados\\Providers\\EgresadosServiceProvider"
+    ],
+    "files": []
+}

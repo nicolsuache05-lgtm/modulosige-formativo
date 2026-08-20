@@ -118,5 +118,14 @@ class BloqueAppSeeder extends Seeder
             'description' => 'Administración de aprendices, instructores, asignación de turnos operacionales en SENA Empresa y control de asistencia.',
             'description_english' => 'Management of apprentices, instructors, operational shifts and attendance control.'
         ]);
+
+        App::updateOrCreate(['url' => '/egresados'], [
+            'bloque_id' => $apoyo->id,
+            'name' => 'SIGE',
+            'color' => '#e65100',
+            'icon' => 'fas fa-user-graduate',
+            'description' => 'Sistema de gestion de egresados (SIGE) para el seguimiento laboral y académico de los egresados.',
+            'description_english' => 'Alumni management system (SIGE) for labor and academic follow-up of alumni.'
+        ]);
     }
 }

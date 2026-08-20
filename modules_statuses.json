@@ -1,5 +1,7 @@
 {
     "ADSO": true,
     "Direccion": true,
-    "SST": true
+    "SST": true,
+    "Egresados": true,
+    "SICA": true
 }

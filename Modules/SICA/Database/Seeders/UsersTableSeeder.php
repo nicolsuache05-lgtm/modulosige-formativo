@@ -21,6 +21,7 @@ class UsersTableSeeder extends Seeder
         User::updateOrCreate(['nickname' => 'damendez'], [ // Actualizar o crear usuario
             'person_id' => $person->id,
             'email' => 'ing.diego.mendez@gmail.com',// Dime3344
+            'password' => bcrypt('12345678'),
         ]);
 
         // Registrar o actualizar usuario para Jesús David Guevara Munar
@@ -28,6 +29,7 @@ class UsersTableSeeder extends Seeder
         User::updateOrCreate(['nickname' => 'JDGM0331'], [ // Actualizar o crear usuario
             'person_id' => $person->id,
             'email' => 'jdguevara01@soy.sena.edu.co',//Jeda4010
+            'password' => bcrypt('12345678'),
         ]);
 
         // Registrar o actualizar usuario para Gloria Maritza Sanchez Alarcón
@@ -35,6 +37,7 @@ class UsersTableSeeder extends Seeder
         User::updateOrCreate(['nickname' => 'gmsanchez'], [ // Actualizar o crear usuario
             'person_id' => $person->id,
             'email' => 'gmsanchez@sena.edu.co',
+            'password' => bcrypt('12345678'),
         ]);
 
         // Registrar o actualizar usuario para Diego Andrés Tovar Rodriguez
@@ -42,13 +45,15 @@ class UsersTableSeeder extends Seeder
         User::updateOrCreate(['nickname' => 'DiegoT'], [ // Actualizar o crear usuario
             'person_id' => $person->id,
             'email' => 'datovar74@misena.edu.co',
+            'password' => bcrypt('12345678'),
         ]);
 
         // Registrar o actualizar usuario para Manuel Steven Ossa Lievano
         $person = Person::where('document_number',1000226706)->first(); // Consultar Persona
         User::updateOrCreate(['nickname' => 'Resmerveilons'], [ // Actualizar o crear usuario
             'person_id' => $person->id,
-            'email' => 'manuelstevenossa@gmail.com'
+            'email' => 'manuelstevenossa@gmail.com',
+            'password' => bcrypt('12345678'),
         ]);
 
     }
