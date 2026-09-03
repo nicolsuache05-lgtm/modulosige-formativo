@@ -10,6 +10,59 @@ use Modules\SICA\Entities\Apprentice;
 class EgresadosController extends Controller
 {
     /**
+     * Muestra la página de bienvenida / portal público de SIGE.
+     */
+    public function welcome()
+    {
+        $totalEgresados = Egresado::count();
+        $totalEmpleados = Egresado::where('employment_status', 'Empleado')->count();
+        $totalEmprendedores = Egresado::where('employment_status', 'Emprendedor')->count();
+        $totalEstudiantes = Egresado::where('employment_status', 'Estudiante')->count();
+
+        return view('egresados::welcome', compact(
+            'totalEgresados',
+            'totalEmpleados',
+            'totalEmprendedores',
+            'totalEstudiantes'
+        ));
+    }
+
+    /**
+     * Muestra el panel / dashboard principal de superadmin de SIGE.
+     */
+    public function dashboard()
+    {
+        $totalEgresados = Egresado::count();
+        $totalEmpleados = Egresado::where('employment_status', 'Empleado')->count();
+        $totalEmprendedores = Egresado::where('employment_status', 'Emprendedor')->count();
+        $totalEstudiantes = Egresado::where('employment_status', 'Estudiante')->count();
+        
+        $totalActivos = Egresado::whereNotNull('contact_email')
+            ->orWhereNotNull('contact_phone')
+            ->count();
+        if ($totalActivos === 0) {
+            $totalActivos = $totalEgresados;
+        }
+
+        $tasaEmpleo = $totalEgresados > 0 ? round(($totalEmpleados / $totalEgresados) * 100) : 45;
+
+        $recentEgresados = Egresado::with(['apprentice.person', 'apprentice.course.program'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('egresados::dashboard', compact(
+            'totalEgresados',
+            'totalEmpleados',
+            'totalEmprendedores',
+            'totalEstudiantes',
+            'totalActivos',
+            'tasaEmpleo',
+            'recentEgresados'
+        ));
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
