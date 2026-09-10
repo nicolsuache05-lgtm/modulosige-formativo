@@ -128,14 +128,29 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center space-x-2.5">
-                <a href="{{ route('login', ['redirect' => route('egresados.dashboard')]) }}" class="bg-black/25 hover:bg-black/40 border border-white/25 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
-                    <i class="fa-regular fa-user text-xs"></i>
-                    <span>Iniciar sesión</span>
-                </a>
-                <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#2e8700] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
-                    <i class="fa-solid fa-user-plus text-xs"></i>
-                    <span>Registrarse</span>
-                </a>
+                @auth
+                    <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-gauge-high text-xs"></i>
+                        <span>Ir a mi Panel</span>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+                        <button type="submit" class="bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-400/30 px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-1.5" title="Cerrar sesión">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                            <span class="hidden sm:inline">Salir</span>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="bg-black/25 hover:bg-black/40 border border-white/25 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
+                        <i class="fa-regular fa-user text-xs"></i>
+                        <span>Iniciar sesión</span>
+                    </a>
+                    <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#2e8700] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                        <span>Registrarse</span>
+                    </a>
+                @endauth
             </div>
 
         </div>
@@ -170,10 +185,17 @@
 
                 <!-- Botones CTA con Mayor Presencia -->
                 <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3">
-                    <a href="{{ route('login', ['redirect' => route('egresados.dashboard')]) }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
-                        <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
-                        <span>Iniciar sesión</span>
-                    </a>
+                    @auth
+                        <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                            <i class="fa-solid fa-gauge-high text-sm"></i>
+                            <span>Ir a mi Panel ({{ Auth::user()->primary_role }})</span>
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                            <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+                            <span>Iniciar sesión</span>
+                        </a>
+                    @endauth
                     <a href="{{ route('egresados.create') }}" class="bg-white hover:bg-gray-50 text-[#013819] border-2 border-[#013819] hover:border-[#39A900] px-7 py-3.5 rounded-full text-base font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                         <i class="fa-solid fa-user-plus text-sm text-[#39A900]"></i>
                         <span>Registrarme como egresado</span>

@@ -242,7 +242,7 @@
             </div>
         @endif
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 p-3" role="alert">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <i class="fas fa-exclamation-triangle fs-4 text-danger"></i>

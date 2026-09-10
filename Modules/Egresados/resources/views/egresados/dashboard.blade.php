@@ -283,16 +283,15 @@
 
     <div class="sidebar-foot">
       @auth
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('egresados.logout') }}" method="POST">
           @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
           <button type="submit" class="logout-btn">
             <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar sesión</span>
           </button>
         </form>
       @else
-        <a href="{{ route('login') }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar Sesión</span>
+        <a href="{{ route('egresados.login') }}" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Iniciar Sesión</span>
         </a>
       @endauth
     </div>
@@ -311,14 +310,14 @@
         </button>
         <div class="user-profile">
           <div class="user-avatar">
-            @auth{{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'AM', 0, 2)) }}@else AM @endauth
+            @auth{{ Auth::user()->initials }}@else EG @endauth
           </div>
           <div class="user-info">
             <div class="user-name">
-              @auth{{ Auth::user()->first_name ?? Auth::user()->name ?? 'Ana María López' }}@else Ana María López @endauth
+              @auth{{ Auth::user()->full_name }}@else Egresado(a) CEFA @endauth
               <i class="fa-solid fa-chevron-down" style="font-size:10px; color:#6B7A70; margin-left:4px;"></i>
             </div>
-            <div class="user-role">Egresada</div>
+            <div class="user-role">@auth{{ Auth::user()->primary_role }}@else Egresada @endauth</div>
           </div>
         </div>
       </div>
@@ -330,7 +329,7 @@
       <!-- ============ SECCIÓN: INICIO ============ -->
       <div id="section-inicio" class="section active">
         <h1 class="page-title">
-          ¡Bienvenida, @auth{{ Auth::user()->first_name ?? Auth::user()->name ?? 'Ana María' }}!@else Ana María! @endauth
+          ¡Bienvenido(a), @auth{{ Auth::user()->full_name }}!@else Egresado(a)! @endauth
         </h1>
         <p class="page-desc">Desde aquí puedes consultar tus encuestas, oportunidades laborales y mantener actualizada tu información.</p>
 

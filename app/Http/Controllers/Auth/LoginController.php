@@ -16,8 +16,21 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
+            $user = Auth::user();
+            $roleSlugs = $user->roles()->pluck('slug')->toArray();
+
+            if (in_array('egresados.admin', $roleSlugs) || $user->email === 'superadmin.egresados@sena.edu.co' || $user->nickname === 'superadmin_egresados') {
+                return redirect()->route('egresados.dashboard');
+            }
+            if (in_array('egresados.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
+                return redirect()->route('egresados.dashboard_instructor');
+            }
+            if (in_array('egresados.egresado', $roleSlugs) || $user->email === 'egresado.sige@sena.edu.co' || $user->nickname === 'egresado_sige') {
+                return redirect()->route('egresados.dashboard_egresado');
+            }
+
             $redirect = $request->query('redirect', route('direccion.welcome'));
-            return redirect($redirect)->with('info', 'Ya has iniciado sesión como ' . Auth::user()->full_name);
+            return redirect($redirect)->with('info', 'Ya has iniciado sesión como ' . $user->full_name);
         }
 
         $redirect = $request->query('redirect', '');
@@ -49,6 +62,24 @@ class LoginController extends Controller
         if ($user && Hash::check($password, $user->password)) {
             Auth::login($user, $remember);
             $request->session()->regenerate();
+
+            // Verificar roles específicos asignados en BD
+            $roleSlugs = $user->roles()->pluck('slug')->toArray();
+
+            // 1. Administrador / Superadmin de Egresados
+            if (in_array('egresados.admin', $roleSlugs) || $user->email === 'superadmin.egresados@sena.edu.co' || $user->nickname === 'superadmin_egresados') {
+                return redirect()->route('egresados.dashboard')->with('success', '¡Bienvenido(a) Administrador(a), ' . $user->full_name . '!');
+            }
+
+            // 2. Instructor de Egresados
+            if (in_array('egresados.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
+                return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) Instructor(a), ' . $user->full_name . '!');
+            }
+
+            // 3. Egresado
+            if (in_array('egresados.egresado', $roleSlugs) || $user->email === 'egresado.sige@sena.edu.co' || $user->nickname === 'egresado_sige') {
+                return redirect()->route('egresados.dashboard_egresado')->with('success', '¡Bienvenido(a) a tu Portal de Egresado, ' . $user->full_name . '!');
+            }
 
             $redirectUrl = $request->input('redirect');
             if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
