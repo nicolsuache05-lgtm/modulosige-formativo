@@ -63,6 +63,39 @@ class EgresadosController extends Controller
     }
 
     /**
+     * Muestra el panel / dashboard para el rol de Egresado.
+     */
+    public function dashboardEgresado()
+    {
+        // Dummy data for now matching the image
+        $encuestasPendientes = 2;
+        $oportunidadesLaborales = 8;
+        $notificaciones = 3;
+
+        return view('egresados::dashboard-egresado', compact(
+            'encuestasPendientes',
+            'oportunidadesLaborales',
+            'notificaciones'
+        ));
+    }
+
+    /**
+     * Muestra la vista de encuestas para el rol de Egresado.
+     */
+    public function encuestasEgresado()
+    {
+        return view('egresados::encuestas-egresado');
+    }
+
+    /**
+     * Muestra las oportunidades laborales para el rol de Egresado.
+     */
+    public function oportunidadesEgresado()
+    {
+        return view('egresados::oportunidades-egresado');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

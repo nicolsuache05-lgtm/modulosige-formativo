@@ -9,6 +9,9 @@ Route::get('egresados/welcome', [EgresadosController::class, 'welcome'])->name('
 
 // 2. Dashboard de Superadmin / Coordinación
 Route::get('egresados/dashboard', [EgresadosController::class, 'dashboard'])->name('egresados.dashboard');
+Route::get('egresados/dashboard-egresado', [EgresadosController::class, 'dashboardEgresado'])->name('egresados.dashboard_egresado');
+Route::get('egresados/encuestas-egresado', [EgresadosController::class, 'encuestasEgresado'])->name('egresados.encuestas_egresado');
+Route::get('egresados/oportunidades-egresado', [EgresadosController::class, 'oportunidadesEgresado'])->name('egresados.oportunidades_egresado');
 
 // 3. Directorio y Gestión de Egresados
 Route::get('egresados/directorio', [EgresadosController::class, 'index'])->name('egresados.index');
