@@ -603,38 +603,25 @@
         <i class="fa-solid fa-user-graduate"></i>
         <span>Egresados</span>
       </a>
-      <a href="#">
+      <a href="{{ route('egresados.instructores') }}">
         <i class="fa-solid fa-chalkboard-user"></i>
         <span>Instructores</span>
       </a>
-      <a href="#">
+      <a href="{{ route('egresados.encuestas_superadmin') }}">
         <i class="fa-solid fa-clipboard-question"></i>
         <span>Encuestas</span>
         <span class="badge">78</span>
       </a>
-      <a href="#">
-        <i class="fa-solid fa-chart-pie"></i>
+      <a href="{{ route('egresados.reportes') }}">
+        <i class="fa-solid fa-file-invoice"></i>
         <span>Reportes</span>
+      </a>
+      <a href="{{ route('egresados.eventos') }}">
+        <i class="fa-regular fa-calendar-check"></i>
+        <span>Eventos</span>
       </a>
     </nav>
 
-    <div class="nav-label">Actividad</div>
-    <nav>
-      <a href="#">
-        <i class="fa-regular fa-calendar-days"></i>
-        <span>Eventos</span>
-        <span class="badge">5</span>
-      </a>
-      <a href="#">
-        <i class="fa-solid fa-briefcase"></i>
-        <span>Ofertas laborales</span>
-      </a>
-      <a href="#">
-        <i class="fa-regular fa-bell"></i>
-        <span>Notificaciones</span>
-        <span class="badge">3</span>
-      </a>
-    </nav>
 
     <div class="nav-label">Portal Público</div>
     <nav>
@@ -646,16 +633,15 @@
 
     <div class="sidebar-foot">
       @auth
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('egresados.logout') }}" method="POST">
           @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
           <button type="submit" class="logout-btn">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             <span>Cerrar sesión</span>
           </button>
         </form>
       @else
-        <a href="{{ route('login', ['redirect' => route('egresados.dashboard')]) }}" class="logout-btn">
+        <a href="{{ route('egresados.login') }}" class="logout-btn">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
           <span>Iniciar sesión</span>
         </a>
@@ -684,16 +670,16 @@
         <div class="user-chip" title="Usuario activo">
           <div class="user-avatar">
             @auth
-              {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'CA', 0, 2)) }}
+              {{ Auth::user()->initials }}
             @else
-              CA
+              SA
             @endauth
           </div>
           <span>
             @auth
-              {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Coordinación Académica' }}
+              {{ Auth::user()->full_name }}
             @else
-              Coordinación Académica
+              Super Administrador SIGE
             @endauth
           </span>
           <i class="fa-solid fa-chevron-down text-[10px] text-white/60 ms-1"></i>
@@ -805,7 +791,7 @@
               <i class="fa-solid fa-clock"></i>
               <span>Por responder</span>
             </div>
-            <a href="#" class="stat-link">
+            <a href="{{ route('egresados.encuestas_superadmin') }}" class="stat-link">
               <span>Ver detalle</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
@@ -826,7 +812,7 @@
               <i class="fa-solid fa-bullhorn"></i>
               <span>Próximos eventos</span>
             </div>
-            <a href="#" class="stat-link">
+            <a href="{{ route('egresados.eventos') }}" class="stat-link">
               <span>Ver detalle</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
@@ -847,7 +833,7 @@
               <i class="fa-solid fa-arrow-up-right-dots"></i>
               <span>Este mes</span>
             </div>
-            <a href="#" class="stat-link">
+            <a href="{{ route('egresados.reportes') }}" class="stat-link">
               <span>Ver detalle</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>

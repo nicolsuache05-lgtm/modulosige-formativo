@@ -283,10 +283,18 @@
 
                         <!-- Demo test credentials helper -->
                         <div class="p-2 bg-light rounded-3 border text-center fs-8 text-muted">
-                            <span class="fw-bold text-dark d-block mb-1"><i class="fas fa-key text-warning me-1"></i> Credencial de Acceso Rápido:</span>
-                            <span class="badge bg-dark text-white cursor-pointer px-2 py-1 me-1" style="cursor: pointer;" onclick="fillDemo('damendez', '12345678')">
-                                Usuario: <code>damendez</code> (SuperAdmin / Director)
-                            </span>
+                            <span class="fw-bold text-dark d-block mb-1"><i class="fas fa-key text-warning me-1"></i> Credenciales de Acceso Rápido:</span>
+                            <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
+                                <span class="badge bg-dark text-white cursor-pointer px-2 py-1" style="cursor: pointer;" onclick="fillDemo('superadmin.egresados@sena.edu.co', '12345678')">
+                                    🛡️ <code>superadmin.egresados...</code>
+                                </span>
+                                <span class="badge bg-primary text-white cursor-pointer px-2 py-1" style="cursor: pointer;" onclick="fillDemo('instructor.egresados@sena.edu.co', '12345678')">
+                                    👨‍🏫 <code>instructor.egresados...</code>
+                                </span>
+                                <span class="badge bg-success text-white cursor-pointer px-2 py-1" style="cursor: pointer;" onclick="fillDemo('egresado.sige@sena.edu.co', '12345678')">
+                                    🎓 <code>egresado.sige...</code>
+                                </span>
+                            </div>
                         </div>
                     </form>
                 </div>
