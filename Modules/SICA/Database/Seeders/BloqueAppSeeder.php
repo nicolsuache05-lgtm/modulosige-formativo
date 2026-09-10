@@ -127,5 +127,14 @@ class BloqueAppSeeder extends Seeder
             'description' => 'Sistema de gestion de egresados (SIGE) para el seguimiento laboral y académico de los egresados.',
             'description_english' => 'Alumni management system (SIGE) for labor and academic follow-up of alumni.'
         ]);
+
+        App::updateOrCreate(['url' => '/admin'], [
+            'bloque_id' => $apoyo->id,
+            'name' => 'Administración',
+            'color' => '#00324D',
+            'icon' => 'fas fa-user-shield',
+            'description' => 'Módulo de seguridad, gobierno de usuarios, asignación de roles, permisos y bitácora de auditoría del ERP.',
+            'description_english' => 'Security module, user governance, role and permission assignment, and audit log of the ERP.'
+        ]);
     }
 }

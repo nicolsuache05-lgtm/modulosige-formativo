@@ -3,5 +3,6 @@
     "Direccion": true,
     "SST": true,
     "Egresados": true,
-    "SICA": true
+    "SICA": true,
+    "Admin": true
 }
