@@ -17,15 +17,23 @@
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Tailwind CSS & Alpine.js CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
       :root {
-        --forest: #013819;
-        --forest-deep: #012410;
+        --forest: #001A29;
+        --forest-deep: #00131E;
+        --sena-dark: #00131E;
+        --sena-navy: #001A29;
+        --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
         --green: #39A900;
         --green-dark: #2a7c00;
         --green-soft: #EAF7EE;
         --moss: #62E31D;
-        --bg: #FCFCFA;
+        --bg: #F4F7F6;
         --card: #FFFFFF;
         --ink: #16261C;
         --ink-soft: #6B7A70;
@@ -772,7 +780,7 @@
       }
     </style>
 </head>
-<body>
+<body x-data="{ openModal: false, openModalSeguimiento: false }">
 
 <div class="app">
 
@@ -810,7 +818,6 @@
       <a href="{{ route('egresados.encuestas_superadmin') }}">
         <i class="fa-solid fa-clipboard-question"></i>
         <span>Encuestas</span>
-        <span class="badge">78</span>
       </a>
       <a href="{{ route('egresados.reportes') }}">
         <i class="fa-solid fa-file-invoice"></i>
@@ -842,7 +849,7 @@
           </button>
         </form>
       @else
-        <a href="{{ route('login') }}" class="logout-btn">
+        <a href="{{ route('login', ['redirect' => route('egresados.index')]) }}" class="logout-btn">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
           <span>Iniciar sesión</span>
         </a>
@@ -896,10 +903,10 @@
         </div>
 
         <div style="display:flex; align-items:center; gap:12px;">
-          <a href="{{ route('egresados.create') }}" class="btn-primary-green">
+          <button type="button" @click="openModal = true" class="btn-primary-green" style="border:none; cursor:pointer;">
             <i class="fa-solid fa-plus text-xs"></i>
             <span>Nuevo Egresado</span>
-          </a>
+          </button>
         </div>
       </div>
 
@@ -1161,7 +1168,7 @@
             <i class="fa-solid fa-arrow-right text-xs"></i>
           </a>
 
-          <button type="button" onclick="alert('Iniciando registro de seguimiento para ' + document.getElementById('detailName').innerText);" class="btn-secondary-action">
+          <button type="button" @click="openModalSeguimiento = true" class="btn-secondary-action">
             <i class="fa-solid fa-notes-medical"></i>
             <span>Registrar Seguimiento</span>
           </button>
@@ -1210,6 +1217,16 @@
         if (btn && data.show_url) {
             btn.href = data.show_url;
         }
+
+        // Sincronizar ID y Nombre en el modal de seguimiento
+        const segInput = document.getElementById('seguimiento_egresado_id');
+        if (segInput && data.id) {
+            segInput.value = data.id;
+        }
+        const segLabel = document.getElementById('seguimiento_egresado_name_label');
+        if (segLabel && data.name) {
+            segLabel.innerText = data.name;
+        }
     }
 
     // Seleccionar automáticamente el primer egresado al cargar
@@ -1220,6 +1237,10 @@
         }
     });
 </script>
+
+<!-- Modales de Superadmin -->
+@include('egresados::superadmin.partials._modal_crear')
+@include('egresados::superadmin.partials._modal_seguimiento')
 
 </body>
 </html>

@@ -23,9 +23,8 @@
             --sena-neon: #62E31D;
             --sena-dark: #00131E;
             --sena-navy: #001A29;
+            --sena-navy-light: #002336;
             --sena-light-navy: #00324D;
-            --sena-orange: #e65100;
-            --sena-orange-hover: #bf4300;
         }
 
         body {
@@ -40,7 +39,7 @@
         /* Top Navbar */
         .egresados-navbar {
             background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
-            border-bottom: 3px solid var(--sena-orange);
+            border-bottom: 3px solid var(--sena-green);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             padding: 10px 0;
         }
@@ -53,8 +52,8 @@
             border-radius: 50%;
         }
 
-        .btn-sena-orange {
-            background-color: var(--sena-orange);
+        .btn-sena, .btn-sena-orange {
+            background-color: var(--sena-green);
             color: #ffffff !important;
             font-weight: 600;
             border: none;
@@ -66,11 +65,11 @@
             gap: 6px;
         }
 
-        .btn-sena-orange:hover {
-            background-color: var(--sena-orange-hover);
+        .btn-sena:hover, .btn-sena-orange:hover {
+            background-color: var(--sena-green-hover);
             color: #ffffff !important;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(230, 81, 0, 0.35);
+            box-shadow: 0 4px 12px rgba(57, 169, 0, 0.35);
         }
 
         .nav-link-custom {
@@ -88,7 +87,7 @@
 
         .nav-link-custom:hover,
         .nav-link-custom.active {
-            color: #ffb74d;
+            color: var(--sena-neon);
             background: rgba(255, 255, 255, 0.08);
         }
 
@@ -107,7 +106,7 @@
         .avatar-circle-sm {
             width: 34px;
             height: 34px;
-            background: linear-gradient(135deg, var(--sena-orange), #ff9800);
+            background: linear-gradient(135deg, var(--sena-green), #62E31D);
             color: #ffffff;
             font-weight: 700;
             border-radius: 50%;
@@ -146,7 +145,7 @@
                     <img src="{{ asset('general/assets/img/cefaempresa.png') }}" alt="SENA Empresa" class="logo-img">
                     <div>
                         <span class="fs-6 fw-bold d-block text-white">SENA EMPRESA</span>
-                        <small class="text-white-50 fs-8">Procesos de Apoyo • <strong style="color: #ffb74d;">SIGE</strong></small>
+                        <small class="text-white-50 fs-8">Procesos de Apoyo • <strong style="color: var(--sena-neon);">SIGE</strong></small>
                     </div>
                 </a>
             </div>
@@ -167,7 +166,7 @@
                     <i class="fas fa-arrow-left"></i> <span>Portal ERP</span>
                 </a>
 
-                <a href="{{ route('egresados.create') }}" class="btn btn-sm btn-sena-orange">
+                <a href="{{ route('egresados.create') }}" class="btn btn-sm btn-sena">
                     <i class="fas fa-plus-circle"></i> <span>Nuevo Egresado</span>
                 </a>
 
@@ -180,7 +179,7 @@
                             </div>
                             <div class="text-start d-none d-md-block pe-1">
                                 <span class="fw-bold fs-8 text-white d-block lh-1">{{ Str::limit(Auth::user()->full_name, 18) }}</span>
-                                <span class="badge bg-warning text-dark fs-8 p-1" style="font-size: 10px !important; font-weight: 700;">
+                                <span class="badge bg-success bg-opacity-75 text-white fs-8 p-1" style="font-size: 10px !important; font-weight: 700;">
                                     {{ Auth::user()->primary_role }}
                                 </span>
                             </div>
@@ -190,7 +189,7 @@
                                 <div class="fw-bold text-dark fs-7">{{ Auth::user()->full_name }}</div>
                                 <small class="text-muted fs-8">{{ Auth::user()->email }}</small>
                                 <div class="mt-1">
-                                    <span class="badge bg-warning bg-opacity-15 text-warning-emphasis border border-warning border-opacity-25 rounded-pill px-2 py-1 fs-8" style="color: #c43e00;">
+                                    <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-pill px-2 py-1 fs-8">
                                         <i class="fas fa-user-shield me-1"></i> {{ Auth::user()->primary_role }}
                                     </span>
                                 </div>
@@ -209,10 +208,15 @@
                                 </a>
                                 <form id="logout-form-master" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
+                                    <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
                                 </form>
                             </li>
                         </ul>
                     </div>
+                @else
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-semibold">
+                        <i class="fas fa-right-to-bracket me-1"></i> Iniciar Sesión
+                    </a>
                 @endauth
             </div>
         </div>

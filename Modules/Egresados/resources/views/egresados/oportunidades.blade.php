@@ -13,12 +13,17 @@
 
     <style>
       :root {
-        --forest: #013819;
-        --forest-deep: #012410;
+        --forest: #001A29;
+        --forest-deep: #00131E;
+        --sena-dark: #00131E;
+        --sena-navy: #001A29;
+        --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
         --green: #39A900;
         --green-dark: #2a7c00;
         --green-soft: #EAF7EE;
-        --bg: #FCFCFA;
+        --moss: #62E31D;
+        --bg: #F4F7F6;
         --card: #FFFFFF;
         --ink: #16261C;
         --ink-soft: #6B7A70;
@@ -323,8 +328,9 @@
           </button>
         </form>
       @else
-        <a href="{{ route('login') }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar Sesión</span>
+        <a href="{{ route('login', ['redirect' => route('egresados.oportunidades_egresado')]) }}" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>Iniciar sesión</span>
         </a>
       @endauth
     </div>

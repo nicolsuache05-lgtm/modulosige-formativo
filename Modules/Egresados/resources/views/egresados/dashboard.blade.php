@@ -11,12 +11,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
       :root {
-        --forest: #013819;
-        --forest-deep: #012410;
+        --forest: #001A29;
+        --forest-deep: #00131E;
+        --sena-dark: #00131E;
+        --sena-navy: #001A29;
+        --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
         --green: #39A900;
         --green-dark: #2a7c00;
         --green-soft: #EAF7EE;
-        --bg: #FCFCFA;
+        --moss: #62E31D;
+        --bg: #F4F7F6;
         --card: #FFFFFF;
         --ink: #16261C;
         --ink-soft: #6B7A70;
@@ -283,15 +288,16 @@
 
     <div class="sidebar-foot">
       @auth
-        <form action="{{ route('egresados.logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST">
           @csrf
+          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
           <button type="submit" class="logout-btn">
             <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar sesión</span>
           </button>
         </form>
       @else
-        <a href="{{ route('egresados.login') }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Iniciar Sesión</span>
+        <a href="{{ route('login', ['redirect' => route('egresados.dashboard_egresado')]) }}" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i><span>Iniciar Sesión</span>
         </a>
       @endauth
     </div>

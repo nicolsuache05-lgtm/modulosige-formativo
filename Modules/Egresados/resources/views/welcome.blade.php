@@ -26,14 +26,14 @@
                     colors: {
                         senaGreen: '#39A900',
                         senaGreenDark: '#2a7c00',
-                        senaForest: '#013819',
-                        senaForestDeep: '#012410',
                         senaNeon: '#62E31D',
-                        senaLight: '#F3FAF4',
-                        senaLightWarm: '#F9F7F1',
-                        senaWarm: '#F5EFEB',
-                        senaGold: '#B9812E',
-                        senaGoldLight: '#E8CA93',
+                        senaNavy: '#001A29',
+                        senaNavyLight: '#002336',
+                        senaDark: '#00131E',
+                        senaForest: '#001A29',
+                        senaForestDeep: '#00131E',
+                        senaLight: '#F4F7F6',
+                        senaLightWarm: '#F8FAF9',
                     },
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
@@ -85,7 +85,21 @@
     <!-- ============================================== -->
     <!-- 1. NAVBAR SUPERIOR INSTITUCIONAL -->
     <!-- ============================================== -->
-    <header class="bg-[#013819] text-white shadow-lg sticky top-0 z-50 border-b border-[#39A900]/30 backdrop-blur-md">
+    @php
+        $panelUrl = route('egresados.dashboard');
+        if (Auth::check()) {
+            $user = Auth::user();
+            $roleSlugs = $user->roles ? $user->roles->pluck('slug')->toArray() : [];
+            if (in_array('egresados.instructor', $roleSlugs) || in_array('sigac.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
+                $panelUrl = route('egresados.dashboard_instructor');
+            } elseif (in_array('egresados.egresado', $roleSlugs) || in_array('senaempresa.apprentice', $roleSlugs) || in_array('sigac.apprentice', $roleSlugs) || $user->email === 'egresado.sige@sena.edu.co' || $user->nickname === 'egresado_sige') {
+                $panelUrl = route('egresados.dashboard_egresado');
+            } else {
+                $panelUrl = route('egresados.dashboard');
+            }
+        }
+    @endphp
+    <header class="bg-[#001A29] text-white shadow-lg sticky top-0 z-50 border-b-2 border-[#39A900] backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
             
             <!-- Brand Logo & Name -->
@@ -104,7 +118,7 @@
 
             <!-- Nav Links -->
             <nav class="hidden lg:flex items-center space-x-1 text-sm font-semibold">
-                <a href="{{ route('egresados.welcome') }}" class="flex items-center space-x-1.5 bg-[#0a5225] text-[#62E31D] px-4 py-2 rounded-full shadow-inner">
+                <a href="{{ route('egresados.welcome') }}" class="flex items-center space-x-1.5 bg-[#002336] text-[#62E31D] px-4 py-2 rounded-full border border-white/10 shadow-inner">
                     <i class="fa-solid fa-house text-xs"></i>
                     <span>Inicio</span>
                 </a>
@@ -129,7 +143,7 @@
             <!-- Action Buttons -->
             <div class="flex items-center space-x-2.5">
                 @auth
-                    <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md transition flex items-center space-x-2">
+                    <a href="{{ $panelUrl }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md transition flex items-center space-x-2">
                         <i class="fa-solid fa-gauge-high text-xs"></i>
                         <span>Ir a mi Panel</span>
                     </a>
@@ -142,7 +156,7 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="bg-black/25 hover:bg-black/40 border border-white/25 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
+                    <a href="{{ route('login', ['redirect' => route('egresados.welcome')]) }}" class="bg-black/25 hover:bg-black/40 border border-white/25 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
                         <i class="fa-regular fa-user text-xs"></i>
                         <span>Iniciar sesión</span>
                     </a>
@@ -170,13 +184,13 @@
             <!-- Columna Izquierda: Texto Principal & Acciones -->
             <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
                 
-                <div class="inline-flex items-center space-x-2 bg-white text-[#013819] text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full shadow-sm border border-green-200/60">
+                <div class="inline-flex items-center space-x-2 bg-white text-[#001A29] text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full shadow-sm border border-green-200/60">
                     <span class="text-base">👋</span>
                     <span>Comunidad de Egresados CEFA</span>
                 </div>
 
-                <h1 class="font-editorial text-4xl sm:text-5xl lg:text-[54px] font-bold text-[#012410] leading-[1.12] tracking-tight">
-                    De la formación a la <em class="italic text-[#0d6928] not-italic underline decoration-[#62E31D] decoration-4 underline-offset-8">cosecha</em> profesional.
+                <h1 class="font-editorial text-4xl sm:text-5xl lg:text-[54px] font-bold text-[#00131E] leading-[1.12] tracking-tight">
+                    De la formación a la <em class="italic text-[#39A900] not-italic underline decoration-[#62E31D] decoration-4 underline-offset-8">cosecha</em> profesional.
                 </h1>
 
                 <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
@@ -186,17 +200,17 @@
                 <!-- Botones CTA con Mayor Presencia -->
                 <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3">
                     @auth
-                        <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                        <a href="{{ $panelUrl }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                             <i class="fa-solid fa-gauge-high text-sm"></i>
                             <span>Ir a mi Panel ({{ Auth::user()->primary_role }})</span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                        <a href="{{ route('login', ['redirect' => route('egresados.welcome')]) }}" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                             <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
                             <span>Iniciar sesión</span>
                         </a>
                     @endauth
-                    <a href="{{ route('egresados.create') }}" class="bg-white hover:bg-gray-50 text-[#013819] border-2 border-[#013819] hover:border-[#39A900] px-7 py-3.5 rounded-full text-base font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                    <a href="{{ route('egresados.create') }}" class="bg-white hover:bg-gray-50 text-[#001A29] border-2 border-[#001A29] hover:border-[#39A900] px-7 py-3.5 rounded-full text-base font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                         <i class="fa-solid fa-user-plus text-sm text-[#39A900]"></i>
                         <span>Registrarme como egresado</span>
                     </a>
@@ -225,11 +239,11 @@
                 <div class="relative w-full max-w-[540px] sm:max-w-[620px] lg:max-w-[680px] flex items-center justify-center">
                     
                     <!-- Aura y Pulso de Fondo en Verde y Dorado Esmeralda -->
-                    <div class="absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-tr from-[#39A900]/30 via-[#62E31D]/25 to-[#E4C382]/30 blur-3xl animate-glow-pulse pointer-events-none"></div>
+                    <div class="absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-tr from-[#39A900]/30 via-[#62E31D]/25 to-[#002336]/20 blur-3xl animate-glow-pulse pointer-events-none"></div>
 
                     <!-- Badge Flotante 1: Comunidad Activa -->
                     <div class="absolute -top-4 -left-2 sm:top-2 sm:left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-green-100 flex items-center gap-2.5 animate-bounce" style="animation-duration: 4s;">
-                        <span class="w-8 h-8 rounded-full bg-[#EAF7EE] text-[#0d6928] flex items-center justify-center text-sm font-bold">
+                        <span class="w-8 h-8 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm font-bold">
                             <i class="fa-solid fa-graduation-cap"></i>
                         </span>
                         <div>
@@ -240,12 +254,12 @@
 
                     <!-- Badge Flotante 2: Vinculación Laboral -->
                     <div class="absolute -bottom-2 -right-2 sm:bottom-4 sm:right-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-green-100 flex items-center gap-2.5 animate-bounce" style="animation-duration: 5s;">
-                        <span class="w-8 h-8 rounded-full bg-[#FFF4E8] text-[#e65100] flex items-center justify-center text-sm font-bold">
+                        <span class="w-8 h-8 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm font-bold">
                             <i class="fa-solid fa-briefcase"></i>
                         </span>
                         <div>
                             <div class="text-[11px] font-bold text-gray-800 leading-tight">Bolsa de Empleo</div>
-                            <div class="text-[9px] text-amber-700 font-semibold">Vacantes del Huila</div>
+                            <div class="text-[9px] text-green-700 font-semibold">Vacantes del Huila</div>
                         </div>
                     </div>
 
@@ -274,7 +288,7 @@
                         <span class="text-xs font-bold text-green-700 bg-green-100/70 px-2 py-0.5 rounded-full">CEFA</span>
                     </div>
                     <div>
-                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#012410] tracking-tight">
+                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#00131E] tracking-tight">
                             {{ $totalEgresados > 0 ? number_format($totalEgresados) : '1.240+' }}
                         </div>
                         <div class="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Egresados registrados</div>
@@ -290,7 +304,7 @@
                         <span class="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">Laboral</span>
                     </div>
                     <div>
-                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#012410] tracking-tight">
+                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#00131E] tracking-tight">
                             {{ $totalEmpleados > 0 ? number_format($totalEmpleados) : '86%' }}
                         </div>
                         <div class="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Vinculados laboralmente</div>
@@ -306,7 +320,7 @@
                         <span class="text-xs font-bold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-full">Negocios</span>
                     </div>
                     <div>
-                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#012410] tracking-tight">
+                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#00131E] tracking-tight">
                             {{ $totalEmprendedores > 0 ? number_format($totalEmprendedores) : '32' }}
                         </div>
                         <div class="text-xs sm:text-sm font-semibold text-gray-600 mt-1">Emprendimientos activos</div>
@@ -322,7 +336,7 @@
                         <span class="text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">Programas</span>
                     </div>
                     <div>
-                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#012410] tracking-tight">
+                        <div class="font-editorial text-3xl sm:text-4xl font-extrabold text-[#00131E] tracking-tight">
                             {{ $totalEstudiantes > 0 ? number_format($totalEstudiantes) : '14' }}
                         </div>
                         <div class="text-xs sm:text-sm font-semibold text-gray-600 mt-1">En formación continua</div>
@@ -343,7 +357,7 @@
             <!-- Encabezado de Sección -->
             <div class="text-center max-w-2xl mx-auto mb-14">
                 <span class="inline-block text-[#39A900] text-xs font-extrabold tracking-widest uppercase mb-2">Servicios y Oportunidades</span>
-                <h2 class="font-editorial text-3xl sm:text-4xl font-bold text-[#012410] tracking-tight">¿Qué encuentras en SIGE?</h2>
+                <h2 class="font-editorial text-3xl sm:text-4xl font-bold text-[#00131E] tracking-tight">¿Qué encuentras en SIGE?</h2>
                 <p class="text-gray-600 text-sm sm:text-base mt-3 leading-relaxed">
                     Cuatro espacios diseñados para acompañar tu crecimiento personal y profesional después de tu egreso del CEFA.
                 </p>
@@ -358,7 +372,7 @@
                         <div class="w-14 h-14 rounded-2xl bg-[#EAF7EE] text-[#0d6928] flex items-center justify-center text-2xl mb-6 shadow-sm">
                             <i class="fa-solid fa-briefcase"></i>
                         </div>
-                        <h3 class="font-editorial text-xl font-bold text-[#012410] mb-2.5">Ofertas laborales</h3>
+                        <h3 class="font-editorial text-xl font-bold text-[#00131E] mb-2.5">Ofertas laborales</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-6">
                             Accede a vacantes filtradas de empresas aliadas y de la Agencia Pública de Empleo (APE SENA) en el Huila.
                         </p>
@@ -374,16 +388,16 @@
                 <!-- Tarjeta 2: Eventos -->
                 <div class="service-card-modern bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="w-14 h-14 rounded-2xl bg-[#FFF4E8] text-[#e65100] flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl bg-[#E8F4FC] text-[#0288D1] flex items-center justify-center text-2xl mb-6 shadow-sm">
                             <i class="fa-solid fa-calendar-days"></i>
                         </div>
-                        <h3 class="font-editorial text-xl font-bold text-[#012410] mb-2.5">Eventos</h3>
+                        <h3 class="font-editorial text-xl font-bold text-[#00131E] mb-2.5">Eventos</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-6">
                             Participa en ferias laborales, talleres de empleabilidad, congresos técnicos y encuentros de egresados.
                         </p>
                     </div>
                     <div class="pt-4 border-t border-gray-100">
-                        <a href="javascript:void(0);" onclick="alert('Próximos talleres y encuentros de egresados programados.');" class="inline-flex items-center space-x-2 text-sm font-bold text-[#e65100] hover:text-[#ff7043] group transition">
+                        <a href="javascript:void(0);" onclick="alert('Próximos talleres y encuentros de egresados programados.');" class="inline-flex items-center space-x-2 text-sm font-bold text-[#0288D1] hover:text-[#00B4D8] group transition">
                             <span>Ver agenda</span>
                             <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1.5 transition-transform"></i>
                         </a>
@@ -393,16 +407,16 @@
                 <!-- Tarjeta 3: Encuestas -->
                 <div class="service-card-modern bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="w-14 h-14 rounded-2xl bg-[#EEF4FF] text-[#0052cc] flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-2xl mb-6 shadow-sm">
                             <i class="fa-solid fa-chart-pie"></i>
                         </div>
-                        <h3 class="font-editorial text-xl font-bold text-[#012410] mb-2.5">Encuestas</h3>
+                        <h3 class="font-editorial text-xl font-bold text-[#00131E] mb-2.5">Encuestas</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-6">
                             Comparte tu experiencia y situación laboral actual para ayudarnos a fortalecer los programas formativos del CEFA.
                         </p>
                     </div>
                     <div class="pt-4 border-t border-gray-100">
-                        <a href="{{ route('egresados.create') }}" class="inline-flex items-center space-x-2 text-sm font-bold text-[#0052cc] hover:text-[#3385ff] group transition">
+                        <a href="{{ route('egresados.create') }}" class="inline-flex items-center space-x-2 text-sm font-bold text-[#39A900] hover:text-[#2d8500] group transition">
                             <span>Actualizar datos</span>
                             <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1.5 transition-transform"></i>
                         </a>
@@ -412,16 +426,16 @@
                 <!-- Tarjeta 4: Notificaciones -->
                 <div class="service-card-modern bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="w-14 h-14 rounded-2xl bg-[#F6EEFF] text-[#7928ca] flex items-center justify-center text-2xl mb-6 shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl bg-[#E8EEF5] text-[#001A29] flex items-center justify-center text-2xl mb-6 shadow-sm">
                             <i class="fa-solid fa-bell"></i>
                         </div>
-                        <h3 class="font-editorial text-xl font-bold text-[#012410] mb-2.5">Notificaciones</h3>
+                        <h3 class="font-editorial text-xl font-bold text-[#00131E] mb-2.5">Notificaciones</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-6">
                             Recibe avisos sobre nuevas convocatorias de Fondo Emprender, cursos complementarios y beneficios institucionales.
                         </p>
                     </div>
                     <div class="pt-4 border-t border-gray-100">
-                        <a href="javascript:void(0);" onclick="alert('Convocatorias activas y notificaciones para egresados SENA.');" class="inline-flex items-center space-x-2 text-sm font-bold text-[#7928ca] hover:text-[#9d4edd] group transition">
+                        <a href="javascript:void(0);" onclick="alert('Convocatorias activas y notificaciones para egresados SENA.');" class="inline-flex items-center space-x-2 text-sm font-bold text-[#001A29] hover:text-[#39A900] group transition">
                             <span>Conocer más</span>
                             <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1.5 transition-transform"></i>
                         </a>
@@ -439,7 +453,7 @@
     <section class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div class="max-w-7xl mx-auto">
             
-            <div class="relative rounded-3xl bg-gradient-to-r from-[#012B12] via-[#013819] to-[#0A5423] p-8 sm:p-12 lg:p-16 shadow-xl overflow-hidden text-white border border-green-700/30">
+            <div class="relative rounded-3xl bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] p-8 sm:p-12 lg:p-16 shadow-xl overflow-hidden text-white border border-[#39A900]/30">
                 
                 <!-- Decorative background elements -->
                 <div class="absolute -top-24 -right-24 w-80 h-80 bg-[#39A900]/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -460,7 +474,7 @@
                     </div>
 
                     <div class="lg:col-span-4 flex justify-center lg:justify-end">
-                        <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#62E31D] hover:text-[#012B12] text-white px-8 py-4 rounded-full text-base font-extrabold shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 flex items-center space-x-3 text-center">
+                        <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#62E31D] hover:text-[#00131E] text-white px-8 py-4 rounded-full text-base font-extrabold shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 flex items-center space-x-3 text-center">
                             <i class="fa-solid fa-user-plus text-lg"></i>
                             <span>Registrarme como egresado</span>
                         </a>
@@ -476,7 +490,7 @@
     <!-- ============================================== -->
     <!-- 6. FOOTER ESTRUCTURADO Y JERÁRQUICO -->
     <!-- ============================================== -->
-    <footer id="contacto" class="bg-[#012410] text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 border-t-4 border-[#39A900]">
+    <footer id="contacto" class="bg-[#00131E] text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 border-t-4 border-[#39A900]">
         <div class="max-w-7xl mx-auto">
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
