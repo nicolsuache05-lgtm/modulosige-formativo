@@ -11,53 +11,20 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     /**
-     * Muestra la vista de inicio de sesión dedicada para el módulo de Egresados.
+     * Redirige al login unificado del ERP.
      */
     public function showLoginForm(Request $request)
     {
-        if (Auth::check()) {
-            return $this->redirectByRole(Auth::user());
-        }
-
-        $redirect = $request->query('redirect', '');
-        return view('egresados::login', compact('redirect'));
+        $redirect = $request->query('redirect', route('egresados.welcome'));
+        return redirect()->route('login', ['redirect' => $redirect]);
     }
 
     /**
-     * Procesa la autenticación y redirige inteligentemente al módulo correspondiente dentro de Egresados.
+     * Redirige las solicitudes de autenticación al login central del ERP.
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string',
-        ], [
-            'email.required' => 'Debes ingresar tu correo institucional o usuario.',
-            'password.required' => 'Debes ingresar tu contraseña.',
-        ]);
-
-        $loginInput = trim($request->input('email'));
-        $password = $request->input('password');
-        $remember = $request->boolean('remember');
-
-        // Buscar al usuario por correo electrónico o por nickname
-        $user = User::with('roles')->where('email', $loginInput)
-            ->orWhere('nickname', $loginInput)
-            ->first();
-
-        if ($user && Hash::check($password, $user->password)) {
-            Auth::login($user, $remember);
-            $request->session()->regenerate();
-
-            // Redirección inteligente por rol a su respectivo submódulo de Egresados
-            return $this->redirectByRole($user);
-        }
-
-        return back()
-            ->withInput($request->only('email', 'remember', 'redirect'))
-            ->withErrors([
-                'email' => 'Las credenciales ingresadas no coinciden con nuestros registros de Egresados.',
-            ]);
+        return redirect()->route('login', ['redirect' => $request->input('redirect', route('egresados.welcome'))]);
     }
 
     /**
@@ -89,17 +56,11 @@ class AuthController extends Controller
     }
 
     /**
-     * Cierra la sesión activa y retorna al portal de bienvenida de Egresados.
+     * Cierra la sesión activa a través del logout del ERP.
      */
     public function logout(Request $request)
     {
-        $userName = Auth::check() ? Auth::user()->full_name : 'Usuario';
-
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('egresados.welcome')
-            ->with('info', 'Has cerrado sesión exitosamente. ¡Hasta pronto, ' . $userName . '!');
+        $redirect = $request->input('redirect', $request->query('redirect', route('egresados.welcome')));
+        return redirect()->route('logout', ['redirect' => $redirect]);
     }
 }

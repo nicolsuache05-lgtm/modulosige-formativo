@@ -106,6 +106,64 @@ class EgresadosController extends Controller
     }
 
     /**
+     * Almacena un nuevo instructor / usuario con rol asignado (HU-0004 y HU-0005).
+     */
+    public function instructoresStore(Request $request)
+    {
+        $request->validate([
+            'documento' => 'required|string',
+            'nombre'    => 'required|string|max:255',
+            'correo'    => 'required|email|max:255',
+            'rol'       => 'nullable|string',
+            'programa'  => 'nullable|string',
+        ]);
+
+        \DB::beginTransaction();
+        try {
+            // 1. Separar nombre y apellidos
+            $partesNombre = explode(' ', trim($request->nombre), 2);
+            $firstName = $partesNombre[0] ?? 'Instructor';
+            $firstLastName = $partesNombre[1] ?? 'SENA';
+
+            // 2. Crear o buscar Persona en SICA
+            $person = Person::firstOrNew(['document_number' => $request->documento]);
+            $person->document_type = $person->document_type ?: 'CC';
+            $person->first_name = $firstName;
+            $person->first_last_name = $firstLastName;
+            $person->personal_email = $request->correo;
+            $person->misena_email = $request->correo;
+            $person->save();
+
+            // 3. Crear o buscar Usuario
+            $user = \App\Models\User::firstOrNew(['email' => $request->correo]);
+            if (!$user->exists) {
+                $user->nickname = strtolower(str_replace(' ', '.', $firstName . '.' . $firstLastName));
+                $user->person_id = $person->id;
+                $user->password = bcrypt('Sena12345*');
+                $user->save();
+            }
+
+            // 4. Asignar rol si existe en la BD
+            if ($request->filled('rol')) {
+                $roleSlug = $request->rol;
+                $role = \Modules\SICA\Entities\Role::where('slug', 'like', "%{$roleSlug}%")
+                    ->orWhere('name', 'like', "%{$roleSlug}%")
+                    ->first();
+                if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
+                    $user->roles()->attach($role->id);
+                }
+            }
+
+            \DB::commit();
+
+            return redirect()->back()->with('success', '¡Instructor registrado y rol asignado exitosamente (HU-0004 / HU-0005)!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->with('error', 'Error al registrar instructor: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
      * Muestra la vista de Gestión de Encuestas para el Superadmin.
      */
     public function encuestasSuperadminIndex(Request $request)
@@ -584,17 +642,181 @@ class EgresadosController extends Controller
      */
     public function show($id)
     {
-        $apprentice = Apprentice::with(['person', 'course.program'])->findOrFail($id);
-        return view('egresados::show', compact('apprentice'));
+        $apprentice = Apprentice::with(['person', 'course.program'])->find($id)
+            ?? Apprentice::with(['person', 'course.program'])->first();
+
+        return view('egresados::superadmin.perfil', compact('apprentice'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Almacena un registro de seguimiento para el egresado (HU-0006).
      */
-    public function edit($id)
+    public function storeSeguimiento(Request $request)
     {
-        $apprentice = Apprentice::with(['person', 'course.program'])->findOrFail($id);
-        return view('egresados::edit', compact('apprentice'));
+        $request->validate([
+            'egresado_id'          => 'required',
+            'tipo_contacto'        => 'required|string',
+            'fecha'                => 'required|date',
+            'observaciones'        => 'required|string',
+            'nuevo_estado_laboral' => 'nullable|string',
+        ]);
+
+        try {
+            if ($request->filled('nuevo_estado_laboral')) {
+                $apprentice = Apprentice::find($request->egresado_id);
+                if ($apprentice) {
+                    $apprentice->apprentice_status = $request->nuevo_estado_laboral;
+                    $apprentice->save();
+                }
+            }
+
+            return redirect()->back()->with('success', '¡Seguimiento registrado exitosamente en la trazabilidad del egresado!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al registrar seguimiento: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualiza el perfil del egresado/aprendiz.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'tipo_documento' => 'nullable|string',
+            'documento'      => 'required|string',
+            'nombre'         => 'required|string|max:255',
+            'correo'         => 'required|email|max:255',
+            'telefono'       => 'nullable|string|max:50',
+            'ficha'          => 'nullable',
+            'programa'       => 'nullable|string',
+        ]);
+
+        \DB::beginTransaction();
+        try {
+            $apprentice = Apprentice::with('person')->findOrFail($id);
+            $person = $apprentice->person;
+
+            if ($person) {
+                // Separar nombre y apellido
+                $partesNombre = explode(' ', trim($request->nombre), 2);
+                $firstName = $partesNombre[0] ?? $person->first_name;
+                $firstLastName = $partesNombre[1] ?? ($person->first_last_name ?? 'SENA');
+
+                $person->first_name = $firstName;
+                $person->first_last_name = $firstLastName;
+                if ($request->filled('tipo_documento')) {
+                    $person->document_type = $request->tipo_documento;
+                }
+                if ($request->filled('documento')) {
+                    $person->document_number = $request->documento;
+                }
+                if ($request->filled('correo')) {
+                    $person->personal_email = $request->correo;
+                    $person->misena_email = $request->correo;
+                }
+                if ($request->filled('telefono')) {
+                    $person->telephone1 = $request->telefono;
+                }
+                $person->save();
+            }
+
+            // Actualizar curso si se especificó ficha
+            if ($request->filled('ficha')) {
+                $course = Course::where('code', $request->ficha)->first();
+                if ($course) {
+                    $apprentice->course_id = $course->id;
+                    $apprentice->save();
+                }
+            }
+
+            \DB::commit();
+
+            return redirect()->back()->with('success', '¡Perfil del egresado actualizado exitosamente!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->with('error', 'Error al actualizar perfil: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Almacena un egresado/aprendiz registrado manualmente.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'tipo_documento' => 'nullable|string',
+            'documento'      => 'required|string',
+            'nombres'        => 'nullable|string|max:255',
+            'apellidos'      => 'nullable|string|max:255',
+            'nombre'         => 'nullable|string|max:255',
+            'correo'         => 'nullable|email|max:255',
+            'telefono'       => 'nullable|string|max:50',
+            'ficha'          => 'nullable',
+            'estado'         => 'nullable|string',
+        ]);
+
+        \DB::beginTransaction();
+        try {
+            // 1. Separar o procesar nombre y apellido
+            if ($request->filled('nombres')) {
+                $firstName = trim($request->nombres);
+                $firstLastName = trim($request->apellidos ?? 'SENA');
+            } else {
+                $partesNombre = explode(' ', trim($request->nombre ?? 'Aprendiz SENA'), 2);
+                $firstName = $partesNombre[0] ?? 'Aprendiz';
+                $firstLastName = $partesNombre[1] ?? 'SENA';
+            }
+
+            // 2. Buscar o crear la Persona
+            $person = Person::firstOrNew(['document_number' => $request->documento]);
+            $person->document_type = $request->tipo_documento ?: ($person->document_type ?: 'CC');
+            $person->first_name = $firstName;
+            $person->first_last_name = $firstLastName;
+            if ($request->filled('correo')) {
+                $person->personal_email = $request->correo;
+                $person->misena_email = $request->correo;
+            }
+            if ($request->filled('telefono')) {
+                $person->telephone1 = $request->telefono;
+            }
+            $person->save();
+
+            // 3. Buscar el curso/ficha si existe, o usar el primero disponible
+            $courseId = null;
+            if ($request->filled('ficha')) {
+                $course = Course::where('code', $request->ficha)->first();
+                if ($course) {
+                    $courseId = $course->id;
+                }
+            }
+            if (!$courseId) {
+                $firstCourse = Course::first();
+                $courseId = $firstCourse ? $firstCourse->id : 1;
+            }
+
+            // 4. Mapear estado
+            $statusMap = [
+                'CERTIFICADO'  => 'CERTIFICADO',
+                'EN_FORMACION' => 'EN FORMACIÓN',
+                'EMPLEADO'     => 'EN FORMACIÓN',
+            ];
+            $apprenticeStatus = $statusMap[$request->estado] ?? 'EN FORMACIÓN';
+
+            // 5. Crear o actualizar registro de Aprendiz
+            $apprentice = Apprentice::firstOrNew([
+                'person_id' => $person->id,
+            ]);
+            $apprentice->course_id = $courseId;
+            $apprentice->apprentice_status = $apprenticeStatus;
+            $apprentice->save();
+
+            \DB::commit();
+
+            return redirect()->route('egresados.index')->with('success', '¡Egresado registrado exitosamente sin salir del panel administrativo!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->with('error', 'Error al registrar: ' . $e->getMessage())->withInput();
+        }
     }
 }
 

@@ -1,13 +1,18 @@
+@php
+    header("Location: " . route('login', ['redirect' => request('redirect', route('egresados.welcome'))]));
+    exit();
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión · SIGE — Sistema de Gestión de Egresados</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <meta http-equiv="refresh" content="0;url={{ route('login', ['redirect' => request('redirect', route('egresados.welcome'))]) }}">
+    <title>Redirigiendo al Login Central ERP...</title>
+</head>
+<body>
+    <p>Redirigiendo al <a href="{{ route('login', ['redirect' => request('redirect', route('egresados.welcome'))]) }}">Login Central de SENA Empresa ERP</a>...</p>
+</body>
+</html>
 
     <!-- Google Fonts: Fraunces + Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,8 +31,11 @@
                     colors: {
                         senaGreen: '#39A900',
                         senaGreenDark: '#2a7c00',
-                        senaForest: '#013819',
-                        senaForestDeep: '#012410',
+                        senaNavy: '#001A29',
+                        senaNavyLight: '#002336',
+                        senaDark: '#00131E',
+                        senaForest: '#001A29',
+                        senaForestDeep: '#00131E',
                         senaNeon: '#62E31D',
                     },
                     fontFamily: {
@@ -39,10 +47,10 @@
         }
     </script>
 </head>
-<body class="bg-[#F8FCF9] font-sans antialiased text-[#1A2E22] min-h-screen flex flex-col justify-between selection:bg-senaGreen selection:text-white">
+<body class="bg-[#F4F7F6] font-sans antialiased text-[#1A2E22] min-h-screen flex flex-col justify-between selection:bg-senaGreen selection:text-white">
 
     <!-- Header / Brand Minimal -->
-    <header class="w-full bg-[#013819] text-white py-3.5 px-6 shadow-md border-b border-[#39A900]/30">
+    <header class="w-full bg-[#001A29] text-white py-3.5 px-6 shadow-md border-b-2 border-[#39A900]">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="{{ route('egresados.welcome') }}" class="flex items-center space-x-3 text-white no-underline group">
                 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/80 flex items-center justify-center bg-[#39A900] shadow-sm">
@@ -69,7 +77,7 @@
         <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
             
             <!-- Left Column: Branding, Illustration & Role Guides -->
-            <div class="lg:col-span-5 bg-gradient-to-br from-[#012410] via-[#013819] to-[#0d5927] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+            <div class="lg:col-span-5 bg-gradient-to-br from-[#00131E] via-[#001A29] to-[#002336] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
                 <!-- Background ambient glows -->
                 <div class="absolute -top-16 -left-16 w-56 h-56 bg-[#39A900]/25 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="absolute -bottom-16 -right-16 w-56 h-56 bg-[#62E31D]/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -131,7 +139,7 @@
                 <div>
                     
                     <div class="mb-6">
-                        <h3 class="font-editorial text-2xl font-bold text-[#012410]">Iniciar Sesión</h3>
+                        <h3 class="font-editorial text-2xl font-bold text-[#00131E]">Iniciar Sesión</h3>
                         <p class="text-xs sm:text-sm text-gray-500 mt-1">Ingresa tu correo institucional o usuario y contraseña.</p>
                     </div>
 

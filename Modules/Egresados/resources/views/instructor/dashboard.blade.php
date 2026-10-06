@@ -68,7 +68,7 @@
 
             <!-- Navigation Links -->
             <nav class="mt-6 space-y-1.5">
-                <a href="{{ route('egresados.dashboard_instructor') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
+                <a href="{{ route('egresados.instructor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
                     <i class="fa-solid fa-chalkboard-user w-4 text-center"></i>
                     <span>Panel de Seguimiento</span>
                 </a>
@@ -76,6 +76,11 @@
                 <a href="{{ route('egresados.instructor.directorio') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
                     <i class="fa-solid fa-address-book w-4 text-center"></i>
                     <span>Directorio Completo</span>
+                </a>
+
+                <a href="{{ route('egresados.instructor.encuestas.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
+                    <i class="fa-solid fa-clipboard-question w-4 text-center"></i>
+                    <span>Mis Encuestas</span>
                 </a>
 
                 <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
@@ -100,7 +105,7 @@
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-bold transition">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-bold transition cursor-pointer">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <span>Cerrar Sesión</span>
                 </button>
@@ -207,7 +212,7 @@
                         <p class="text-xs text-gray-500">Visualiza la información de contacto y situación ocupacional de los egresados.</p>
                     </div>
 
-                    <form action="{{ route('egresados.dashboard_instructor') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                    <form action="{{ route('egresados.instructor.dashboard') }}" method="GET" class="flex flex-wrap items-center gap-2">
                         <select name="course_id" onchange="this.form.submit()" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:bg-white focus:border-[#39A900] outline-none">
                             <option value="">-- Todos los cursos / fichas --</option>
                             @foreach($courses as $course)
@@ -228,7 +233,7 @@
                         </button>
 
                         @if(request('course_id') || request('search'))
-                            <a href="{{ route('egresados.dashboard_instructor') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2">
+                            <a href="{{ route('egresados.instructor.dashboard') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2">
                                 <i class="fa-solid fa-xmark"></i> Limpiar
                             </a>
                         @endif
@@ -251,57 +256,54 @@
                         <tbody class="divide-y divide-gray-100 text-gray-700">
                             @forelse($egresadosSeguimiento as $egresado)
                                 <tr class="hover:bg-green-50/30 transition">
-                                    <td class="py-3.5 px-5 font-bold text-gray-900">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-full bg-green-100 text-[#0d6928] flex items-center justify-center font-bold text-xs shrink-0">
-                                                {{ $egresado->person ? strtoupper(substr($egresado->person->first_name, 0, 1) . substr($egresado->person->first_last_name, 0, 1)) : 'EG' }}
-                                            </div>
-                                            <div>
-                                                <div class="font-bold text-gray-800">
-                                                    {{ $egresado->person ? $egresado->person->first_name . ' ' . $egresado->person->first_last_name . ' ' . ($egresado->person->second_last_name ?? '') : 'Aprendiz Egresado #' . $egresado->id }}
-                                                </div>
-                                                <span class="text-[10px] text-gray-400">ID Aprendiz: #{{ $egresado->id }}</span>
-                                            </div>
+                                    <td class="py-3.5 px-5">
+                                        <div class="font-bold text-gray-900">
+                                            {{ $egresado->person->first_name ?? 'Sin Nombre' }} {{ $egresado->person->first_last_name ?? '' }}
+                                        </div>
+                                        <div class="text-[11px] text-gray-400">
+                                            {{ $egresado->person->misena_email ?? ($egresado->person->personal_email ?? 'No registra email') }}
                                         </div>
                                     </td>
-                                    <td class="py-3.5 px-4 font-semibold text-gray-600">
-                                        {{ $egresado->person->document_number ?? 'No registra' }}
+                                    <td class="py-3.5 px-4 font-mono text-xs font-semibold">
+                                        {{ $egresado->person->document_type ?? 'CC' }} {{ $egresado->person->document_number ?? 'S/N' }}
                                     </td>
                                     <td class="py-3.5 px-4">
-                                        <span class="font-bold text-gray-800 d-block">
-                                            {{ $egresado->course && $egresado->course->program ? Str::limit($egresado->course->program->name, 28) : 'Programa CEFA' }}
-                                        </span>
-                                        <span class="text-[10px] text-gray-500">Ficha: {{ $egresado->course->code ?? 'N/A' }}</span>
+                                        <div class="font-semibold text-gray-800">{{ $egresado->course->program->name ?? 'Programa General' }}</div>
+                                        <div class="text-[11px] text-green-800 font-medium">Ficha: {{ $egresado->course->code ?? 'N/A' }}</div>
                                     </td>
-                                    <td class="py-3.5 px-4">
-                                        <div class="text-[11px] text-gray-700">{{ $egresado->person->misena_email ?? $egresado->person->personal_email ?? 'Sin correo' }}</div>
-                                        <div class="text-[10px] text-gray-400"><i class="fa-solid fa-phone text-[9px] me-1"></i>{{ $egresado->person->telephone1 ?? 'Sin teléfono' }}</div>
+                                    <td class="py-3.5 px-4 text-xs">
+                                        <div><i class="fa-solid fa-phone text-[10px] text-gray-400 mr-1"></i>{{ $egresado->person->telephone1 ?? 'No registra' }}</div>
                                     </td>
                                     <td class="py-3.5 px-4">
                                         @php
-                                            $st = $egresado->apprentice_status ?? 'CERTIFICADO';
-                                            $badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                                            if($st === 'EN FORMACIÓN') $badgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
-                                            elseif($st === 'INDUCCIÓN') $badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
-                                            elseif($st === 'CONDICIONADO') $badgeClass = 'bg-purple-50 text-purple-700 border-purple-200';
+                                            $st = $egresado->apprentice_status;
+                                            $badgeClass = match($st) {
+                                                'EN FORMACIÓN' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                'INDUCCIÓN' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                                'CONDICIONADO' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                                default => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                            };
+                                            $badgeLabel = match($st) {
+                                                'EN FORMACIÓN' => 'EMPLEADO',
+                                                'INDUCCIÓN' => 'EMPRENDEDOR',
+                                                'CONDICIONADO' => 'ESTUDIANDO',
+                                                default => 'GRADUADO',
+                                            };
                                         @endphp
-                                        <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border {{ $badgeClass }}">
-                                            {{ $st }}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $badgeClass }}">
+                                            {{ $badgeLabel }}
                                         </span>
                                     </td>
                                     <td class="py-3.5 px-4 text-center">
-                                        <button type="button" onclick="alert('Registrando seguimiento para {{ $egresado->person ? $egresado->person->first_name : 'Egresado' }}');" 
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold transition">
-                                            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
-                                            <span>Seguimiento</span>
-                                        </button>
+                                        <a href="{{ route('egresados.superadmin.perfil', ['id' => $egresado->id]) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-[#39A900] hover:text-white text-gray-600 transition" title="Ver Perfil Detallado">
+                                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-8 text-center text-gray-400">
-                                        <i class="fa-solid fa-folder-open text-2xl mb-2 text-gray-300"></i>
-                                        <div>No se encontraron registros de egresados para los criterios seleccionados.</div>
+                                    <td colspan="6" class="py-8 text-center text-gray-400 text-xs">
+                                        No se encontraron aprendices egresados con los filtros seleccionados.
                                     </td>
                                 </tr>
                             @endforelse
@@ -311,14 +313,15 @@
 
                 <!-- Pagination -->
                 @if($egresadosSeguimiento->hasPages())
-                    <div class="p-4 border-t border-gray-100">
-                        {{ $egresadosSeguimiento->links() }}
+                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                        {{ $egresadosSeguimiento->appends(request()->query())->links() }}
                     </div>
                 @endif
 
             </div>
 
         </main>
+
     </div>
 
 </body>
