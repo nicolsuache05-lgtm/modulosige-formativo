@@ -160,7 +160,7 @@
                         <i class="fa-regular fa-user text-xs"></i>
                         <span>Iniciar sesión</span>
                     </a>
-                    <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#2e8700] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
+                    <a href="{{ route('egresados.registro') }}" class="bg-[#39A900] hover:bg-[#2e8700] text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition flex items-center space-x-2">
                         <i class="fa-solid fa-user-plus text-xs"></i>
                         <span>Registrarse</span>
                     </a>
@@ -210,7 +210,7 @@
                             <span>Iniciar sesión</span>
                         </a>
                     @endauth
-                    <a href="{{ route('egresados.create') }}" class="bg-white hover:bg-gray-50 text-[#001A29] border-2 border-[#001A29] hover:border-[#39A900] px-7 py-3.5 rounded-full text-base font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                    <a href="{{ route('egresados.registro') }}" class="bg-white hover:bg-gray-50 text-[#001A29] border-2 border-[#001A29] hover:border-[#39A900] px-7 py-3.5 rounded-full text-base font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                         <i class="fa-solid fa-user-plus text-sm text-[#39A900]"></i>
                         <span>Registrarme como egresado</span>
                     </a>
@@ -416,7 +416,7 @@
                         </p>
                     </div>
                     <div class="pt-4 border-t border-gray-100">
-                        <a href="{{ route('egresados.create') }}" class="inline-flex items-center space-x-2 text-sm font-bold text-[#39A900] hover:text-[#2d8500] group transition">
+                        <a href="{{ route('egresados.registro') }}" class="inline-flex items-center space-x-2 text-sm font-bold text-[#39A900] hover:text-[#2d8500] group transition">
                             <span>Actualizar datos</span>
                             <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1.5 transition-transform"></i>
                         </a>
@@ -474,7 +474,7 @@
                     </div>
 
                     <div class="lg:col-span-4 flex justify-center lg:justify-end">
-                        <a href="{{ route('egresados.create') }}" class="bg-[#39A900] hover:bg-[#62E31D] hover:text-[#00131E] text-white px-8 py-4 rounded-full text-base font-extrabold shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 flex items-center space-x-3 text-center">
+                        <a href="{{ route('egresados.registro') }}" class="bg-[#39A900] hover:bg-[#62E31D] hover:text-[#00131E] text-white px-8 py-4 rounded-full text-base font-extrabold shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 flex items-center space-x-3 text-center">
                             <i class="fa-solid fa-user-plus text-lg"></i>
                             <span>Registrarme como egresado</span>
                         </a>

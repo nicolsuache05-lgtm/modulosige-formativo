@@ -22,7 +22,10 @@ class EgresadosServiceProvider extends ModuleServiceProvider
      *
      * @var string[]
      */
-    // protected array $commands = [];
+    protected array $commands = [
+        \Modules\Egresados\Console\Commands\TestCorreoInstitucionalCommand::class,
+        \Modules\Egresados\Console\Commands\SyncSigeCommand::class,
+    ];
 
     /**
      * Provider classes to register.
@@ -35,12 +38,20 @@ class EgresadosServiceProvider extends ModuleServiceProvider
     ];
 
     /**
-     * Define module schedules.
-     * 
-     * @param $schedule
+     * Register services.
      */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->singleton(\Modules\Egresados\Services\SigeSyncService::class);
+        $this->app->alias(\Modules\Egresados\Services\SigeSyncService::class, 'sige.sync');
+
+        if (!class_exists('App\Services\SigeSyncService')) {
+            class_alias(\Modules\Egresados\Services\SigeSyncService::class, 'App\Services\SigeSyncService');
+        }
+        if (!class_exists('App\Models\Egresado')) {
+            class_alias(\Modules\Egresados\Models\Egresado::class, 'App\Models\Egresado');
+        }
+    }
 }

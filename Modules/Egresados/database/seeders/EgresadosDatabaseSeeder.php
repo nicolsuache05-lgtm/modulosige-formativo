@@ -23,9 +23,31 @@ class EgresadosDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Obtener la App de Egresados
+        // 1. Crear o asegurar el registro de la App de Egresados en la tabla `apps` (Bloque: Procesos de Apoyo)
         $app = DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
-        $appId = $app ? $app->id : 30;
+        if (!$app) {
+            $appId = DB::table('apps')->insertGetId([
+                'name' => 'Egresados',
+                'url' => '/egresados',
+                'color' => '#e65100',
+                'icon' => 'fas fa-user-graduate',
+                'description' => 'Sistema Integrado de Gestión y Seguimiento a Egresados (SIGE), directorio laboral, encuestas y eventos.',
+                'description_english' => 'Integrated Alumni Management and Tracking System (SIGE), job board, surveys and events.',
+                'bloque_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } else {
+            $appId = $app->id;
+            DB::table('apps')->where('id', $appId)->update([
+                'name' => 'Egresados',
+                'url' => '/egresados',
+                'color' => $app->color ?? '#e65100',
+                'icon' => $app->icon ?? 'fas fa-user-graduate',
+                'bloque_id' => 3,
+                'updated_at' => now(),
+            ]);
+        }
 
         // 2. Obtener IDs de tablas maestras para las Personas
         $epsId = DB::table('e_p_s')->value('id') ?? 1;

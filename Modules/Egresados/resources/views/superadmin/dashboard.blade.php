@@ -176,33 +176,6 @@
         color: var(--forest-deep);
       }
 
-      .sidebar-foot {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.14);
-      }
-      .logout-btn {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 13.5px;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: 10px;
-        background: transparent;
-        border: none;
-        width: 100%;
-        text-align: left;
-        transition: all 0.15s ease;
-        text-decoration: none;
-      }
-      .logout-btn:hover {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fca5a5;
-      }
-
       /* ---------------- MAIN ---------------- */
       .main {
         display: flex;
@@ -633,24 +606,6 @@
         <span>Portal Egresados</span>
       </a>
     </nav>
-
-    <div class="sidebar-foot">
-      @auth
-        <form action="{{ route('logout') }}" method="POST">
-          @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-          <button type="submit" class="logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Cerrar sesión</span>
-          </button>
-        </form>
-      @else
-        <a href="{{ route('login', ['redirect' => route('egresados.dashboard')]) }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Iniciar sesión</span>
-        </a>
-      @endauth
-    </div>
   </aside>
 
   <!-- MAIN VIEWPORT -->
@@ -665,30 +620,7 @@
         </a>
       </div>
 
-      <div class="topbar-right">
-        <button class="icon-btn" title="Notificaciones" aria-label="Notificaciones">
-          <i class="fa-regular fa-bell"></i>
-          <div class="dot"></div>
-        </button>
-
-        <div class="user-chip" title="Usuario activo">
-          <div class="user-avatar">
-            @auth
-              {{ Auth::user()->initials }}
-            @else
-              SA
-            @endauth
-          </div>
-          <span>
-            @auth
-              {{ Auth::user()->full_name }}
-            @else
-              Super Administrador SIGE
-            @endauth
-          </span>
-          <i class="fa-solid fa-chevron-down text-[10px] text-white/60 ms-1"></i>
-        </div>
-      </div>
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Main Content -->

@@ -310,11 +310,11 @@ class ReportesController extends Controller
             if ($egresados->count() > 0) {
                 foreach ($egresados as $egresado) {
                     $fullName = $egresado->person ? ($egresado->person->first_name . ' ' . $egresado->person->first_last_name) : 'Aprendiz ' . $egresado->id;
-                    $docType = $egresado->person && $egresado->person->document_type ? $egresado->person->document_type->name : 'CC';
+                    $docType = $egresado->person ? ($egresado->person->document_type ?? 'CC') : 'CC';
                     $docNumber = $egresado->person->document_number ?? 'N/A';
                     $progName = $egresado->course && $egresado->course->program ? $egresado->course->program->name : 'ADSO';
                     $code = $egresado->course->code ?? '2694551';
-                    $email = $egresado->person->misena_email ?? $egresado->person->personal_email ?? 'egresado@sena.edu.co';
+                    $email = $egresado->person->misena_email ?? ($egresado->person->personal_email ?? 'egresado@sena.edu.co');
                     $phone = $egresado->person->telephone1 ?? '3100000000';
                     $status = $egresado->apprentice_status ?? 'CERTIFICADO';
 
