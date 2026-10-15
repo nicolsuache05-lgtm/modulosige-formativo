@@ -182,33 +182,6 @@
         color: var(--forest-deep);
       }
 
-      .sidebar-foot {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.14);
-      }
-      .logout-btn {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 13.5px;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: 10px;
-        background: transparent;
-        border: none;
-        width: 100%;
-        text-align: left;
-        transition: all 0.15s ease;
-        text-decoration: none;
-      }
-      .logout-btn:hover {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fca5a5;
-      }
-
       /* ---------------- MAIN VIEWPORT ---------------- */
       .main {
         display: flex;
@@ -759,6 +732,26 @@
         background: #d8f3de;
       }
 
+      .btn-edit-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: #fef3c7;
+        color: #b45309;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-edit-action:hover {
+        background: #fde68a;
+        color: #92400e;
+      }
+
       /* Pagination */
       .pagination-wrap {
         padding: 16px 20px;
@@ -779,8 +772,15 @@
         .topbar { padding: 12px 18px; }
       }
     </style>
-</head>
-<body x-data="{ openModal: false, openModalSeguimiento: false }">
+<body x-data="{ 
+    openModal: false, 
+    openModalSeguimiento: false, 
+    openModalImportar: false, 
+    openModalEditar: false, 
+    openModalPerfilEgresado: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}">
 
 <div class="app">
 
@@ -837,24 +837,6 @@
         <span>Portal Egresados</span>
       </a>
     </nav>
-
-    <div class="sidebar-foot">
-      @auth
-        <form action="{{ route('logout') }}" method="POST">
-          @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-          <button type="submit" class="logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Cerrar sesión</span>
-          </button>
-        </form>
-      @else
-        <a href="{{ route('login', ['redirect' => route('egresados.index')]) }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Iniciar sesión</span>
-        </a>
-      @endauth
-    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -871,25 +853,7 @@
         </a>
       </div>
 
-      <div class="topbar-right">
-        <div class="user-chip" title="Usuario activo">
-          <div class="user-avatar">
-            @auth
-              {{ Auth::user()->initials }}
-            @else
-              SA
-            @endauth
-          </div>
-          <span>
-            @auth
-              {{ Auth::user()->full_name }}
-            @else
-              Super Administrador SIGE
-            @endauth
-          </span>
-          <i class="fa-solid fa-chevron-down text-[10px] text-white/60 ms-1"></i>
-        </div>
-      </div>
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Main Content -->
@@ -902,9 +866,25 @@
           <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
-          <button type="button" @click="openModal = true" class="btn-primary-green" style="border:none; cursor:pointer;">
-            <i class="fa-solid fa-plus text-xs"></i>
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- BOTÓN 1: Sincronizar API (Formulario directo) -->
+          <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" class="m-0 p-0">
+            @csrf
+            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Sincronizar SICEFA</span>
+            </button>
+          </form>
+
+          <!-- BOTÓN 2: Importar Excel (Abre Modal) -->
+          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer">
+            <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Importar Excel</span>
+          </button>
+
+          <!-- BOTÓN 3: Nuevo Egresado (Abre Modal) -->
+          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Nuevo Egresado</span>
           </button>
         </div>
@@ -1076,11 +1056,19 @@
                             title="Ver en Panel de Detalle">
                           <i class="fa-solid fa-eye"></i>
                         </button>
-                        <a href="{{ route('egresados.show', $item->id) }}" 
+                        <button type="button" 
+                            @click.stop="openModalPerfilEgresado = true; selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalPerfilEgresado({{ $jsonData }});" 
                             class="btn-circle-action" 
-                            title="Ver Ficha Completa">
-                          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
+                            title="Ver Perfil Completo (Ventana Flotante)">
+                          <i class="fa-solid fa-id-card text-emerald-700"></i>
+                        </button>
+                        <button type="button" 
+                            @click.stop="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalEditar({{ $jsonData }}); openModalEditar = true;" 
+                            class="btn-circle-action" 
+                            style="color:#d97706;" 
+                            title="Editar Datos del Egresado">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
                       </div>
                     </td>
 
@@ -1163,12 +1151,22 @@
           </div>
 
           <!-- Botones de Acción -->
-          <a id="detailFullBtn" href="#" class="btn-cta-detail">
+          <button type="button" 
+              id="detailFullBtn" 
+              @click="openModalPerfilEgresado = true; if(window.currentSelectedEgresado) populateModalPerfilEgresado(window.currentSelectedEgresado);" 
+              class="btn-cta-detail cursor-pointer">
             <span>Ver Perfil Completo</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
-          </a>
+          </button>
 
-          <button type="button" @click="openModalSeguimiento = true" class="btn-secondary-action">
+          <button type="button" 
+              @click="if(window.currentSelectedEgresado) populateModalEditar(window.currentSelectedEgresado); openModalEditar = true;" 
+              class="btn-edit-action cursor-pointer">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>Editar Datos</span>
+          </button>
+
+          <button type="button" @click="openModalSeguimiento = true" class="btn-secondary-action cursor-pointer">
             <i class="fa-solid fa-notes-medical"></i>
             <span>Registrar Seguimiento</span>
           </button>
@@ -1186,6 +1184,7 @@
     // Función interactiva para actualizar el panel de detalles reactivo
     function selectEgresado(data, rowId) {
         if (!data) return;
+        window.currentSelectedEgresado = data;
 
         // Actualizar fila activa
         document.querySelectorAll('.egresado-row').forEach(row => {
@@ -1213,11 +1212,6 @@
             pill.className = 'badge-pill ' + (data.pill_class || 'status-green');
         }
 
-        const btn = document.getElementById('detailFullBtn');
-        if (btn && data.show_url) {
-            btn.href = data.show_url;
-        }
-
         // Sincronizar ID y Nombre en el modal de seguimiento
         const segInput = document.getElementById('seguimiento_egresado_id');
         if (segInput && data.id) {
@@ -1226,6 +1220,11 @@
         const segLabel = document.getElementById('seguimiento_egresado_name_label');
         if (segLabel && data.name) {
             segLabel.innerText = data.name;
+        }
+
+        // Sincronizar automáticamente la ventana flotante de perfil
+        if (typeof populateModalPerfilEgresado === 'function') {
+            populateModalPerfilEgresado(data);
         }
     }
 
@@ -1238,9 +1237,13 @@
     });
 </script>
 
-<!-- Modales de Superadmin -->
+<!-- Modales y Drawer Lateral de Superadmin -->
 @include('egresados::superadmin.partials._modal_crear')
 @include('egresados::superadmin.partials._modal_seguimiento')
+@include('egresados::superadmin.partials._modal_editar')
+@include('egresados::superadmin.partials._modal_importar')
+@include('egresados::superadmin.partials._modal_perfil_egresado')
+@include('egresados::superadmin.partials._modal_alertas')
 
 </body>
 </html>

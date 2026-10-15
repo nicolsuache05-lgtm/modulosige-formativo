@@ -483,24 +483,6 @@
         <span>Portal Egresados</span>
       </a>
     </nav>
-
-    <div class="sidebar-foot">
-      @auth
-        <form action="{{ route('logout') }}" method="POST">
-          @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-          <button type="submit" class="logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Cerrar sesión</span>
-          </button>
-        </form>
-      @else
-        <a href="{{ route('login', ['redirect' => route('egresados.create')]) }}" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Iniciar sesión</span>
-        </a>
-      @endauth
-    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -517,24 +499,7 @@
         </a>
       </div>
 
-      <div class="topbar-right">
-        <div class="user-chip" title="Usuario activo">
-          <div class="user-avatar">
-            @auth
-              {{ Auth::user()->initials }}
-            @else
-              SA
-            @endauth
-          </div>
-          <span style="font-size:12.5px; font-weight:700; color:var(--ink);">
-            @auth
-              {{ Auth::user()->nickname ?? 'Superadmin' }}
-            @else
-              Superadmin
-            @endauth
-          </span>
-        </div>
-      </div>
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Content Area: EXACT DESIGN AS REQUESTED -->

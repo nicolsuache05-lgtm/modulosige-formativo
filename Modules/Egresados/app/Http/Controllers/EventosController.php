@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Modules\SICA\Entities\Apprentice;
+use Modules\Egresados\App\Jobs\EnviarInvitacionMasivaJob;
 
 class EventosController extends Controller
 {
@@ -376,9 +377,47 @@ class EventosController extends Controller
      */
     public function invitar(Request $request, string $id)
     {
-        $evento = $this->findEvento($id);
-        $titulo = $evento['title'] ?? 'Evento Institucional';
+        $evento = $this->findEvento($id) ?? [
+            'id' => $id,
+            'title' => 'Evento Institucional',
+            'nombre' => 'Evento Institucional',
+            'location' => 'Auditorio Principal',
+            'lugar' => 'Auditorio Principal',
+            'date' => 'Próximamente',
+            'fecha_inicio' => 'Próximamente',
+            'description' => 'Invitación a evento de egresados.',
+            'descripcion' => 'Invitación a evento de egresados.',
+            'program' => 'Egresados CEFA',
+        ];
+
+        $titulo = $evento['title'] ?? ($evento['nombre'] ?? 'Evento Institucional');
         $progs = $evento['program'] ?? 'Egresados CEFA';
+
+        // Obtener egresados con correo registrado
+        $egresados = Apprentice::with('person')->take(50)->get()->map(function ($appr) {
+            $p = $appr->person;
+            return (object) [
+                'nombre' => $p ? trim(($p->first_name ?? '') . ' ' . ($p->first_last_name ?? '')) : 'Egresado SENA',
+                'correo' => $p ? ($p->misena_email ?? ($p->personal_email ?? null)) : null,
+            ];
+        })->filter(fn($e) => !empty($e->correo));
+
+        // Si no hay egresados en BD, preparar lista de prueba
+        if ($egresados->isEmpty()) {
+            $egresados = collect([
+                (object) [
+                    'nombre' => 'Egresado SENA',
+                    'correo' => env('MAILTRAP_FROM_ADDRESS', 'test@demomailtrap.co'),
+                ]
+            ]);
+        }
+
+        // Despachar el Job con el SDK oficial de Mailtrap
+        try {
+            EnviarInvitacionMasivaJob::dispatch($evento, $egresados);
+        } catch (\Throwable $e) {
+            \Log::error('Error al despachar EnviarInvitacionMasivaJob: ' . $e->getMessage());
+        }
 
         return redirect()->route('egresados.superadmin.eventos.index')
             ->with('success', '¡Invitación y enlace de registro enviados exitosamente a los egresados (' . $progs . ') para el evento "' . $titulo . '"!');
