@@ -6,8 +6,9 @@ use Modules\Admin\Http\Controllers\UsuarioController;
 use Modules\Admin\Http\Controllers\RolController;
 use Modules\Admin\Http\Controllers\PermisoController;
 use Modules\Admin\Http\Controllers\AuditoriaController;
+use Modules\Admin\Http\Middleware\CheckAdminRole;
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(CheckAdminRole::class)->prefix('admin')->name('admin.')->group(function () {
     // Landing institucional y Dashboard
     Route::get('/', [AdminController::class, 'welcome'])->name('welcome');
     Route::get('/index', [AdminController::class, 'welcome'])->name('index');
