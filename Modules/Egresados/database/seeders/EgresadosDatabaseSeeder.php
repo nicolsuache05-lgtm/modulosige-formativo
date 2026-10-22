@@ -27,7 +27,7 @@ class EgresadosDatabaseSeeder extends Seeder
         $app = DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
         if (!$app) {
             $appId = DB::table('apps')->insertGetId([
-                'name' => 'Egresados',
+                'name' => 'Egresados (SIGE)',
                 'url' => '/egresados',
                 'color' => '#e65100',
                 'icon' => 'fas fa-user-graduate',
@@ -40,7 +40,7 @@ class EgresadosDatabaseSeeder extends Seeder
         } else {
             $appId = $app->id;
             DB::table('apps')->where('id', $appId)->update([
-                'name' => 'Egresados',
+                'name' => 'Egresados (SIGE)',
                 'url' => '/egresados',
                 'color' => $app->color ?? '#e65100',
                 'icon' => $app->icon ?? 'fas fa-user-graduate',

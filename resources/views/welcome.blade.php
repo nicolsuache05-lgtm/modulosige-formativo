@@ -985,6 +985,7 @@
           @foreach($bloques as $bloque)
             <!-- BLOQUE: {{ strtoupper($bloque->name) }} -->
             <div id="modules-{{ $bloque->slug }}" class="process-category-block mb-5 p-4 rounded-4 shadow-sm bg-white border-start border-5" style="border-left-color: {{ $bloque->color ?? '#39A900' }} !important;" data-aos="fade-up">
+              @if($bloque->slug === 'apoyos')<div id="modules-apoyo" style="position: relative; top: -100px;"></div>@endif
               <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
                 <div class="process-icon-box me-3 p-3 rounded-circle" style="background-color: {{ $bloque->color ?? '#39A900' }}1f; color: {{ $bloque->color ?? '#39A900' }};">
                   <i class="{{ $bloque->icon ?? 'fas fa-cubes' }} fs-2"></i>
@@ -1507,7 +1508,9 @@
             if (lower.includes('qué es') || lower.includes('que es') || lower.includes('sena empresa')) {
               response = '🏢 <strong>SENA Empresa</strong> es un modelo didáctico de formación profesional en el Centro Agroindustrial "La Angostura" (Campoalegre - Huila). Permite a los aprendices vivir la operación real de una empresa en áreas administrativas, productivas y comerciales.';
             } else if (lower.includes('proceso') || lower.includes('erp') || lower.includes('modulo') || lower.includes('módulo')) {
-              response = '📊 <strong>Procesos ERP SENA Empresa:</strong><br>• 🟢 <strong>Estratégicos:</strong> Planeación e Indicadores.<br>• 🔵 <strong>Misionales:</strong> Inventario, Ventas y Compras.<br>• 🟠 <strong>Apoyo:</strong> Contabilidad y Talento Humano.<br><br><a href="#modules" onclick="document.getElementById(\'senaBotChat\').classList.remove(\'active\')">Ir a Procesos ERP &rarr;</a>';
+              response = '📊 <strong>Procesos ERP SENA Empresa:</strong><br>• 🟢 <strong>Estratégicos:</strong> Dirección, Planeación e Indicadores.<br>• 🔵 <strong>Misionales:</strong> Inventario, Ventas y Compras.<br>• 🟠 <strong>Apoyo:</strong> Contabilidad, Talento Humano y Egresados (SIGE).<br><br><a href="#modules" onclick="document.getElementById(\'senaBotChat\').classList.remove(\'active\')">Ir a Procesos ERP &rarr;</a>';
+            } else if (lower.includes('egresad') || lower.includes('sige') || lower.includes('graduad')) {
+              response = '🎓 <strong>Módulo de Egresados (SIGE):</strong><br>Forma parte de los <strong>Procesos de Apoyo</strong>. Gestiona la intermediación laboral, directorio de egresados del CEFA, seguimiento y encuestas.<br><br><a href="/egresados" class="btn btn-sm text-white rounded-pill px-3 mt-1" style="background-color: #e65100; font-size: 13px;">Acceder a Egresados (SIGE) &rarr;</a>';
             } else if (lower.includes('organigrama') || lower.includes('estructura')) {
               response = '🗺️ El <strong>Organigrama de SENA Empresa</strong> muestra la jerarquía desde la Subdirección y Coordinación hasta los Gerentes (Administrativo, Producción, Comercial), Gestores y Aprendices.<br><br><a href="#organigrama" onclick="document.getElementById(\'senaBotChat\').classList.remove(\'active\')">Ver Organigrama Completo &rarr;</a>';
             } else if (lower.includes('noticia') || lower.includes('novedad')) {
@@ -1653,6 +1656,18 @@
             "Control biométrico / digital de asistencia de aprendices.",
             "Evaluación de desempeño y competencias comportamentales.",
             "Directorio de funcionarios, instructores y pasantes."
+          ]
+        },
+        egresados: {
+          title: "Submódulo de Egresados (SIGE)",
+          category: "Procesos de Apoyo",
+          icon: "fas fa-user-graduate text-warning",
+          desc: "Sistema Integrado de Gestión y Seguimiento a Egresados (SIGE), seguimiento a la inserción laboral, directorio de graduados del CEFA, encuestas de satisfacción y eventos institucionales.",
+          features: [
+            "Seguimiento y trazabilidad a la vinculación laboral de los egresados.",
+            "Aplicación y análisis de encuestas a graduados y empleadores.",
+            "Directorio oficial de egresados con verificación de certificación.",
+            "Gestión de convocatorias laborales y eventos de integración."
           ]
         }
       };
