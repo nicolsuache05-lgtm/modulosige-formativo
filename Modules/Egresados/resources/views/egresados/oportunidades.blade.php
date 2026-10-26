@@ -122,16 +122,76 @@
         font-size: 10px; font-weight: bold;
         display: flex; align-items: center; justify-content: center;
       }
-      .user-profile { display: flex; align-items: center; gap: 10px; }
+      .user-profile-wrapper { position: relative; }
+      .user-profile {
+        display: flex; align-items: center; gap: 10px; cursor: pointer;
+        padding: 4px 10px 4px 4px; border-radius: 24px; transition: all 0.2s ease;
+        background: transparent; border: 1px solid transparent;
+      }
+      .user-profile:hover, .user-profile.active {
+        background: #F8FAFC; border-color: #E2E8F0;
+      }
       .user-avatar {
         width: 36px; height: 36px; border-radius: 50%;
         background: var(--forest); color: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 14px;
+        font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
       }
-      .user-info { display: flex; flex-direction: column; }
-      .user-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+      .user-info { display: flex; flex-direction: column; text-align: left; }
+      .user-name { font-size: 13.5px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; }
       .user-role { font-size: 11px; color: var(--ink-soft); }
+      .topbar-chevron { font-size: 10px; color: #94a3b8; transition: transform 0.2s ease; }
+      .user-profile.active .topbar-chevron { transform: rotate(180deg); color: var(--forest); }
+
+      /* Dropdown Menu */
+      .topbar-dropdown-menu {
+        position: absolute; top: calc(100% + 8px); right: 0; width: 260px;
+        background: #ffffff; border: 1px solid #E2E8F0; border-radius: 16px;
+        box-shadow: 0 12px 28px -4px rgba(11, 59, 36, 0.12), 0 8px 12px -6px rgba(0, 0, 0, 0.06);
+        padding: 10px; z-index: 1000; display: none;
+        animation: dropdownFadeIn 0.2s ease;
+      }
+      .topbar-dropdown-menu.show { display: block; }
+      @keyframes dropdownFadeIn {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .dropdown-user-header {
+        padding: 10px 12px; background: #F8FAFC; border-radius: 12px;
+        display: flex; align-items: center; gap: 10px;
+      }
+      .dropdown-user-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--forest); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 800; flex-shrink: 0;
+      }
+      .dropdown-user-meta { flex: 1; min-width: 0; }
+      .dropdown-user-name {
+        font-size: 13px; font-weight: 700; color: var(--ink);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+      }
+      .dropdown-user-email {
+        font-size: 11px; color: var(--ink-soft);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+      }
+      .dropdown-divider { height: 1px; background: #F1F5F9; margin: 8px 0; }
+      .dropdown-link-item {
+        display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        font-size: 12.5px; font-weight: 600; color: var(--ink-soft);
+        border-radius: 8px; text-decoration: none; transition: all 0.15s ease;
+      }
+      .dropdown-link-item:hover { background: #F1F5F9; color: var(--forest); }
+      .dropdown-link-item i { font-size: 13px; width: 16px; text-align: center; color: #94A3B8; }
+      .dropdown-link-item:hover i { color: var(--forest); }
+      .dropdown-logout-btn {
+        width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        font-size: 12.5px; font-weight: 700; color: #EF4444; background: transparent;
+        border: none; border-radius: 8px; cursor: pointer; transition: all 0.15s ease;
+        text-align: left;
+      }
+      .dropdown-logout-btn:hover { background: #FEF2F2; color: #DC2626; }
+      .dropdown-logout-btn i { font-size: 13px; width: 16px; text-align: center; color: #EF4444; }
 
       /* ---- CONTENT ---- */
       .content { padding: 34px 40px 48px; flex: 1; }
@@ -347,21 +407,65 @@
           <i class="fa-regular fa-bell"></i>
           <span class="badge">3</span>
         </button>
-        <div class="user-profile">
-          <div class="user-avatar">
-            @auth
-              {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'AM', 0, 2)) }}
-            @else
-              AM
-            @endauth
-          </div>
-          <div class="user-info">
-            <div class="user-name">
-              @auth {{ Auth::user()->first_name ?? Auth::user()->name ?? 'Ana María López' }}
-              @else Ana María López @endauth
-              <i class="fa-solid fa-chevron-down" style="font-size:10px; color:#6B7A70; margin-left:4px;"></i>
+        <div class="user-profile-wrapper" id="profileDropdownWrapper">
+          <div class="user-profile" id="profileDropdownBtn" onclick="toggleProfileDropdown()">
+            <div class="user-avatar">
+              @auth
+                {{ Auth::user()->initials ?? 'VR' }}
+              @else
+                VR
+              @endauth
             </div>
-            <div class="user-role">Egresada</div>
+            <div class="user-info">
+              <div class="user-name">
+                @auth {{ Auth::user()->short_name ?? Auth::user()->first_name ?? Auth::user()->name }}
+                @else Valentina Ríos @endauth
+                <i class="fa-solid fa-chevron-down topbar-chevron"></i>
+              </div>
+              <div class="user-role">Egresada</div>
+            </div>
+          </div>
+
+          <!-- Dropdown Menu -->
+          <div class="topbar-dropdown-menu" id="profileDropdownMenu">
+            <div class="dropdown-user-header">
+              <div class="dropdown-user-avatar">
+                @auth {{ Auth::user()->initials ?? 'VR' }} @else VR @endauth
+              </div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-user-name">
+                  @auth {{ Auth::user()->full_name }} @else Valentina Ríos Egresada @endauth
+                </span>
+                <span class="dropdown-user-email">
+                  @auth {{ Auth::user()->email }} @else egresado.sige@sena.edu.co @endauth
+                </span>
+              </div>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <a href="{{ route('egresados.welcome') }}" class="dropdown-link-item">
+              <i class="fa-solid fa-globe"></i>
+              <span>Portal Público</span>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            @auth
+              <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                @csrf
+                <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+                <button type="submit" class="dropdown-logout-btn">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  <span>Cerrar Sesión</span>
+                </button>
+              </form>
+            @else
+              <a href="{{ route('login', ['redirect' => route('egresados.oportunidades_egresado')]) }}" class="dropdown-logout-btn">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <span>Cerrar Sesión</span>
+              </a>
+            @endauth
           </div>
         </div>
       </div>
@@ -629,5 +733,34 @@
     </div>
   </div>
 </div>
+
+<script>
+  function toggleProfileDropdown(forceState) {
+    const menu = document.getElementById('profileDropdownMenu');
+    const btn = document.getElementById('profileDropdownBtn');
+    if (!menu || !btn) return;
+    const isOpen = forceState !== undefined ? forceState : !menu.classList.contains('show');
+    if (isOpen) {
+      menu.classList.add('show');
+      btn.classList.add('active');
+    } else {
+      menu.classList.remove('show');
+      btn.classList.remove('active');
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('profileDropdownWrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      toggleProfileDropdown(false);
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      toggleProfileDropdown(false);
+    }
+  });
+</script>
 </body>
 </html>

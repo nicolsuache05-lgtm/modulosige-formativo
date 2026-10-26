@@ -114,12 +114,12 @@ class User extends Authenticatable
                 $this->person->second_last_name
             ]);
             if (!empty($names)) {
-                return implode(' ', $names);
+                return mb_convert_case(implode(' ', $names), MB_CASE_TITLE, 'UTF-8');
             }
         }
 
         if (!empty($this->name)) {
-            return $this->name;
+            return mb_convert_case($this->name, MB_CASE_TITLE, 'UTF-8');
         }
 
         if (!empty($this->nickname)) {
@@ -144,6 +144,51 @@ class User extends Authenticatable
         }
 
         return 'Usuario';
+    }
+
+    /**
+     * Obtiene el primer nombre del usuario a partir de su persona o nickname
+     */
+    public function getFirstNameAttribute(): string
+    {
+        if ($this->person && !empty($this->person->first_name)) {
+            return mb_convert_case(trim($this->person->first_name), MB_CASE_TITLE, 'UTF-8');
+        }
+
+        if (!empty($this->name)) {
+            $parts = explode(' ', trim($this->name));
+            return mb_convert_case($parts[0], MB_CASE_TITLE, 'UTF-8');
+        }
+
+        if (!empty($this->nickname)) {
+            return $this->nickname;
+        }
+
+        return 'Usuario';
+    }
+
+    /**
+     * Obtiene un nombre corto (primer nombre y primer apellido)
+     */
+    public function getShortNameAttribute(): string
+    {
+        if ($this->person && !empty($this->person->first_name)) {
+            $last = $this->person->first_last_name ?? '';
+            $combined = trim($this->person->first_name . ' ' . $last);
+            return mb_convert_case($combined, MB_CASE_TITLE, 'UTF-8');
+        }
+
+        if (!empty($this->name)) {
+            $parts = explode(' ', trim($this->name));
+            $combined = count($parts) > 1 ? ($parts[0] . ' ' . $parts[1]) : $parts[0];
+            return mb_convert_case($combined, MB_CASE_TITLE, 'UTF-8');
+        }
+
+        if (!empty($this->nickname)) {
+            return $this->nickname;
+        }
+
+        return $this->email ?? 'Usuario';
     }
 
     /**
