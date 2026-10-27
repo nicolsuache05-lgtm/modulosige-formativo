@@ -694,7 +694,7 @@ class EgresadosController extends Controller
 
         $egresadosSeguimiento = $query->orderBy('id', 'desc')->paginate(8);
 
-        return view('egresados::admin.dashboard', compact(
+        return view('egresados::instructor.dashboard', compact(
             'courses',
             'totalEgresados',
             'totalEmpleados',
