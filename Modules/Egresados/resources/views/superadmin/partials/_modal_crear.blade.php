@@ -71,26 +71,27 @@
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 mb-1">DNI / Cédula <span class="text-red-500">*</span></label>
-                            <input type="text" name="documento" required placeholder="Ej. 1060123456" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 1060123456" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
 
                 <!-- 2. Información de contacto -->
                 <div>
-                    <div class="flex items-center gap-2.5 mb-4">
+                    <div class="flex items-center gap-2.5 mb-2">
                         <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">2</span>
                         <h4 class="text-sm font-extrabold text-gray-900">Información de contacto</h4>
                     </div>
+                    <p class="text-[11px] text-gray-500 mb-3.5">Datos únicos de contacto: el correo institucional/personal y teléfono deben pertenecer exclusivamente al egresado.</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Correo electrónico <span class="text-red-500">*</span></label>
-                            <input type="email" name="correo" required placeholder="egresado@correo.com" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="email" name="correo" required placeholder="egresado@correo.com" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono</label>
-                            <input type="text" name="telefono" placeholder="Ej. 3001234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono / Celular</label>
+                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3001234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
@@ -105,13 +106,33 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Programa de Formación <span class="text-red-500">*</span></label>
-                            <select name="programa" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
-                                <option value="">Seleccione un programa...</option>
-                                <option value="ADSO">Análisis y Desarrollo de Software (ADSO)</option>
-                                <option value="GESTION_AGROPECUARIA">Gestión de Empresas Agropecuarias</option>
-                                <option value="PROCESAMIENTO_ALIMENTOS">Procesamiento de Alimentos</option>
-                                <option value="PRODUCCION_GANADERA">Producción Ganadera</option>
-                            </select>
+                            <input type="text" 
+                                   name="programa" 
+                                   id="crear_programa" 
+                                   list="lista_programas_formacion" 
+                                   required 
+                                   placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
+                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium text-gray-800">
+                            <datalist id="lista_programas_formacion">
+                                <option value="Análisis y Desarrollo de Software (ADSO)">
+                                <option value="Gestión de Empresas Agropecuarias">
+                                <option value="Procesamiento de Alimentos">
+                                <option value="Producción Ganadera">
+                                <option value="Gestión Administrativa">
+                                <option value="Gestión del Talento Humano">
+                                <option value="Contabilización de Operaciones Comerciales y Financieras">
+                                <option value="Producción Agropecuaria Ecológica">
+                                <option value="Riego, Drenaje y Manejo de Suelos Agrícolas">
+                                <option value="Mantenimiento Mecatrónico de Automotores">
+                                <option value="Sistemas">
+                                <option value="Construcción de Edificaciones">
+                                <option value="Cocina">
+                                <option value="Agroindustria">
+                                <option value="Mecanización Agrícola">
+                                <option value="Acuicultura">
+                                <option value="Recursos Humanos">
+                                <option value="Salud Ocupacional">
+                            </datalist>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Código de Ficha <span class="text-red-500">*</span></label>

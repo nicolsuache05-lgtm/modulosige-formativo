@@ -54,4 +54,14 @@ class EgresadosServiceProvider extends ModuleServiceProvider
             class_alias(\Modules\Egresados\Models\Egresado::class, 'App\Models\Egresado');
         }
     }
+
+    /**
+     * Boot the application events.
+     */
+    public function boot(): void
+    {
+        parent::boot();
+
+        \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
+    }
 }

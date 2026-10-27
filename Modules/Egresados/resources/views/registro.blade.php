@@ -188,7 +188,7 @@
                                     <option value="Cédula de ciudadanía" {{ old('document_type') == 'Cédula de ciudadanía' ? 'selected' : '' }}>Cédula de Ciudadanía (CC)</option>
                                     <option value="Tarjeta de identidad" {{ old('document_type') == 'Tarjeta de identidad' ? 'selected' : '' }}>Tarjeta de Identidad (TI)</option>
                                     <option value="Cédula de extranjería" {{ old('document_type') == 'Cédula de extranjería' ? 'selected' : '' }}>Cédula de Extranjería (CE)</option>
-                                    <option value="Permiso Especial de Permanencia" {{ old('document_type') == 'Permiso Especial de Permanencia' ? 'selected' : '' }}>Permiso Especial (PEP)</option>
+                                    <option value="Permiso de Protección Temporal" {{ old('document_type') == 'Permiso de Protección Temporal' || old('document_type') == 'Permiso Especial de Permanencia' ? 'selected' : '' }}>Permiso de Protección Temporal (PPT / PEP)</option>
                                     <option value="Pasaporte" {{ old('document_type') == 'Pasaporte' ? 'selected' : '' }}>Pasaporte</option>
                                 </select>
                             </div>

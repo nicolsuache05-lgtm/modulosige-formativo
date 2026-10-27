@@ -74,12 +74,13 @@
 
     <!-- Botones de Acción -->
     <div id="detalleActionButtons" class="flex flex-col gap-2 pt-1" x-data="{ confirmarCierre: false }">
-        <a id="detailResultsBtn" 
-           href="{{ route('egresados.superadmin.encuestas.resultados', 'ENC-025') }}" 
-           class="w-full py-2.5 px-4 bg-[#001A29] hover:bg-[#39A900] text-white text-xs font-bold rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer text-center">
+        <button type="button" 
+                id="detailResultsBtn" 
+                @click="openModalResultados = true; abrirResultadosModal();"
+                class="w-full py-2.5 px-4 bg-[#001A29] hover:bg-[#39A900] text-white text-xs font-bold rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer text-center">
             <i class="fa-solid fa-chart-pie text-xs"></i>
             <span>Ver Resultados Completos</span>
-        </a>
+        </button>
 
         <button type="button" 
                 id="btnDescargarResumenPDF"

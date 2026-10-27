@@ -44,7 +44,7 @@ class EgresadosImport
         $telefono  = $normalized['telefono'] ?? $normalized['celular'] ?? $normalized['telefono_1'] ?? $values[4] ?? null;
         $programa  = $normalized['programa_de_formacion'] ?? $normalized['programa'] ?? $normalized['nombre_programa'] ?? $values[5] ?? null;
         $ficha     = $normalized['codigo_de_ficha'] ?? $normalized['codigo_ficha'] ?? $normalized['ficha'] ?? $values[6] ?? null;
-        $estado    = $normalized['estado'] ?? $normalized['estado_del_aprendiz'] ?? $normalized['estado_ocupacional'] ?? $values[7] ?? 'EN FORMACIÓN';
+        $estado    = $normalized['estado'] ?? $normalized['estado_del_aprendiz'] ?? $normalized['estado_ocupacional'] ?? $values[7] ?? 'CERTIFICADO';
 
         if (empty($docRaw)) {
             return null;
@@ -93,21 +93,31 @@ class EgresadosImport
             $person->second_last_name = $secondLastName;
         }
 
-        // Correo: Guardar como NULL si viene vacío
+        // Correo: Validar formato y verificar que no pertenezca a otra persona con diferente documento
         if (!empty($correo) && filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-            $cleanEmail = filter_var($correo, FILTER_SANITIZE_EMAIL);
-            $person->personal_email = $cleanEmail;
-            $person->misena_email = $cleanEmail;
-        } else {
-            $person->personal_email = null;
-            $person->misena_email = null;
+            $cleanEmail = strtolower(filter_var($correo, FILTER_SANITIZE_EMAIL));
+            $isEmailTakenByOther = Person::where(function($q) use ($cleanEmail) {
+                $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+            })->where('document_number', '!=', $docNum)->exists();
+
+            if (!$isEmailTakenByOther) {
+                $person->personal_email = $cleanEmail;
+                $person->misena_email = $cleanEmail;
+            }
         }
 
-        // Teléfono: Guardar como NULL si viene vacío
+        // Teléfono: Validar formato (7-15 dígitos) y verificar que no pertenezca a otra persona
         if (!empty($telefono)) {
-            $person->telephone1 = strip_tags((string)$telefono);
-        } else {
-            $person->telephone1 = null;
+            $cleanTelDigits = preg_replace('/\D/', '', (string)$telefono);
+            if (!empty($cleanTelDigits) && strlen($cleanTelDigits) >= 7 && strlen($cleanTelDigits) <= 15) {
+                $isTelTakenByOther = Person::where('telephone1', (int)$cleanTelDigits)
+                    ->where('document_number', '!=', $docNum)
+                    ->exists();
+
+                if (!$isTelTakenByOther) {
+                    $person->telephone1 = (int)$cleanTelDigits;
+                }
+            }
         }
 
         // Asignar llaves foráneas por defecto si es nuevo
@@ -143,24 +153,27 @@ class EgresadosImport
             $courseId = $firstCourse ? $firstCourse->id : 1;
         }
 
-        // 5. Mapear Estado Ocupacional al Enum de MySQL
+        // 5. Mapear Estado Ocupacional al Enum de MySQL (por defecto CERTIFICADO para egresados)
         $mapStatus = [
-            'NO REGISTRA' => 'NO REGISTRA',
-            'CERTIFICADO' => 'CERTIFICADO',
-            'EN FORMACION' => 'EN FORMACIÓN',
-            'EN FORMACIÓN' => 'EN FORMACIÓN',
+            'NO REGISTRA'       => 'NO REGISTRA',
+            'CERTIFICADO'       => 'CERTIFICADO',
+            'EGRESADO'          => 'CERTIFICADO',
+            'GRADUADO'          => 'CERTIFICADO',
+            'TITULADO'          => 'CERTIFICADO',
+            'FINALIZADO'        => 'CERTIFICADO',
+            'CULMINADO'         => 'CERTIFICADO',
+            'EN FORMACION'      => 'EN FORMACIÓN',
+            'EN FORMACIÓN'      => 'EN FORMACIÓN',
             'RETIRO VOLUNTARIO' => 'RETIRO VOLUNTARIO',
-            'CANCELADO' => 'CANCELADO',
-            'TRASLADADO' => 'TRASLADADO',
-            'APLAZADO' => 'APLAZADO',
-            'INDUCCION' => 'INDUCCIÓN',
-            'INDUCCIÓN' => 'INDUCCIÓN',
-            'CONDICIONADO' => 'CONDICIONADO',
-            'EGRESADO' => 'CERTIFICADO',
-            'GRADUADO' => 'CERTIFICADO',
+            'CANCELADO'         => 'CANCELADO',
+            'TRASLADADO'        => 'TRASLADADO',
+            'APLAZADO'          => 'APLAZADO',
+            'INDUCCION'         => 'INDUCCIÓN',
+            'INDUCCIÓN'         => 'INDUCCIÓN',
+            'CONDICIONADO'      => 'CONDICIONADO',
         ];
         $statusClean = strtoupper(trim(str_replace(['á','é','í','ó','ú','Á','É','Í','Ó','Ú'], ['a','e','i','o','u','A','E','I','O','U'], (string)$estado)));
-        $finalStatus = $mapStatus[$statusClean] ?? ($mapStatus[(string)$estado] ?? 'EN FORMACIÓN');
+        $finalStatus = $mapStatus[$statusClean] ?? 'CERTIFICADO';
 
         // 6. Crear o Actualizar Aprendiz (Egresado)
         $apprentice = Apprentice::firstOrNew(['person_id' => $person->id]);

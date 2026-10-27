@@ -696,10 +696,12 @@
       }
 
       .pagination-wrap {
-        padding: 16px 20px;
+        padding: 14px 20px;
         border-top: 1px solid var(--line);
-        display: flex;
-        justify-content: center;
+        background: #ffffff;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       @media (max-width: 1080px) {
@@ -715,7 +717,14 @@
       }
     </style>
 </head>
-<body x-data="{ openModalNuevoInstructor: false, openModalPerfilInstructor: false, openModalAsignarFicha: false }">
+<body x-data="{ 
+    openModalNuevoInstructor: false, 
+    openModalPerfilInstructor: false, 
+    openModalAsignarFicha: false, 
+    openModalEditarInstructor: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}" @open-modal-editar-instructor.window="openModalEditarInstructor = true">
 
 <div class="app">
 
@@ -897,8 +906,9 @@
                         if (!empty($w)) $initials .= mb_strtoupper(mb_substr($w, 0, 1));
                     }
 
-                    // Rol principal
-                    $roleName = $inst->roles->first() ? $inst->roles->first()->name : 'Instructor';
+                    // Programa asociado al instructor a través de los cursos del CEFA
+                    $instCourse = \Modules\SICA\Entities\Course::with('program')->where('person_id', $person?->id)->first();
+                    $instProgramName = $instCourse?->program?->name ?? 'Análisis y Desarrollo de Software (ADSO)';
 
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
@@ -906,17 +916,20 @@
                         'name' => $fullName,
                         'initials' => $initials ?: 'IN',
                         'document' => $person->document_number ?? '107584578',
+                        'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
                         'email' => $inst->email ?? ($person->misena_email ?? 'instructor@sena.edu.co'),
                         'phone' => $person->telephone1 ?? '316 000 0000',
-                        'program' => 'ADSO (Desarrollo de Software)',
-                        'especialidad' => 'Desarrollo de Software & TIC',
-                        'fichas' => '6 Fichas activas',
+                        'role_slug' => 'egresados.instructor',
+                        'program' => $instProgramName,
+                        'especialidad' => 'Formación Profesional Integral',
+                        'fichas' => 'Fichas activas CEFA',
                         'status' => 'ACTIVO',
                         'status_pill' => 'status-green',
                     ]);
                   @endphp
                   <tr class="instructor-row {{ $index === 0 ? 'selected-row' : '' }}" 
                       id="inst-row-{{ $inst->id }}"
+                      data-json="{{ htmlspecialchars($jsonData, ENT_QUOTES, 'UTF-8') }}"
                       onclick="selectInstructor({{ $jsonData }}, 'inst-row-{{ $inst->id }}')">
                     
                     <td style="font-weight:700; color:var(--forest-deep);">
@@ -934,8 +947,8 @@
                     </td>
 
                     <td>
-                      <div style="font-weight:600; color:var(--ink);">ADSO</div>
-                      <div style="font-size:11px; color:var(--ink-soft); font-weight:600;">{{ $roleName }}</div>
+                      <div style="font-weight:600; color:var(--ink);">{{ $instProgramName }}</div>
+                      <div style="font-size:11px; color:var(--ink-soft); font-weight:600;">Instructor de Formación</div>
                     </td>
 
                     <td>
@@ -951,9 +964,9 @@
                           <i class="fa-solid fa-eye"></i>
                         </button>
                         <button type="button" 
-                            onclick="alert('Editar datos de {{ $fullName }}');" 
+                            onclick="openEditarInstructorModal({{ $jsonData }})" 
                             class="btn-circle-action" 
-                            title="Editar">
+                            title="Editar Instructor">
                           <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                       </div>
@@ -976,7 +989,7 @@
           <!-- Paginación -->
           @if($instructores->hasPages())
             <div class="pagination-wrap">
-              {{ $instructores->withQueryString()->links() }}
+              {{ $instructores->withQueryString()->links('egresados::partials.pagination') }}
             </div>
           @endif
 
@@ -1098,11 +1111,57 @@
         if (asgName) asgName.innerText = data.name || 'Instructor';
     }
 
-    // Inicializar seleccionando el primer instructor disponible
+    // Función interactiva para abrir el modal de edición de instructor
+    function openEditarInstructorModal(data) {
+        if (!data) return;
+        const form = document.getElementById('form-editar-instructor');
+        if (form && data.id) {
+            form.action = '/egresados/superadmin/instructores/' + data.id;
+        }
+        const nameLabel = document.getElementById('edit_inst_name_label');
+        if (nameLabel) nameLabel.innerText = data.name || 'Docente';
+
+        const docInput = document.getElementById('edit_inst_doc');
+        if (docInput) docInput.value = data.document || '';
+
+        const nameInput = document.getElementById('edit_inst_nombre');
+        if (nameInput) nameInput.value = data.name || '';
+
+        const emailInput = document.getElementById('edit_inst_correo');
+        if (emailInput) emailInput.value = data.email || '';
+
+        const phoneInput = document.getElementById('edit_inst_telefono');
+        if (phoneInput) phoneInput.value = (data.phone && data.phone !== '316 000 0000') ? data.phone : '';
+
+        const progInput = document.getElementById('edit_inst_programa');
+        if (progInput) progInput.value = data.program || '';
+
+        const docTypeSelect = document.getElementById('edit_inst_tipo_doc');
+        if (docTypeSelect && data.document_type) {
+            const dt = String(data.document_type).toUpperCase();
+            if (dt.includes('TARJETA') || dt === 'TI') docTypeSelect.value = 'Tarjeta de identidad';
+            else if (dt.includes('EXTRANJER') || dt === 'CE') docTypeSelect.value = 'Cédula de extranjería';
+            else if (dt.includes('PROTECCIÓN') || dt.includes('PROTECCION') || dt.includes('PEP') || dt.includes('PPT')) docTypeSelect.value = 'Permiso de Protección Temporal';
+            else docTypeSelect.value = 'Cédula de ciudadanía';
+        }
+
+        window.dispatchEvent(new CustomEvent('open-modal-editar-instructor'));
+    }
+
+    // Inicializar seleccionando el primer instructor disponible sin evento click() sintético
     document.addEventListener('DOMContentLoaded', function() {
         const firstRow = document.querySelector('.instructor-row');
         if (firstRow) {
-            firstRow.click();
+            const rawJson = firstRow.getAttribute('data-json');
+            if (rawJson) {
+                try {
+                    selectInstructor(JSON.parse(rawJson), firstRow.id);
+                } catch(e) {
+                    firstRow.classList.add('selected-row');
+                }
+            } else {
+                firstRow.classList.add('selected-row');
+            }
         }
     });
 </script>
@@ -1278,72 +1337,293 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" x-cloak>
     
+    <!-- Contenedor del Formulario Estilo Card Premium -->
     <div @click.away="openModalNuevoInstructor = false" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-green-100 flex flex-col max-h-[92vh] overflow-hidden">
+        
+        <!-- Encabezado del Modal con Icono Verde -->
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 sm:px-8 py-5 bg-[#ffffff]">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-[#008f39] text-white flex items-center justify-center text-lg shadow-md flex-shrink-0">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <div class="text-[10.5px] font-extrabold text-[#008f39] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES</div>
+                    <h3 class="text-xl font-extrabold text-gray-900 tracking-tight">Registrar instructor</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Vincular nuevo docente a la plataforma de egresados CEFA La Angostura.</p>
+                </div>
+            </div>
+            <button @click="openModalNuevoInstructor = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Cuerpo del Formulario (Con scroll suave) -->
+        <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-6">
+            <form id="form-crear-instructor" action="{{ route('egresados.superadmin.instructores.store') }}" method="POST" class="space-y-6">
+                @csrf
+                <input type="hidden" name="rol" value="instructor_egresados">
+                
+                <!-- 1. Datos personales -->
+                <div>
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">1</span>
+                        <h4 class="text-sm font-extrabold text-gray-900">Datos personales</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nombres <span class="text-red-500">*</span></label>
+                            <input type="text" name="nombres" required placeholder="Ej. Carlos Alberto" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Apellidos <span class="text-red-500">*</span></label>
+                            <input type="text" name="apellidos" required placeholder="Ej. Mendoza Castro" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                        <div class="sm:col-span-1">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tipo Doc. <span class="text-red-500">*</span></label>
+                            <select name="tipo_documento" required class="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                                <option value="Cédula de ciudadanía">Cédula de Ciudadanía (CC)</option>
+                                <option value="Tarjeta de identidad">Tarjeta de Identidad (TI)</option>
+                                <option value="Cédula de extranjería">Cédula de Extranjería (CE)</option>
+                                <option value="Permiso de Protección Temporal">Permiso Protección Temporal (PPT/PEP)</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">DNI / Cédula <span class="text-red-500">*</span></label>
+                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Información de contacto -->
+                <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">2</span>
+                        <h4 class="text-sm font-extrabold text-gray-900">Información de contacto</h4>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mb-3.5">Datos únicos de contacto: el correo institucional y teléfono deben pertenecer exclusivamente al instructor.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico Institucional <span class="text-red-500">*</span></label>
+                            <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono / Celular</label>
+                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Información académica y vinculación -->
+                <div>
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">3</span>
+                        <h4 class="text-sm font-extrabold text-gray-900">Información académica y vinculación</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Programa de Formación <span class="text-red-500">*</span></label>
+                            <input type="text" 
+                                   name="programa" 
+                                   id="crear_inst_programa" 
+                                   list="lista_programas_instructor_crear" 
+                                   required 
+                                   placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
+                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium text-gray-800">
+                            <datalist id="lista_programas_instructor_crear">
+                                <option value="Análisis y Desarrollo de Software (ADSO)">
+                                <option value="Gestión de Empresas Agropecuarias">
+                                <option value="Procesamiento de Alimentos">
+                                <option value="Producción Ganadera">
+                                <option value="Gestión Administrativa">
+                                <option value="Gestión del Talento Humano">
+                                <option value="Contabilización de Operaciones Comerciales y Financieras">
+                                <option value="Producción Agropecuaria Ecológica">
+                                <option value="Riego, Drenaje y Manejo de Suelos Agrícolas">
+                                <option value="Mantenimiento Mecatrónico de Automotores">
+                                <option value="Sistemas">
+                                <option value="Construcción de Edificaciones">
+                                <option value="Cocina">
+                                <option value="Agroindustria">
+                                <option value="Mecanización Agrícola">
+                                <option value="Acuicultura">
+                                <option value="Recursos Humanos">
+                                <option value="Salud Ocupacional">
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Centro de Formación</label>
+                            <input type="text" name="centro_formacion" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-50 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Informativo -->
+                <div class="bg-[#f0faf3] border border-[#d4eedd] rounded-2xl p-4 flex items-start gap-3.5">
+                    <div class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-info"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-extrabold text-[#008f39]">Rol y vinculación institucional</div>
+                        <p class="text-[11.5px] text-[#2c5239] mt-0.5 leading-relaxed">
+                            Este registro asigna automáticamente el perfil exclusivo de <strong>Instructor</strong> para el seguimiento y gestión de egresados del CEFA La Angostura.
+                        </p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Pie del Modal (Botones Exactos) -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 bg-[#fbfdfc]">
+            <button type="button" @click="openModalNuevoInstructor = false" class="w-full sm:w-auto px-6 py-3 bg-[#f1f5f3] hover:bg-[#e2ece6] text-[#4b6354] text-xs font-bold rounded-xl transition cursor-pointer text-center">
+                Cancelar
+            </button>
+            <button type="submit" form="form-crear-instructor" class="w-full sm:w-auto px-7 py-3 bg-[#008f39] hover:bg-[#007a30] text-white text-xs font-extrabold rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>Registrar instructor</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL 4: EDITAR INSTRUCTOR -->
+<!-- ============================================== -->
+<div x-show="openModalEditarInstructor" 
+     style="display: none;"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" x-cloak>
+    
+    <div @click.away="openModalEditarInstructor = false" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
          class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-gray-100 flex flex-col">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900">Registrar Nuevo Instructor</h3>
-                <p class="text-xs text-gray-500 mt-1">Vincular nuevo docente a la plataforma SIGE CEFA La Angostura.</p>
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5 bg-gradient-to-r from-[#001A29] to-[#00131E] text-white rounded-t-3xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-inner">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">GESTIÓN DOCENTE · SIGE</div>
+                    <h3 class="text-lg font-bold text-white tracking-tight">Editar Instructor</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Modificando datos de: <span id="edit_inst_name_label" class="text-emerald-300 font-bold">Docente</span></p>
+                </div>
             </div>
-            <button @click="openModalNuevoInstructor = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+            <button @click="openModalEditarInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
         <div class="px-6 py-5">
-            <form id="form-crear-instructor" action="{{ route('egresados.superadmin.instructores.store') }}" method="POST" class="space-y-4">
+            <form id="form-editar-instructor" action="/egresados/superadmin/instructores/1" method="POST" class="space-y-4">
                 @csrf
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Documento <span class="text-red-500">*</span></label>
-                        <input type="text" name="documento" required placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Tipo Doc.</label>
+                        <select name="tipo_documento" id="edit_inst_tipo_doc" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                            <option value="Cédula de ciudadanía">CC - Cédula</option>
+                            <option value="Tarjeta de identidad">TI - Tarjeta</option>
+                            <option value="Cédula de extranjería">CE - Extranjería</option>
+                            <option value="Permiso de Protección Temporal">PPT / PEP</option>
+                        </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nombre Completo <span class="text-red-500">*</span></label>
-                        <input type="text" name="nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Número de Documento <span class="text-red-500">*</span></label>
+                        <input type="text" name="documento" id="edit_inst_doc" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Correo Electrónico Institucional <span class="text-red-500">*</span></label>
-                    <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nombre Completo <span class="text-red-500">*</span></label>
+                    <input type="text" name="nombre" id="edit_inst_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Rol en el Sistema</label>
-                        <select name="rol" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                            <option value="instructor_egresados">Instructor Egresados</option>
-                            <option value="superadmin_egresados">Super Administrador</option>
-                            <option value="coordinador">Coordinador Académico</option>
-                        </select>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Correo Electrónico <span class="text-red-500">*</span></label>
+                        <input type="email" name="correo" id="edit_inst_correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
                     </div>
                     <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Teléfono / Celular</label>
+                        <input type="tel" name="telefono" id="edit_inst_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                    </div>
+                </div>
+
+                <input type="hidden" name="rol" value="instructor_egresados">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Programa Vinculado</label>
-                        <select name="programa" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                            <option value="ADSO">ADSO</option>
-                            <option value="GAE">Gestión Agropecuaria</option>
-                            <option value="ALIMENTOS">Procesamiento de Alimentos</option>
-                        </select>
+                        <input type="text" 
+                               name="programa" 
+                               id="edit_inst_programa" 
+                               list="lista_programas_instructor_edit" 
+                               placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-medium text-gray-800">
+                        <datalist id="lista_programas_instructor_edit">
+                            <option value="Análisis y Desarrollo de Software (ADSO)">
+                            <option value="Gestión de Empresas Agropecuarias">
+                            <option value="Procesamiento de Alimentos">
+                            <option value="Producción Ganadera">
+                            <option value="Gestión Administrativa">
+                            <option value="Gestión del Talento Humano">
+                            <option value="Contabilización de Operaciones Comerciales y Financieras">
+                            <option value="Producción Agropecuaria Ecológica">
+                            <option value="Riego, Drenaje y Manejo de Suelos Agrícolas">
+                            <option value="Mantenimiento Mecatrónico de Automotores">
+                            <option value="Sistemas">
+                            <option value="Construcción de Edificaciones">
+                            <option value="Cocina">
+                            <option value="Agroindustria">
+                            <option value="Mecanización Agrícola">
+                            <option value="Acuicultura">
+                            <option value="Recursos Humanos">
+                            <option value="Salud Ocupacional">
+                        </datalist>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Centro de Formación</label>
+                        <input type="text" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
                     </div>
                 </div>
             </form>
         </div>
 
         <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-3xl">
-            <button type="button" @click="openModalNuevoInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+            <button type="button" @click="openModalEditarInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
                 Cancelar
             </button>
-            <button type="submit" form="form-crear-instructor" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer">
-                Guardar Instructor
+            <button type="submit" form="form-editar-instructor" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                <span>Guardar Cambios</span>
             </button>
         </div>
     </div>
 </div>
+
+<!-- Modal de Alertas y Notificaciones -->
+@include('egresados::superadmin.partials._modal_alertas')
 
 </body>
 </html>

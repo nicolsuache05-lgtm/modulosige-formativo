@@ -754,10 +754,12 @@
 
       /* Pagination */
       .pagination-wrap {
-        padding: 16px 20px;
+        padding: 14px 20px;
         border-top: 1px solid var(--line);
-        display: flex;
-        justify-content: center;
+        background: #ffffff;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       @media (max-width: 1080px) {
@@ -951,8 +953,8 @@
             </div>
 
             <select name="apprentice_status" onchange="this.form.submit()" class="filter-select">
-              <option value="">-- Todos los Estados --</option>
-              <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>Certificado</option>
+              <option value="CERTIFICADO" {{ request('apprentice_status', 'CERTIFICADO') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Solo Certificados (Egresados)</option>
+              <option value="TODOS" {{ request('apprentice_status') == 'TODOS' ? 'selected' : '' }}>-- Ver Todos los Aprendices ERP --</option>
               <option value="EN FORMACIÓN" {{ request('apprentice_status') == 'EN FORMACIÓN' ? 'selected' : '' }}>En Formación</option>
               <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
               <option value="CONDICIONADO" {{ request('apprentice_status') == 'CONDICIONADO' ? 'selected' : '' }}>Condicionado</option>
@@ -1023,6 +1025,7 @@
                   @endphp
                   <tr class="egresado-row {{ $index === 0 ? 'selected-row' : '' }}" 
                       id="row-{{ $item->id }}"
+                      data-json="{{ htmlspecialchars($jsonData, ENT_QUOTES, 'UTF-8') }}"
                       onclick="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}')">
                     
                     <td style="font-weight:700; color:var(--forest-deep);">
@@ -1089,7 +1092,7 @@
           <!-- Paginación -->
           @if($egresados->hasPages())
             <div class="pagination-wrap">
-              {{ $egresados->withQueryString()->links() }}
+              {{ $egresados->withQueryString()->links('egresados::partials.pagination') }}
             </div>
           @endif
 
@@ -1228,11 +1231,20 @@
         }
     }
 
-    // Seleccionar automáticamente el primer egresado al cargar
+    // Seleccionar automáticamente el primer egresado al cargar sin disparar click() sintético
     document.addEventListener('DOMContentLoaded', function() {
         const firstRow = document.querySelector('.egresado-row');
         if (firstRow) {
-            firstRow.click();
+            const rawJson = firstRow.getAttribute('data-json');
+            if (rawJson) {
+                try {
+                    selectEgresado(JSON.parse(rawJson), firstRow.id);
+                } catch(e) {
+                    firstRow.classList.add('selected-row');
+                }
+            } else {
+                firstRow.classList.add('selected-row');
+            }
         }
     });
 </script>

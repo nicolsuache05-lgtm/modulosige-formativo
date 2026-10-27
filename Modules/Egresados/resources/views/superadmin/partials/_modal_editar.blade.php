@@ -59,26 +59,27 @@
                             </select>
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Número de Documento</label>
-                            <input type="text" name="documento" id="edit_documento" required placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Número de Documento <span class="text-red-500">*</span></label>
+                            <input type="text" name="documento" id="edit_documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
                         </div>
                     </div>
                     
                     <div class="mt-4">
-                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nombre Completo (Nombres y Apellidos)</label>
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nombre Completo (Nombres y Apellidos) <span class="text-red-500">*</span></label>
                         <input type="text" name="nombre" id="edit_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Correo Electrónico</label>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Correo Electrónico <span class="text-red-500">*</span></label>
                             <input type="email" name="correo" id="edit_correo" required placeholder="correo@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 text-gray-800">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Teléfono / Celular</label>
-                            <input type="text" name="telefono" id="edit_telefono" placeholder="Ej. 3201234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 text-gray-800">
+                            <input type="tel" name="telefono" id="edit_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3201234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 text-gray-800">
                         </div>
                     </div>
+                    <p class="text-[11px] text-gray-400 mt-2">Los datos de contacto (correo y teléfono) deben ser únicos y no pertenecer a otro registro.</p>
                 </div>
 
                 <!-- Sección 2: Información Académica y Estado -->
@@ -90,21 +91,36 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Programa de Formación</label>
+                            <input type="text" name="programa" id="edit_programa" list="lista_programas_formacion_edit" placeholder="Escribe el programa de formación" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
+                            <datalist id="lista_programas_formacion_edit">
+                                <option value="Análisis y Desarrollo de Software (ADSO)">
+                                <option value="Gestión de Empresas Agropecuarias">
+                                <option value="Procesamiento de Alimentos">
+                                <option value="Producción Ganadera">
+                                <option value="Gestión Administrativa">
+                                <option value="Gestión del Talento Humano">
+                                <option value="Contabilización de Operaciones Comerciales y Financieras">
+                                <option value="Producción Agropecuaria Ecológica">
+                                <option value="Sistemas">
+                            </datalist>
+                        </div>
+                        <div>
                             <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Código de Ficha SENA</label>
                             <input type="text" name="ficha" id="edit_ficha" placeholder="Ej. 3230026" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Estado Ocupacional</label>
-                            <select name="estado" id="edit_estado" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
-                                <option value="CERTIFICADO">CERTIFICADO</option>
-                                <option value="EN FORMACIÓN">EN FORMACIÓN</option>
-                                <option value="CONDICIONADO">CONDICIONADO</option>
-                                <option value="INDUCCIÓN">INDUCCIÓN</option>
-                                <option value="APLAZADO">APLAZADO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                                <option value="RETIRO VOLUNTARIO">RETIRO VOLUNTARIO</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Estado Ocupacional</label>
+                        <select name="estado" id="edit_estado" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-semibold text-gray-800">
+                            <option value="CERTIFICADO">CERTIFICADO</option>
+                            <option value="EN FORMACIÓN">EN FORMACIÓN</option>
+                            <option value="CONDICIONADO">CONDICIONADO</option>
+                            <option value="INDUCCIÓN">INDUCCIÓN</option>
+                            <option value="APLAZADO">APLAZADO</option>
+                            <option value="CANCELADO">CANCELADO</option>
+                            <option value="RETIRO VOLUNTARIO">RETIRO VOLUNTARIO</option>
+                        </select>
                     </div>
                 </div>
             </form>
@@ -160,6 +176,9 @@
 
         const fichaInput = document.getElementById('edit_ficha');
         if (fichaInput) fichaInput.value = data.code || '';
+
+        const progInput = document.getElementById('edit_programa');
+        if (progInput) progInput.value = data.program || '';
 
         const docTypeSelect = document.getElementById('edit_tipo_documento');
         if (docTypeSelect && data.document_type) {
