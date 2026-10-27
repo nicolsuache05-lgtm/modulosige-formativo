@@ -72,16 +72,21 @@ class AuthController extends Controller
      */
     public function redirectByRole(User $user)
     {
-        // 1. Super Administrador / Admin de Egresados -> Dashboard General
+        // 1. Instructor / Admin de Seguimiento -> Dashboard de Instructor de Egresados
+        if ($user->nickname === 'admin' || 
+            $user->nickname === 'instructor_egresados' || 
+            $user->email === 'instructor.egresados@sena.edu.co' || 
+            $user->hasRole('egresados.instructor') || 
+            $user->hasRole('sigac.instructor') || 
+            $user->hasRole('agrocefa.trainer')) {
+            return redirect()->route('egresados.dashboard_instructor')
+                ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . $user->full_name . '!');
+        }
+
+        // 2. Super Administrador General del ERP -> Dashboard General
         if ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->nickname === 'superadmin_egresados' || $user->email === 'superadmin.egresados@sena.edu.co') {
             return redirect()->route('egresados.dashboard')
                 ->with('success', '¡Bienvenido(a) al Panel de Control de Egresados, ' . $user->full_name . '!');
-        }
-
-        // 2. Instructor -> Dashboard de Instructor de Egresados
-        if ($user->hasRole('egresados.instructor') || $user->hasRole('sigac.instructor') || $user->hasRole('agrocefa.trainer') || $user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co') {
-            return redirect()->route('egresados.dashboard_instructor')
-                ->with('success', '¡Bienvenido(a) Instructor(a), ' . $user->full_name . '!');
         }
 
         // 3. Egresado -> Portal del Egresado

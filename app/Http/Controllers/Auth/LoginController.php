@@ -52,7 +52,17 @@ class LoginController extends Controller
 
             $redirectUrl = $request->input('redirect');
             if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
+                // Si el redirect es la landing de egresados, dirigir directo al dashboard de instructor/admin
+                if (str_contains($redirectUrl, 'egresados/welcome') || str_contains($redirectUrl, 'egresados/home') || str_ends_with($redirectUrl, '/egresados')) {
+                    if ($user->nickname === 'admin' || $user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados') {
+                        return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
+                    }
+                }
                 return redirect($redirectUrl)->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
+            }
+
+            if ($user->nickname === 'admin' || $user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados') {
+                return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
             }
 
             return redirect()->intended(route('direccion.welcome'))->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
