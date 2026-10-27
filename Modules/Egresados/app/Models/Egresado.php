@@ -2,36 +2,42 @@
 
 namespace Modules\Egresados\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\SICA\Entities\Apprentice;
+use Modules\SICA\Entities\Person;
+use Modules\SICA\Entities\Course;
 
-class Egresado extends Model
+/**
+ * Modelo Egresado para el Módulo SIGE.
+ * Mapea directamente sobre la entidad institucional Apprentice sin crear tablas redundantes.
+ */
+class Egresado extends Apprentice
 {
-    use SoftDeletes;
-
-    protected $table = 'egresados';
-
-    protected $fillable = [
-        'apprentice_id',
-        'graduation_date',
-        'employment_status',
-        'company',
-        'position',
-        'salary',
-        'contact_email',
-        'contact_phone',
-        'linkedin',
-        'observations',
-    ];
-
-    protected $dates = ['deleted_at', 'graduation_date'];
+    /**
+     * Nombre de la tabla de aprendices del ERP.
+     */
+    protected $table = 'apprentices';
 
     /**
-     * Relación con el Aprendiz
+     * Scope para filtrar únicamente aprendices graduados/certificados.
      */
-    public function apprentice()
+    public function scopeEgresados($query)
     {
-        return $this->belongsTo(Apprentice::class, 'apprentice_id');
+        return $query->whereIn('apprentice_status', ['CERTIFICADO', 'EGRESADO']);
+    }
+
+    /**
+     * Relación con la entidad de persona.
+     */
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_id');
+    }
+
+    /**
+     * Relación con el curso / ficha de formación.
+     */
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id');
     }
 }

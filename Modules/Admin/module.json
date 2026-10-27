@@ -1,0 +1,11 @@
+{
+    "name": "Admin",
+    "alias": "admin",
+    "description": "Módulo de Administración y Seguridad de SENA Empresa ERP",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Admin\\Providers\\AdminServiceProvider"
+    ],
+    "files": []
+}
