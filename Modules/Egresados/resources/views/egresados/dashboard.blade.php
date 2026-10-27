@@ -14,31 +14,43 @@
 
   <style>
     :root {
-      --forest-deep: #012410;
-      --forest: #013819;
-      --forest-dark: #001A0B;
-      --forest-card: #012E14;
+      /* ========================================================
+         PALETA INSTITUCIONAL SENA EMPRESA ERP
+         ======================================================== */
+      --sena-green: #39A900;
+      --sena-green-hover: #2d8500;
+      --sena-neon: #62E31D;
+      --sena-dark: #00131E;
+      --sena-navy: #001A29;
+      --sena-navy-light: #002336;
+      --sena-light-navy: #00324D;
+
+      /* Mapeo del sistema a las variables oficiales del ERP */
+      --forest-deep: #00131E;
+      --forest: #001A29;
+      --forest-dark: #000F17;
+      --forest-card: #002336;
       --green: #39A900;
-      --green-active: #16a34a;
-      --green-light: #22c55e;
+      --green-active: #39A900;
+      --green-light: #62E31D;
       --green-soft: #EAF7EE;
       --green-soft-border: #BBF7D0;
       --green-badge: #dcfce7;
       --green-badge-text: #166534;
       --bg: #F4F7F6;
       --card: #FFFFFF;
-      --ink: #0F172A;
-      --ink-soft: #64748B;
-      --ink-muted: #94A3B8;
+      --ink: #00131E;
+      --ink-soft: #5A6E7D;
+      --ink-muted: #8B9FA9;
       --line: #E2E8F0;
       --line-subtle: #EEF2F6;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 18px;
       --radius-xl: 24px;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 28px rgba(1, 36, 16, 0.08);
+      --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+      --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+      --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
       --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -58,10 +70,10 @@
     }
 
     /* ========================================================
-       SIDEBAR (Diseño idéntico al panel admin/encuestas)
+       SIDEBAR (Diseño Oficial SENA Empresa ERP)
        ======================================================== */
     .sidebar {
-      background: linear-gradient(180deg, var(--forest-deep) 0%, #00190a 100%);
+      background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -71,7 +83,7 @@
       height: 100vh;
       overflow-y: auto;
       z-index: 100;
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
     .sidebar::-webkit-scrollbar { width: 5px; }
     .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
@@ -97,6 +109,7 @@
       flex-shrink: 0;
       padding: 5px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      border: 2px solid var(--sena-neon);
     }
     .brand-icon-wrap img {
       width: 100%;
@@ -124,7 +137,7 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      background: #16a34a;
+      background: var(--sena-green);
       color: #FFFFFF;
       padding: 2px 7px;
       border-radius: 20px;
@@ -181,12 +194,12 @@
     .nav-item:hover i {
       color: #FFFFFF;
     }
-    /* Estilo del botón activo exacto al screenshot (verde brillante con punto blanco al final) */
+    /* Estilo del botón activo con Verde Oficial SENA */
     .nav-item.active {
-      background: var(--green-active);
+      background: var(--sena-green);
       color: #FFFFFF;
       font-weight: 700;
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
     }
     .nav-item.active i {
       color: #FFFFFF;
@@ -306,7 +319,7 @@
 
     .topbar {
       background: var(--card);
-      border-bottom: 1px solid var(--line);
+      border-bottom: 2px solid var(--sena-green);
       padding: 14px 36px;
       display: flex;
       align-items: center;
@@ -315,6 +328,7 @@
       top: 0;
       z-index: 90;
       gap: 16px;
+      box-shadow: 0 2px 10px rgba(0, 19, 30, 0.04);
     }
     .topbar-left {
       display: flex;
@@ -447,7 +461,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--forest);
+      background: var(--sena-green);
       color: #fff;
       display: flex;
       align-items: center;
@@ -470,7 +484,7 @@
     }
     .topbar-profile-btn.active .topbar-chevron-icon {
       transform: rotate(180deg);
-      color: var(--forest);
+      color: var(--sena-green);
     }
 
     /* Menu flotante del perfil */
@@ -508,7 +522,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: var(--forest);
+      background: var(--sena-green);
       color: #fff;
       display: flex;
       align-items: center;
@@ -546,9 +560,9 @@
       gap: 5px;
       font-size: 10px;
       font-weight: 700;
-      color: var(--forest);
-      background: #E8F5E9;
-      border: 1px solid #C8E6C9;
+      color: var(--sena-green);
+      background: #EAF7EE;
+      border: 1px solid #BBF7D0;
       padding: 2px 8px;
       border-radius: 12px;
       margin-top: 4px;
@@ -646,17 +660,19 @@
     }
 
     /* ========================================================
-       HERO BANNER (Diseño idéntico al banner verde del admin)
+       HERO BANNER (Diseño Institucional SENA Empresa ERP)
        ======================================================== */
     .hero-banner-card {
-      background: linear-gradient(135deg, var(--forest) 0%, var(--forest-deep) 100%);
+      background: linear-gradient(135deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
       border-radius: var(--radius-xl);
       padding: 36px 40px;
       color: #FFFFFF;
       position: relative;
       overflow: hidden;
       margin-bottom: 26px;
-      box-shadow: 0 10px 26px rgba(1, 36, 16, 0.14);
+      box-shadow: 0 10px 26px rgba(0, 19, 30, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 5px solid var(--sena-green);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -670,7 +686,7 @@
       width: 220px;
       height: 220px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(57, 169, 0, 0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(57, 169, 0, 0.28) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-content {
@@ -682,14 +698,14 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(57, 169, 0, 0.18);
+      border: 1px solid rgba(98, 227, 29, 0.45);
       backdrop-filter: blur(4px);
       padding: 5px 12px;
       border-radius: 20px;
       font-size: 11.5px;
       font-weight: 700;
-      color: #A7F3D0;
+      color: var(--sena-neon);
       margin-bottom: 14px;
       letter-spacing: 0.02em;
     }
@@ -718,7 +734,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #16a34a;
+      background: var(--sena-green);
       color: #FFFFFF;
       border: none;
       padding: 12px 22px;
@@ -727,13 +743,13 @@
       font-weight: 700;
       cursor: pointer;
       font-family: inherit;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       transition: var(--transition);
     }
     .btn-hero-action:hover {
-      background: #15803d;
+      background: var(--sena-green-hover);
       transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 6px 18px rgba(57, 169, 0, 0.45);
     }
     .hero-image-decor {
       position: absolute;
@@ -812,7 +828,7 @@
     .kpi-metric-card:hover .kpi-icon-badge {
       transform: scale(1.06);
     }
-    .kpi-icon-badge.green { background: #EAF7EE; color: #16a34a; }
+    .kpi-icon-badge.green { background: #EAF7EE; color: var(--sena-green); }
     .kpi-icon-badge.blue { background: #E0F2FE; color: #0284c7; }
     .kpi-icon-badge.orange { background: #FEF3C7; color: #d97706; }
     .kpi-icon-badge.purple { background: #F3E8FF; color: #9333ea; }
@@ -900,8 +916,8 @@
       transition: var(--transition);
     }
     .input-search-field input:focus {
-      border-color: var(--forest);
-      box-shadow: 0 0 0 3px rgba(1, 56, 25, 0.08);
+      border-color: var(--sena-green);
+      box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.15);
     }
     .input-search-field i {
       position: absolute;
@@ -958,7 +974,7 @@
       font-size: 20px;
       flex-shrink: 0;
     }
-    .card-icon-pill.green { background: #EAF7EE; color: #16a34a; }
+    .card-icon-pill.green { background: #EAF7EE; color: var(--sena-green); }
     .card-icon-pill.blue { background: #E0F2FE; color: #0284c7; }
     .card-icon-pill.purple { background: #F3E8FF; color: #9333ea; }
     .card-icon-pill.amber { background: #FEF3C7; color: #d97706; }
@@ -1042,7 +1058,7 @@
     }
 
     .btn-green-submit {
-      background: var(--forest);
+      background: var(--sena-green);
       color: #FFFFFF;
       border: none;
       padding: 9px 18px;
@@ -1057,7 +1073,7 @@
       gap: 6px;
     }
     .btn-green-submit:hover {
-      background: #15803d;
+      background: var(--sena-green-hover);
       transform: translateY(-1px);
     }
     .btn-card-outline {
@@ -1134,12 +1150,12 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(1, 24, 10, 0.65);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 19, 30, 0.75);
+      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 9999;
       opacity: 0;
       visibility: hidden;
       transition: all 0.25s ease;
@@ -1260,20 +1276,20 @@
       height: 76px;
       border-radius: 50%;
       background: #EAF7EE;
-      color: #16a34a;
+      color: var(--sena-green);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 36px;
       margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(22, 163, 74, 0.25);
+      box-shadow: 0 8px 24px rgba(57, 169, 0, 0.25);
       border: 3px solid #BBF7D0;
     }
     .success-modal-card h3 {
       font-family: 'Fraunces', Georgia, serif;
       font-size: 24px;
       font-weight: 700;
-      color: var(--forest);
+      color: var(--sena-dark);
       margin-bottom: 10px;
       letter-spacing: -0.01em;
     }
@@ -1284,7 +1300,7 @@
       margin-bottom: 26px;
     }
     .btn-modal-accept {
-      background: #16a34a;
+      background: var(--sena-green);
       color: #FFFFFF;
       border: none;
       padding: 13px 36px;
@@ -1296,12 +1312,12 @@
       width: 100%;
       max-width: 240px;
       transition: var(--transition);
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
     }
     .btn-modal-accept:hover {
-      background: #15803d;
+      background: var(--sena-green-hover);
       transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
+      box-shadow: 0 6px 18px rgba(57, 169, 0, 0.45);
     }
 
     /* Centered Toast Alert */
@@ -1390,55 +1406,18 @@
       <a id="nav-oportunidades" class="nav-item" onclick="showSection('oportunidades')">
         <i class="fa-solid fa-briefcase"></i>
         <span>Oportunidades Laborales</span>
-        <span class="nav-badge">{{ $oportunidadesLaborales ?? 8 }}</span>
+        <span class="nav-badge" id="nav-badge-oportunidades">3</span>
       </a>
       <a id="nav-noticias" class="nav-item" onclick="showSection('noticias')">
         <i class="fa-regular fa-calendar-days"></i>
-        <span>Noticias y Eventos</span>
+        <span>Eventos</span>
       </a>
       <a id="nav-notificaciones" class="nav-item" onclick="showSection('notificaciones')">
         <i class="fa-regular fa-bell"></i>
         <span>Notificaciones</span>
-        <span class="nav-badge">{{ $notificaciones ?? 3 }}</span>
       </a>
     </nav>
 
-    <!-- Pie de Barra Lateral: Perfil y Salida -->
-    <div class="sidebar-footer">
-      <div class="user-pill-badge">
-        <div class="user-avatar-circle">
-          @auth
-            {{ Auth::user()->initials ?? 'EG' }}
-          @else
-            NS
-          @endauth
-        </div>
-        <div class="user-info-text">
-          <span class="user-name-label">
-            @auth {{ Auth::user()->full_name }} @else Nicol Suache @endauth
-          </span>
-          <span class="user-email-label">
-            @auth {{ Auth::user()->email }} @else egresada.cefa@sena.edu.co @endauth
-          </span>
-        </div>
-      </div>
-
-      @auth
-        <form action="{{ route('logout') }}" method="POST" id="sidebar-logout-form" style="display:none;">
-          @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        </form>
-        <button type="button" class="logout-btn-action" onclick="document.getElementById('sidebar-logout-form').submit()">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      @else
-        <a href="{{ route('login', ['redirect' => route('egresados.dashboard_egresado')]) }}" class="logout-btn-action">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Iniciar Sesión</span>
-        </a>
-      @endauth
-    </div>
   </aside>
 
   <!-- ========================================================
@@ -1563,7 +1542,7 @@
           <div class="kpi-metric-card" onclick="showSection('oportunidades')">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">OFERTAS LABORALES</span>
-              <span class="kpi-big-number">{{ $oportunidadesLaborales ?? 8 }}</span>
+              <span class="kpi-big-number" id="kpi-inicio-ofertas-count">3</span>
               <span class="kpi-sub-text">Vacantes disponibles hoy</span>
             </div>
             <div class="kpi-icon-badge blue">
@@ -1575,7 +1554,7 @@
           <div class="kpi-metric-card" onclick="showSection('noticias')">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">EVENTOS ACTIVOS</span>
-              <span class="kpi-big-number">5</span>
+              <span class="kpi-big-number" id="kpi-inicio-eventos-count">2</span>
               <span class="kpi-sub-text">Talleres y encuentros</span>
             </div>
             <div class="kpi-icon-badge purple">
@@ -1857,20 +1836,10 @@
 
         <div class="hero-banner-card">
           <div class="hero-content">
-            <div class="hero-pill-badge">
-              <i class="fa-solid fa-building-user"></i>
-              <span>Bolsa de Empleo y Convenios Empresariales</span>
-            </div>
-            <h1 class="hero-heading">Oportunidades Laborales Vigentes</h1>
+            <h1 class="hero-heading">Oportunidades Laborales</h1>
             <p class="hero-description">
               Encuentra vacantes de empleo, proyectos de desarrollo y ofertas dirigidas exclusivamente a la comunidad de egresados del CEFA La Angostura.
             </p>
-          </div>
-          <div class="hero-action-box">
-            <button type="button" class="btn-hero-action" onclick="showToast('Filtro de vacantes sugeridas activado')">
-              <i class="fa-solid fa-filter"></i>
-              <span>Vacantes para mí</span>
-            </button>
           </div>
         </div>
 
@@ -1879,7 +1848,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">OFERTAS ACTIVAS</span>
-              <span class="kpi-big-number">{{ $oportunidadesLaborales ?? 8 }}</span>
+              <span class="kpi-big-number" id="kpi-ofertas-activas-count">3</span>
               <span class="kpi-sub-text">Vacantes abiertas</span>
             </div>
             <div class="kpi-icon-badge blue"><i class="fa-solid fa-briefcase"></i></div>
@@ -1887,7 +1856,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">GUARDADAS</span>
-              <span class="kpi-big-number">3</span>
+              <span class="kpi-big-number" id="kpi-guardadas-count">0</span>
               <span class="kpi-sub-text">Favoritas</span>
             </div>
             <div class="kpi-icon-badge orange"><i class="fa-regular fa-bookmark"></i></div>
@@ -1895,8 +1864,8 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">POSTULACIONES</span>
-              <span class="kpi-big-number">2</span>
-              <span class="kpi-sub-text">En revisión</span>
+              <span class="kpi-big-number" id="kpi-postulaciones-count">0</span>
+              <span class="kpi-sub-text">Enviadas</span>
             </div>
             <div class="kpi-icon-badge green"><i class="fa-solid fa-paper-plane"></i></div>
           </div>
@@ -1907,156 +1876,136 @@
           <div class="search-inputs-group" style="width:100%; justify-content:space-between; flex-wrap:wrap;">
             <div class="input-search-field" style="flex:1; max-width:340px;">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" placeholder="Buscar por cargo, empresa o tecnología..." style="width:100%;">
+              <input type="text" id="input-buscar-ofertas" placeholder="Buscar por cargo, empresa o tecnología..." style="width:100%;" oninput="filtrarOfertasLaborales()">
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <select class="select-filter-dropdown">
-                <option>📍 Todas las ubicaciones</option>
-                <option>Neiva, Huila</option>
-                <option>Campoalegre / La Angostura</option>
-                <option>Remoto / Teletrabajo</option>
+              <select class="select-filter-dropdown" id="select-filtro-ubicacion" onchange="filtrarOfertasLaborales()">
+                <option value="todas">📍 Todas las ubicaciones</option>
+                <option value="neiva">Neiva (Híbrido)</option>
+                <option value="campoalegre">Campoalegre, Huila</option>
+                <option value="remoto">Remoto (Colombia)</option>
               </select>
-              <select class="select-filter-dropdown">
-                <option>🏷 Todas las áreas</option>
-                <option>Tecnología y Software</option>
-                <option>Agroindustria & Alimentos</option>
-                <option>Gestión Administrativa</option>
+              <select class="select-filter-dropdown" id="select-filtro-area" onchange="filtrarOfertasLaborales()">
+                <option value="todas">🏷 Todas las áreas</option>
+                <option value="tecnologia">Tecnología & Software</option>
+                <option value="agroindustria">Agroindustria & Alimentos</option>
               </select>
             </div>
           </div>
         </div>
 
         <!-- Listado de Ofertas -->
-        <div class="two-column-layout">
-          <div>
+        <div style="display: flex; flex-direction: column;">
 
-            <!-- Oferta 1 -->
-            <div class="portal-item-card">
-              <div class="card-icon-pill blue">
-                <i class="fa-solid fa-code"></i>
+          <!-- Oferta 1 -->
+          <div class="portal-item-card job-card-item" data-job-id="job-1" data-location="neiva" data-area="tecnologia" data-type="completo">
+            <div class="card-icon-pill blue">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            <div class="card-body-content">
+              <div class="card-top-header">
+                <div>
+                  <h3 class="card-title-text">Desarrollador Junior Full Stack (PHP / Laravel)</h3>
+                  <span class="card-tag-badge blue">Tecnología &bull; TrabSistema S.A.S.</span>
+                </div>
+                <button type="button" class="btn-green-submit" id="btn-postular-job-1" onclick="postularOferta('Desarrollador Junior Full Stack (PHP / Laravel)', 'TrabSistema S.A.S.', 'Neiva (Híbrido)', '$2.500.000 - $3.200.000', this, 'job-1')">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Postularme</span>
+                </button>
               </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Desarrollador Junior Full Stack (PHP / Laravel)</h3>
-                    <span class="card-tag-badge blue">Tecnología &bull; TrabSistema S.A.S.</span>
-                  </div>
-                  <button type="button" class="btn-green-submit" onclick="postularOferta('Desarrollador Junior Full Stack')">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Postularme</span>
-                  </button>
-                </div>
-                <div class="card-meta-list">
-                  <span><i class="fa-solid fa-location-dot"></i> Neiva (Híbrido)</span>
-                  <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
-                  <span><i class="fa-solid fa-money-bill-wave"></i> $2.500.000 - $3.200.000</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Empresa de software regional busca tecnólogo en ADSO egresado del SENA para soporte y desarrollo de módulos en Laravel y Vue.js.
-                </p>
-                <div class="card-action-bar">
-                  <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 1 día</span>
-                  <button type="button" class="btn-card-outline" onclick="toggleBookmark(this)">
-                    <i class="fa-regular fa-bookmark"></i>
-                    <span>Guardar</span>
-                  </button>
-                </div>
+              <div class="card-meta-list">
+                <span><i class="fa-solid fa-location-dot"></i> Neiva (Híbrido)</span>
+                <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
+                <span><i class="fa-solid fa-money-bill-wave"></i> $2.500.000 - $3.200.000</span>
+              </div>
+              <p class="card-desc-paragraph">
+                Empresa de software regional busca tecnólogo en ADSO egresado del SENA para soporte y desarrollo de módulos en Laravel y Vue.js.
+              </p>
+              <div class="card-action-bar">
+                <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 1 día</span>
+                <button type="button" class="btn-card-outline" id="btn-guardar-job-1" onclick="toggleBookmark(this, 'job-1')">
+                  <i class="fa-regular fa-bookmark"></i>
+                  <span>Guardar</span>
+                </button>
               </div>
             </div>
-
-            <!-- Oferta 2 -->
-            <div class="portal-item-card">
-              <div class="card-icon-pill green">
-                <i class="fa-solid fa-seedling"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Coordinador de Calidad y Procesamiento Agroindustrial</h3>
-                    <span class="card-tag-badge">Agroindustria &bull; Agrosur Huila</span>
-                  </div>
-                  <button type="button" class="btn-green-submit" onclick="postularOferta('Coordinador de Calidad')">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Postularme</span>
-                  </button>
-                </div>
-                <div class="card-meta-list">
-                  <span><i class="fa-solid fa-location-dot"></i> Campoalegre, Huila</span>
-                  <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
-                  <span><i class="fa-solid fa-money-bill-wave"></i> $2.200.000 + Prestaciones</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Control de inocuidad y buenas prácticas agrícolas en planta procesadora. Dirigido a egresados de Gestión de la Producción Agrícola y Agroindustria.
-                </p>
-                <div class="card-action-bar">
-                  <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 3 días</span>
-                  <button type="button" class="btn-card-outline" onclick="toggleBookmark(this)">
-                    <i class="fa-regular fa-bookmark"></i>
-                    <span>Guardar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Oferta 3 -->
-            <div class="portal-item-card">
-              <div class="card-icon-pill purple">
-                <i class="fa-solid fa-laptop-code"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Analista de Datos y Automatización</h3>
-                    <span class="card-tag-badge purple">Tecnología &bull; InnovaTech BPO</span>
-                  </div>
-                  <button type="button" class="btn-green-submit" onclick="postularOferta('Analista de Datos')">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Postularme</span>
-                  </button>
-                </div>
-                <div class="card-meta-list">
-                  <span><i class="fa-solid fa-location-dot"></i> Remoto (Colombia)</span>
-                  <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
-                  <span><i class="fa-solid fa-money-bill-wave"></i> $3.000.000</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Construcción de dashboards de visualización y reporting en PowerBI y Python. Excelente ambiente laboral y plan de beneficios formativos.
-                </p>
-                <div class="card-action-bar">
-                  <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 5 días</span>
-                  <button type="button" class="btn-card-outline" onclick="toggleBookmark(this)">
-                    <i class="fa-regular fa-bookmark"></i>
-                    <span>Guardar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          <!-- Panel de Filtro Lateral -->
-          <aside>
-            <div class="side-widget-card">
-              <h3 class="side-widget-title">Filtros Rápidos</h3>
-              <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="checkbox" checked style="accent-color:var(--forest);"> Tiempo Completo (6)
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="checkbox" style="accent-color:var(--forest);"> Medio Tiempo (2)
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="checkbox" style="accent-color:var(--forest);"> Modalidad Remota (4)
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="checkbox" style="accent-color:var(--forest);"> Prácticas / Pasantías (1)
-                </label>
-              </div>
-              <button type="button" class="btn-modal-accept" style="max-width:100%; margin-top:16px; padding:10px;" onclick="showToast('Filtros aplicados con éxito')">
-                Aplicar Selección
-              </button>
+          <!-- Oferta 2 -->
+          <div class="portal-item-card job-card-item" data-job-id="job-2" data-location="campoalegre" data-area="agroindustria" data-type="completo">
+            <div class="card-icon-pill green">
+              <i class="fa-solid fa-seedling"></i>
             </div>
-          </aside>
+            <div class="card-body-content">
+              <div class="card-top-header">
+                <div>
+                  <h3 class="card-title-text">Coordinador de Calidad y Procesamiento Agroindustrial</h3>
+                  <span class="card-tag-badge">Agroindustria &bull; Agrosur Huila</span>
+                </div>
+                <button type="button" class="btn-green-submit" id="btn-postular-job-2" onclick="postularOferta('Coordinador de Calidad y Procesamiento Agroindustrial', 'Agrosur Huila', 'Campoalegre, Huila', '$2.200.000 + Prestaciones', this, 'job-2')">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Postularme</span>
+                </button>
+              </div>
+              <div class="card-meta-list">
+                <span><i class="fa-solid fa-location-dot"></i> Campoalegre, Huila</span>
+                <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
+                <span><i class="fa-solid fa-money-bill-wave"></i> $2.200.000 + Prestaciones</span>
+              </div>
+              <p class="card-desc-paragraph">
+                Control de inocuidad y buenas prácticas agrícolas en planta procesadora. Dirigido a egresados de Gestión de la Producción Agrícola y Agroindustria.
+              </p>
+              <div class="card-action-bar">
+                <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 3 días</span>
+                <button type="button" class="btn-card-outline" id="btn-guardar-job-2" onclick="toggleBookmark(this, 'job-2')">
+                  <i class="fa-regular fa-bookmark"></i>
+                  <span>Guardar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Oferta 3 -->
+          <div class="portal-item-card job-card-item" data-job-id="job-3" data-location="remoto" data-area="tecnologia" data-type="completo">
+            <div class="card-icon-pill purple">
+              <i class="fa-solid fa-laptop-code"></i>
+            </div>
+            <div class="card-body-content">
+              <div class="card-top-header">
+                <div>
+                  <h3 class="card-title-text">Analista de Datos y Automatización</h3>
+                  <span class="card-tag-badge purple">Tecnología &bull; InnovaTech BPO</span>
+                </div>
+                <button type="button" class="btn-green-submit" id="btn-postular-job-3" onclick="postularOferta('Analista de Datos y Automatización', 'InnovaTech BPO', 'Remoto (Colombia)', '$3.000.000', this, 'job-3')">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>Postularme</span>
+                </button>
+              </div>
+              <div class="card-meta-list">
+                <span><i class="fa-solid fa-location-dot"></i> Remoto (Colombia)</span>
+                <span><i class="fa-regular fa-clock"></i> Tiempo Completo</span>
+                <span><i class="fa-solid fa-money-bill-wave"></i> $3.000.000</span>
+              </div>
+              <p class="card-desc-paragraph">
+                Construcción de dashboards de visualización y reporting en PowerBI y Python. Excelente ambiente laboral y plan de beneficios formativos.
+              </p>
+              <div class="card-action-bar">
+                <span style="font-size:12px; color:var(--ink-soft);"><i class="fa-regular fa-calendar"></i> Publicada hace 5 días</span>
+                <button type="button" class="btn-card-outline" id="btn-guardar-job-3" onclick="toggleBookmark(this, 'job-3')">
+                  <i class="fa-regular fa-bookmark"></i>
+                  <span>Guardar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado Vacío cuando no hay resultados de búsqueda -->
+          <div id="jobs-empty-state" style="display:none; text-align:center; padding:48px 24px; background:#fff; border-radius:var(--radius-xl); border:1px dashed var(--line); margin-top:12px;">
+            <i class="fa-solid fa-magnifying-glass" style="font-size:32px; color:var(--ink-soft); margin-bottom:12px;"></i>
+            <h4 style="font-size:16px; font-weight:700; color:var(--sena-dark); margin-bottom:6px;">No se encontraron vacantes</h4>
+            <p style="font-size:13px; color:var(--ink-soft); margin:0;">Intenta ajustando los términos de búsqueda o los filtros seleccionados.</p>
+          </div>
+
         </div>
 
       </section>
@@ -2068,20 +2017,10 @@
 
         <div class="hero-banner-card">
           <div class="hero-content">
-            <div class="hero-pill-badge">
-              <i class="fa-solid fa-bullhorn"></i>
-              <span>Agenda de Actividades & Formación Continua</span>
-            </div>
             <h1 class="hero-heading">Eventos y Convocatorias</h1>
             <p class="hero-description">
-              Participa en conferencias, ferias de empleo, jornadas de networking y webinars de actualización profesional organizados para ti.
+              Participa en los eventos de CEFA La Angostura.
             </p>
-          </div>
-          <div class="hero-action-box">
-            <button type="button" class="btn-hero-action" onclick="openInscripcionModal('Feria de Empleo y Emprendimiento')">
-              <i class="fa-solid fa-calendar-plus"></i>
-              <span>Inscribirme a Evento</span>
-            </button>
           </div>
         </div>
 
@@ -2089,7 +2028,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">EVENTOS ACTIVOS</span>
-              <span class="kpi-big-number">5</span>
+              <span class="kpi-big-number" id="kpi-eventos-activos-count">2</span>
               <span class="kpi-sub-text">Disponibles</span>
             </div>
             <div class="kpi-icon-badge purple"><i class="fa-regular fa-calendar-days"></i></div>
@@ -2097,103 +2036,76 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">MIS INSCRIPCIONES</span>
-              <span class="kpi-big-number">2</span>
+              <span class="kpi-big-number" id="kpi-mis-inscripciones-count">0</span>
               <span class="kpi-sub-text">Confirmadas</span>
             </div>
             <div class="kpi-icon-badge green"><i class="fa-solid fa-user-check"></i></div>
           </div>
-          <div class="kpi-metric-card">
-            <div class="kpi-data-col">
-              <span class="kpi-tag-label">NOTICIAS</span>
-              <span class="kpi-big-number">3</span>
-              <span class="kpi-sub-text">Boletines recientes</span>
-            </div>
-            <div class="kpi-icon-badge blue"><i class="fa-regular fa-newspaper"></i></div>
-          </div>
         </div>
 
-        <div class="two-column-layout">
-          <div>
+        <div style="display: flex; flex-direction: column;">
 
-            <!-- Evento 1 -->
-            <div class="portal-item-card">
-              <div class="card-icon-pill green">
-                <i class="fa-solid fa-microphone"></i>
+          <!-- Evento 1 -->
+          <div class="portal-item-card event-card-item" data-event-id="event-1">
+            <div class="card-icon-pill green">
+              <i class="fa-solid fa-microphone"></i>
+            </div>
+            <div class="card-body-content">
+              <div class="card-top-header">
+                <div>
+                  <h3 class="card-title-text">Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral</h3>
+                  <span class="card-tag-badge">Académico · Virtual</span>
+                </div>
+                <button type="button" class="btn-green-submit" id="btn-inscribir-event-1" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', this, 'event-1')">
+                  <i class="fa-solid fa-ticket"></i>
+                  <span>Inscribirme</span>
+                </button>
               </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral</h3>
-                    <span class="card-tag-badge">Académico · Virtual</span>
-                  </div>
-                  <button type="button" class="btn-green-submit" onclick="openInscripcionModal('Taller: Habilidades Blandas')">
-                    <i class="fa-solid fa-ticket"></i>
-                    <span>Inscribirme</span>
-                  </button>
-                </div>
-                <div class="card-meta-list">
-                  <span><i class="fa-regular fa-calendar"></i> 10 de junio, 2026</span>
-                  <span><i class="fa-regular fa-clock"></i> 9:00 a.m. – 12:00 m.</span>
-                  <span><i class="fa-solid fa-chalkboard-user"></i> Facilitador: Lic. Andrés Palacios</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Sesión práctica sobre comunicación asertiva, resolución de conflictos y preparación para entrevistas en paneles corporativos.
-                </p>
-                <div class="card-action-bar">
-                  <span style="font-size:12px; color:#16a34a; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupos Disponibles</span>
-                  <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Taller: Habilidades Blandas')">Ver temario</button>
-                </div>
+              <div class="card-meta-list">
+                <span><i class="fa-regular fa-calendar"></i> 10 de junio, 2026</span>
+                <span><i class="fa-regular fa-clock"></i> 9:00 a.m. – 12:00 m.</span>
+                <span><i class="fa-solid fa-chalkboard-user"></i> Facilitador: Lic. Andrés Palacios</span>
+              </div>
+              <p class="card-desc-paragraph">
+                Sesión práctica sobre comunicación asertiva, resolución de conflictos y preparación para entrevistas en paneles corporativos.
+              </p>
+              <div class="card-action-bar">
+                <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupos Disponibles</span>
+                <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', document.getElementById('btn-inscribir-event-1'), 'event-1')">Ver temario</button>
               </div>
             </div>
-
-            <!-- Evento 2 -->
-            <div class="portal-item-card">
-              <div class="card-icon-pill blue">
-                <i class="fa-solid fa-handshake-angle"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Feria Regional de Empleo y Emprendimiento CEFA 2026</h3>
-                    <span class="card-tag-badge blue">Empleabilidad &bull; Presencial</span>
-                  </div>
-                  <button type="button" class="btn-green-submit" onclick="openInscripcionModal('Feria Regional de Empleo')">
-                    <i class="fa-solid fa-ticket"></i>
-                    <span>Inscribirme</span>
-                  </button>
-                </div>
-                <div class="card-meta-list">
-                  <span><i class="fa-regular fa-calendar"></i> 20 de junio, 2026</span>
-                  <span><i class="fa-solid fa-location-dot"></i> Auditorio Principal La Angostura</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Espacio de articulación con más de 25 empresas de la región interesadas en perfiles de egresados SENA.
-                </p>
-                <div class="card-action-bar">
-                  <span style="font-size:12px; color:#16a34a; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Entrada Libre para Egresados</span>
-                  <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Feria Regional de Empleo')">Ver empresas</button>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          <!-- Noticias Lateral -->
-          <aside>
-            <div class="side-widget-card">
-              <h3 class="side-widget-title">Boletines de Interés</h3>
-              <div style="border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:12px;">
-                <span style="font-size:11px; color:#16a34a; font-weight:700;">FORMACIÓN CONTINUA</span>
-                <h4 style="font-size:13px; font-weight:700; color:var(--ink); margin:4px 0;">Cursos Complementarios Certificados 2026</h4>
-                <p style="font-size:11.5px; color:var(--ink-soft); line-height:1.4;">Accede a microcertificaciones gratuitas de profundización técnica.</p>
+          <!-- Evento 2 -->
+          <div class="portal-item-card event-card-item" data-event-id="event-2">
+            <div class="card-icon-pill blue">
+              <i class="fa-solid fa-handshake-angle"></i>
+            </div>
+            <div class="card-body-content">
+              <div class="card-top-header">
+                <div>
+                  <h3 class="card-title-text">Feria Regional de Empleo y Emprendimiento CEFA 2026</h3>
+                  <span class="card-tag-badge blue">Empleabilidad &bull; Presencial</span>
+                </div>
+                <button type="button" class="btn-green-submit" id="btn-inscribir-event-2" onclick="openInscripcionModal('Feria Regional de Empleo y Emprendimiento CEFA 2026', this, 'event-2')">
+                  <i class="fa-solid fa-ticket"></i>
+                  <span>Inscribirme</span>
+                </button>
               </div>
-              <div>
-                <span style="font-size:11px; color:#0284c7; font-weight:700;">HISTORIAS DE ÉXITO</span>
-                <h4 style="font-size:13px; font-weight:700; color:var(--ink); margin:4px 0;">Egresados destacados en Agroindustria</h4>
-                <p style="font-size:11.5px; color:var(--ink-soft); line-height:1.4;">Conoce el testimonio de egresados que lideran proyectos productivos en el Huila.</p>
+              <div class="card-meta-list">
+                <span><i class="fa-regular fa-calendar"></i> 20 de junio, 2026</span>
+                <span><i class="fa-solid fa-location-dot"></i> Auditorio Principal La Angostura</span>
+              </div>
+              <p class="card-desc-paragraph">
+                Espacio de articulación con más de 25 empresas de la región interesadas en perfiles de egresados SENA.
+              </p>
+              <div class="card-action-bar">
+                <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Entrada Libre para Egresados</span>
+                <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Feria Regional de Empleo y Emprendimiento CEFA 2026', document.getElementById('btn-inscribir-event-2'), 'event-2')">Ver empresas</button>
               </div>
             </div>
-          </aside>
+          </div>
+
         </div>
 
       </section>
@@ -2205,20 +2117,10 @@
 
         <div class="hero-banner-card">
           <div class="hero-content">
-            <div class="hero-pill-badge">
-              <i class="fa-regular fa-bell"></i>
-              <span>Centro de Notificaciones y Mensajería</span>
-            </div>
             <h1 class="hero-heading">Avisos y Alertas Recientes</h1>
             <p class="hero-description">
               Revisa comunicados institucionales, recordatorios de encuestas asignadas y convocatorias especiales.
             </p>
-          </div>
-          <div class="hero-action-box">
-            <button type="button" class="btn-hero-action" onclick="showToast('Todas las notificaciones marcadas como leídas')">
-              <i class="fa-solid fa-check-double"></i>
-              <span>Marcar Leídas</span>
-            </button>
           </div>
         </div>
 
@@ -2226,7 +2128,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">NO LEÍDAS</span>
-              <span class="kpi-big-number">{{ $notificaciones ?? 3 }}</span>
+              <span class="kpi-big-number" id="kpi-notif-noleidas-count">3</span>
               <span class="kpi-sub-text">Mensajes nuevos</span>
             </div>
             <div class="kpi-icon-badge green"><i class="fa-regular fa-envelope"></i></div>
@@ -2234,89 +2136,104 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">LEÍDAS</span>
-              <span class="kpi-big-number">12</span>
-              <span class="kpi-sub-text">Histórico</span>
+              <span class="kpi-big-number" id="kpi-notif-leidas-count">0</span>
+              <span class="kpi-sub-text">Revisadas</span>
             </div>
             <div class="kpi-icon-badge blue"><i class="fa-solid fa-inbox"></i></div>
           </div>
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">IMPORTANTES</span>
-              <span class="kpi-big-number">2</span>
-              <span class="kpi-sub-text">Marcadas</span>
+              <span class="kpi-big-number" id="kpi-notif-importantes-count">0</span>
+              <span class="kpi-sub-text">Marcadas con estrella</span>
             </div>
             <div class="kpi-icon-badge orange"><i class="fa-solid fa-star"></i></div>
           </div>
         </div>
 
-        <div class="two-column-layout">
-          <div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
 
-            <!-- Notificación 1 -->
-            <div class="portal-item-card" style="padding:16px 20px;">
-              <div class="card-icon-pill green" style="width:40px; height:40px; font-size:16px;">
-                <i class="fa-regular fa-clipboard"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header" style="margin-bottom:4px;">
-                  <h4 style="font-size:14px; font-weight:700; color:var(--ink);">Nueva Encuesta Disponible: Inserción Laboral 2026</h4>
-                  <span class="card-tag-badge" style="background:#FEF3C7; color:#92400e;">Pendiente</span>
-                </div>
-                <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
-                  Se ha asignado a tu perfil la encuesta de satisfacción y desempeño profesional. Tu participación es fundamental.
-                </p>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> Hace 2 horas</span>
-                  <button type="button" class="btn-card-outline" style="padding:5px 12px; font-size:11.5px;" onclick="showSection('encuestas')">
-                    Ir a responder
+          <!-- Notificación 1 -->
+          <div class="portal-item-card notif-card-item" id="notif-card-1" data-notif-id="notif-1" style="padding:16px 20px; transition:var(--transition); margin-bottom:0;">
+            <div class="card-icon-pill green" style="width:40px; height:40px; font-size:16px;">
+              <i class="fa-regular fa-clipboard"></i>
+            </div>
+            <div class="card-body-content" style="flex:1;">
+              <div class="card-top-header" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="font-size:14px; font-weight:700; color:var(--ink); margin:0;">Nueva Encuesta Disponible: Inserción Laboral 2026</h4>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" class="btn-star-notif" id="btn-star-notif-1" onclick="toggleNotifImportante('notif-1', this)" title="Marcar como importante" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:#cbd5e1; padding:3px 6px; border-radius:6px; transition:var(--transition);">
+                    <i class="fa-regular fa-star"></i>
                   </button>
+                  <span class="card-tag-badge" id="badge-notif-1" style="background:#FEF3C7; color:#92400e;">Pendiente</span>
                 </div>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
+                Se ha asignado a tu perfil la encuesta de satisfacción y desempeño profesional. Tu participación es fundamental.
+              </p>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> Hace 2 horas</span>
+                <button type="button" class="btn-card-outline" style="padding:5px 12px; font-size:11.5px;" onclick="marcarNotifLeida('notif-1'); showSection('encuestas');">
+                  Ir a responder
+                </button>
               </div>
             </div>
-
-            <!-- Notificación 2 -->
-            <div class="portal-item-card" style="padding:16px 20px;">
-              <div class="card-icon-pill blue" style="width:40px; height:40px; font-size:16px;">
-                <i class="fa-solid fa-briefcase"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header" style="margin-bottom:4px;">
-                  <h4 style="font-size:14px; font-weight:700; color:var(--ink);">Nueva vacante que coincide con tu perfil</h4>
-                  <span class="card-tag-badge blue">Empleo</span>
-                </div>
-                <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
-                  TrabSistema S.A.S. ha publicado una vacante de Desarrollador Junior Full Stack dirigida a graduados ADSO.
-                </p>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> Ayer a las 4:30 p.m.</span>
-                  <button type="button" class="btn-card-outline" style="padding:5px 12px; font-size:11.5px;" onclick="showSection('oportunidades')">
-                    Ver oferta
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          <aside>
-            <div class="side-widget-card">
-              <h3 class="side-widget-title">Preferencias de Alertas</h3>
-              <p style="font-size:12px; color:var(--ink-soft); margin-bottom:12px;">Configura cómo deseas recibir avisos importantes:</p>
-              <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
-                <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-                  <span><i class="fa-regular fa-envelope" style="margin-right:6px; color:#16a34a;"></i> Correo Electrónico</span>
-                  <input type="checkbox" checked style="accent-color:var(--forest);">
-                </label>
-                <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-                  <span><i class="fa-solid fa-bell" style="margin-right:6px; color:#16a34a;"></i> Alertas en Plataforma</span>
-                  <input type="checkbox" checked style="accent-color:var(--forest);">
-                </label>
-              </div>
-              <button type="button" class="btn-modal-accept" style="max-width:100%; margin-top:16px; padding:9px;" onclick="showToast('Preferencias guardadas exitosamente')">
-                Guardar Ajustes
-              </button>
+          <!-- Notificación 2 -->
+          <div class="portal-item-card notif-card-item" id="notif-card-2" data-notif-id="notif-2" style="padding:16px 20px; transition:var(--transition); margin-bottom:0;">
+            <div class="card-icon-pill blue" style="width:40px; height:40px; font-size:16px;">
+              <i class="fa-solid fa-briefcase"></i>
             </div>
-          </aside>
+            <div class="card-body-content" style="flex:1;">
+              <div class="card-top-header" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="font-size:14px; font-weight:700; color:var(--ink); margin:0;">Nueva vacante que coincide con tu perfil</h4>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" class="btn-star-notif" id="btn-star-notif-2" onclick="toggleNotifImportante('notif-2', this)" title="Marcar como importante" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:#cbd5e1; padding:3px 6px; border-radius:6px; transition:var(--transition);">
+                    <i class="fa-regular fa-star"></i>
+                  </button>
+                  <span class="card-tag-badge blue" id="badge-notif-2">Empleo</span>
+                </div>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
+                TrabSistema S.A.S. ha publicado una vacante de Desarrollador Junior Full Stack dirigida a graduados ADSO.
+              </p>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> Ayer a las 4:30 p.m.</span>
+                <button type="button" class="btn-card-outline" style="padding:5px 12px; font-size:11.5px;" onclick="marcarNotifLeida('notif-2'); showSection('oportunidades');">
+                  Ver oferta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notificación 3 -->
+          <div class="portal-item-card notif-card-item" id="notif-card-3" data-notif-id="notif-3" style="padding:16px 20px; transition:var(--transition); margin-bottom:0;">
+            <div class="card-icon-pill purple" style="width:40px; height:40px; font-size:16px;">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <div class="card-body-content" style="flex:1;">
+              <div class="card-top-header" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="font-size:14px; font-weight:700; color:var(--ink); margin:0;">Nuevo Evento: Taller de Habilidades Blandas y Liderazgo</h4>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" class="btn-star-notif" id="btn-star-notif-3" onclick="toggleNotifImportante('notif-3', this)" title="Marcar como importante" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:#cbd5e1; padding:3px 6px; border-radius:6px; transition:var(--transition);">
+                    <i class="fa-regular fa-star"></i>
+                  </button>
+                  <span class="card-tag-badge purple" id="badge-notif-3">Evento</span>
+                </div>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
+                Se han abierto cupos para el próximo taller de actualización laboral del CEFA La Angostura.
+              </p>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> Hace 1 día</span>
+                <button type="button" class="btn-card-outline" style="padding:5px 12px; font-size:11.5px;" onclick="marcarNotifLeida('notif-3'); showSection('noticias');">
+                  Ver evento
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </section>
@@ -2394,12 +2311,19 @@
      MODAL DE INSCRIPCIÓN A EVENTOS
      ======================================================== -->
 <div class="modal-backdrop" id="inscripcionModal" onclick="if(event.target===this)closeInscripcionModal()">
-  <div class="modal-box-card" style="max-width:460px;">
+  <div class="modal-box-card" style="max-width:480px; border-top: 4px solid var(--sena-green); padding: 32px 28px;">
     <button type="button" class="modal-close-x" onclick="closeInscripcionModal()"><i class="fa-solid fa-xmark"></i></button>
 
-    <div class="modal-header-banner" style="background:#E0F2FE; border-color:#BAE6FD;">
-      <h3 style="color:#0369a1;" id="modal-event-title">Inscripción a Actividad</h3>
-      <p style="color:#0284c7;">Confirma tus datos para apartar tu cupo en este evento del CEFA.</p>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: #EAF7EE; color: var(--sena-green); display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; border: 2px solid #BBF7D0;">
+        <i class="fa-regular fa-calendar-check"></i>
+      </div>
+      <h3 style="font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 700; color: var(--sena-dark); margin-bottom: 4px;" id="modal-event-title">
+        Inscripción a Actividad
+      </h3>
+      <p style="font-size: 13px; color: var(--ink-soft); margin: 0;">
+        Confirma tus datos para apartar tu cupo en este evento del CEFA.
+      </p>
     </div>
 
     <form onsubmit="event.preventDefault(); confirmInscripcion();">
@@ -2411,16 +2335,108 @@
         <label style="display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:5px;">Correo Electrónico</label>
         <input type="email" value="@auth {{ Auth::user()->email }} @else egresada.cefa@sena.edu.co @endauth" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
       </div>
-      <div style="margin-bottom:18px;">
+      <div style="margin-bottom:20px;">
         <label style="display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:5px;">Teléfono de Contacto</label>
-        <input type="tel" placeholder="310 123 4567" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
+        <input type="tel" value="310 123 4567" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button type="button" class="btn-card-outline" onclick="closeInscripcionModal()">Cancelar</button>
-        <button type="submit" class="btn-green-submit" style="padding:10px 22px;">Confirmar Registro</button>
+        <button type="button" class="btn-card-outline" onclick="closeInscripcionModal()" style="padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">Cancelar</button>
+        <button type="submit" class="btn-green-submit" style="padding:10px 22px; border-radius:10px; font-weight:700; background:var(--sena-green); cursor:pointer;">
+          <i class="fa-solid fa-check"></i>
+          <span>Confirmar Registro</span>
+        </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL DE CONFIRMACIÓN: INSCRIPCIÓN EXITOSA A EVENTO
+     ======================================================== -->
+<div class="modal-backdrop" id="modalInscripcionExitosa" onclick="if(event.target===this)closeInscripcionExitosaModal()">
+  <div class="success-modal-card" style="border-top: 4px solid var(--sena-green);">
+    <div class="chulo-circle-badge">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h3 style="font-family:'Fraunces', Georgia, serif; font-size:24px; font-weight:700; color:var(--sena-dark); margin-bottom:10px;">¡Inscripción Confirmada con Éxito!</h3>
+    <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin-bottom:26px;">
+      Te has inscrito exitosamente a <strong id="modal-success-event-title" style="color:var(--sena-dark);">este evento</strong> en el CEFA La Angostura. Recibirás los recordatorios y detalles de acceso en tu correo electrónico.
+    </p>
+    <button type="button" class="btn-modal-accept" onclick="closeInscripcionExitosaModal()">
+      Aceptar
+    </button>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL DE CONFIRMACIÓN DE POSTULACIÓN A VACANTE
+     ======================================================== -->
+<div class="modal-backdrop" id="modalPostulacion" onclick="if(event.target===this)cerrarModalPostulacion()">
+  <div class="modal-box-card" style="max-width: 500px; border-top: 4px solid var(--sena-green); padding: 32px 28px;">
+    <button type="button" class="modal-close-x" onclick="cerrarModalPostulacion()" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div style="text-align: center; margin-bottom: 22px;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(57, 169, 0, 0.12); color: var(--sena-green); display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; border: 2px solid rgba(98, 227, 29, 0.4); box-shadow: 0 4px 14px rgba(57, 169, 0, 0.2);">
+        <i class="fa-solid fa-briefcase"></i>
+      </div>
+      <h3 style="font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 700; color: var(--sena-dark); margin-bottom: 6px; letter-spacing: -0.01em;">
+        ¿Deseas postularte a esta vacante?
+      </h3>
+      <p style="font-size: 13px; color: var(--ink-soft); max-width: 380px; margin: 0 auto; line-height: 1.5;">
+        Estás a punto de postularte a esta oportunidad laboral a través de la Bolsa de Empleo APE SENA.
+      </p>
+    </div>
+
+    <!-- Resumen detallado de la vacante -->
+    <div style="background: #F8FAFC; border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <span style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--sena-green); letter-spacing: 0.05em; background: rgba(57, 169, 0, 0.1); padding: 3px 10px; border-radius: 20px;">
+          Vacante APE SENA
+        </span>
+        <span id="modal-post-salario" style="font-size: 12.5px; font-weight: 800; color: var(--sena-dark);">
+          $2.500.000 - $3.200.000
+        </span>
+      </div>
+      <h4 id="modal-post-cargo" style="font-size: 15px; font-weight: 800; color: var(--sena-dark); margin-bottom: 8px; line-height: 1.35;">
+        Desarrollador Junior Full Stack (PHP / Laravel)
+      </h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-soft);">
+        <span><i class="fa-solid fa-building" style="color: var(--sena-green); margin-right: 5px;"></i><strong id="modal-post-empresa" style="color: var(--ink);">TrabSistema S.A.S.</strong></span>
+        <span><i class="fa-solid fa-location-dot" style="color: var(--sena-green); margin-right: 5px;"></i><span id="modal-post-ubicacion">Neiva (Híbrido)</span></span>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+      <button type="button" class="btn-card-outline" onclick="cerrarModalPostulacion()" style="padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer;">
+        Cancelar
+      </button>
+      <button type="button" class="btn-green-submit" id="btnConfirmarPostulacion" onclick="confirmarPostulacion()" style="padding: 10px 22px; border-radius: 10px; font-weight: 700; background: var(--sena-green); box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35); cursor: pointer;">
+        <i class="fa-solid fa-check"></i>
+        <span>Aceptar y Postularme</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL DE CONFIRMACIÓN: POSTULACIÓN EXITOSA CON BOTÓN ACEPTAR
+     ======================================================== -->
+<div class="modal-backdrop" id="modalPostulacionExitosa" onclick="if(event.target===this)cerrarModalPostulacionExitosa()">
+  <div class="success-modal-card" style="border-top: 4px solid var(--sena-green);">
+    <div class="chulo-circle-badge">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h3>¡Postulación Enviada con Éxito!</h3>
+    <p>
+      Tu perfil de egresado(a) y hoja de vida han sido remitidos formalmente para la vacante de <strong id="modal-success-cargo" style="color:var(--sena-dark);">este cargo</strong>. La empresa revisará tus competencias y te contactará a través de tus datos registrados.
+    </p>
+    <button type="button" class="btn-modal-accept" onclick="cerrarModalPostulacionExitosa()">
+      Aceptar
+    </button>
   </div>
 </div>
 
@@ -2711,23 +2727,183 @@
     filterSurveys(currentSurveyFilter);
   }
 
-  // Modales de Eventos
-  function openInscripcionModal(title) {
-    if (title) document.getElementById('modal-event-title').textContent = 'Inscripción: ' + title;
-    document.getElementById('inscripcionModal').classList.add('active');
+  // Modales y Control de Inscripción a Eventos
+  const STORAGE_EVENTOS_KEY = 'SIGE_EVENTOS_INSCRITOS_IDS';
+
+  function getStoredEventSet() {
+    try {
+      const data = localStorage.getItem(STORAGE_EVENTOS_KEY);
+      return data ? new Set(JSON.parse(data)) : new Set();
+    } catch(e) {
+      return new Set();
+    }
+  }
+
+  function saveStoredEventSet(set) {
+    try {
+      localStorage.setItem(STORAGE_EVENTOS_KEY, JSON.stringify(Array.from(set)));
+    } catch(e) {}
+  }
+
+  let inscribedEvents = getStoredEventSet();
+  let activeEventBtn = null;
+  let activeEventTitle = '';
+  let activeEventId = '';
+
+  function updateEventCounters() {
+    const totalEvents = document.querySelectorAll('#section-noticias .event-card-item').length || 2;
+
+    const kpiEventosActivos = document.getElementById('kpi-eventos-activos-count');
+    if (kpiEventosActivos) kpiEventosActivos.textContent = totalEvents;
+
+    const kpiInicioEventos = document.getElementById('kpi-inicio-eventos-count');
+    if (kpiInicioEventos) kpiInicioEventos.textContent = totalEvents;
+
+    const kpiInscripciones = document.getElementById('kpi-mis-inscripciones-count');
+    if (kpiInscripciones) kpiInscripciones.textContent = inscribedEvents.size;
+  }
+
+  function openInscripcionModal(title, btn, eventId) {
+    activeEventTitle = title || 'Actividad Especial';
+    activeEventBtn = btn || null;
+    activeEventId = eventId || '';
+
+    const titleEl = document.getElementById('modal-event-title');
+    if (titleEl) titleEl.textContent = 'Inscripción: ' + activeEventTitle;
+
+    const modal = document.getElementById('inscripcionModal');
+    if (modal) modal.classList.add('active');
   }
 
   function closeInscripcionModal() {
-    document.getElementById('inscripcionModal').classList.remove('active');
+    const modal = document.getElementById('inscripcionModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function closeInscripcionExitosaModal() {
+    const modal = document.getElementById('modalInscripcionExitosa');
+    if (modal) modal.classList.remove('active');
   }
 
   function confirmInscripcion() {
     closeInscripcionModal();
+
+    if (activeEventId) {
+      inscribedEvents.add(activeEventId);
+      saveStoredEventSet(inscribedEvents);
+    }
+
+    // Actualizar visualmente el botón sobre el que se hizo clic
+    if (activeEventBtn) {
+      activeEventBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>¡Inscrito!</span>';
+      activeEventBtn.style.background = '#EAF7EE';
+      activeEventBtn.style.color = 'var(--sena-green)';
+      activeEventBtn.style.border = '1px solid #BBF7D0';
+      activeEventBtn.style.cursor = 'default';
+      activeEventBtn.style.boxShadow = 'none';
+      activeEventBtn.disabled = true;
+    }
+
+    // Actualizar los cuadritos vinculados
+    updateEventCounters();
+
+    // Mostrar ventana modal de confirmación con botón Aceptar
+    const titleSuccess = document.getElementById('modal-success-event-title');
+    if (titleSuccess) titleSuccess.textContent = activeEventTitle || 'el evento seleccionado';
+
     setTimeout(() => {
-      document.getElementById('encuestaEnviadaModal').querySelector('h3').textContent = '¡Inscripción Confirmada!';
-      document.getElementById('encuestaEnviadaModal').querySelector('p').textContent = 'Te has inscrito exitosamente al evento. Recibirás recordatorios y el enlace de acceso.';
-      document.getElementById('encuestaEnviadaModal').classList.add('active');
-    }, 200);
+      const modalExitosa = document.getElementById('modalInscripcionExitosa');
+      if (modalExitosa) modalExitosa.classList.add('active');
+    }, 150);
+  }
+
+  // Control de Notificaciones (Importantes con Estrella y Leídas)
+  const STORAGE_NOTIF_IMPORTANTES_KEY = 'SIGE_NOTIF_IMPORTANTES_IDS';
+  const STORAGE_NOTIF_LEIDAS_KEY = 'SIGE_NOTIF_LEIDAS_IDS';
+
+  function getStoredNotifSet(key) {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? new Set(JSON.parse(data)) : new Set();
+    } catch(e) {
+      return new Set();
+    }
+  }
+
+  function saveStoredNotifSet(key, set) {
+    try {
+      localStorage.setItem(key, JSON.stringify(Array.from(set)));
+    } catch(e) {}
+  }
+
+  let notifImportantes = getStoredNotifSet(STORAGE_NOTIF_IMPORTANTES_KEY);
+  let notifLeidas = getStoredNotifSet(STORAGE_NOTIF_LEIDAS_KEY);
+
+  function updateNotifCounters() {
+    const allNotifs = document.querySelectorAll('.notif-card-item');
+    const totalNotifs = allNotifs.length || 3;
+    const leidasCount = notifLeidas.size;
+    const noLeidasCount = Math.max(0, totalNotifs - leidasCount);
+
+    const kpiNoLeidas = document.getElementById('kpi-notif-noleidas-count');
+    if (kpiNoLeidas) kpiNoLeidas.textContent = noLeidasCount;
+
+    const kpiLeidas = document.getElementById('kpi-notif-leidas-count');
+    if (kpiLeidas) kpiLeidas.textContent = leidasCount;
+
+    const kpiImportantes = document.getElementById('kpi-notif-importantes-count');
+    if (kpiImportantes) kpiImportantes.textContent = notifImportantes.size;
+
+    const badgeNav = document.getElementById('nav-badge-notificaciones');
+    if (badgeNav) {
+      badgeNav.textContent = noLeidasCount;
+      badgeNav.style.display = noLeidasCount === 0 ? 'none' : 'inline-block';
+    }
+
+    const bellBubble = document.querySelector('.notif-bubble');
+    if (bellBubble) {
+      bellBubble.style.display = noLeidasCount === 0 ? 'none' : 'block';
+    }
+  }
+
+  function toggleNotifImportante(id, btn) {
+    if (!btn) btn = document.getElementById('btn-star-' + id);
+    const isImportante = notifImportantes.has(id);
+    const icon = btn ? btn.querySelector('i') : null;
+
+    if (!isImportante) {
+      notifImportantes.add(id);
+      if (icon) {
+        icon.classList.remove('fa-regular');
+        icon.classList.add('fa-solid');
+      }
+      if (btn) btn.style.color = '#F59E0B';
+      showToast('Notificación marcada como importante');
+    } else {
+      notifImportantes.delete(id);
+      if (icon) {
+        icon.classList.remove('fa-solid');
+        icon.classList.add('fa-regular');
+      }
+      if (btn) btn.style.color = '#cbd5e1';
+      showToast('Notificación desmarcada de importantes');
+    }
+
+    saveStoredNotifSet(STORAGE_NOTIF_IMPORTANTES_KEY, notifImportantes);
+    updateNotifCounters();
+  }
+
+  function marcarNotifLeida(id) {
+    if (!notifLeidas.has(id)) {
+      notifLeidas.add(id);
+      saveStoredNotifSet(STORAGE_NOTIF_LEIDAS_KEY, notifLeidas);
+
+      const card = document.getElementById('notif-card-' + id.replace('notif-', ''));
+      if (card) {
+        card.style.opacity = '0.70';
+      }
+      updateNotifCounters();
+    }
   }
 
   // Toast flotante
@@ -2742,23 +2918,191 @@
     }, 3500);
   }
 
-  function postularOferta(cargo) {
-    showToast(`¡Postulación enviada exitosamente para ${cargo}!`);
+  // Modal y Control de Postulación y Guardadas de Ofertas Laborales
+  const STORAGE_POSTULACIONES_KEY = 'SIGE_POSTULACIONES_IDS';
+  const STORAGE_GUARDADAS_KEY = 'SIGE_GUARDADAS_IDS';
+
+  function getStoredJobSet(key) {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? new Set(JSON.parse(data)) : new Set();
+    } catch(e) {
+      return new Set();
+    }
   }
 
-  function toggleBookmark(btn) {
+  function saveStoredJobSet(key, set) {
+    try {
+      localStorage.setItem(key, JSON.stringify(Array.from(set)));
+    } catch(e) {}
+  }
+
+  let appliedJobs = getStoredJobSet(STORAGE_POSTULACIONES_KEY);
+  let savedJobs = getStoredJobSet(STORAGE_GUARDADAS_KEY);
+  let activePostulacionBtn = null;
+  let activePostulacionCargo = '';
+  let activePostulacionJobId = '';
+
+  function updateJobCounters() {
+    const allJobCards = document.querySelectorAll('#section-oportunidades .job-card-item');
+    const totalJobs = allJobCards.length || 3;
+
+    // Actualizar Cuadrito: OFERTAS ACTIVAS
+    const elKpiOfertas = document.getElementById('kpi-ofertas-activas-count');
+    if (elKpiOfertas) elKpiOfertas.textContent = totalJobs;
+
+    const elKpiInicioOfertas = document.getElementById('kpi-inicio-ofertas-count');
+    if (elKpiInicioOfertas) elKpiInicioOfertas.textContent = totalJobs;
+
+    const elBadgeOportunidades = document.getElementById('nav-badge-oportunidades');
+    if (elBadgeOportunidades) elBadgeOportunidades.textContent = totalJobs;
+
+    // Actualizar Cuadrito: GUARDADAS
+    const elKpiGuardadas = document.getElementById('kpi-guardadas-count');
+    if (elKpiGuardadas) elKpiGuardadas.textContent = savedJobs.size;
+
+    // Actualizar Cuadrito: POSTULACIONES
+    const elKpiPostulaciones = document.getElementById('kpi-postulaciones-count');
+    if (elKpiPostulaciones) elKpiPostulaciones.textContent = appliedJobs.size;
+  }
+
+  function postularOferta(cargo, empresa, ubicacion, salario, btn, jobId) {
+    activePostulacionCargo = cargo || 'esta vacante';
+    activePostulacionBtn = btn || null;
+    activePostulacionJobId = jobId || '';
+
+    const cargoEl = document.getElementById('modal-post-cargo');
+    const empresaEl = document.getElementById('modal-post-empresa');
+    const ubicacionEl = document.getElementById('modal-post-ubicacion');
+    const salarioEl = document.getElementById('modal-post-salario');
+
+    if (cargoEl) cargoEl.textContent = cargo || 'Vacante Disponible';
+    if (empresaEl) empresaEl.textContent = empresa || 'Empresa Aliada';
+    if (ubicacionEl) ubicacionEl.textContent = ubicacion || 'Presencial / Híbrido';
+    if (salarioEl) salarioEl.textContent = salario || 'A convenir';
+
+    const modal = document.getElementById('modalPostulacion');
+    if (modal) modal.classList.add('active');
+  }
+
+  function cerrarModalPostulacion() {
+    const modal = document.getElementById('modalPostulacion');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function cerrarModalPostulacionExitosa() {
+    const modal = document.getElementById('modalPostulacionExitosa');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function confirmarPostulacion() {
+    cerrarModalPostulacion();
+
+    if (activePostulacionJobId) {
+      appliedJobs.add(activePostulacionJobId);
+      saveStoredJobSet(STORAGE_POSTULACIONES_KEY, appliedJobs);
+    }
+
+    // Actualizar visualmente el botón sobre el que se dio clic
+    if (activePostulacionBtn) {
+      activePostulacionBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>¡Postulado!</span>';
+      activePostulacionBtn.style.background = '#EAF7EE';
+      activePostulacionBtn.style.color = 'var(--sena-green)';
+      activePostulacionBtn.style.border = '1px solid #BBF7D0';
+      activePostulacionBtn.style.cursor = 'default';
+      activePostulacionBtn.style.boxShadow = 'none';
+      activePostulacionBtn.disabled = true;
+    }
+
+    // Actualizar todos los cuadritos vinculados
+    updateJobCounters();
+
+    // Mostrar ventana modal de confirmación con botón Aceptar
+    const successCargo = document.getElementById('modal-success-cargo');
+    if (successCargo) successCargo.textContent = activePostulacionCargo || 'la vacante seleccionada';
+
+    setTimeout(() => {
+      const modalExitosa = document.getElementById('modalPostulacionExitosa');
+      if (modalExitosa) modalExitosa.classList.add('active');
+    }, 150);
+  }
+
+  function toggleBookmark(btn, jobId) {
+    if (!jobId && btn.id) {
+      jobId = btn.id.replace('btn-guardar-', '');
+    }
+    const isSaved = savedJobs.has(jobId);
     const icon = btn.querySelector('i');
-    if (icon.classList.contains('fa-regular')) {
-      icon.classList.remove('fa-regular');
-      icon.classList.add('fa-solid');
+    const label = btn.querySelector('span');
+
+    if (!isSaved) {
+      savedJobs.add(jobId);
+      if (icon) {
+        icon.classList.remove('fa-regular');
+        icon.classList.add('fa-solid');
+      }
       btn.style.color = '#d97706';
+      btn.style.borderColor = '#fbbf24';
+      btn.style.background = '#fffbeb';
+      if (label) label.textContent = 'Guardada';
       showToast('Oferta guardada en tus favoritas');
     } else {
-      icon.classList.remove('fa-solid');
-      icon.classList.add('fa-regular');
+      savedJobs.delete(jobId);
+      if (icon) {
+        icon.classList.remove('fa-solid');
+        icon.classList.add('fa-regular');
+      }
       btn.style.color = '';
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      if (label) label.textContent = 'Guardar';
       showToast('Oferta eliminada de tus favoritas');
     }
+
+    saveStoredJobSet(STORAGE_GUARDADAS_KEY, savedJobs);
+    updateJobCounters();
+  }
+
+  // Filtrado dinámico de ofertas laborales
+  function filtrarOfertasLaborales() {
+    const q = (document.getElementById('input-buscar-ofertas')?.value || '').toLowerCase().trim();
+    const loc = document.getElementById('select-filtro-ubicacion')?.value || 'todas';
+    const area = document.getElementById('select-filtro-area')?.value || 'todas';
+
+    const cards = document.querySelectorAll('#section-oportunidades .job-card-item');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardLoc = card.getAttribute('data-location') || '';
+      const cardArea = card.getAttribute('data-area') || '';
+      const text = card.textContent.toLowerCase();
+
+      let matchSearch = !q || text.includes(q);
+      let matchLoc = (loc === 'todas' || cardLoc === loc);
+      let matchArea = (area === 'todas' || cardArea === area);
+
+      if (matchSearch && matchLoc && matchArea) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const empty = document.getElementById('jobs-empty-state');
+    if (empty) empty.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  function resetFiltrosOfertas() {
+    const input = document.getElementById('input-buscar-ofertas');
+    if (input) input.value = '';
+    const loc = document.getElementById('select-filtro-ubicacion');
+    if (loc) loc.value = 'todas';
+    const area = document.getElementById('select-filtro-area');
+    if (area) area.value = 'todas';
+
+    filtrarOfertasLaborales();
+    showToast('Filtros restablecidos');
   }
 
   // Filtros de Encuestas (En 'Todas' se eliminan las enviadas, que solo aparecen en 'Respondidas')
@@ -2924,6 +3268,9 @@
       closeSurveyModal();
       closeEncuestaEnviadaModal();
       closeInscripcionModal();
+      closeInscripcionExitosaModal();
+      cerrarModalPostulacion();
+      cerrarModalPostulacionExitosa();
     }
   });
 
@@ -2936,6 +3283,89 @@
       });
     }
     updateSurveyCounters();
+
+    // Restaurar estado persistido de ofertas postuladas y guardadas
+    if (appliedJobs && appliedJobs.size > 0) {
+      appliedJobs.forEach(id => {
+        const btn = document.getElementById('btn-postular-' + id);
+        if (btn) {
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>¡Postulado!</span>';
+          btn.style.background = '#EAF7EE';
+          btn.style.color = 'var(--sena-green)';
+          btn.style.border = '1px solid #BBF7D0';
+          btn.style.cursor = 'default';
+          btn.style.boxShadow = 'none';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    if (savedJobs && savedJobs.size > 0) {
+      savedJobs.forEach(id => {
+        const btn = document.getElementById('btn-guardar-' + id);
+        if (btn) {
+          const icon = btn.querySelector('i');
+          const label = btn.querySelector('span');
+          if (icon) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+          }
+          btn.style.color = '#d97706';
+          btn.style.borderColor = '#fbbf24';
+          btn.style.background = '#fffbeb';
+          if (label) label.textContent = 'Guardada';
+        }
+      });
+    }
+
+    // Actualizar todos los cuadritos/KPIs vinculados con lo que hay
+    updateJobCounters();
+
+    // Restaurar eventos inscritos
+    if (inscribedEvents && inscribedEvents.size > 0) {
+      inscribedEvents.forEach(id => {
+        const btn = document.getElementById('btn-inscribir-' + id);
+        if (btn) {
+          btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>¡Inscrito!</span>';
+          btn.style.background = '#EAF7EE';
+          btn.style.color = 'var(--sena-green)';
+          btn.style.border = '1px solid #BBF7D0';
+          btn.style.cursor = 'default';
+          btn.style.boxShadow = 'none';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    // Actualizar cuadritos de eventos vinculados
+    updateEventCounters();
+
+    // Restaurar notificaciones importantes y leídas
+    if (notifImportantes && notifImportantes.size > 0) {
+      notifImportantes.forEach(id => {
+        const btn = document.getElementById('btn-star-' + id);
+        if (btn) {
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+          }
+          btn.style.color = '#F59E0B';
+        }
+      });
+    }
+
+    if (notifLeidas && notifLeidas.size > 0) {
+      notifLeidas.forEach(id => {
+        const card = document.getElementById('notif-card-' + id.replace('notif-', ''));
+        if (card) {
+          card.style.opacity = '0.70';
+        }
+      });
+    }
+
+    // Actualizar cuadritos de notificaciones vinculados
+    updateNotifCounters();
 
     // Aplicar filtrado para que en 'Todas' se eliminen las enviadas y solo aparezcan en 'Respondidas'
     filterSurveys(currentSurveyFilter);
