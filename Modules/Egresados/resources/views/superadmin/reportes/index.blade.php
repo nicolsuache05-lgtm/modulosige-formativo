@@ -288,7 +288,11 @@
       [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body x-data="{ 
+    openModal: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}">
 
 <div class="app">
 
@@ -387,21 +391,8 @@
       @include('egresados::superadmin.partials._topbar_right')
     </div>
 
-    <!-- Main Content con Alpine.js -->
-    <div class="content space-y-6" x-data="{ openModal: false }">
-
-      <!-- Alertas Flash -->
-      @if(session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 cursor-pointer">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-      @endif
+    <!-- Main Content -->
+    <div class="content space-y-6">
 
       @if(isset($errors) && $errors->any())
         <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs sm:text-sm font-semibold flex items-start gap-2 shadow-xs">
@@ -456,6 +447,9 @@
 
 </div>
 
+<!-- Modal de Alertas y Notificaciones Institucionales -->
+@include('egresados::superadmin.partials._modal_alertas')
+
 <!-- Scripts interactivos de Reportes -->
 <script>
     // Función interactiva para actualizar el panel de detalles reactivo
@@ -507,7 +501,7 @@
 
         const btnExcel = document.getElementById('btnActionExcel');
         if (btnExcel) {
-            btnExcel.href = baseUrl + "/exportar/excel?title=" + encodeURIComponent(fullTitle);
+            btnExcel.href = baseUrl + "/exportar/excel?title=" + encodeURIComponent(fullTitle) + "&program=" + encodeURIComponent(data.program || '');
         }
 
         const btnPdf = document.getElementById('btnActionPdf');

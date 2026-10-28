@@ -286,7 +286,14 @@ class ReportesController extends Controller
         $formato = strtolower($formato ?: 'excel');
 
         // Buscar información contextual del reporte en sesión o base
-        $customReports = session('custom_reports', []);
+        $customReports = [];
+        try {
+            if (app()->bound('session')) {
+                $customReports = session('custom_reports', []) ?? [];
+            }
+        } catch (\Exception $e) {
+            $customReports = [];
+        }
         $targetReport = null;
         foreach ($customReports as $cr) {
             if (($cr['id'] ?? '') === $id) {
@@ -303,11 +310,13 @@ class ReportesController extends Controller
             // Generar vista imprimible lista para descarga o visualización PDF
             try {
                 $egresados = Apprentice::with(['person', 'course.program'])->take(100)->get();
-            } catch (\Exception $e) {
+                $total = Apprentice::count() ?: 350;
+                $empleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count() ?: 280;
+            } catch (\Throwable $e) {
                 $egresados = collect();
+                $total = 350;
+                $empleados = 280;
             }
-            $total = Apprentice::count() ?: 350;
-            $empleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count() ?: 280;
             $desempleados = max(0, $total - $empleados);
             $rate = $total > 0 ? round(($empleados / $total) * 100) . '%' : '80%';
 
@@ -438,7 +447,7 @@ class ReportesController extends Controller
                     date('d/m/Y')
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Continúa para abastecer con datos representativos
         }
 

@@ -9,6 +9,7 @@
     $lowerMsg = strtolower($successMsg);
     $isInstructor = str_contains($lowerMsg, 'instructor');
     $isEncuesta = str_contains($lowerMsg, 'encuesta');
+    $isReporte = str_contains($lowerMsg, 'reporte');
     $isEvento = str_contains($lowerMsg, 'evento');
     $isSeguimiento = str_contains($lowerMsg, 'seguimiento');
     $isImport = str_contains($lowerMsg, 'importad');
@@ -47,6 +48,18 @@
             $badgeText = 'Encuesta institucional publicada y disponible para egresados';
             $tagIcon = 'fa-clipboard-question';
             $tagLabel = 'MÓDULO DE ENCUESTAS SIGE ERP';
+        }
+    } elseif ($isReporte) {
+        if ($isDeleted) {
+            $successTitle = '¡Reporte Eliminado Correctamente!';
+            $badgeText = 'El reporte ha sido retirado del sistema';
+            $tagIcon = 'fa-trash-can';
+            $tagLabel = 'MÓDULO DE REPORTES · SIGE ERP';
+        } else {
+            $successTitle = '¡Reporte Generado Exitosamente!';
+            $badgeText = 'Parámetros configurados y reporte institucional generado';
+            $tagIcon = 'fa-file-circle-check';
+            $tagLabel = 'GENERADOR DE REPORTES · SIGE ERP';
         }
     } elseif ($isEvento) {
         $successTitle = $isUpdated ? '¡Evento Actualizado Correctamente!' : '¡Evento Creado Exitosamente!';
