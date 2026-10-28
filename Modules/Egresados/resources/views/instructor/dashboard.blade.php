@@ -68,6 +68,13 @@
 
             <!-- Navigation Links -->
             <nav class="mt-6 space-y-1.5">
+                @if(Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->nickname === 'superadmin_egresados' || Auth::user()->roles->contains('slug', 'egresados.admin')))
+                    <a href="{{ route('egresados.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-300 hover:text-white hover:bg-amber-500/40 font-bold text-xs border border-amber-400/40 shadow-sm transition mb-3">
+                        <i class="fa-solid fa-crown w-4 text-center text-amber-400"></i>
+                        <span>Ir a Panel Superadmin</span>
+                    </a>
+                @endif
+
                 <a href="{{ route('egresados.instructor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
                     <i class="fa-solid fa-chalkboard-user w-4 text-center"></i>
                     <span>Panel de Seguimiento</span>
@@ -133,7 +140,7 @@
             <div class="flex items-center gap-3">
                 <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
                     <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    Rol: Instructor Egresados
+                    Rol: {{ Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->roles->contains('slug', 'egresados.admin') || Auth::user()->nickname === 'superadmin_egresados') ? 'Superadmin / Coordinación' : 'Instructor Egresados' }}
                 </span>
                 <a href="{{ route('home') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-arrow-left text-xs"></i>

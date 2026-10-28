@@ -8,6 +8,7 @@ use Modules\SICA\Entities\Apprentice;
 use Modules\SICA\Entities\Course;
 use Modules\SICA\Entities\Person;
 use Modules\SICA\Entities\Role;
+use Modules\SICA\Entities\Program;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -109,6 +110,84 @@ class EgresadosController extends Controller
         }
         if (empty($person->document_type)) {
             $person->document_type = 'Cédula de ciudadanía';
+        }
+    }
+
+    /**
+     * Localiza inteligentemente un Programa de formación en el ERP o lo crea cumpliendo el esquema relacional.
+     */
+    public static function findOrCreateProgram(?string $progName): ?Program
+    {
+        if (empty($progName)) {
+            return Program::first();
+        }
+
+        $progClean = trim(strip_tags($progName));
+
+        // 1. Búsqueda exacta o contenida directa
+        $program = Program::where('name', 'like', '%' . $progClean . '%')->first();
+        if ($program) {
+            return $program;
+        }
+
+        // 2. Búsqueda sin paréntesis ni siglas secundarias (ej. "Análisis y Desarrollo de Software (ADSO)" -> "Análisis y Desarrollo de Software")
+        $withoutParentheses = trim(preg_replace('/\s*\(.*?\)\s*/', ' ', $progClean));
+        if (!empty($withoutParentheses) && $withoutParentheses !== $progClean) {
+            $program = Program::where('name', 'like', '%' . $withoutParentheses . '%')->first();
+            if ($program) {
+                return $program;
+            }
+        }
+
+        // 3. Búsqueda por palabras clave principales
+        $words = array_filter(preg_split('/[\s,\.\(\)\-]+/', $progClean), function($w) {
+            return mb_strlen($w) >= 4;
+        });
+
+        if (!empty($words)) {
+            $query = Program::query();
+            foreach ($words as $word) {
+                $query->where('name', 'like', '%' . $word . '%');
+            }
+            $program = $query->first();
+            if ($program) {
+                return $program;
+            }
+
+            usort($words, fn($a, $b) => mb_strlen($b) - mb_strlen($a));
+            $longest = reset($words);
+            $program = Program::where('name', 'like', '%' . $longest . '%')->first();
+            if ($program) {
+                return $program;
+            }
+        }
+
+        // 4. Si el programa no existe, se crea con todos los campos requeridos por el esquema SICA
+        try {
+            $networkId = \DB::table('knowledge_networks')->value('id') ?? 1;
+            $maxSofia = (int) (\DB::table('programs')->max('sofia_code') ?? 100000);
+            $newSofiaCode = $maxSofia + rand(1, 100);
+
+            $newProg = new Program();
+            $newProg->name = $withoutParentheses ?: $progClean;
+            $newProg->sofia_code = $newSofiaCode;
+            $newProg->version = 1;
+            $newProg->training_type = 'Titulada';
+            $newProg->quarter_number = 6;
+            $newProg->knowledge_network_id = $networkId;
+            $newProg->program_type = 'Tecnólogo';
+            $newProg->maximum_duration = 24;
+            $newProg->modality = 'Presencial';
+            $newProg->priority_bets = 'Sin especificar';
+            $newProg->fic = 'No';
+            $newProg->months_lectiva = 18;
+            $newProg->months_productiva = 6;
+            $newProg->save();
+
+            return $newProg;
+        } catch (\Exception $e) {
+            \Log::warning('No se pudo registrar nuevo programa en SICA, asignando programa base: ' . $e->getMessage());
+            return Program::first();
         }
     }
 
@@ -319,18 +398,47 @@ class EgresadosController extends Controller
      */
     public function dashboard()
     {
-        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
-        
-        $totalActivos = $totalEgresados;
-        $tasaEmpleo = 45;
+        $baseQuery = Apprentice::where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
 
-        $recentEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')
+        $totalEgresados = (clone $baseQuery)->count();
+        $totalActivos = $totalEgresados;
+        $totalEmpleados = (clone $baseQuery)->where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = (clone $baseQuery)->where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = (clone $baseQuery)->where('apprentice_status', 'EN FORMACIÓN')->count();
+        
+        $tasaEmpleo = $totalActivos > 0 ? round(($totalEmpleados / $totalActivos) * 100) : 100;
+
+        $recentEgresados = (clone $baseQuery)
             ->with(['person', 'course.program'])
+            ->orderBy('updated_at', 'desc')
             ->orderBy('id', 'desc')
-            ->take(5)
+            ->take(6)
+            ->get();
+
+        // Métricas reales de egresados por programa de formación
+        $programStats = DB::table('programs')
+            ->join('courses', 'programs.id', '=', 'courses.program_id')
+            ->join('apprentices', 'courses.id', '=', 'apprentices.course_id')
+            ->whereNull('apprentices.deleted_at')
+            ->where(function($q) {
+                $q->whereExists(function($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('people')
+                        ->join('users', 'people.id', '=', 'users.person_id')
+                        ->join('role_user', 'users.id', '=', 'role_user.user_id')
+                        ->join('roles', 'role_user.role_id', '=', 'roles.id')
+                        ->whereColumn('people.id', 'apprentices.person_id')
+                        ->where('roles.slug', 'egresados.egresado');
+                })->orWhere('apprentices.apprentice_status', 'CERTIFICADO');
+            })
+            ->select('programs.name', DB::raw('count(apprentices.id) as total'))
+            ->groupBy('programs.id', 'programs.name')
+            ->orderByDesc('total')
+            ->take(4)
             ->get();
 
         return view('egresados::superadmin.dashboard', compact(
@@ -340,7 +448,8 @@ class EgresadosController extends Controller
             'totalEstudiantes',
             'totalActivos',
             'tasaEmpleo',
-            'recentEgresados'
+            'recentEgresados',
+            'programStats'
         ));
     }
 
@@ -1131,14 +1240,13 @@ class EgresadosController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Apprentice::with(['person', 'course.program']);
-
-        // Regla institucional SENA: Los egresados son únicamente los que han sido certificados
-        // Por defecto se filtran los 'CERTIFICADO'. Si el usuario selecciona 'TODOS', se listan todos los aprendices.
-        $statusFilter = $request->input('apprentice_status', 'CERTIFICADO');
-        if ($statusFilter !== 'TODOS' && !empty($statusFilter)) {
-            $query->where('apprentice_status', $statusFilter);
-        }
+        // Consulta base: Egresados vinculados a SIGE o con estado CERTIFICADO (evita los 5,600 aprendices de otros módulos)
+        $query = Apprentice::with(['person.users.roles', 'course.program'])
+            ->where(function($q) {
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
+            });
 
         // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
@@ -1151,16 +1259,27 @@ class EgresadosController extends Controller
             });
         }
 
+        // Filtro por estado solo si se selecciona uno específico distinto de TODOS
+        if ($request->filled('apprentice_status') && $request->input('apprentice_status') !== 'TODOS') {
+            $query->where('apprentice_status', $request->input('apprentice_status'));
+        }
+
         $egresados = $query->orderBy('id', 'desc')->paginate(10);
 
-        // Estadísticas rápidas para las tarjetas superiores basadas en egresados reales certificados
-        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
+        // Estadísticas de egresados de este módulo
+        $baseCount = Apprentice::where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
+
+        $totalEgresados = (clone $baseCount)->count();
+        $totalEmpleados = (clone $baseCount)->where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = (clone $baseCount)->where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = (clone $baseCount)->where('apprentice_status', 'EN FORMACIÓN')->count();
         $actualizacionPendiente = 0;
-        $seguimientosRealizados = 300;
-        $alertasEnviadas = 243;
+        $seguimientosRealizados = $totalEgresados;
+        $alertasEnviadas = 0;
 
         return view('egresados::superadmin.index', compact(
             'egresados',
@@ -1248,7 +1367,7 @@ class EgresadosController extends Controller
             'correo.email'       => 'Debe ingresar un formato de correo electrónico válido.',
         ]);
 
-        $apprentice = Apprentice::with('person')->findOrFail($id);
+        $apprentice = Apprentice::with(['person', 'course.program'])->findOrFail($id);
         $person = $apprentice->person;
 
         $cleanDoc = (int) preg_replace('/\D/', '', (string)$request->documento);
@@ -1258,21 +1377,25 @@ class EgresadosController extends Controller
 
         if (!$person) {
             $person = Person::firstOrNew(['document_number' => $cleanDoc]);
+            $person->save();
+            $apprentice->person_id = $person->id;
         }
 
         // SEGURIDAD: 1. Unicidad del documento contra otras personas
         $otherPersonWithDoc = Person::where('document_number', $cleanDoc)->where('id', '!=', $person->id)->first();
         if ($otherPersonWithDoc) {
-            return redirect()->back()->with('error', "El número de documento {$cleanDoc} ya se encuentra asignado a otra persona en el sistema. Los documentos deben ser únicos.")->withInput();
+            // Si ya existe otra persona con ese documento en el ERP, asociamos el aprendiz a esa persona existente
+            $person = $otherPersonWithDoc;
+            $apprentice->person_id = $person->id;
         }
 
-        // SEGURIDAD: 2. Unicidad del correo electrónico (nada de correos duplicados)
+        // SEGURIDAD: 2. Unicidad del correo electrónico
         $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
         $otherPersonWithEmail = Person::where(function($q) use ($cleanEmail) {
             $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
         })->where('id', '!=', $person->id)->first();
 
-        if ($otherPersonWithEmail) {
+        if ($otherPersonWithEmail && $otherPersonWithEmail->document_number != $cleanDoc) {
             return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra asignado a otra persona en el sistema (Documento: {$otherPersonWithEmail->document_number}). Los correos deben ser únicos.")->withInput();
         }
 
@@ -1281,7 +1404,7 @@ class EgresadosController extends Controller
             return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está en uso por otra cuenta de usuario. Ingrese un correo único.")->withInput();
         }
 
-        // SEGURIDAD: 3. Unicidad del número de teléfono (nada de teléfonos duplicados)
+        // SEGURIDAD: 3. Unicidad del número de teléfono
         $cleanTel = null;
         if ($request->filled('telefono')) {
             $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telefono);
@@ -1290,7 +1413,7 @@ class EgresadosController extends Controller
                     return redirect()->back()->with('error', 'El número de teléfono debe tener entre 7 y 15 dígitos numéricos.')->withInput();
                 }
                 $otherPersonWithPhone = Person::where('telephone1', (int)$cleanTelDigits)->where('id', '!=', $person->id)->first();
-                if ($otherPersonWithPhone) {
+                if ($otherPersonWithPhone && $otherPersonWithPhone->document_number != $cleanDoc) {
                     return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra asignado a otra persona en el sistema (Documento: {$otherPersonWithPhone->document_number}). Los teléfonos deben ser únicos.")->withInput();
                 }
                 $cleanTel = (int)$cleanTelDigits;
@@ -1299,12 +1422,12 @@ class EgresadosController extends Controller
 
         \DB::beginTransaction();
         try {
-
             // Sanitizar y separar nombres inteligentemente
             $nombreLimpio = strip_tags(trim($request->nombre));
             $partes = preg_split('/\s+/', $nombreLimpio);
             if (count($partes) === 1) {
                 $person->first_name = $partes[0];
+                $person->first_last_name = $person->first_last_name ?: 'SENA';
             } elseif (count($partes) === 2) {
                 $person->first_name = $partes[0];
                 $person->first_last_name = $partes[1];
@@ -1331,22 +1454,41 @@ class EgresadosController extends Controller
             self::ensurePersonDefaults($person);
             $person->save();
 
-            // Actualizar curso si se especificó ficha o programa
+            // Actualizar curso y programa según lo que el usuario editó
             $cleanFicha = $request->filled('ficha') ? preg_replace('/\D/', '', (string)$request->ficha) : null;
             $progName = $request->filled('programa') ? trim(strip_tags($request->programa)) : null;
 
+            $course = null;
             if ($cleanFicha) {
                 $course = Course::where('code', $cleanFicha)->orWhere('code', trim(strip_tags($request->ficha)))->first();
-                if ($course) {
-                    $apprentice->course_id = $course->id;
+            }
+
+            $program = self::findOrCreateProgram($progName);
+
+            if (!$course && ($cleanFicha || $program)) {
+                $municipalityId = \DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha ?: rand(1000000, 9999999)],
+                    [
+                        'program_id'      => $program ? $program->id : ($apprentice->course ? $apprentice->course->program_id : 1),
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
+            } elseif ($course && $program) {
+                if ($course->program_id !== $program->id) {
+                    $course->program_id = $program->id;
+                    $course->save();
                 }
-            } elseif ($progName) {
-                $course = Course::whereHas('program', function($q) use ($progName) {
-                    $q->where('name', 'like', '%' . $progName . '%');
-                })->first();
-                if ($course) {
-                    $apprentice->course_id = $course->id;
-                }
+            }
+
+            if ($course) {
+                $apprentice->course_id = $course->id;
+            } elseif ($program && $apprentice->course) {
+                $apprentice->course->program_id = $program->id;
+                $apprentice->course->save();
             }
 
             // Actualizar estado ocupacional normalizado a enum del ERP
@@ -1355,6 +1497,7 @@ class EgresadosController extends Controller
             }
 
             $apprentice->person_id = $person->id;
+            $apprentice->touch();
             $apprentice->save();
 
             // Si tiene usuario vinculado por person_id, sincronizar su email de forma segura
@@ -1523,25 +1666,35 @@ class EgresadosController extends Controller
                 $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
             }
 
-            // 4. Buscar el curso/ficha si existe, o usar el primero disponible
+            // 4. Buscar el curso/ficha si existe, o crearlo/asociarlo fielmente
             $courseId = null;
-            if ($request->filled('ficha')) {
-                $cleanFicha = preg_replace('/\D/', '', (string)$request->ficha);
+            $cleanFicha = $request->filled('ficha') ? preg_replace('/\D/', '', (string)$request->ficha) : null;
+            $progName = $request->filled('programa') ? strip_tags(trim($request->programa)) : null;
+
+            $course = null;
+            if ($cleanFicha) {
                 $course = Course::where('code', $cleanFicha)->orWhere('code', strip_tags($request->ficha))->first();
-                if ($course) {
-                    $courseId = $course->id;
-                }
             }
-            if (!$courseId && $request->filled('programa')) {
-                $progName = strip_tags($request->programa);
-                $course = Course::whereHas('program', function($q) use ($progName) {
-                    $q->where('name', 'like', '%' . $progName . '%');
-                })->first();
-                if ($course) {
-                    $courseId = $course->id;
-                }
+
+            $program = self::findOrCreateProgram($progName);
+
+            if (!$course && ($cleanFicha || $program)) {
+                $municipalityId = \DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha ?: rand(1000000, 9999999)],
+                    [
+                        'program_id'      => $program ? $program->id : 1,
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
             }
-            if (!$courseId) {
+
+            if ($course) {
+                $courseId = $course->id;
+            } else {
                 $firstCourse = Course::first();
                 $courseId = $firstCourse ? $firstCourse->id : 1;
             }
@@ -1555,6 +1708,7 @@ class EgresadosController extends Controller
             ]);
             $apprentice->course_id = $courseId;
             $apprentice->apprentice_status = $apprenticeStatus;
+            $apprentice->touch();
             $apprentice->save();
 
             \DB::commit();

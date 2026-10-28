@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -30,10 +30,12 @@
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+        --sena-green: #39A900;
         --green: #39A900;
         --green-dark: #2a7c00;
         --green-soft: #EAF7EE;
         --moss: #62E31D;
+        --sena-neon: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
         --ink: #16261C;
@@ -46,7 +48,7 @@
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: #f8faf9;
         color: var(--ink);
         min-height: 100vh;
@@ -55,13 +57,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -70,6 +72,8 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        z-index: 30;
+        overflow-y: auto;
       }
 
       .brand {
@@ -104,7 +108,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -113,10 +117,9 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: var(--green);
+        background: var(--sena-green);
         color: #ffffff;
         padding: 2px 6px;
         border-radius: 999px;
@@ -141,14 +144,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
         width: 18px;
@@ -157,18 +160,18 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN VIEWPORT ---------------- */
@@ -179,12 +182,14 @@
       }
 
       .topbar {
-        background: #ffffff;
-        border-bottom: 1px solid var(--line);
-        padding: 12px 32px;
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
+        color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 12px 36px;
         position: sticky;
         top: 0;
         z-index: 20;
@@ -193,16 +198,22 @@
       .portal-link-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 7px 14px;
-        border-radius: 999px;
-        background: var(--green-soft);
-        color: var(--forest);
-        font-size: 12.5px;
-        font-weight: 700;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 20px;
         text-decoration: none;
-        border: 1px solid rgba(57, 169, 0, 0.3);
-        transition: all 0.15s ease;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .portal-link-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
       }
       .portal-link-btn:hover {
         background: #d8f3de;
@@ -276,28 +287,27 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
-        <div class="brand-sub">Panel de Administración</div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
 
-    <div class="nav-label">Módulos Principales</div>
+    <div class="nav-label">General</div>
     <nav>
       <a href="{{ route('egresados.dashboard') }}">
-        <i class="fa-solid fa-chart-pie"></i>
+        <i class="fa-solid fa-gauge-high"></i>
         <span>Inicio</span>
       </a>
       <a href="{{ route('egresados.index') }}" class="active">
         <i class="fa-solid fa-user-graduate"></i>
-        <span>Gestión de Egresados</span>
+        <span>Egresados</span>
       </a>
       <a href="{{ route('egresados.instructores') }}">
         <i class="fa-solid fa-chalkboard-user"></i>
         <span>Instructores</span>
       </a>
       <a href="{{ route('egresados.encuestas_superadmin') }}">
-        <i class="fa-solid fa-square-poll-vertical"></i>
+        <i class="fa-solid fa-clipboard-question"></i>
         <span>Encuestas</span>
       </a>
       <a href="{{ route('egresados.reportes') }}">
@@ -316,7 +326,32 @@
         <i class="fa-solid fa-house"></i>
         <span>Portal Egresados</span>
       </a>
+      <a href="{{ route('egresados.dashboard_instructor') }}">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Panel Instructores</span>
+      </a>
     </nav>
+
+    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
+    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
+          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
+        </div>
+        <div style="overflow: hidden;">
+          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
+          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->

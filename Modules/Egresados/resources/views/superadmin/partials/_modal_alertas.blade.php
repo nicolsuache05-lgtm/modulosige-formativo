@@ -47,7 +47,7 @@
         width: 78px;
         height: 78px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #39A900 0%, #008f39 100%);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -168,7 +168,7 @@
         </div>
 
         <!-- Encabezado / Tag -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#008f39] uppercase tracking-wider mb-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#39A900] uppercase tracking-wider mb-2">
             <i class="fa-solid fa-graduation-cap"></i>
             <span>SISTEMA INSTITUCIONAL SIGE</span>
         </div>
@@ -193,7 +193,7 @@
         <div class="mt-6">
             <button type="button" 
                     @click="openSuccessModal = false" 
-                    class="w-full py-3.5 px-6 bg-gradient-to-r from-[#001A29] to-[#008f39] hover:from-[#00131E] hover:to-[#00752e] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-950/20 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
+                    class="w-full py-3.5 px-6 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-950/20 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
                 <i class="fa-solid fa-check"></i>
                 <span>Aceptar y Continuar</span>
             </button>

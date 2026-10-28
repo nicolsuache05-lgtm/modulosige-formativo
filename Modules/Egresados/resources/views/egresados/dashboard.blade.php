@@ -6,10 +6,10 @@
   <title>SIGE · Portal del Egresado · SENA CEFA</title>
   <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-  <!-- Google Fonts: Fraunces (Serif elegante para títulos/números) + Plus Jakarta Sans (UI moderna) -->
+  <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
@@ -57,7 +57,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100vh; }
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       background: var(--bg);
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
@@ -710,7 +710,7 @@
       letter-spacing: 0.02em;
     }
     .hero-heading {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 32px;
       font-weight: 700;
       line-height: 1.15;
@@ -802,7 +802,7 @@
       margin-bottom: 8px;
     }
     .kpi-big-number {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 42px;
       font-weight: 700;
       color: var(--ink);
@@ -846,7 +846,7 @@
       gap: 14px;
     }
     .section-title-wrap h2 {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 22px;
       font-weight: 700;
       color: var(--ink);
@@ -1104,7 +1104,7 @@
       box-shadow: var(--shadow-sm);
     }
     .side-widget-title {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 16.5px;
       font-weight: 700;
       color: var(--ink);
@@ -1213,7 +1213,7 @@
       margin-bottom: 20px;
     }
     .modal-header-banner h3 {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 17px;
       font-weight: 700;
       color: var(--forest);
@@ -1286,7 +1286,7 @@
       border: 3px solid #BBF7D0;
     }
     .success-modal-card h3 {
-      font-family: 'Fraunces', Georgia, serif;
+      font-family: 'Poppins', 'Nunito', sans-serif;
       font-size: 24px;
       font-weight: 700;
       color: var(--sena-dark);
@@ -1406,7 +1406,6 @@
       <a id="nav-oportunidades" class="nav-item" onclick="showSection('oportunidades')">
         <i class="fa-solid fa-briefcase"></i>
         <span>Oportunidades Laborales</span>
-        <span class="nav-badge" id="nav-badge-oportunidades">3</span>
       </a>
       <a id="nav-noticias" class="nav-item" onclick="showSection('noticias')">
         <i class="fa-regular fa-calendar-days"></i>
@@ -2017,7 +2016,7 @@
 
         <div class="hero-banner-card">
           <div class="hero-content">
-            <h1 class="hero-heading">Eventos y Convocatorias</h1>
+            <h1 class="hero-heading">Eventos</h1>
             <p class="hero-description">
               Participa en los eventos de CEFA La Angostura.
             </p>
@@ -2318,7 +2317,7 @@
       <div style="width: 60px; height: 60px; border-radius: 50%; background: #EAF7EE; color: var(--sena-green); display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; border: 2px solid #BBF7D0;">
         <i class="fa-regular fa-calendar-check"></i>
       </div>
-      <h3 style="font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 700; color: var(--sena-dark); margin-bottom: 4px;" id="modal-event-title">
+      <h3 style="font-family: 'Poppins', 'Nunito', sans-serif; font-size: 20px; font-weight: 700; color: var(--sena-dark); margin-bottom: 4px;" id="modal-event-title">
         Inscripción a Actividad
       </h3>
       <p style="font-size: 13px; color: var(--ink-soft); margin: 0;">
@@ -2359,7 +2358,7 @@
     <div class="chulo-circle-badge">
       <i class="fa-solid fa-check"></i>
     </div>
-    <h3 style="font-family:'Fraunces', Georgia, serif; font-size:24px; font-weight:700; color:var(--sena-dark); margin-bottom:10px;">¡Inscripción Confirmada con Éxito!</h3>
+    <h3 style="font-family:'Poppins', 'Nunito', sans-serif; font-size:24px; font-weight:700; color:var(--sena-dark); margin-bottom:10px;">¡Inscripción Confirmada con Éxito!</h3>
     <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin-bottom:26px;">
       Te has inscrito exitosamente a <strong id="modal-success-event-title" style="color:var(--sena-dark);">este evento</strong> en el CEFA La Angostura. Recibirás los recordatorios y detalles de acceso en tu correo electrónico.
     </p>
@@ -2382,7 +2381,7 @@
       <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(57, 169, 0, 0.12); color: var(--sena-green); display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; border: 2px solid rgba(98, 227, 29, 0.4); box-shadow: 0 4px 14px rgba(57, 169, 0, 0.2);">
         <i class="fa-solid fa-briefcase"></i>
       </div>
-      <h3 style="font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 700; color: var(--sena-dark); margin-bottom: 6px; letter-spacing: -0.01em;">
+      <h3 style="font-family: 'Poppins', 'Nunito', sans-serif; font-size: 22px; font-weight: 700; color: var(--sena-dark); margin-bottom: 6px; letter-spacing: -0.01em;">
         ¿Deseas postularte a esta vacante?
       </h3>
       <p style="font-size: 13px; color: var(--ink-soft); max-width: 380px; margin: 0 auto; line-height: 1.5;">
@@ -2953,9 +2952,6 @@
 
     const elKpiInicioOfertas = document.getElementById('kpi-inicio-ofertas-count');
     if (elKpiInicioOfertas) elKpiInicioOfertas.textContent = totalJobs;
-
-    const elBadgeOportunidades = document.getElementById('nav-badge-oportunidades');
-    if (elBadgeOportunidades) elBadgeOportunidades.textContent = totalJobs;
 
     // Actualizar Cuadrito: GUARDADAS
     const elKpiGuardadas = document.getElementById('kpi-guardadas-count');

@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -23,29 +23,49 @@
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* ========================================================
+           PALETA INSTITUCIONAL SENA EMPRESA ERP
+           ======================================================== */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
         --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -54,13 +74,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -69,6 +89,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        overflow-y: auto;
       }
 
       .brand {
@@ -103,7 +124,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -112,12 +133,12 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 999px;
       }
       .brand-sub {
@@ -140,14 +161,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
         width: 18px;
@@ -156,18 +177,30 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
+      }
+      nav a .badge {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      nav a.active .badge {
+        background: rgba(0, 0, 0, 0.25);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN VIEWPORT ---------------- */
@@ -178,13 +211,14 @@
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: sticky;
         top: 0;
         z-index: 20;
@@ -247,7 +281,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
@@ -267,7 +301,7 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 28px;
         margin: 0 0 6px;
@@ -337,7 +371,7 @@
         color: var(--ink-soft);
       }
       .metric-mini-num {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 24px;
         font-weight: 700;
         color: var(--forest-deep);
@@ -573,7 +607,7 @@
         border-radius: 14px;
         background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
         color: #ffffff;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         display: flex;
@@ -583,7 +617,7 @@
         box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
       }
       .detail-user-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 16px;
         color: var(--forest-deep);
@@ -739,7 +773,6 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
         <div class="brand-sub">Gestión de Egresados</div>
       </div>
@@ -780,7 +813,32 @@
         <i class="fa-solid fa-house"></i>
         <span>Portal Egresados</span>
       </a>
+      <a href="{{ route('egresados.dashboard_instructor') }}">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Panel Instructores</span>
+      </a>
     </nav>
+
+    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
+    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
+          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
+        </div>
+        <div style="overflow: hidden;">
+          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
+          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -1345,21 +1403,21 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-         class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-green-100 flex flex-col max-h-[92vh] overflow-hidden">
+         class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden">
         
-        <!-- Encabezado del Modal con Icono Verde -->
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 sm:px-8 py-5 bg-[#ffffff]">
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
             <div class="flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-[#008f39] text-white flex items-center justify-center text-lg shadow-md flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-lg shadow-md shadow-black/20 flex-shrink-0">
                     <i class="fa-solid fa-chalkboard-user"></i>
                 </div>
                 <div>
-                    <div class="text-[10.5px] font-extrabold text-[#008f39] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES</div>
-                    <h3 class="text-xl font-extrabold text-gray-900 tracking-tight">Registrar instructor</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Vincular nuevo docente a la plataforma de egresados CEFA La Angostura.</p>
+                    <div class="text-[10.5px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE</div>
+                    <h3 class="text-xl font-bold text-white tracking-tight">Registrar instructor</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Vincular nuevo docente a la plataforma de egresados CEFA La Angostura.</p>
                 </div>
             </div>
-            <button @click="openModalNuevoInstructor = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer">
+            <button @click="openModalNuevoInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -1373,25 +1431,25 @@
                 <!-- 1. Datos personales -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">1</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Datos personales</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">1</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Datos personales</h4>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Nombres <span class="text-red-500">*</span></label>
-                            <input type="text" name="nombres" required placeholder="Ej. Carlos Alberto" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="text" name="nombres" required placeholder="Ej. Carlos Alberto" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Apellidos <span class="text-red-500">*</span></label>
-                            <input type="text" name="apellidos" required placeholder="Ej. Mendoza Castro" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="text" name="apellidos" required placeholder="Ej. Mendoza Castro" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tipo Doc. <span class="text-red-500">*</span></label>
-                            <select name="tipo_documento" required class="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <select name="tipo_documento" required class="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                                 <option value="Cédula de ciudadanía">Cédula de Ciudadanía (CC)</option>
                                 <option value="Tarjeta de identidad">Tarjeta de Identidad (TI)</option>
                                 <option value="Cédula de extranjería">Cédula de Extranjería (CE)</option>
@@ -1400,7 +1458,7 @@
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 mb-1">DNI / Cédula <span class="text-red-500">*</span></label>
-                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
@@ -1408,19 +1466,19 @@
                 <!-- 2. Información de contacto -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">2</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Información de contacto</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">2</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Información de contacto</h4>
                     </div>
                     <p class="text-[11px] text-gray-500 mb-3.5">Datos únicos de contacto: el correo institucional y teléfono deben pertenecer exclusivamente al instructor.</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico Institucional <span class="text-red-500">*</span></label>
-                            <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono / Celular</label>
-                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
@@ -1428,8 +1486,8 @@
                 <!-- 3. Información académica y vinculación -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">3</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Información académica y vinculación</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">3</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Información académica y vinculación</h4>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1441,7 +1499,7 @@
                                    list="lista_programas_instructor_crear" 
                                    required 
                                    placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
-                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium text-gray-800">
+                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium text-gray-800">
                             <datalist id="lista_programas_instructor_crear">
                                 <option value="Análisis y Desarrollo de Software (ADSO)">
                                 <option value="Gestión de Empresas Agropecuarias">
@@ -1465,20 +1523,20 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Centro de Formación</label>
-                            <input type="text" name="centro_formacion" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-50 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
+                            <input type="text" name="centro_formacion" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-50 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed font-medium">
                         </div>
                     </div>
                 </div>
 
                 <!-- Banner Informativo -->
-                <div class="bg-[#f0faf3] border border-[#d4eedd] rounded-2xl p-4 flex items-start gap-3.5">
-                    <div class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-start gap-3.5">
+                    <div class="w-7 h-7 rounded-full bg-[#39A900] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-xs">
                         <i class="fa-solid fa-info"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-extrabold text-[#008f39]">Rol y vinculación institucional</div>
-                        <p class="text-[11.5px] text-[#2c5239] mt-0.5 leading-relaxed">
-                            Este registro asigna automáticamente el perfil exclusivo de <strong>Instructor</strong> para el seguimiento y gestión de egresados del CEFA La Angostura.
+                        <div class="text-xs font-bold text-[#00131E]">Rol y vinculación institucional</div>
+                        <p class="text-[11.5px] text-gray-600 mt-0.5 leading-relaxed">
+                            Este registro asigna automáticamente el perfil exclusivo de <strong>Instructor</strong> para el seguimiento y gestión de egresados del centro de formación.
                         </p>
                     </div>
                 </div>
@@ -1486,12 +1544,12 @@
             </form>
         </div>
 
-        <!-- Pie del Modal (Botones Exactos) -->
-        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 bg-[#fbfdfc]">
-            <button type="button" @click="openModalNuevoInstructor = false" class="w-full sm:w-auto px-6 py-3 bg-[#f1f5f3] hover:bg-[#e2ece6] text-[#4b6354] text-xs font-bold rounded-xl transition cursor-pointer text-center">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 bg-[#f8faf9]">
+            <button type="button" @click="openModalNuevoInstructor = false" class="w-full sm:w-auto px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer text-center">
                 Cancelar
             </button>
-            <button type="submit" form="form-crear-instructor" class="w-full sm:w-auto px-7 py-3 bg-[#008f39] hover:bg-[#007a30] text-white text-xs font-extrabold rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2">
+            <button type="submit" form="form-crear-instructor" class="w-full sm:w-auto px-7 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md hover:shadow-lg shadow-[#39A900]/25 cursor-pointer flex items-center justify-center gap-2">
                 <i class="fa-solid fa-chalkboard-user"></i>
                 <span>Registrar instructor</span>
             </button>

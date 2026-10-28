@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -41,7 +41,7 @@
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -95,7 +95,7 @@
       }
 
       .brand-name {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0px;
@@ -431,7 +431,7 @@
         margin-bottom: 24px;
       }
       .page-title {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 24px;
         margin: 0 0 6px;

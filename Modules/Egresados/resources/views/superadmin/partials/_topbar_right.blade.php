@@ -226,6 +226,59 @@
 </div>
 
 <style>
+  /* ================= VIEW TRANSITIONS & TRANSICIONES SUAVES ================= */
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: 160ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeOut;
+  }
+  ::view-transition-new(root) {
+    animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeIn;
+  }
+
+  @keyframes sigeFadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-4px); }
+  }
+
+  @keyframes sigeFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mantener el sidebar y topbar firmes durante la navegación sin saltos */
+  .sidebar {
+    view-transition-name: sige-sidebar;
+  }
+  .topbar {
+    view-transition-name: sige-topbar;
+  }
+
+  /* Animación de entrada suave del contenido principal */
+  .content, .content-area {
+    animation: sigePageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes sigePageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Estilo durante la salida suave al hacer clic en un módulo */
+  .sige-page-exit {
+    opacity: 0 !important;
+    transform: translateY(-4px) !important;
+    transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
   /* ================= ESTILOS DE TOPBAR RIGHT & MENÚS PLEGABLES ================= */
   .topbar-right-wrapper {
     display: flex;
@@ -282,7 +335,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Poppins', 'Nunito', sans-serif;
     font-weight: 700;
     font-size: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
@@ -673,5 +726,42 @@
       if (notifMenu) notifMenu.style.display = 'none';
       if (chevron) chevron.classList.remove('rotate');
     }
+  });
+  // ================= TRANSICIÓN FLUIDA ENTRE MÓDULOS =================
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Recordar y mantener la posición de scroll del sidebar para evitar saltos
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      const savedScroll = sessionStorage.getItem('sige_superadmin_sidebar_scroll');
+      if (savedScroll !== null) {
+        sidebar.scrollTop = parseInt(savedScroll, 10);
+      }
+      sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sige_superadmin_sidebar_scroll', sidebar.scrollTop);
+      }, { passive: true });
+    }
+
+    // 2. Interceptar clics en los enlaces del menú para salida suave
+    const moduleLinks = document.querySelectorAll('.sidebar nav a, .user-menu-item, .portal-link-btn');
+    moduleLinks.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        // Ignorar enlaces vacíos, anclas, javascript o enlaces que se abran en nueva pestaña
+        if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
+        // Si ya está activo en esta página, no hacer nada
+        if (this.classList.contains('active')) return;
+        // Respetar combinaciones de teclas para abrir en pestaña nueva
+        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+        const mainContent = document.querySelector('.content') || document.querySelector('.content-area') || document.querySelector('.main');
+        if (mainContent) {
+          e.preventDefault();
+          mainContent.classList.add('sige-page-exit');
+          setTimeout(function() {
+            window.location.href = href;
+          }, 140);
+        }
+      });
+    });
   });
 </script>

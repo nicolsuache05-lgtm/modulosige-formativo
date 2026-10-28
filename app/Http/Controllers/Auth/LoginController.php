@@ -50,18 +50,39 @@ class LoginController extends Controller
             Auth::login($user, $remember);
             $request->session()->regenerate();
 
+            // Identificar perfil del usuario
+            $isSuperAdmin = $user->hasSuperAdmin() || 
+                            $user->nickname === 'superadmin_egresados' || 
+                            $user->email === 'superadmin.egresados@sena.edu.co' || 
+                            $user->nickname === 'superadmin' || 
+                            $user->roles->contains('slug', 'egresados.admin') ||
+                            $user->roles->contains('slug', 'superadmin');
+
+            $isInstructor = $user->nickname === 'instructor_egresados' || 
+                            $user->email === 'instructor.egresados@sena.edu.co' || 
+                            $user->roles->contains('slug', 'egresados.instructor') || 
+                            $user->roles->contains('slug', 'sigac.instructor') || 
+                            $user->roles->contains('slug', 'agrocefa.trainer');
+
             $redirectUrl = $request->input('redirect');
             if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
-                // Si el redirect es la landing de egresados, dirigir directo al dashboard de instructor/admin
+                // Si el redirect es la landing de egresados, dirigir directo al dashboard correspondiente
                 if (str_contains($redirectUrl, 'egresados/welcome') || str_contains($redirectUrl, 'egresados/home') || str_ends_with($redirectUrl, '/egresados')) {
-                    if ($user->nickname === 'admin' || $user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados') {
+                    if ($isSuperAdmin) {
+                        return redirect()->route('egresados.dashboard')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
+                    }
+                    if ($isInstructor) {
                         return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
                     }
                 }
                 return redirect($redirectUrl)->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
             }
 
-            if ($user->nickname === 'admin' || $user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados') {
+            if ($isSuperAdmin) {
+                return redirect()->route('egresados.dashboard')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
+            }
+
+            if ($isInstructor) {
                 return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
             }
 

@@ -373,8 +373,25 @@ class SigeSyncService
                 continue;
             }
 
-            // Resolver ficha / curso en O(1) desde memoria sin consultas repetidas
+            // Resolver ficha / curso en O(1) desde memoria o registrarla si es nueva
             $rawFicha = preg_replace('/[^0-9]/', '', (string) ($item['ficha'] ?? $item['codigo_ficha'] ?? $item['codigo_de_ficha'] ?? $item['course_code'] ?? ''));
+            if (!empty($rawFicha) && !isset($this->courseMap[$rawFicha])) {
+                $c = Course::where('code', $rawFicha)->first();
+                if (!$c) {
+                    $municipalityId = DB::table('municipalities')->value('id') ?? 1;
+                    $c = Course::firstOrCreate(
+                        ['code' => $rawFicha],
+                        [
+                            'program_id'      => $this->fallbackCourseId ? (Course::where('id', $this->fallbackCourseId)->value('program_id') ?? 1) : 1,
+                            'municipality_id' => $municipalityId,
+                            'start_date'      => now()->subYears(2)->toDateString(),
+                            'end_date'        => now()->toDateString(),
+                            'status'          => 'Activo',
+                        ]
+                    );
+                }
+                $this->courseMap[$rawFicha] = $c->id;
+            }
             $courseId = $this->courseMap[$rawFicha] ?? $this->fallbackCourseId;
 
             // Mapear estado ocupacional
@@ -402,6 +419,37 @@ class SigeSyncService
                     'updated_at',
                 ]
             );
+        }
+
+        // 6. Asignar rol de egresado institucional a cada persona importada para visibilidad inmediata en SIGE
+        $roleEgresado = DB::table('roles')->where('slug', 'egresados.egresado')->first();
+        if ($roleEgresado && !empty($personIdMap)) {
+            foreach ($personIdMap as $docNum => $pId) {
+                $user = DB::table('users')->where('person_id', $pId)->first();
+                if (!$user) {
+                    $cleanEmail = $peopleBatch[$docNum]['personal_email'] ?? "egresado.{$docNum}@sena.edu.co";
+                    $userId = DB::table('users')->insertGetId([
+                        'email'      => $cleanEmail,
+                        'nickname'   => "egresado.{$docNum}",
+                        'password'   => \Illuminate\Support\Facades\Hash::make("Sena{$docNum}*"),
+                        'person_id'  => $pId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    $userId = $user->id;
+                }
+
+                $hasRole = DB::table('role_user')->where('user_id', $userId)->where('role_id', $roleEgresado->id)->exists();
+                if (!$hasRole) {
+                    DB::table('role_user')->insert([
+                        'role_id'    => $roleEgresado->id,
+                        'user_id'    => $userId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            }
         }
 
         $procesadosCount = count($peopleBatch);
