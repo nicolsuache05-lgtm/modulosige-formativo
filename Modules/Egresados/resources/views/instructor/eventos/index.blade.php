@@ -90,7 +90,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(98, 227, 29, 0.6);
+        border: 2px solid rgba(2, 136, 209, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -112,14 +112,12 @@
         font-family: 'Poppins', 'Open Sans', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+        background: #0288d1;
         color: #ffffff;
-        padding: 2px 8px;
+        padding: 2px 7px;
         border-radius: 999px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border: 1px solid rgba(98, 227, 29, 0.5);
-        box-shadow: 0 2px 8px rgba(57, 169, 0, 0.35);
       }
       .brand-sub {
         font-size: 10.5px;
@@ -157,22 +155,18 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(57, 169, 0, 0.16);
-        color: #62E31D;
-        transform: translateX(3px);
-      }
-      nav a:hover i {
-        color: #62E31D;
+        background: rgba(255, 255, 255, 0.09);
+        color: #ffffff;
+        transform: translateX(2px);
       }
       nav a.active {
-        background: linear-gradient(90deg, #39A900 0%, #2a7c00 100%);
-        color: #ffffff;
+        background: #ffffff;
+        color: var(--forest-deep);
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
-        border: 1px solid rgba(98, 227, 29, 0.4);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
       }
       nav a.active i {
-        color: #ffffff;
+        color: #0288d1;
       }
 
       /* ---------------- MAIN ---------------- */
