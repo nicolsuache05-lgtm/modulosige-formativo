@@ -1,3 +1,7 @@
+@php
+    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sena-logo.png');
+    $senaLogoBase64 = file_exists($senaLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($senaLogoPath)) : '';
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -292,7 +296,12 @@
       [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body x-data="{ 
+    openModal: false,
+    openModalResultados: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}">
 
 <div class="app">
 
@@ -391,26 +400,8 @@
       @include('egresados::superadmin.partials._topbar_right')
     </div>
 
-    <!-- Main Content con Alpine.js -->
-    <div class="content space-y-6" x-data="{ 
-        openModal: false,
-        openModalResultados: false,
-        openSuccessModal: {{ session('success') ? 'true' : 'false' }},
-        openErrorModal: {{ session('error') ? 'true' : 'false' }}
-    }">
-
-      <!-- Alertas Flash -->
-      @if(session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 cursor-pointer">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-      @endif
+    <!-- Main Content -->
+    <div class="content space-y-6">
 
       @if(isset($errors) && $errors->any())
         <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs sm:text-sm font-semibold flex items-start gap-2 shadow-xs">
@@ -478,13 +469,13 @@
     function selectEncuesta(data, rowId) {
         if (!data) return;
 
-        // Actualizar fila activa en la tabla
+        // Actualizar fila activa en la tabla con colores del SENA ERP
         document.querySelectorAll('.encuesta-row').forEach(row => {
-            row.classList.remove('selected-row', 'bg-emerald-50/60', 'border-l-4', 'border-emerald-600');
+            row.classList.remove('selected-row', 'bg-[#EAF7EE]', 'border-l-4', 'border-[#39A900]', 'bg-emerald-50/60', 'border-emerald-600');
         });
         const activeRow = document.getElementById(rowId);
         if (activeRow) {
-            activeRow.classList.add('selected-row', 'bg-emerald-50/60', 'border-l-4', 'border-emerald-600');
+            activeRow.classList.add('selected-row', 'bg-[#EAF7EE]', 'border-l-4', 'border-[#39A900]');
         }
 
         // Actualizar datos del panel lateral
@@ -508,7 +499,7 @@
         if (badge) {
             badge.innerText = data.status || 'ACTIVA';
             if (data.status === 'ACTIVA') {
-                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase';
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] uppercase';
             } else if (data.status === 'CERRADA') {
                 badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-600 border border-gray-200 uppercase';
             } else {
@@ -573,47 +564,205 @@
         }
     });
 
-    // Función para descargar el resumen ejecutivo del panel lateral en PDF
+    // Función para descargar el reporte ejecutivo escrito de la encuesta en PDF (1 Página exacta, Formato Oficial ERP)
     function descargarResumenPDF() {
-        const elemento = document.getElementById('panel-resumen-pdf');
-        if (!elemento) return;
-
-        const actionButtons = document.getElementById('detalleActionButtons');
-        const printHeader = document.getElementById('detalle-print-header');
         const btn = document.getElementById('btnDescargarResumenPDF');
         const btnText = document.getElementById('btnDescargarResumenText');
 
-        // Extraer datos de la encuesta para el nombre del archivo
-        const surveyId = (document.getElementById('detailSurveyMeta')?.innerText || 'ENC-025').trim();
+        const data = currentEncuestaData || {};
+        const surveyId = (data.id || document.getElementById('detailSurveyMeta')?.innerText || 'ENC-025').trim();
+        const surveyTitle = (data.full_title || data.title || document.getElementById('detailSurveyTitle')?.innerText || 'Encuesta Institucional').trim();
+        const surveyDesc = (data.description || document.getElementById('detailSurveyDesc')?.innerText || 'Instrumento para el diagnóstico, seguimiento a la inserción laboral y pertinencia de las competencias adquiridas en el Centro Agroindustrial La Angostura.').trim();
+        const surveyDate = (data.date || document.getElementById('detailSurveyDate')?.innerText || new Date().toLocaleDateString('es-CO')).trim();
+        const surveyTarget = (data.target || document.getElementById('detailSurveyTarget')?.innerText || 'Comunidad de Egresados CEFA').trim();
+        const surveyStatus = (data.status || document.getElementById('detailStatusBadge')?.innerText || 'ACTIVA').trim();
+        const surveyCreator = (data.creado_por || 'Coordinación Académica y Seguimiento a Egresados').trim();
 
-        // Ocultar botones de acción y mostrar encabezado para impresión
-        if (actionButtons) actionButtons.style.display = 'none';
-        if (printHeader) printHeader.classList.remove('hidden');
+        const envVal = (data.enviadas || document.getElementById('detailEnviadas')?.innerText || '0').toString().trim();
+        const respVal = (data.respondidas || document.getElementById('detailRespondidas')?.innerText || '0').toString().trim();
+        const pendVal = (data.pendientes || document.getElementById('detailPendientes')?.innerText || '0').toString().trim();
+        const rateVal = (data.rate || document.getElementById('detailRate')?.innerText || '0%').toString().trim();
 
-        // Estado visual del botón
-        if (btnText) btnText.innerText = 'Generando PDF...';
+        if (btnText) btnText.innerText = 'Generando Reporte...';
         if (btn) btn.disabled = true;
 
-        const opciones = {
-            margin:       [8, 8, 8, 8],
-            filename:     'Resumen_Encuesta_' + surveyId + '.pdf',
+        const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}";
+
+        const container = document.createElement('div');
+        container.style.padding = '4px 18px 14px 18px';
+        container.style.fontFamily = 'Arial, Helvetica, sans-serif';
+        container.style.color = '#1e293b';
+        container.style.backgroundColor = '#ffffff';
+        container.style.lineHeight = '1.45';
+
+        container.innerHTML = `
+            <!-- Encabezado Institucional SENA ERP con Logo Oficial -->
+            <div style="background: #001A29; border-bottom: 4px solid #39A900; border-radius: 8px 8px 0 0; padding: 14px 18px; color: #ffffff;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 48px; vertical-align: middle;">
+                            <img src="${senaLogo}" style="width: 38px; height: 38px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                        </td>
+                        <td style="vertical-align: middle; padding-left: 10px;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #62E31D; text-transform: uppercase; letter-spacing: 1px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>
+                            <div style="font-size: 14.5px; font-weight: bold; color: #ffffff; margin-top: 2px;">Centro de Formación Agroindustrial La Angostura — CEFA</div>
+                            <div style="font-size: 10px; color: #cbd5e1; margin-top: 1px;">Sistema Institucional de Gestión y Seguimiento a Egresados (SIGE)</div>
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="background: #39A900; color: #ffffff; padding: 4px 10px; font-size: 9.5px; font-weight: bold; border-radius: 4px; text-transform: uppercase;">INFORME ESCRITO</span>
+                            <div style="font-size: 9.5px; color: #94a3b8; margin-top: 3px;">Fecha: ${new Date().toLocaleDateString('es-CO')}</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Franja de Identificación del Instrumento -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; padding: 10px 18px; margin-bottom: 14px; border-radius: 0 0 8px 8px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <tr>
+                        <td style="color: #001A29; font-weight: bold;">
+                            <span style="color: #39A900; margin-right: 4px;">●</span> Encuesta: <span style="color: #0f172a;">${surveyTitle}</span>
+                        </td>
+                        <td style="text-align: right; color: #64748b;">
+                            Código: <strong style="color: #001A29;">${surveyId}</strong> &nbsp;|&nbsp; 
+                            Estado: <strong style="color: ${surveyStatus === 'ACTIVA' ? '#166534' : '#475569'};">${surveyStatus}</strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Ficha Técnica de Registro -->
+            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #edf2f7; padding-bottom: 5px; margin-bottom: 8px;">
+                    Ficha Técnica y Datos de Emisión
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; background: #f8fafc; border-radius: 6px;">
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Código de Control:</strong> <span style="color:#0f172a;">${surveyId}</span></td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Fecha de Publicación:</strong> ${surveyDate}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 34%;"><strong>Población Citada:</strong> <span style="color:#166534; font-weight:bold;">${surveyTarget}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Responsable de Gestión:</strong> ${surveyCreator}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Ámbito:</strong> Regional Huila — CEFA</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Descripción y Objetivo Institucional (Lo Escrito) -->
+            <div style="border: 1px solid #e2e8f0; border-left: 4px solid #39A900; border-radius: 6px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 5px;">
+                    Objetivo y Alcance del Instrumento
+                </div>
+                <p style="font-size: 10.5px; color: #334155; margin: 0; line-height: 1.5; text-align: justify;">
+                    ${surveyDesc} Este instrumento permite recolectar evidencias fácticas sobre el desempeño laboral de los egresados, el grado de pertinencia formativa respecto a las demandas de los sectores productivos y la efectividad de las competencias técnicas y transversales orientadas por la entidad.
+                </p>
+            </div>
+
+            <!-- Consolidado Numérico y Desempeño Operativo -->
+            <div style="font-size: 11px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 7px;">
+                Consolidado de Participación y Efectividad
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 11px;">
+                <thead>
+                    <tr style="background: #001A29; color: #ffffff;">
+                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Indicador de Recolección</th>
+                        <th style="padding: 8px 10px; text-align: center; border: 1px solid #001A29; width: 90px;">Muestra</th>
+                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Detalle Operativo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Egresados Convocados (Enviadas)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #0f172a;">${envVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Cuestionarios enviados y convocatorias oficiales notificadas</td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Cuestionarios Completados (Respondidas)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #39A900;">${respVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Respuestas válidas procesadas y consolidadas en base de datos</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Cuestionarios en Trámite (Pendientes)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #d97706;">${pendVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Egresados en proceso de diligenciamiento dentro del cronograma</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; font-weight: bold; color: #166534;">Tasa Global de Respuesta</td>
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; text-align: center; font-weight: 900; font-size: 15px; color: #15803d;">${rateVal}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 10px; font-weight: 600;">Nivel de representatividad estadística alcanzado en el instrumento</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Ejes Temáticos del Cuestionario -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 6px;">
+                    Dimensiones Evaluadas en el Cuestionario
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                    <tr>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Situación y Vinculación Laboral Actual</td>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Pertinencia de las Competencias del CEFA</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Rangos Salariales y Estabilidad Económica</td>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Percepción y Calidad de la Formación Profesional</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Dictamen Institucional y Conclusiones -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 10px; color: #334155; line-height: 1.45;">
+                <strong style="color: #001A29; text-transform: uppercase;">Conclusión del Seguimiento:</strong> La muestra recolectada permite validar la trazabilidad ocupacional y aporta información estratégica para los procesos de autoevaluación, mejoramiento curricular y acreditación institucional del Centro de Formación Agroindustrial La Angostura — CEFA.
+            </div>
+
+            <!-- Certificación de Confidencialidad (Habeas Data) -->
+            <div style="background: #f0faf3; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; font-size: 9.5px; color: #166534; margin-bottom: 22px; line-height: 1.4;">
+                <strong>Tratamiento de Información (Ley 1581 de 2012):</strong> Los datos suministrados por los egresados gozan de reserva estadística y su procesamiento tiene fines exclusivamente académicos y de caracterización institucional bajo los estándares del SENA.
+            </div>
+
+            <!-- Firmas Institucionales de Responsabilidad -->
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px;">
+                <tr>
+                    <td style="width: 46%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
+                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Coordinación Académica</div>
+                            <div style="font-size: 9px; color: #64748b;">CEFA La Angostura — SENA</div>
+                        </div>
+                    </td>
+                    <td style="width: 8%;"></td>
+                    <td style="width: 46%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
+                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Líder de Seguimiento a Egresados</div>
+                            <div style="font-size: 9px; color: #64748b;">Sistema Institucional SIGE</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Pie de Página Institucional -->
+            <div style="border-top: 1px solid #cbd5e1; padding-top: 8px; text-align: center; font-size: 9px; color: #64748b; margin-top: 10px;">
+                SISTEMA DE GESTIÓN DE EGRESADOS (SIGE) • SENA EMPRESA ERP • CEFA LA ANGOSTURA — {{ date('Y') }}
+            </div>
+        `;
+
+        const opt = {
+            margin:       [3, 6, 6, 6],
+            filename:     'Reporte_Ejecutivo_' + surveyId + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opciones).from(elemento).save().then(() => {
-            if (actionButtons) actionButtons.style.display = 'flex';
-            if (printHeader) printHeader.classList.add('hidden');
+        html2pdf().set(opt).from(container).save().then(() => {
             if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
             if (btn) btn.disabled = false;
         }).catch(err => {
-            console.error('Error generando PDF:', err);
-            if (actionButtons) actionButtons.style.display = 'flex';
-            if (printHeader) printHeader.classList.add('hidden');
+            console.error('Error generando reporte escrito:', err);
             if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
             if (btn) btn.disabled = false;
-            alert('Hubo un inconveniente al generar el PDF del resumen.');
+            alert('Ocurrió un error al generar el reporte.');
         });
     }
 
@@ -632,6 +781,9 @@
 
         const idEl = document.getElementById('modalResId');
         if (idEl) idEl.innerText = data.id || 'ENC-000';
+
+        const pdfCodeEl = document.getElementById('modalPdfCode');
+        if (pdfCodeEl) pdfCodeEl.innerText = data.id || 'ENC-000';
 
         const targetEl = document.getElementById('modalResTarget');
         if (targetEl) targetEl.innerText = data.target || 'Egresados CEFA';
@@ -666,7 +818,7 @@
         // Renderizar gráficas tras la transición de apertura
         setTimeout(() => {
             renderizarGraficasModal(data);
-        }, 150);
+        }, 100);
     }
 
     function renderizarGraficasModal(data) {
@@ -677,18 +829,18 @@
         const desempleados = Math.round(respondidas * 0.20);
         const estudiando = Math.max(1, respondidas - empleados - desempleados);
 
-        // 1. Gráfica de Dona: Estado Laboral
+        // 1. Gráfica de Dona: Estado Laboral (Compacta para 1 Página A4)
         const donaContainer = document.querySelector("#modal-grafica-estado-laboral");
         if (donaContainer) {
             donaContainer.innerHTML = '';
             const optionsDona = {
                 series: [empleados, desempleados, estudiando],
                 labels: ['Empleados', 'En Búsqueda / Desempleados', 'Estudiando / Emprendiendo'],
-                chart: { type: 'donut', height: 260, fontFamily: 'inherit', animations: { enabled: true } },
-                colors: ['#008f39', '#f59e0b', '#3b82f6'],
-                plotOptions: { pie: { donut: { size: '65%' }, expandOnClick: true } },
+                chart: { type: 'donut', height: 185, fontFamily: 'inherit', animations: { enabled: false } },
+                colors: ['#39A900', '#001A29', '#62E31D'],
+                plotOptions: { pie: { donut: { size: '65%' }, expandOnClick: false } },
                 dataLabels: { enabled: false },
-                legend: { position: 'bottom', fontSize: '11.5px', fontWeight: 600 },
+                legend: { position: 'bottom', fontSize: '10px', fontWeight: 600 },
                 tooltip: { theme: 'light', y: { formatter: val => val + ' Egresados' } }
             };
             if (chartDonaModal) { try { chartDonaModal.destroy(); } catch(e){} }
@@ -696,20 +848,20 @@
             chartDonaModal.render();
         }
 
-        // 2. Gráfica de Barras: Salarios
+        // 2. Gráfica de Barras: Salarios (Compacta para 1 Página A4)
         const barrasContainer = document.querySelector("#modal-grafica-salarios");
         if (barrasContainer) {
             barrasContainer.innerHTML = '';
             const optionsBarras = {
                 series: [{ name: 'Egresados', data: [Math.round(empleados * 0.2), Math.round(empleados * 0.45), Math.round(empleados * 0.25), Math.round(empleados * 0.1)] }],
-                chart: { type: 'bar', height: 240, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true } },
-                colors: ['#008f39', '#10b981', '#34d399', '#059669'],
-                plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true } },
+                chart: { type: 'bar', height: 175, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: false } },
+                colors: ['#39A900', '#2e8b00', '#001A29', '#002336'],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '40%', distributed: true } },
                 dataLabels: { enabled: false },
                 legend: { show: false },
                 xaxis: {
                     categories: ['1 SMMLV', '1 a 2 SMMLV', '2 a 3 SMMLV', 'Más de 3'],
-                    labels: { style: { cssClass: 'text-[11px] font-semibold text-gray-500' } }
+                    labels: { style: { fontSize: '10px', cssClass: 'font-semibold text-gray-500' } }
                 },
                 tooltip: { theme: 'light' }
             };
@@ -718,7 +870,7 @@
             chartBarrasModal.render();
         }
 
-        // 3. Gráfica Apilada: Pertinencia
+        // 3. Gráfica Apilada: Pertinencia (Compacta para 1 Página A4)
         const pertContainer = document.querySelector("#modal-grafica-pertinencia");
         if (pertContainer) {
             pertContainer.innerHTML = '';
@@ -727,12 +879,12 @@
                     { name: 'Totalmente relacionado', data: [Math.round(empleados * 0.6), Math.round(empleados * 0.55)] },
                     { name: 'No relacionado', data: [Math.round(empleados * 0.15), Math.round(empleados * 0.2)] }
                 ],
-                chart: { type: 'bar', stacked: true, height: 180, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true } },
+                chart: { type: 'bar', stacked: true, height: 120, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: false } },
                 colors: ['#008f39', '#ef4444'],
-                plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
-                dataLabels: { enabled: true },
+                plotOptions: { bar: { horizontal: true, borderRadius: 3 } },
+                dataLabels: { enabled: true, style: { fontSize: '9.5px' } },
                 xaxis: { categories: [data.target || 'ADSO', 'Otros programas CEFA'] },
-                legend: { position: 'top', horizontalAlign: 'left', fontSize: '11px' }
+                legend: { position: 'top', horizontalAlign: 'left', fontSize: '10px' }
             };
             if (chartPertinenciaModal) { try { chartPertinenciaModal.destroy(); } catch(e){} }
             chartPertinenciaModal = new ApexCharts(pertContainer, optionsPert);
@@ -740,38 +892,86 @@
         }
     }
 
-    // Exportar el contenido del modal de resultados a PDF de alta resolución
+    // Exportar el contenido del reporte a PDF en EXACTAMENTE 1 PÁGINA (Sin páginas en blanco)
     function descargarModalResultadosPDF() {
         const elemento = document.getElementById('modal-area-imprimir');
         if (!elemento) return;
-        const header = document.getElementById('modalPrintHeader');
         const btn = document.getElementById('btn-modal-pdf');
         const btnText = document.getElementById('btn-modal-pdf-text');
         const surveyId = (document.getElementById('modalResId')?.innerText || 'ENC-025').trim();
 
         if (btnText) btnText.innerText = 'Generando PDF...';
         if (btn) btn.disabled = true;
-        if (header) header.classList.remove('hidden');
+
+        // 1. Mostrar encabezado oficial para PDF
+        const printHeader = document.getElementById('modalPrintHeader');
+        if (printHeader) printHeader.classList.remove('hidden');
+
+        // 2. Elementos del modal a acomodar temporalmente
+        const modalBox = elemento.closest('.bg-white.rounded-3xl');
+        const modalBackdrop = elemento.closest('.fixed.inset-0');
+        const modalHeader = modalBox ? modalBox.querySelector('.border-b-2') : null;
+
+        const prevModalScroll = elemento.scrollTop;
+        const prevWindowScroll = window.scrollY;
+
+        // Ajustes para captura al ras exacta sin huecos ni desbordes
+        if (modalHeader) modalHeader.style.display = 'none';
+        if (modalBackdrop) {
+            modalBackdrop.style.paddingTop = '0px';
+            modalBackdrop.style.alignItems = 'flex-start';
+        }
+        if (modalBox) {
+            modalBox.style.marginTop = '0px';
+            modalBox.style.borderRadius = '0px';
+            modalBox.style.maxHeight = 'none';
+        }
+        elemento.scrollTop = 0;
+        window.scrollTo(0, 0);
 
         const opciones = {
-            margin:       [8, 8, 8, 8],
-            filename:     'Resultados_' + surveyId + '.pdf',
+            margin:       [4, 4, 4, 4],
+            filename:     'Reporte_Resultados_' + surveyId + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true, 
+                logging: false,
+                letterRendering: true,
+                scrollY: 0,
+                scrollX: 0
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: 'avoid-all' }
         };
 
-        html2pdf().set(opciones).from(elemento).save().then(() => {
-            if (header) header.classList.add('hidden');
+        const restoreModal = () => {
+            if (printHeader) printHeader.classList.add('hidden');
+            if (modalHeader) modalHeader.style.display = '';
+            if (modalBackdrop) {
+                modalBackdrop.style.paddingTop = '';
+                modalBackdrop.style.alignItems = '';
+            }
+            if (modalBox) {
+                modalBox.style.marginTop = '';
+                modalBox.style.borderRadius = '';
+                modalBox.style.maxHeight = '';
+            }
+            elemento.scrollTop = prevModalScroll;
+            window.scrollTo(0, prevWindowScroll);
             if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
             if (btn) btn.disabled = false;
-        }).catch(err => {
-            console.error('Error generando PDF:', err);
-            if (header) header.classList.add('hidden');
-            if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
-            if (btn) btn.disabled = false;
-            alert('Ocurrió un error al generar el PDF de resultados.');
-        });
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opciones).from(elemento).save().then(() => {
+                restoreModal();
+            }).catch(err => {
+                console.error('Error generando PDF resultados:', err);
+                restoreModal();
+                alert('Ocurrió un error al generar el PDF de resultados.');
+            });
+        }, 150);
     }
 </script>
 

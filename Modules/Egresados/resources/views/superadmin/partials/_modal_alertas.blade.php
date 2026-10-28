@@ -1,5 +1,3 @@
-<!-- Modules/Egresados/Resources/views/superadmin/partials/_modal_alertas.blade.php -->
-<!-- VENTANA MODAL FLOTANTE DE RETROALIMENTACIÓN INSTITUCIONAL CON CHULITO ANIMADO -->
 
 @php
     $hasSuccess = session()->has('success');
@@ -7,16 +5,79 @@
     $successMsg = session('success', '¡Egresado registrado correctamente!');
     $errorMsg = session('error', 'Ocurrió un error al procesar la solicitud.');
     
-    // Título inteligente
-    $successTitle = '¡Egresado Registrado Correctamente!';
-    if (str_contains(strtolower($successMsg), 'actualizado')) {
-        $successTitle = '¡Datos Actualizados Correctamente!';
-    } elseif (str_contains(strtolower($successMsg), 'seguimiento')) {
+    // Detección contextual por tipo de entidad y acción
+    $lowerMsg = strtolower($successMsg);
+    $isInstructor = str_contains($lowerMsg, 'instructor');
+    $isEncuesta = str_contains($lowerMsg, 'encuesta');
+    $isEvento = str_contains($lowerMsg, 'evento');
+    $isSeguimiento = str_contains($lowerMsg, 'seguimiento');
+    $isImport = str_contains($lowerMsg, 'importad');
+    $isSync = str_contains($lowerMsg, 'sincroniz');
+    $isUpdated = str_contains($lowerMsg, 'actualiz');
+    $isDeleted = str_contains($lowerMsg, 'elimin');
+    $isCerrada = str_contains($lowerMsg, 'cerrad') || str_contains($lowerMsg, 'cierre');
+
+    // Título dinámico inteligente
+    if ($isInstructor) {
+        if ($isUpdated) {
+            $successTitle = '¡Instructor Actualizado Correctamente!';
+            $badgeText = 'Información del instructor actualizada en la base de datos';
+        } elseif ($isDeleted) {
+            $successTitle = '¡Instructor Retirado Correctamente!';
+            $badgeText = 'Registro de instructor modificado en la base de datos';
+        } else {
+            $successTitle = '¡Instructor Registrado Correctamente!';
+            $badgeText = 'Instructor guardado y verificado en la base de datos';
+        }
+        $tagIcon = 'fa-chalkboard-user';
+        $tagLabel = 'GESTIÓN DE INSTRUCTORES SIGE';
+    } elseif ($isEncuesta) {
+        if ($isCerrada) {
+            $successTitle = '¡Encuesta Cerrada Exitosamente!';
+            $badgeText = 'Instrumento cerrado y recolección de respuestas finalizada';
+            $tagIcon = 'fa-lock';
+            $tagLabel = 'CIERRE DE ENCUESTA · SIGE ERP';
+        } elseif ($isUpdated) {
+            $successTitle = '¡Encuesta Actualizada Correctamente!';
+            $badgeText = 'Información de la encuesta actualizada en el sistema';
+            $tagIcon = 'fa-clipboard-question';
+            $tagLabel = 'MÓDULO DE ENCUESTAS SIGE ERP';
+        } else {
+            $successTitle = '¡Encuesta Publicada Exitosamente!';
+            $badgeText = 'Encuesta institucional publicada y disponible para egresados';
+            $tagIcon = 'fa-clipboard-question';
+            $tagLabel = 'MÓDULO DE ENCUESTAS SIGE ERP';
+        }
+    } elseif ($isEvento) {
+        $successTitle = $isUpdated ? '¡Evento Actualizado Correctamente!' : '¡Evento Creado Exitosamente!';
+        $badgeText = 'Evento institucional programado en el sistema';
+        $tagIcon = 'fa-calendar-check';
+        $tagLabel = 'GESTIÓN DE EVENTOS SIGE';
+    } elseif ($isSeguimiento) {
         $successTitle = '¡Seguimiento Registrado con Éxito!';
-    } elseif (str_contains(strtolower($successMsg), 'sincroniz')) {
+        $badgeText = 'Bitácora de seguimiento registrada en el expediente';
+        $tagIcon = 'fa-chart-line';
+        $tagLabel = 'SEGUIMIENTO A EGRESADOS';
+    } elseif ($isSync) {
         $successTitle = '¡Sincronización Completada!';
-    } elseif (str_contains(strtolower($successMsg), 'importad')) {
+        $badgeText = 'Datos sincronizados exitosamente con SICA';
+        $tagIcon = 'fa-rotate';
+        $tagLabel = 'SINCRONIZACIÓN SICA - ERP';
+    } elseif ($isImport) {
         $successTitle = '¡Importación Exitosa!';
+        $badgeText = 'Egresados cargados y registrados en la base de datos';
+        $tagIcon = 'fa-file-excel';
+        $tagLabel = 'IMPORTACIÓN MASIVA SIGE';
+    } elseif ($isUpdated) {
+        $successTitle = '¡Datos Actualizados Correctamente!';
+        $badgeText = 'Expediente actualizado y verificado en la base de datos';
+        $tagIcon = 'fa-graduation-cap';
+        $tagLabel = 'SISTEMA INSTITUCIONAL SIGE';
+    } else {
+        $successTitle = '¡Egresado Registrado Correctamente!';
+        $badgeText = 'Expediente guardado y verificado en la base de datos';
+        $tagIcon = 'fa-graduation-cap';
+        $tagLabel = 'SISTEMA INSTITUCIONAL SIGE';
     }
 @endphp
 
@@ -169,8 +230,8 @@
 
         <!-- Encabezado / Tag -->
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#39A900] uppercase tracking-wider mb-2">
-            <i class="fa-solid fa-graduation-cap"></i>
-            <span>SISTEMA INSTITUCIONAL SIGE</span>
+            <i class="fa-solid {{ $tagIcon }}"></i>
+            <span>{{ $tagLabel }}</span>
         </div>
 
         <!-- Título Principal -->
@@ -186,7 +247,7 @@
         <!-- Badge de Confirmación y Verificación -->
         <div class="mt-4 p-3 bg-gradient-to-r from-emerald-50/70 to-green-50/50 rounded-2xl border border-emerald-100/70 flex items-center justify-center gap-2 text-xs text-emerald-800 font-semibold">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-            <span>Expediente guardado y verificado en la base de datos</span>
+            <span>{{ $badgeText }}</span>
         </div>
 
         <!-- Botón de Acción Principal -->

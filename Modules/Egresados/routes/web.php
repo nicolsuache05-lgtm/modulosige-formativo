@@ -52,7 +52,10 @@ Route::get('egresados/assets/images/{filename}', function ($filename) {
     if (!file_exists($path)) {
         abort(404);
     }
-    return response()->file($path);
+    return response()->file($path, [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+    ]);
 })->name('egresados.assets.image');
 
 
@@ -97,7 +100,7 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/superadmin/reportes', [ReportesController::class, 'index'])->name('egresados.superadmin.reportes.index');
     Route::post('egresados/superadmin/reportes/store', [ReportesController::class, 'store'])->name('egresados.superadmin.reportes.store');
     Route::get('egresados/superadmin/reportes/export/{id?}', [ReportesController::class, 'export'])->name('egresados.superadmin.reportes.export');
-    Route::get('egresados/superadmin/reportes/{id}/exportar/{formato}', [ReportesController::class, 'exportar'])->name('egresados.superadmin.reportes.exportar');
+    Route::get('egresados/superadmin/reportes/{id}/exportar/{formato?}', [ReportesController::class, 'exportar'])->name('egresados.superadmin.reportes.exportar');
     Route::get('egresados/superadmin/reportes/{id}/graficas', [ReportesController::class, 'graficas'])->name('egresados.superadmin.reportes.graficas');
     Route::post('egresados/superadmin/reportes/{id}/enviar', [ReportesController::class, 'enviarCorreo'])->name('egresados.superadmin.reportes.enviar');
     Route::delete('egresados/superadmin/reportes/{id}', [ReportesController::class, 'destroy'])->name('egresados.superadmin.reportes.destroy');

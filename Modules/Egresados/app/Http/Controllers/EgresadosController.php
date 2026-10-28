@@ -492,13 +492,16 @@ class EgresadosController extends Controller
         $fichasActivas = 36;
         $evaluaciones = 15;
 
+        $availableCourses = Course::with('program')->orderBy('code')->get();
+
         return view('egresados::superadmin.instructores', compact(
             'instructores',
             'totalInstructores',
             'activos',
             'programas',
             'fichasActivas',
-            'evaluaciones'
+            'evaluaciones',
+            'availableCourses'
         ));
     }
 

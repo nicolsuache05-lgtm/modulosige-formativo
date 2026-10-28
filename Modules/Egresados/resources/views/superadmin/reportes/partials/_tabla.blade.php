@@ -139,9 +139,10 @@
                                             title="Ver Detalle">
                                         <i class="fa-solid fa-eye text-xs"></i>
                                     </button>
-                                    <a href="{{ route('egresados.superadmin.reportes.export', ['title' => $item['title'], 'format' => $item['format'] ?? 'EXCEL']) }}" 
-                                       class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition cursor-pointer" 
-                                       title="Descargar">
+                                    <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $item['id'], 'formato' => strtolower($item['format'] ?? 'excel')]) }}?title={{ urlencode($item['full_title'] ?? $item['title']) }}" 
+                                       class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition cursor-pointer" 
+                                       title="Descargar {{ $item['format'] ?? 'Excel' }}"
+                                       download>
                                         <i class="fa-solid fa-download text-xs"></i>
                                     </a>
                                 </div>

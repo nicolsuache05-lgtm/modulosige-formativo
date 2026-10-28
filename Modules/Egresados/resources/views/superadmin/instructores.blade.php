@@ -23,9 +23,7 @@
 
     <style>
       :root {
-        /* ========================================================
-           PALETA INSTITUCIONAL SENA EMPRESA ERP
-           ======================================================== */
+     
         --sena-green: #39A900;
         --sena-green-hover: #2d8500;
         --sena-neon: #62E31D;
@@ -1109,8 +1107,8 @@
           </button>
 
           <button type="button" @click="openModalAsignarFicha = true" class="btn-secondary-action" style="border:none; cursor:pointer; width:100%;">
-            <i class="fa-solid fa-link"></i>
-            <span>Asignar Ficha / Seguimiento</span>
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Asignar Seguimiento a Egresados</span>
           </button>
 
         </div>
@@ -1243,18 +1241,18 @@
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
          class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 sm:px-8 py-5 bg-gradient-to-r from-[#001A29] to-[#00131E] text-white">
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
             <div class="flex items-center gap-4">
-                <div id="modalInstInitials" class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-inner">
+                <div id="modalInstInitials" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20">
                     CM
                 </div>
                 <div>
-                    <div class="text-[10.5px] font-extrabold text-emerald-300 uppercase tracking-wider">EXPEDIENTE DOCENTE · SIGE</div>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">EXPEDIENTE DOCENTE · SIGE</div>
                     <h3 id="modalInstName" class="text-xl font-bold text-white tracking-tight">Carla Moreno</h3>
-                    <p class="text-xs text-green-100/70 mt-0.5">Centro de Formación Agroindustrial La Angostura</p>
+                    <p class="text-xs text-white/70 mt-0.5">Centro de Formación Agroindustrial La Angostura — CEFA</p>
                 </div>
             </div>
-            <button @click="openModalPerfilInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer">
+            <button @click="openModalPerfilInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -1296,14 +1294,14 @@
                 <div class="flex flex-wrap gap-2">
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Desarrollo de Software Web</span>
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Bases de Datos Relacionales</span>
-                    <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Seguimiento Etapa Productiva</span>
+                    <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Seguimiento a Egresados</span>
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Tutoría de Proyectos SENA</span>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end bg-gray-50/50">
-            <button type="button" @click="openModalPerfilInstructor = false" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end bg-gray-50/70">
+            <button type="button" @click="openModalPerfilInstructor = false" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                 Cerrar Expediente
             </button>
         </div>
@@ -1311,7 +1309,7 @@
 </div>
 
 <!-- ============================================== -->
-<!-- MODAL 2: ASIGNAR FICHA / SEGUIMIENTO -->
+<!-- MODAL 2: ASIGNAR SEGUIMIENTO A EGRESADOS -->
 <!-- ============================================== -->
 <div x-show="openModalAsignarFicha" 
      style="display: none;"
@@ -1327,55 +1325,94 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-         class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col">
+         class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900">Asignar Ficha / Seguimiento</h3>
-                <p class="text-xs text-gray-500 mt-1">Instructor: <span id="assignInstructorNameLabel" class="font-bold text-emerald-700">Carla Moreno</span></p>
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20 flex-shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight">Asignar Seguimiento a Egresados</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Instructor asignado: <strong id="assignInstructorNameLabel" class="text-[#62E31D] font-bold">Carla Moreno</strong></p>
+                </div>
             </div>
-            <button @click="openModalAsignarFicha = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+            <button @click="openModalAsignarFicha = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
-        <div class="px-6 py-5">
-            <form id="form-asignar-ficha" onsubmit="event.preventDefault(); alert('¡Ficha asignada exitosamente al instructor en el sistema!');" class="space-y-4">
+        <!-- Cuerpo del Formulario con Estilos ERP -->
+        <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-5">
+            <form id="form-asignar-ficha" 
+                  @submit.prevent="
+                    openModalAsignarFicha = false; 
+                    window.dispatchEvent(new CustomEvent('open-success-modal', { 
+                        detail: { 
+                            title: '¡Seguimiento a Egresados Asignado!', 
+                            message: 'Se ha asignado exitosamente la ficha al docente para el seguimiento y monitoreo exclusivo de egresados.' 
+                        } 
+                    }));
+                  " 
+                  class="space-y-4">
                 <input type="hidden" id="assignInstructorId" value="1">
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Ficha de Formación <span class="text-red-500">*</span></label>
-                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                        <option value="">Seleccione una ficha...</option>
-                        <option value="3145614">3145614 - Análisis y Desarrollo de Software (ADSO)</option>
-                        <option value="55555">55555 - Gestión de Empresas Agropecuarias</option>
-                        <option value="3145615">3145615 - Procesamiento de Alimentos</option>
-                        <option value="2981122">2981122 - Producción Ganadera</option>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-[#39A900]"></i>
+                        <span>Ficha de Formación (Egresados)</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                        <option value="">Seleccione una ficha de egresados...</option>
+                        @if(isset($availableCourses) && $availableCourses->count() > 0)
+                            @foreach($availableCourses as $c)
+                                <option value="{{ $c->code }}">{{ $c->code }} - {{ $c->program?->name ?? 'Programa SENA' }}</option>
+                            @endforeach
+                        @else
+                            <option value="3145614">3145614 - Análisis y Desarrollo de Software (ADSO)</option>
+                            <option value="55555">55555 - Gestión de Empresas Agropecuarias</option>
+                            <option value="3145615">3145615 - Procesamiento de Alimentos</option>
+                            <option value="2981122">2981122 - Producción Ganadera</option>
+                        @endif
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Rol de Acompañamiento <span class="text-red-500">*</span></label>
-                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                        <option value="lider">Instructor Líder de Ficha</option>
-                        <option value="etapa_productiva" selected>Seguimiento a Etapa Productiva / Egresados</option>
-                        <option value="tecnico">Instructor Técnico de Especialidad</option>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check text-[#39A900]"></i>
+                        <span>Tipo de Seguimiento al Egresado</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                        <option value="seguimiento_integral" selected>Seguimiento Integral al Egresado</option>
+                        <option value="contacto_permanente">Contacto y Comunicación Permanente con el Egresado</option>
+                        <option value="actualizacion_datos">Actualización y Verificación de Datos del Egresado</option>
+                        <option value="encuestas_caracterizacion">Encuestas y Caracterización del Egresado</option>
+                        <option value="red_encuentros">Red de Egresados y Encuentros Institucionales</option>
+                        <option value="acompanamiento_academico">Acompañamiento y Formación Continua del Egresado</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Observaciones de la asignación</label>
-                    <textarea rows="3" placeholder="Detalle acuerdos de acompañamiento a egresados o cronograma..." class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none resize-none"></textarea>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-comment-dots text-[#39A900]"></i>
+                        <span>Observaciones del Seguimiento al Egresado</span>
+                    </label>
+                    <textarea rows="3" placeholder="Detalle los objetivos del acompañamiento al egresado, canales de contacto o acuerdos de seguimiento..." class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none resize-none font-medium text-gray-800 transition"></textarea>
                 </div>
             </form>
         </div>
 
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-3xl">
-            <button type="button" @click="openModalAsignarFicha = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end gap-3 bg-gray-50/70 rounded-b-3xl">
+            <button type="button" @click="openModalAsignarFicha = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
                 Cancelar
             </button>
-            <button type="submit" form="form-asignar-ficha" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
-                <i class="fa-solid fa-link text-xs"></i>
+            <button type="submit" form="form-asignar-ficha" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-950/20 transition cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-xs"></i>
                 <span>Guardar Asignación</span>
             </button>
         </div>
@@ -1528,18 +1565,7 @@
                     </div>
                 </div>
 
-                <!-- Banner Informativo -->
-                <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-start gap-3.5">
-                    <div class="w-7 h-7 rounded-full bg-[#39A900] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-xs">
-                        <i class="fa-solid fa-info"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-[#00131E]">Rol y vinculación institucional</div>
-                        <p class="text-[11.5px] text-gray-600 mt-0.5 leading-relaxed">
-                            Este registro asigna automáticamente el perfil exclusivo de <strong>Instructor</strong> para el seguimiento y gestión de egresados del centro de formación.
-                        </p>
-                    </div>
-                </div>
+
 
             </form>
         </div>
@@ -1559,7 +1585,7 @@
 </div>
 
 <!-- ============================================== -->
-<!-- MODAL 4: EDITAR INSTRUCTOR -->
+<!-- MODAL 4: EDITAR INSTRUCTOR (ESTILO INSTITUCIONAL ERP) -->
 <!-- ============================================== -->
 <div x-show="openModalEditarInstructor" 
      style="display: none;"
@@ -1569,38 +1595,44 @@
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" x-cloak>
+     class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-start justify-center p-3 sm:p-4 pt-4 sm:pt-6" x-cloak>
     
     <div @click.away="openModalEditarInstructor = false" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-         class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-gray-100 flex flex-col">
+         class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[94vh] overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5 bg-gradient-to-r from-[#001A29] to-[#00131E] text-white rounded-t-3xl">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-inner">
-                    <i class="fa-solid fa-pen-to-square"></i>
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20 flex-shrink-0">
+                    <i class="fa-solid fa-user-pen"></i>
                 </div>
                 <div>
-                    <div class="text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">GESTIÓN DOCENTE · SIGE</div>
-                    <h3 class="text-lg font-bold text-white tracking-tight">Editar Instructor</h3>
-                    <p class="text-xs text-white/70 mt-0.5">Modificando datos de: <span id="edit_inst_name_label" class="text-emerald-300 font-bold">Docente</span></p>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE ERP</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight">Editar Datos del Instructor</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Modificando expediente de: <strong id="edit_inst_name_label" class="text-[#62E31D] font-bold">Docente</strong></p>
                 </div>
             </div>
-            <button @click="openModalEditarInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer">
+            <button @click="openModalEditarInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
-        <div class="px-6 py-5">
+        <!-- Cuerpo del Formulario con Estilos ERP -->
+        <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-4">
             <form id="form-editar-instructor" action="/egresados/superadmin/instructores/1" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
+                
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Tipo Doc.</label>
-                        <select name="tipo_documento" id="edit_inst_tipo_doc" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-id-card text-[#39A900]"></i>
+                            <span>Tipo Doc.</span>
+                        </label>
+                        <select name="tipo_documento" id="edit_inst_tipo_doc" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                             <option value="Cédula de ciudadanía">CC - Cédula</option>
                             <option value="Tarjeta de identidad">TI - Tarjeta</option>
                             <option value="Cédula de extranjería">CE - Extranjería</option>
@@ -1608,37 +1640,55 @@
                         </select>
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Número de Documento <span class="text-red-500">*</span></label>
-                        <input type="text" name="documento" id="edit_inst_doc" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-fingerprint text-[#39A900]"></i>
+                            <span>Número de Documento</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="documento" id="edit_inst_doc" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-semibold text-gray-800 transition">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nombre Completo <span class="text-red-500">*</span></label>
-                    <input type="text" name="nombre" id="edit_inst_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-user text-[#39A900]"></i>
+                        <span>Nombre Completo</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="nombre" id="edit_inst_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-semibold text-gray-800 transition">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Correo Electrónico <span class="text-red-500">*</span></label>
-                        <input type="email" name="correo" id="edit_inst_correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-envelope text-[#39A900]"></i>
+                            <span>Correo Electrónico</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" name="correo" id="edit_inst_correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Teléfono / Celular</label>
-                        <input type="tel" name="telefono" id="edit_inst_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-phone text-[#39A900]"></i>
+                            <span>Teléfono / Celular</span>
+                        </label>
+                        <input type="tel" name="telefono" id="edit_inst_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                     </div>
                 </div>
 
                 <input type="hidden" name="rol" value="instructor_egresados">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Programa Vinculado</label>
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-graduation-cap text-[#39A900]"></i>
+                            <span>Programa Vinculado</span>
+                        </label>
                         <input type="text" 
                                name="programa" 
                                id="edit_inst_programa" 
                                list="lista_programas_instructor_edit" 
-                               placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
-                               class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-medium text-gray-800">
+                               placeholder="Escribe el programa (ej. ADSO, Agropecuaria...)" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                         <datalist id="lista_programas_instructor_edit">
                             <option value="Análisis y Desarrollo de Software (ADSO)">
                             <option value="Gestión de Empresas Agropecuarias">
@@ -1661,22 +1711,28 @@
                         </datalist>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Centro de Formación</label>
-                        <input type="text" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-building-columns text-[#39A900]"></i>
+                            <span>Centro de Formación</span>
+                        </label>
+                        <input type="text" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed font-medium">
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-3xl">
-            <button type="button" @click="openModalEditarInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end gap-3 bg-gray-50/70 rounded-b-3xl">
+            <button type="button" @click="openModalEditarInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
                 Cancelar
             </button>
-            <button type="submit" form="form-editar-instructor" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
+            <button type="submit" form="form-editar-instructor" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-950/20 transition cursor-pointer flex items-center gap-2 transform hover:-translate-y-0.5">
                 <i class="fa-solid fa-floppy-disk text-xs"></i>
                 <span>Guardar Cambios</span>
             </button>
         </div>
+    </div>
+</div>
     </div>
 </div>
 
