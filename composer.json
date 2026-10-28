@@ -29,7 +29,11 @@
             "Modules\\": "Modules/",
             "Modules\\Egresados\\": "Modules/Egresados/app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\Direccion\\": "Modules/Direccion/app/",
+            "Modules\\SICA\\": "Modules/SICA/",
+            "Modules\\Egresados\\Database\\Factories\\": "Modules/Egresados/database/factories/",
+            "Modules\\Egresados\\Database\\Seeders\\": "Modules/Egresados/database/seeders/"
         },
         "files": [
             "app/Support/AuditableShim.php"
