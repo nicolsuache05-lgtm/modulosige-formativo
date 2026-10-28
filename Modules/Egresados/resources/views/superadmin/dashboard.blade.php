@@ -9,39 +9,59 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* ========================================================
+           PALETA INSTITUCIONAL SENA EMPRESA ERP
+           ======================================================== */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
         --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -50,18 +70,22 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
         padding: 22px 16px;
         border-right: 1px solid rgba(255, 255, 255, 0.08);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
       }
 
       .brand {
@@ -96,7 +120,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -105,12 +129,12 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 999px;
       }
       .brand-sub {
@@ -133,13 +157,13 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
+        font-weight: 600;
+        margin-bottom: 4px;
         transition: all 0.15s ease;
       }
       nav a i, nav a svg {
@@ -149,18 +173,18 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
         transform: translateX(2px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
       }
       nav a .badge {
         margin-left: auto;
@@ -172,8 +196,8 @@
         border-radius: 20px;
       }
       nav a.active .badge {
-        background: var(--green-soft);
-        color: var(--forest-deep);
+        background: rgba(0, 0, 0, 0.25);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN ---------------- */
@@ -184,13 +208,17 @@
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 20;
       }
 
       .topbar-left {
@@ -279,7 +307,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
@@ -299,18 +327,18 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
-        font-size: 28px;
+        font-size: 26px;
         margin: 0 0 6px;
         color: var(--forest-deep);
-        letter-spacing: -0.5px;
+        letter-spacing: -0.3px;
       }
       .page-title span {
-        color: var(--green);
+        color: var(--sena-green);
       }
       .page-desc {
-        font-size: 14.5px;
+        font-size: 14px;
         color: var(--ink-soft);
         margin: 0;
       }
@@ -328,7 +356,7 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
       }
       .period-pill i {
-        color: var(--green);
+        color: var(--sena-green);
       }
 
       /* Stat cards */
@@ -346,13 +374,13 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
         transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       }
       .stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 24px rgba(1, 56, 25, 0.06);
-        border-color: rgba(57, 169, 0, 0.35);
+        box-shadow: 0 10px 24px rgba(0, 19, 30, 0.08);
+        border-color: rgba(57, 169, 0, 0.4);
       }
 
       .stat-top {
@@ -361,24 +389,35 @@
         gap: 12px;
       }
       .stat-icon {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         background: var(--green-soft);
-        color: var(--forest);
+        color: var(--sena-green);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
         flex-shrink: 0;
+        transition: transform 0.2s ease;
       }
+      .stat-card:hover .stat-icon {
+        transform: scale(1.08);
+      }
+      .stat-icon.green   { background: #EAF7EE; color: var(--sena-green); }
+      .stat-icon.blue    { background: #E0F2FE; color: #0284c7; }
+      .stat-icon.emerald { background: #DCFCE7; color: #166534; }
+      .stat-icon.amber   { background: #FEF3C7; color: #d97706; }
+      .stat-icon.purple  { background: #F3E8FF; color: #9333ea; }
+      .stat-icon.cyan    { background: #E0F7FA; color: #00838f; }
+
       .stat-title {
         font-size: 13.5px;
         color: var(--ink-soft);
         font-weight: 600;
       }
       .stat-value {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 32px;
         color: var(--forest-deep);
@@ -395,7 +434,7 @@
       .stat-trend {
         font-size: 12px;
         font-weight: 700;
-        color: var(--green);
+        color: var(--sena-green);
         display: flex;
         align-items: center;
         gap: 5px;
@@ -405,7 +444,7 @@
       }
       .stat-link {
         font-size: 12.5px;
-        color: var(--forest);
+        color: var(--sena-dark);
         font-weight: 700;
         text-decoration: none;
         display: flex;
@@ -414,7 +453,7 @@
         transition: color 0.15s ease;
       }
       .stat-link:hover {
-        color: var(--green);
+        color: var(--sena-green);
         text-decoration: underline;
       }
 
@@ -430,7 +469,7 @@
         border: 1px solid var(--line);
         border-radius: 16px;
         padding: 24px 26px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
       }
       .panel-head {
         display: flex;
@@ -441,7 +480,7 @@
         border-bottom: 1px solid var(--line);
       }
       .panel-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         color: var(--forest-deep);
@@ -527,13 +566,13 @@
       }
       .progress-track {
         height: 8px;
-        background: var(--green-soft);
+        background: var(--line);
         border-radius: 20px;
         overflow: hidden;
       }
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--forest) 0%, var(--green) 100%);
+        background: linear-gradient(90deg, var(--sena-green) 0%, var(--sena-neon) 100%);
         border-radius: 20px;
         transition: width 1s ease-in-out;
       }
@@ -564,7 +603,6 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
         <div class="brand-sub">Gestión de Egresados</div>
       </div>
@@ -605,7 +643,32 @@
         <i class="fa-solid fa-house"></i>
         <span>Portal Egresados</span>
       </a>
+      <a href="{{ route('egresados.dashboard_instructor') }}">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Panel Instructores</span>
+      </a>
     </nav>
+
+    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
+    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
+          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
+        </div>
+        <div style="overflow: hidden;">
+          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
+          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- MAIN VIEWPORT -->
@@ -630,7 +693,7 @@
       <div class="page-head">
         <div>
           <h1 class="page-title">
-            ¡Bienvenido(a), <span>{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Coordinación Académica') : 'Coordinación Académica' }}</span>!
+            ¡Bienvenido(a), <span>Super Admin</span>!
           </h1>
           <p class="page-desc">Desde aquí puedes gestionar y hacer seguimiento a los egresados del centro.</p>
         </div>
@@ -647,18 +710,18 @@
         <!-- Card 1: Total Egresados -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon green">
               <i class="fa-solid fa-graduation-cap"></i>
             </div>
             <div class="stat-title">Total egresados</div>
           </div>
           <div class="stat-value">
-            {{ isset($totalEgresados) && $totalEgresados > 0 ? number_format($totalEgresados) : '1.245' }}
+            {{ number_format($totalEgresados ?? 0) }}
           </div>
           <div class="stat-meta">
             <div class="stat-trend">
               <i class="fa-solid fa-arrow-trend-up"></i>
-              <span>↑ 4.2% este mes</span>
+              <span>↑ Registros en sistema</span>
             </div>
             <a href="{{ route('egresados.index') }}" class="stat-link">
               <span>Ver detalle</span>
@@ -670,13 +733,13 @@
         <!-- Card 2: Egresados Activos -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon blue">
               <i class="fa-solid fa-user-check"></i>
             </div>
             <div class="stat-title">Egresados activos</div>
           </div>
           <div class="stat-value">
-            {{ isset($totalActivos) && $totalActivos > 0 ? number_format($totalActivos) : '892' }}
+            {{ number_format($totalActivos ?? 0) }}
           </div>
           <div class="stat-meta">
             <div class="stat-trend">
@@ -693,18 +756,18 @@
         <!-- Card 3: Egresados Empleados -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon emerald">
               <i class="fa-solid fa-briefcase"></i>
             </div>
             <div class="stat-title">Egresados empleados</div>
           </div>
           <div class="stat-value">
-            {{ isset($totalEmpleados) && $totalEmpleados > 0 ? number_format($totalEmpleados) : '564' }}
+            {{ number_format($totalEmpleados ?? 0) }}
           </div>
           <div class="stat-meta">
             <div class="stat-trend">
               <i class="fa-solid fa-chart-line"></i>
-              <span>{{ isset($tasaEmpleo) ? $tasaEmpleo . '%' : '45%' }} de vinculación</span>
+              <span>{{ isset($tasaEmpleo) ? $tasaEmpleo . '%' : '0%' }} de vinculación</span>
             </div>
             <a href="{{ route('egresados.index', ['employment_status' => 'Empleado']) }}" class="stat-link">
               <span>Ver detalle</span>
@@ -716,7 +779,7 @@
         <!-- Card 4: Encuestas Pendientes -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon amber">
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div class="stat-title">Encuestas pendientes</div>
@@ -737,7 +800,7 @@
         <!-- Card 5: Eventos Programados -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon purple">
               <i class="fa-regular fa-calendar-check"></i>
             </div>
             <div class="stat-title">Eventos programados</div>
@@ -758,7 +821,7 @@
         <!-- Card 6: Reportes Generados -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon cyan">
               <i class="fa-solid fa-file-invoice"></i>
             </div>
             <div class="stat-title">Reportes generados</div>
@@ -781,105 +844,117 @@
       <!-- Lower Grid: Actividad Reciente + Avance por Programa -->
       <div class="lower-grid">
         
-        <!-- Panel Izquierdo: Actividad Reciente -->
+        <!-- Panel Izquierdo: Actividad Reciente Dinámica -->
         <div class="panel">
           <div class="panel-head">
             <h3 class="panel-title">
-              <i class="fa-solid fa-bolt"></i>
+              <i class="fa-solid fa-bolt text-[#39A900]"></i>
               <span>Actividad reciente</span>
             </h3>
             <a href="{{ route('egresados.index') }}" class="panel-action">Ver todo</a>
           </div>
 
-          <div class="activity-row">
-            <div class="activity-dot">
-              <i class="fa-solid fa-check"></i>
+          @forelse($recentEgresados as $item)
+            @php
+              $p = $item->person;
+              $fullName = $p ? trim($p->first_name . ' ' . $p->first_last_name) : 'Aprendiz SENA';
+              $progName = $item->course && $item->course->program ? $item->course->program->name : 'Formación SENA';
+              $isUpdated = $item->updated_at && $item->created_at && ($item->updated_at->timestamp > $item->created_at->timestamp + 60);
+              $timeDiff = $item->updated_at ? $item->updated_at->diffForHumans() : ($item->created_at ? $item->created_at->diffForHumans() : 'Recientemente');
+            @endphp
+            <div class="activity-row">
+              <div class="activity-dot" style="{{ $isUpdated ? 'background:#e0f2fe; color:#0284c7;' : 'background:#dcfce7; color:#166534;' }}">
+                <i class="fa-solid {{ $isUpdated ? 'fa-user-pen' : 'fa-user-plus' }}"></i>
+              </div>
+              <div style="flex:1;">
+                <div class="activity-text">
+                  @if($isUpdated)
+                    Se actualizaron los datos de <b>{{ $fullName }}</b> ({{ $progName }})
+                  @else
+                    Nuevo egresado registrado: <b>{{ $fullName }}</b> ({{ $progName }})
+                  @endif
+                </div>
+                <div class="activity-time flex items-center gap-2">
+                  <span>{{ $timeDiff }}</span>
+                  <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(0,19,30,0.06); font-weight:600;">{{ $item->apprentice_status }}</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <div class="activity-text"><b>Juan Pérez</b> actualizó su información laboral</div>
-              <div class="activity-time">Hace 20 minutos</div>
+          @empty
+            <div style="text-align:center; padding: 28px 16px; color: var(--ink-soft); font-size:13px;">
+              <i class="fa-regular fa-clock" style="font-size:24px; margin-bottom:8px; display:block; opacity:0.4;"></i>
+              No hay actividades registradas recientemente.
             </div>
-          </div>
-
-          <div class="activity-row">
-            <div class="activity-dot">
-              <i class="fa-solid fa-clipboard-check"></i>
-            </div>
-            <div>
-              <div class="activity-text">Se cerró la encuesta <b>"Seguimiento laboral 2026-1"</b></div>
-              <div class="activity-time">Hace 3 horas</div>
-            </div>
-          </div>
-
-          <div class="activity-row">
-            <div class="activity-dot">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div>
-              <div class="activity-text">Nueva oferta laboral publicada: <b>Técnico Agropecuario</b></div>
-              <div class="activity-time">Ayer</div>
-            </div>
-          </div>
-
-          <div class="activity-row">
-            <div class="activity-dot">
-              <i class="fa-solid fa-user-plus"></i>
-            </div>
-            <div>
-              <div class="activity-text"><b>15 egresados</b> completaron su registro este mes</div>
-              <div class="activity-time">Hace 2 días</div>
-            </div>
-          </div>
+          @endforelse
         </div>
 
         <!-- Panel Derecho: Avance por Programa -->
         <div class="panel">
           <div class="panel-head">
             <h3 class="panel-title">
-              <i class="fa-solid fa-chart-simple"></i>
+              <i class="fa-solid fa-chart-simple text-[#39A900]"></i>
               <span>Avance por programa</span>
             </h3>
           </div>
 
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>Gestión Agroempresarial</span>
-              <span>82%</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width: 82%"></div>
-            </div>
-          </div>
+          @php
+            $maxCount = (isset($programStats) && $programStats->count() > 0) ? $programStats->max('total') : 1;
+            if ($maxCount <= 0) $maxCount = 1;
+          @endphp
 
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>ADSO (Desarrollo de Software)</span>
-              <span>68%</span>
+          @if(isset($programStats) && $programStats->count() > 0)
+            @foreach($programStats as $prog)
+              @php
+                $pct = round(($prog->total / $maxCount) * 100);
+              @endphp
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>{{ $prog->name }}</span>
+                  <span>{{ $prog->total }} egresado{{ $prog->total != 1 ? 's' : '' }} ({{ $pct }}%)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: {{ $pct }}%"></div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Gestión Agroempresarial</span>
+                <span>82%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 82%"></div>
+              </div>
             </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width: 68%"></div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>ADSO (Desarrollo de Software)</span>
+                <span>68%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 68%"></div>
+              </div>
             </div>
-          </div>
-
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>Producción Agrícola</span>
-              <span>54%</span>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Producción Agrícola</span>
+                <span>54%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 54%"></div>
+              </div>
             </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width: 54%"></div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Contabilización</span>
+                <span>41%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 41%"></div>
+              </div>
             </div>
-          </div>
-
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>Contabilización</span>
-              <span>41%</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width: 41%"></div>
-            </div>
-          </div>
+          @endif
         </div>
 
       </div>

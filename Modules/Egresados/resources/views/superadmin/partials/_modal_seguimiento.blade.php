@@ -19,13 +19,13 @@
          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col">
         
-        <!-- Encabezado del Modal -->
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 py-4 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white rounded-t-2xl">
             <div>
-                <h3 class="text-lg font-bold text-gray-900">Registrar Seguimiento</h3>
-                <p class="text-xs text-gray-500 mt-1">Agregue un nuevo hito a la trazabilidad para <span id="seguimiento_egresado_name_label" class="font-bold text-emerald-700">{{ $nombreCompleto ?? 'el egresado' }}</span>.</p>
+                <h3 class="text-lg font-bold text-white">Registrar Seguimiento</h3>
+                <p class="text-xs text-white/70 mt-0.5">Agregue un nuevo hito a la trazabilidad para <span id="seguimiento_egresado_name_label" class="font-bold text-[#62E31D]">{{ $nombreCompleto ?? 'el egresado' }}</span>.</p>
             </div>
-            <button @click="openModalSeguimiento = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+            <button @click="openModalSeguimiento = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -40,7 +40,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Tipo de Contacto</label>
-                        <select name="tipo_contacto" required class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600">
+                        <select name="tipo_contacto" required class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none">
                             <option value="TELEFONICO">Llamada Telefónica</option>
                             <option value="CORREO">Correo Electrónico</option>
                             <option value="PRESENCIAL">Visita Presencial</option>
@@ -50,13 +50,13 @@
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Fecha del Seguimiento</label>
                         <!-- Fecha actual por defecto -->
-                        <input type="date" name="fecha" required value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600">
+                        <input type="date" name="fecha" required value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">¿Cambió su estado laboral?</label>
-                    <select name="nuevo_estado_laboral" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600">
+                    <select name="nuevo_estado_laboral" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none">
                         <option value="">No, mantener estado actual</option>
                         <option value="EMPLEADO">Cambiar a: Empleado</option>
                         <option value="DESEMPLEADO">Cambiar a: Desempleado</option>
@@ -67,19 +67,19 @@
 
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Observaciones / Detalles del Contacto</label>
-                    <textarea name="observaciones" rows="4" required placeholder="Detalle aquí los resultados de la llamada, acuerdos o comentarios del egresado..." class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 resize-none"></textarea>
+                    <textarea name="observaciones" rows="4" required placeholder="Detalle aquí los resultados de la llamada, acuerdos o comentarios del egresado..." class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none resize-none"></textarea>
                 </div>
             </form>
         </div>
 
         <!-- Pie del Modal -->
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-2xl">
-            <button type="button" @click="openModalSeguimiento = false" class="px-5 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-[#f8faf9] rounded-b-2xl">
+            <button type="button" @click="openModalSeguimiento = false" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
                 Cancelar
             </button>
-            <button type="submit" form="form-seguimiento" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Guardar Seguimiento
+            <button type="submit" form="form-seguimiento" class="px-5 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 hover:shadow-lg cursor-pointer flex items-center gap-2 border-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Guardar Seguimiento</span>
             </button>
         </div>
     </div>

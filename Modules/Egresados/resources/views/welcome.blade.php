@@ -90,7 +90,7 @@
         if (Auth::check()) {
             $user = Auth::user();
             $roleSlugs = $user->roles ? $user->roles->pluck('slug')->toArray() : [];
-            if (in_array('egresados.instructor', $roleSlugs) || in_array('sigac.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
+            if ($user->nickname === 'admin' || in_array('egresados.instructor', $roleSlugs) || in_array('sigac.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
                 $panelUrl = route('egresados.dashboard_instructor');
             } elseif (in_array('egresados.egresado', $roleSlugs) || in_array('senaempresa.apprentice', $roleSlugs) || in_array('sigac.apprentice', $roleSlugs) || $user->email === 'egresado.sige@sena.edu.co' || $user->nickname === 'egresado_sige') {
                 $panelUrl = route('egresados.dashboard_egresado');

@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts & FontAwesome -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Tailwind CSS & Chart.js -->
@@ -21,19 +21,21 @@
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        --sena-green: #39A900;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
-        --sena-navy-light: #002336;
-        --sena-light-navy: #00324D;
+        --forest: #001A29;
+        --forest-deep: #00131E;
         --green: #39A900;
         --bg: #F4F7F6;
       }
       body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: #16261C;
+      }
+      .font-editorial {
+        font-family: 'Poppins', 'Nunito', sans-serif;
       }
     </style>
 </head>
@@ -143,7 +145,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Plus Jakarta Sans' } } }
+                        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Poppins' } } }
                     }
                 }
             });
@@ -169,7 +171,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Plus Jakarta Sans' } } }
+                        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Poppins' } } }
                     },
                     scales: {
                         y: { beginAtZero: true }

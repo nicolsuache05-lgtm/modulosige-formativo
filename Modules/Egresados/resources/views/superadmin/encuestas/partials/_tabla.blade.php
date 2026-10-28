@@ -116,6 +116,12 @@
                                         title="Ver detalles en panel lateral">
                                     <i class="fa-solid fa-eye text-xs"></i>
                                 </button>
+                                <button type="button" 
+                                        onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}'); abrirResultadosModal({{ $jsonData }});" 
+                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition shadow-2xs" 
+                                        title="Ver Estadísticas y Resultados">
+                                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                                </button>
                                 @if(!empty($item['url']))
                                     <a href="{{ $item['url'] }}" 
                                        target="_blank" 

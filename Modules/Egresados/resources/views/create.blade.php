@@ -573,7 +573,7 @@
               </div>
               <div class="sm:col-span-2">
                 <label class="custom-label">DNI / Cédula <span class="req">*</span></label>
-                <input type="text" name="documento" value="{{ old('documento') }}" required placeholder="Ej. 1060123456" class="custom-input">
+                <input type="text" name="documento" value="{{ old('documento') }}" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 1060123456" class="custom-input">
               </div>
             </div>
           </div>
@@ -584,6 +584,7 @@
               <span class="step-badge">2</span>
               <span>Información de contacto</span>
             </div>
+            <p style="font-size: 11px; color: #64748b; margin: -6px 0 14px 0;">Datos únicos de contacto: el correo electrónico y teléfono deben pertenecer exclusivamente al egresado.</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -591,8 +592,8 @@
                 <input type="email" name="correo" value="{{ old('correo') }}" required placeholder="egresado@correo.com" class="custom-input">
               </div>
               <div>
-                <label class="custom-label">Teléfono</label>
-                <input type="text" name="telefono" value="{{ old('telefono') }}" placeholder="Ej. 3001234567" class="custom-input">
+                <label class="custom-label">Teléfono / Celular</label>
+                <input type="tel" name="telefono" value="{{ old('telefono') }}" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3001234567" class="custom-input">
               </div>
             </div>
           </div>
@@ -607,13 +608,33 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="custom-label">Programa de Formación <span class="req">*</span></label>
-                <select name="programa" required class="custom-input">
-                  <option value="">Seleccione un programa...</option>
-                  <option value="ADSO" {{ old('programa') == 'ADSO' ? 'selected' : '' }}>Análisis y Desarrollo de Software (ADSO)</option>
-                  <option value="GESTION_AGROPECUARIA" {{ old('programa') == 'GESTION_AGROPECUARIA' ? 'selected' : '' }}>Gestión de Empresas Agropecuarias</option>
-                  <option value="PROCESAMIENTO_ALIMENTOS" {{ old('programa') == 'PROCESAMIENTO_ALIMENTOS' ? 'selected' : '' }}>Procesamiento de Alimentos</option>
-                  <option value="PRODUCCION_GANADERA" {{ old('programa') == 'PRODUCCION_GANADERA' ? 'selected' : '' }}>Producción Ganadera</option>
-                </select>
+                <input type="text" 
+                       name="programa" 
+                       value="{{ old('programa') }}" 
+                       list="lista_programas_create" 
+                       required 
+                       placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
+                       class="custom-input">
+                <datalist id="lista_programas_create">
+                  <option value="Análisis y Desarrollo de Software (ADSO)">
+                  <option value="Gestión de Empresas Agropecuarias">
+                  <option value="Procesamiento de Alimentos">
+                  <option value="Producción Ganadera">
+                  <option value="Gestión Administrativa">
+                  <option value="Gestión del Talento Humano">
+                  <option value="Contabilización de Operaciones Comerciales y Financieras">
+                  <option value="Producción Agropecuaria Ecológica">
+                  <option value="Riego, Drenaje y Manejo de Suelos Agrícolas">
+                  <option value="Mantenimiento Mecatrónico de Automotores">
+                  <option value="Sistemas">
+                  <option value="Construcción de Edificaciones">
+                  <option value="Cocina">
+                  <option value="Agroindustria">
+                  <option value="Mecanización Agrícola">
+                  <option value="Acuicultura">
+                  <option value="Recursos Humanos">
+                  <option value="Salud Ocupacional">
+                </datalist>
               </div>
               <div>
                 <label class="custom-label">Código de Ficha <span class="req">*</span></label>

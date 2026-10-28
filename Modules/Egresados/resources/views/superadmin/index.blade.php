@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -23,29 +23,49 @@
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* ========================================================
+           PALETA INSTITUCIONAL SENA EMPRESA ERP
+           ======================================================== */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
         --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -54,13 +74,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -69,6 +89,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        overflow-y: auto;
       }
 
       .brand {
@@ -103,7 +124,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -112,12 +133,12 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 999px;
       }
       .brand-sub {
@@ -140,14 +161,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
         width: 18px;
@@ -156,18 +177,18 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
       }
       nav a .badge {
         margin-left: auto;
@@ -178,8 +199,8 @@
         border-radius: 999px;
       }
       nav a.active .badge {
-        background: var(--green-soft);
-        color: var(--forest-deep);
+        background: rgba(0, 0, 0, 0.25);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN VIEWPORT ---------------- */
@@ -190,13 +211,14 @@
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: sticky;
         top: 0;
         z-index: 20;
@@ -259,7 +281,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
@@ -279,7 +301,7 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 28px;
         margin: 0 0 6px;
@@ -366,7 +388,7 @@
         color: var(--ink-soft);
       }
       .stat-num {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 30px;
         font-weight: 700;
         color: var(--forest-deep);
@@ -626,7 +648,7 @@
         border-radius: 14px;
         background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
         color: #ffffff;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         display: flex;
@@ -636,7 +658,7 @@
         box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
       }
       .detail-user-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 16px;
         color: var(--forest-deep);
@@ -754,10 +776,12 @@
 
       /* Pagination */
       .pagination-wrap {
-        padding: 16px 20px;
+        padding: 14px 20px;
         border-top: 1px solid var(--line);
-        display: flex;
-        justify-content: center;
+        background: #ffffff;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       @media (max-width: 1080px) {
@@ -795,7 +819,6 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
         <div class="brand-sub">Gestión de Egresados</div>
       </div>
@@ -836,7 +859,32 @@
         <i class="fa-solid fa-house"></i>
         <span>Portal Egresados</span>
       </a>
+      <a href="{{ route('egresados.dashboard_instructor') }}">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Panel Instructores</span>
+      </a>
     </nav>
+
+    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
+    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
+          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
+        </div>
+        <div style="overflow: hidden;">
+          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
+          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -867,23 +915,23 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-          <!-- BOTÓN 1: Sincronizar API (Formulario directo) -->
+          <!-- BOTÓN 1: Sincronizar API (Formulario directo con Azul Noche Institucional) -->
           <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" class="m-0 p-0">
             @csrf
-            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#00131E] to-[#001A29] hover:from-[#001A29] hover:to-[#00283d] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer border border-white/10">
+              <svg class="w-4 h-4 mr-2 text-[#62E31D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               <span>Sincronizar SICEFA</span>
             </button>
           </form>
 
-          <!-- BOTÓN 2: Importar Excel (Abre Modal) -->
-          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer">
-            <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <!-- BOTÓN 2: Importar Excel (Estilo Card Institucional con Verde SENA) -->
+          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-emerald-50/50 border border-gray-200 hover:border-[#39A900]/50 text-gray-700 hover:text-[#00131E] text-xs font-bold rounded-xl transition-all duration-200 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+            <svg class="w-4 h-4 mr-2 text-[#39A900]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             <span>Importar Excel</span>
           </button>
 
-          <!-- BOTÓN 3: Nuevo Egresado (Abre Modal) -->
-          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
+          <!-- BOTÓN 3: Nuevo Egresado (Verde Principal Institucional SENA) -->
+          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-0">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Nuevo Egresado</span>
           </button>
@@ -951,11 +999,11 @@
             </div>
 
             <select name="apprentice_status" onchange="this.form.submit()" class="filter-select">
-              <option value="">-- Todos los Estados --</option>
-              <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>Certificado</option>
+              <option value="TODOS" {{ request('apprentice_status', 'TODOS') == 'TODOS' ? 'selected' : '' }}>Todos los Egresados (Módulo)</option>
+              <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Certificados</option>
               <option value="EN FORMACIÓN" {{ request('apprentice_status') == 'EN FORMACIÓN' ? 'selected' : '' }}>En Formación</option>
-              <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
               <option value="CONDICIONADO" {{ request('apprentice_status') == 'CONDICIONADO' ? 'selected' : '' }}>Condicionado</option>
+              <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
               <option value="CANCELADO" {{ request('apprentice_status') == 'CANCELADO' ? 'selected' : '' }}>Cancelado</option>
               <option value="RETIRO VOLUNTARIO" {{ request('apprentice_status') == 'RETIRO VOLUNTARIO' ? 'selected' : '' }}>Retiro Voluntario</option>
             </select>
@@ -964,7 +1012,7 @@
               Filtrar
             </button>
 
-            @if(request('search') || request('apprentice_status'))
+            @if(request('search') || (request('apprentice_status') && request('apprentice_status') !== 'TODOS'))
               <a href="{{ route('egresados.index') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar">
                 <i class="fa-solid fa-xmark"></i>
               </a>
@@ -1005,17 +1053,29 @@
                     elseif(in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO'])) $pillClass = 'status-red';
                     elseif($st === 'CONDICIONADO') $pillClass = 'status-amber';
 
+                    // Extraer valores limpios para campos de edición
+                    $docRaw = ($person && $person->document_number) ? (string)$person->document_number : '';
+                    $emailRaw = ($person && ($person->personal_email || $person->misena_email)) ? ($person->personal_email ?: $person->misena_email) : '';
+                    $phoneRaw = ($person && ($person->telephone1 || $person->telephone2)) ? (string)($person->telephone1 ?: $person->telephone2) : '';
+                    $progRaw = ($program && $program->name) ? $program->name : '';
+                    $codeRaw = ($course && $course->code) ? (string)$course->code : '';
+
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
                         'id' => $item->id,
                         'name' => $fullName,
                         'initials' => $initials ?: 'EG',
-                        'document' => $person->document_number ?? 'N/A',
+                        'document' => $docRaw ?: 'N/A',
+                        'document_raw' => $docRaw,
                         'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
-                        'email' => $person->misena_email ?? $person->personal_email ?? 'No registra correo',
-                        'phone' => $person->telephone1 ?? $person->telephone2 ?? 'No registra teléfono',
-                        'program' => $program->name ?? 'Programa de Formación CEFA',
-                        'code' => $course->code ?? 'N/A',
+                        'email' => $emailRaw ?: 'No registra correo',
+                        'email_raw' => $emailRaw,
+                        'phone' => $phoneRaw ?: 'No registra teléfono',
+                        'phone_raw' => $phoneRaw,
+                        'program' => $progRaw ?: 'Programa de Formación CEFA',
+                        'program_raw' => $progRaw,
+                        'code' => $codeRaw ?: 'N/A',
+                        'code_raw' => $codeRaw,
                         'status' => $st,
                         'pill_class' => $pillClass,
                         'show_url' => route('egresados.show', $item->id),
@@ -1023,6 +1083,7 @@
                   @endphp
                   <tr class="egresado-row {{ $index === 0 ? 'selected-row' : '' }}" 
                       id="row-{{ $item->id }}"
+                      data-json="{{ htmlspecialchars($jsonData, ENT_QUOTES, 'UTF-8') }}"
                       onclick="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}')">
                     
                     <td style="font-weight:700; color:var(--forest-deep);">
@@ -1089,7 +1150,7 @@
           <!-- Paginación -->
           @if($egresados->hasPages())
             <div class="pagination-wrap">
-              {{ $egresados->withQueryString()->links() }}
+              {{ $egresados->withQueryString()->links('egresados::partials.pagination') }}
             </div>
           @endif
 
@@ -1222,17 +1283,29 @@
             segLabel.innerText = data.name;
         }
 
-        // Sincronizar automáticamente la ventana flotante de perfil
+        // Sincronizar automáticamente la ventana flotante de perfil y el modal de edición
         if (typeof populateModalPerfilEgresado === 'function') {
             populateModalPerfilEgresado(data);
         }
+        if (typeof populateModalEditar === 'function') {
+            populateModalEditar(data);
+        }
     }
 
-    // Seleccionar automáticamente el primer egresado al cargar
+    // Seleccionar automáticamente el primer egresado al cargar sin disparar click() sintético
     document.addEventListener('DOMContentLoaded', function() {
         const firstRow = document.querySelector('.egresado-row');
         if (firstRow) {
-            firstRow.click();
+            const rawJson = firstRow.getAttribute('data-json');
+            if (rawJson) {
+                try {
+                    selectEgresado(JSON.parse(rawJson), firstRow.id);
+                } catch(e) {
+                    firstRow.classList.add('selected-row');
+                }
+            } else {
+                firstRow.classList.add('selected-row');
+            }
         }
     });
 </script>

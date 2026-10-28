@@ -79,16 +79,18 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/instructores', [EgresadosController::class, 'instructoresIndex'])->name('egresados.instructores');
     Route::get('egresados/superadmin/instructores', [EgresadosController::class, 'instructoresIndex'])->name('egresados.superadmin.instructores.index');
     Route::post('egresados/superadmin/instructores/store', [EgresadosController::class, 'instructoresStore'])->name('egresados.superadmin.instructores.store');
+    Route::put('egresados/superadmin/instructores/{id}', [EgresadosController::class, 'instructoresUpdate'])->name('egresados.superadmin.instructores.update')->whereNumber('id');
+    Route::put('egresados/instructores/{id}', [EgresadosController::class, 'instructoresUpdate'])->name('egresados.instructores.update')->whereNumber('id');
 
     // Módulo de Encuestas
     Route::get('egresados/encuestas-superadmin', [EncuestasController::class, 'index'])->name('egresados.encuestas_superadmin');
     Route::get('egresados/encuestas', [EncuestasController::class, 'index'])->name('egresados.encuestas');
     Route::get('egresados/superadmin/encuestas', [EncuestasController::class, 'index'])->name('egresados.superadmin.encuestas.index');
     Route::post('egresados/superadmin/encuestas/store', [EncuestasController::class, 'store'])->name('egresados.superadmin.encuestas.store');
-    Route::get('egresados/superadmin/encuestas/{id}/resultados', [EncuestasController::class, 'resultados'])->name('egresados.superadmin.encuestas.resultados')->whereNumber('id');
-    Route::get('egresados/encuestas/{id}/resultados', [EncuestasController::class, 'resultados'])->name('egresados.encuestas.resultados')->whereNumber('id');
-    Route::put('egresados/superadmin/encuestas/{id}/cerrar', [EncuestasController::class, 'cerrar'])->name('egresados.superadmin.encuestas.cerrar')->whereNumber('id');
-    Route::put('egresados/encuestas/{id}/cerrar', [EncuestasController::class, 'cerrar'])->name('egresados.encuestas.cerrar')->whereNumber('id');
+    Route::get('egresados/superadmin/encuestas/{id}/resultados', [EncuestasController::class, 'resultados'])->name('egresados.superadmin.encuestas.resultados');
+    Route::get('egresados/encuestas/{id}/resultados', [EncuestasController::class, 'resultados'])->name('egresados.encuestas.resultados');
+    Route::put('egresados/superadmin/encuestas/{id}/cerrar', [EncuestasController::class, 'cerrar'])->name('egresados.superadmin.encuestas.cerrar');
+    Route::put('egresados/encuestas/{id}/cerrar', [EncuestasController::class, 'cerrar'])->name('egresados.encuestas.cerrar');
 
     // Módulo de Reportes y Estadísticas
     Route::get('egresados/reportes', [ReportesController::class, 'index'])->name('egresados.reportes');

@@ -47,7 +47,7 @@
         width: 78px;
         height: 78px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #39A900 0%, #008f39 100%);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -97,7 +97,12 @@
         width: 100%;
         border-radius: 0 0 24px 24px;
         transform-origin: left;
-        animation: sena-progress-drain 5.5s linear forwards;
+        animation: sena-progress-drain 7.5s linear forwards;
+    }
+
+    /* Pausar progreso al interactuar o pasar el mouse para permitir lectura tranquila */
+    .sena-modal-card:hover .sena-alert-progress {
+        animation-play-state: paused;
     }
 
     @keyframes sena-chulito-pop {
@@ -123,7 +128,7 @@
 </style>
 
 <!-- ============================================== -->
-<!-- 1. MODAL DE ÉXITO ("CHULITO BIEN BONITO") -->
+<!-- 1. MODAL DE ÉXITO
 <!-- ============================================== -->
 <div x-show="openSuccessModal" 
      @open-success-modal.window="openSuccessModal = true; if($event.detail?.title) document.getElementById('modalSuccessTitle').innerText = $event.detail.title; if($event.detail?.message) document.getElementById('modalSuccessMessage').innerText = $event.detail.message;"
@@ -136,16 +141,16 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      @keydown.window.escape="openSuccessModal = false"
+     @click.self="openSuccessModal = false"
      class="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" x-cloak>
     
-    <div @click.away="openSuccessModal = false"
-         x-transition:enter="transition ease-out duration-300"
+    <div x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90 translate-y-4"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-         class="relative bg-white rounded-3xl max-w-md w-full shadow-2xl border border-emerald-100/80 overflow-hidden text-center p-7 sm:p-8">
+         class="sena-modal-card relative bg-white rounded-3xl max-w-md w-full shadow-2xl border border-emerald-100/80 overflow-hidden text-center p-7 sm:p-8">
         
         <!-- Botón cerrar (X) en esquina -->
         <button @click="openSuccessModal = false" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer" title="Cerrar">
@@ -163,7 +168,7 @@
         </div>
 
         <!-- Encabezado / Tag -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#008f39] uppercase tracking-wider mb-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#39A900] uppercase tracking-wider mb-2">
             <i class="fa-solid fa-graduation-cap"></i>
             <span>SISTEMA INSTITUCIONAL SIGE</span>
         </div>
@@ -188,7 +193,7 @@
         <div class="mt-6">
             <button type="button" 
                     @click="openSuccessModal = false" 
-                    class="w-full py-3.5 px-6 bg-gradient-to-r from-[#001A29] to-[#008f39] hover:from-[#00131E] hover:to-[#00752e] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-950/20 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
+                    class="w-full py-3.5 px-6 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-950/20 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
                 <i class="fa-solid fa-check"></i>
                 <span>Aceptar y Continuar</span>
             </button>
@@ -216,10 +221,10 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      @keydown.window.escape="openErrorModal = false"
+     @click.self="openErrorModal = false"
      class="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" x-cloak>
     
-    <div @click.away="openErrorModal = false"
-         x-transition:enter="transition ease-out duration-300"
+    <div x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90 translate-y-4"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
@@ -268,10 +273,47 @@
     /**
      * Función global para abrir dinámicamente la ventana con el chulito desde JavaScript
      */
+    let successAlertTimer = null;
+    let successStartTime = 0;
+    const SUCCESS_DURATION = 7500; // 7.5 segundos (3 segundos adicionales para permitir una lectura tranquila)
+    let successRemaining = SUCCESS_DURATION;
+
+    function clearSuccessTimer() {
+        if (successAlertTimer) {
+            clearTimeout(successAlertTimer);
+            successAlertTimer = null;
+        }
+    }
+
+    function startSuccessTimer(duration) {
+        clearSuccessTimer();
+        successStartTime = Date.now();
+        successRemaining = duration;
+        successAlertTimer = setTimeout(function() {
+            window.dispatchEvent(new CustomEvent('close-success-modal'));
+        }, successRemaining);
+    }
+
+    function pauseSuccessTimer() {
+        if (successAlertTimer) {
+            clearSuccessTimer();
+            successRemaining -= (Date.now() - successStartTime);
+            if (successRemaining < 1000) successRemaining = 1000;
+        }
+    }
+
     window.showSuccessAlert = function(title, message) {
         window.dispatchEvent(new CustomEvent('open-success-modal', {
             detail: { title: title, message: message }
         }));
+        // Reiniciar barra de animación
+        const progressBar = document.querySelector('.sena-alert-progress');
+        if (progressBar) {
+            progressBar.style.animation = 'none';
+            void progressBar.offsetWidth;
+            progressBar.style.animation = 'sena-progress-drain ' + (SUCCESS_DURATION / 1000) + 's linear forwards';
+        }
+        startSuccessTimer(SUCCESS_DURATION);
     };
 
     window.showErrorAlert = function(title, message) {
@@ -280,10 +322,20 @@
         }));
     };
 
-    // Autocierre después de 5.5 segundos si está abierto por sesión
+    // Autocierre después de 7.5 segundos si está abierto por sesión, con pausa interactiva al pasar el mouse
     @if($hasSuccess)
-    setTimeout(function() {
-        window.dispatchEvent(new CustomEvent('close-success-modal'));
-    }, 5500);
+    startSuccessTimer(SUCCESS_DURATION);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const successCard = document.querySelector('.sena-modal-card');
+        if (successCard) {
+            successCard.addEventListener('mouseenter', pauseSuccessTimer);
+            successCard.addEventListener('mouseleave', function() {
+                if (successRemaining > 0) {
+                    startSuccessTimer(successRemaining);
+                }
+            });
+        }
+    });
     @endif
 </script>

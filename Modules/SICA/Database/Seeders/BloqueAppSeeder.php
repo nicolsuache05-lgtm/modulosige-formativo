@@ -121,11 +121,11 @@ class BloqueAppSeeder extends Seeder
 
         App::updateOrCreate(['url' => '/egresados'], [
             'bloque_id' => $apoyo->id,
-            'name' => 'SIGE',
+            'name' => 'Egresados (SIGE)',
             'color' => '#e65100',
             'icon' => 'fas fa-user-graduate',
-            'description' => 'Sistema de gestion de egresados (SIGE) para el seguimiento laboral y académico de los egresados.',
-            'description_english' => 'Alumni management system (SIGE) for labor and academic follow-up of alumni.'
+            'description' => 'Sistema Integrado de Gestión y Seguimiento a Egresados (SIGE) para el seguimiento laboral y académico de los egresados.',
+            'description_english' => 'Integrated Alumni Management and Tracking System (SIGE) for labor and academic follow-up of alumni.'
         ]);
 
         App::updateOrCreate(['url' => '/admin'], [

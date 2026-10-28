@@ -230,9 +230,12 @@ class SigeSyncService
             'CERTIFICADO'       => 'CERTIFICADO',
             'EGRESADO'          => 'CERTIFICADO',
             'GRADUADO'          => 'CERTIFICADO',
+            'TITULADO'          => 'CERTIFICADO',
+            'FINALIZADO'        => 'CERTIFICADO',
+            'CULMINADO'         => 'CERTIFICADO',
+            'EMPLEADO'          => 'CERTIFICADO',
             'EN FORMACION'      => 'EN FORMACIÓN',
             'EN FORMACIÓN'      => 'EN FORMACIÓN',
-            'EMPLEADO'          => 'EN FORMACIÓN',
             'RETIRO VOLUNTARIO' => 'RETIRO VOLUNTARIO',
             'CANCELADO'         => 'CANCELADO',
             'TRASLADADO'        => 'TRASLADADO',
@@ -245,6 +248,8 @@ class SigeSyncService
         $now = now()->toDateTimeString();
         $peopleBatch = [];
         $itemsByDoc = [];
+        $seenEmailsInBatch = [];
+        $seenTelsInBatch = [];
 
         // 1. Mapeo estricto y depuración en memoria: solo los campos necesarios
         foreach ($items as $item) {
@@ -289,13 +294,27 @@ class SigeSyncService
             $firstLastName = $rawLastName !== '' ? substr($rawLastName, 0, 100) : 'SENA';
             $secondLastName = !empty($item['segundo_apellido']) ? substr(trim((string) $item['segundo_apellido']), 0, 100) : null;
 
-            // Sanitizar correo
+            // Sanitizar correo y asegurar unicidad dentro del lote
             $rawEmail = strtolower(trim((string) ($item['correo'] ?? $item['email'] ?? $item['correo_electronico'] ?? '')));
             $cleanEmail = filter_var($rawEmail, FILTER_VALIDATE_EMAIL) ? substr($rawEmail, 0, 150) : null;
+            if ($cleanEmail) {
+                if (isset($seenEmailsInBatch[$cleanEmail]) && $seenEmailsInBatch[$cleanEmail] !== $docNum) {
+                    $cleanEmail = null; // Evitar colisión de correos duplicados entre distintos egresados
+                } else {
+                    $seenEmailsInBatch[$cleanEmail] = $docNum;
+                }
+            }
 
-            // Sanitizar teléfono
+            // Sanitizar teléfono (7 a 15 dígitos) y asegurar unicidad dentro del lote
             $rawTel = preg_replace('/[^0-9]/', '', (string) ($item['telefono'] ?? $item['celular'] ?? ''));
-            $cleanTel = ($rawTel !== '' && strlen($rawTel) >= 7) ? (int) substr($rawTel, 0, 18) : null;
+            $cleanTel = ($rawTel !== '' && strlen($rawTel) >= 7 && strlen($rawTel) <= 15) ? (int) substr($rawTel, 0, 15) : null;
+            if ($cleanTel) {
+                if (isset($seenTelsInBatch[$cleanTel]) && $seenTelsInBatch[$cleanTel] !== $docNum) {
+                    $cleanTel = null; // Evitar colisión de teléfonos duplicados entre distintos egresados
+                } else {
+                    $seenTelsInBatch[$cleanTel] = $docNum;
+                }
+            }
 
             // Fila para UPSERT masivo en `people` (identificador único: document_number)
             $peopleBatch[$docNum] = [
@@ -354,8 +373,25 @@ class SigeSyncService
                 continue;
             }
 
-            // Resolver ficha / curso en O(1) desde memoria sin consultas repetidas
+            // Resolver ficha / curso en O(1) desde memoria o registrarla si es nueva
             $rawFicha = preg_replace('/[^0-9]/', '', (string) ($item['ficha'] ?? $item['codigo_ficha'] ?? $item['codigo_de_ficha'] ?? $item['course_code'] ?? ''));
+            if (!empty($rawFicha) && !isset($this->courseMap[$rawFicha])) {
+                $c = Course::where('code', $rawFicha)->first();
+                if (!$c) {
+                    $municipalityId = DB::table('municipalities')->value('id') ?? 1;
+                    $c = Course::firstOrCreate(
+                        ['code' => $rawFicha],
+                        [
+                            'program_id'      => $this->fallbackCourseId ? (Course::where('id', $this->fallbackCourseId)->value('program_id') ?? 1) : 1,
+                            'municipality_id' => $municipalityId,
+                            'start_date'      => now()->subYears(2)->toDateString(),
+                            'end_date'        => now()->toDateString(),
+                            'status'          => 'Activo',
+                        ]
+                    );
+                }
+                $this->courseMap[$rawFicha] = $c->id;
+            }
             $courseId = $this->courseMap[$rawFicha] ?? $this->fallbackCourseId;
 
             // Mapear estado ocupacional
@@ -383,6 +419,37 @@ class SigeSyncService
                     'updated_at',
                 ]
             );
+        }
+
+        // 6. Asignar rol de egresado institucional a cada persona importada para visibilidad inmediata en SIGE
+        $roleEgresado = DB::table('roles')->where('slug', 'egresados.egresado')->first();
+        if ($roleEgresado && !empty($personIdMap)) {
+            foreach ($personIdMap as $docNum => $pId) {
+                $user = DB::table('users')->where('person_id', $pId)->first();
+                if (!$user) {
+                    $cleanEmail = $peopleBatch[$docNum]['personal_email'] ?? "egresado.{$docNum}@sena.edu.co";
+                    $userId = DB::table('users')->insertGetId([
+                        'email'      => $cleanEmail,
+                        'nickname'   => "egresado.{$docNum}",
+                        'password'   => \Illuminate\Support\Facades\Hash::make("Sena{$docNum}*"),
+                        'person_id'  => $pId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    $userId = $user->id;
+                }
+
+                $hasRole = DB::table('role_user')->where('user_id', $userId)->where('role_id', $roleEgresado->id)->exists();
+                if (!$hasRole) {
+                    DB::table('role_user')->insert([
+                        'role_id'    => $roleEgresado->id,
+                        'user_id'    => $userId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            }
         }
 
         $procesadosCount = count($peopleBatch);

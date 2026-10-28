@@ -828,7 +828,23 @@
               <span>Portal Público SIGE</span>
             </a>
 
+<<<<<<< HEAD
             <div class="user-dropdown-divider"></div>
+=======
+            <!-- Navigation Links -->
+            <nav class="mt-6 space-y-1.5">
+                @if(Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->nickname === 'superadmin_egresados' || Auth::user()->roles->contains('slug', 'egresados.admin')))
+                    <a href="{{ route('egresados.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-300 hover:text-white hover:bg-amber-500/40 font-bold text-xs border border-amber-400/40 shadow-sm transition mb-3">
+                        <i class="fa-solid fa-crown w-4 text-center text-amber-400"></i>
+                        <span>Ir a Panel Superadmin</span>
+                    </a>
+                @endif
+
+                <a href="{{ route('egresados.instructor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
+                    <i class="fa-solid fa-chalkboard-user w-4 text-center"></i>
+                    <span>Panel de Seguimiento</span>
+                </a>
+>>>>>>> origin/main
 
             <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
               @csrf
@@ -870,6 +886,7 @@
             <div class="stat-icon">
               <i class="fa-solid fa-user-graduate"></i>
             </div>
+<<<<<<< HEAD
             <div class="stat-title">Total Egresados Fichas</div>
           </div>
           <div class="stat-value">{{ number_format($totalEgresados) }}</div>
@@ -877,6 +894,18 @@
             <div class="stat-trend">
               <i class="fa-solid fa-circle-check"></i>
               <span>Bajo seguimiento</span>
+=======
+
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    Rol: {{ Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->roles->contains('slug', 'egresados.admin') || Auth::user()->nickname === 'superadmin_egresados') ? 'Superadmin / Coordinación' : 'Instructor Egresados' }}
+                </span>
+                <a href="{{ route('home') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                    <span>Portal Principal ERP</span>
+                </a>
+>>>>>>> origin/main
             </div>
             <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
               <span>Ver detalle</span>

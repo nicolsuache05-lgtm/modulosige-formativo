@@ -16,12 +16,12 @@ class InstructorController extends Controller
     public function dashboard(Request $request)
     {
         $courses = Course::with('program')->get();
-        $totalEgresados = Apprentice::count() ?: 5634;
-        $totalEmpleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count() ?: 3799;
-        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count() ?: 680;
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'CONDICIONADO')->count() ?: 450;
+        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
 
-        $query = Apprentice::with(['person', 'course.program']);
+        $query = Apprentice::where('apprentice_status', 'CERTIFICADO')->with(['person', 'course.program']);
 
         if ($request->filled('course_id')) {
             $query->where('course_id', $request->input('course_id'));
@@ -54,9 +54,9 @@ class InstructorController extends Controller
     public function directorio(Request $request)
     {
         // Métricas de seguimiento para el instructor
-        $totalEgresadosCount = Apprentice::count();
-        $totalEgresados = $totalEgresadosCount > 0 ? $totalEgresadosCount : 5634;
-        $actualizacionPendiente = 304;
+        $totalEgresadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEgresados = $totalEgresadosCount;
+        $actualizacionPendiente = 0;
         $seguimientosRealizados = 300;
 
         // Cursos y programas para filtros
@@ -64,7 +64,7 @@ class InstructorController extends Controller
         $programs = Program::orderBy('name')->get();
 
         // Consulta de egresados con relaciones
-        $query = Apprentice::with(['person', 'course.program']);
+        $query = Apprentice::where('apprentice_status', 'CERTIFICADO')->with(['person', 'course.program']);
 
         if ($request->filled('search')) {
             $search = $request->input('search');

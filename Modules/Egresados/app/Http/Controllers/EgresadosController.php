@@ -8,6 +8,7 @@ use Modules\SICA\Entities\Apprentice;
 use Modules\SICA\Entities\Course;
 use Modules\SICA\Entities\Person;
 use Modules\SICA\Entities\Role;
+use Modules\SICA\Entities\Program;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,179 @@ use Modules\Egresados\app\Imports\InstructoresImport;
 
 class EgresadosController extends Controller
 {
+    /**
+     * Mapea cualquier variante de tipo de documento al ENUM exacto de la tabla people del ERP.
+     */
+    public static function normalizeDocumentType(?string $tipo): string
+    {
+        if (empty($tipo)) {
+            return 'Cédula de ciudadanía';
+        }
+
+        $clean = strtoupper(trim(str_replace(
+            ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú', 'ñ', 'Ñ'],
+            ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U', 'n', 'N'],
+            $tipo
+        )));
+
+        if (str_contains($clean, 'TARJETA') || $clean === 'TI') {
+            return 'Tarjeta de identidad';
+        }
+        if (str_contains($clean, 'EXTRANJER') || $clean === 'CE') {
+            return 'Cédula de extranjería';
+        }
+        if (str_contains($clean, 'PASAPORTE') || $clean === 'PAS') {
+            return 'Pasaporte';
+        }
+        if (str_contains($clean, 'NACIONAL') || $clean === 'DNI') {
+            return 'Documento nacional de identidad';
+        }
+        if (str_contains($clean, 'REGISTRO') || $clean === 'RC') {
+            return 'Registro civil';
+        }
+        if (str_contains($clean, 'PROTECCION') || str_contains($clean, 'PERMISO') || str_contains($clean, 'PEP') || str_contains($clean, 'PPT') || str_contains($clean, 'TEMPORAL')) {
+            return 'Permiso de Protección Temporal';
+        }
+
+        return 'Cédula de ciudadanía';
+    }
+
+    /**
+     * Mapea cualquier estado al ENUM exacto de la tabla apprentices del ERP.
+     */
+    public static function normalizeApprenticeStatus(?string $estado): string
+    {
+        if (empty($estado)) {
+            return 'CERTIFICADO';
+        }
+
+        $clean = strtoupper(trim(str_replace(
+            ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+            ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'],
+            $estado
+        )));
+
+        $map = [
+            'CERTIFICADO'       => 'CERTIFICADO',
+            'EN_FORMACION'      => 'EN FORMACIÓN',
+            'EN FORMACION'      => 'EN FORMACIÓN',
+            'EN FORMACIÓN'      => 'EN FORMACIÓN',
+            'FORMACION'         => 'EN FORMACIÓN',
+            'EMPLEADO'          => 'EN FORMACIÓN',
+            'CONDICIONADO'      => 'CONDICIONADO',
+            'INDUCCION'         => 'INDUCCIÓN',
+            'INDUCCIÓN'         => 'INDUCCIÓN',
+            'APLAZADO'          => 'APLAZADO',
+            'CANCELADO'         => 'CANCELADO',
+            'RETIRO VOLUNTARIO' => 'RETIRO VOLUNTARIO',
+            'RETIRO_VOLUNTARIO' => 'RETIRO VOLUNTARIO',
+            'TRASLADADO'        => 'TRASLADADO',
+            'NO REGISTRA'       => 'NO REGISTRA',
+        ];
+
+        return $map[$clean] ?? 'CERTIFICADO';
+    }
+
+    /**
+     * Sanitiza y asegura campos obligatorios de Person para evitar advertencias de truncamiento en MySQL del ERP.
+     */
+    public static function ensurePersonDefaults(Person $person): void
+    {
+        if (!isset($person->eps_id) || $person->eps_id === null || $person->eps_id === '') {
+            $eps = \DB::table('e_p_s')->value('id');
+            $person->eps_id = $eps !== null ? $eps : 0;
+        }
+        if (!isset($person->population_group_id) || $person->population_group_id === null || $person->population_group_id === '') {
+            $pop = \DB::table('population_groups')->value('id');
+            $person->population_group_id = $pop !== null ? $pop : 1;
+        }
+        if (!isset($person->pension_entity_id) || $person->pension_entity_id === null || $person->pension_entity_id === '') {
+            $pen = \DB::table('pension_entities')->value('id');
+            $person->pension_entity_id = $pen !== null ? $pen : 1;
+        }
+        if (empty($person->document_type)) {
+            $person->document_type = 'Cédula de ciudadanía';
+        }
+    }
+
+    /**
+     * Localiza inteligentemente un Programa de formación en el ERP o lo crea cumpliendo el esquema relacional.
+     */
+    public static function findOrCreateProgram(?string $progName): ?Program
+    {
+        if (empty($progName)) {
+            return Program::first();
+        }
+
+        $progClean = trim(strip_tags($progName));
+
+        // 1. Búsqueda exacta o contenida directa
+        $program = Program::where('name', 'like', '%' . $progClean . '%')->first();
+        if ($program) {
+            return $program;
+        }
+
+        // 2. Búsqueda sin paréntesis ni siglas secundarias (ej. "Análisis y Desarrollo de Software (ADSO)" -> "Análisis y Desarrollo de Software")
+        $withoutParentheses = trim(preg_replace('/\s*\(.*?\)\s*/', ' ', $progClean));
+        if (!empty($withoutParentheses) && $withoutParentheses !== $progClean) {
+            $program = Program::where('name', 'like', '%' . $withoutParentheses . '%')->first();
+            if ($program) {
+                return $program;
+            }
+        }
+
+        // 3. Búsqueda por palabras clave principales
+        $words = array_filter(preg_split('/[\s,\.\(\)\-]+/', $progClean), function($w) {
+            return mb_strlen($w) >= 4;
+        });
+
+        if (!empty($words)) {
+            $query = Program::query();
+            foreach ($words as $word) {
+                $query->where('name', 'like', '%' . $word . '%');
+            }
+            $program = $query->first();
+            if ($program) {
+                return $program;
+            }
+
+            usort($words, fn($a, $b) => mb_strlen($b) - mb_strlen($a));
+            $longest = reset($words);
+            $program = Program::where('name', 'like', '%' . $longest . '%')->first();
+            if ($program) {
+                return $program;
+            }
+        }
+
+        // 4. Si el programa no existe, se crea con todos los campos requeridos por el esquema SICA
+        try {
+            $networkId = \DB::table('knowledge_networks')->value('id') ?? 1;
+            $maxSofia = (int) (\DB::table('programs')->max('sofia_code') ?? 100000);
+            $newSofiaCode = $maxSofia + rand(1, 100);
+
+            $newProg = new Program();
+            $newProg->name = $withoutParentheses ?: $progClean;
+            $newProg->sofia_code = $newSofiaCode;
+            $newProg->version = 1;
+            $newProg->training_type = 'Titulada';
+            $newProg->quarter_number = 6;
+            $newProg->knowledge_network_id = $networkId;
+            $newProg->program_type = 'Tecnólogo';
+            $newProg->maximum_duration = 24;
+            $newProg->modality = 'Presencial';
+            $newProg->priority_bets = 'Sin especificar';
+            $newProg->fic = 'No';
+            $newProg->months_lectiva = 18;
+            $newProg->months_productiva = 6;
+            $newProg->save();
+
+            return $newProg;
+        } catch (\Exception $e) {
+            \Log::warning('No se pudo registrar nuevo programa en SICA, asignando programa base: ' . $e->getMessage());
+            return Program::first();
+        }
+    }
+
     /**
      * Muestra el panel exclusivo de registro para egresados del CEFA.
      */
@@ -60,26 +234,73 @@ class EgresadosController extends Controller
             'habeas_data.accepted'      => 'Debes aceptar la autorización de tratamiento de datos personales (Habeas Data).',
         ]);
 
-        $cleanEmail = filter_var(trim($request->personal_email), FILTER_SANITIZE_EMAIL);
-        $docNumber = (int) $request->document_number;
+        $cleanEmail = strtolower(filter_var(trim($request->personal_email), FILTER_SANITIZE_EMAIL));
+        $docNumber = (int) preg_replace('/\D/', '', (string) $request->document_number);
+        if ($docNumber <= 0 || strlen((string)$docNumber) < 5) {
+            return redirect()->back()->with('error', 'El número de documento debe contener solo dígitos válidos (mínimo 5 dígitos).')->withInput();
+        }
 
-        // Verificar si ya existe un usuario con este correo
-        $existingUser = User::where('email', $cleanEmail)->first();
-        if ($existingUser && $existingUser->password) {
+        // 1. SEGURIDAD: Verificar si el documento ya está registrado como egresado
+        $existingApprentice = Apprentice::whereHas('person', function($q) use ($docNumber) {
+            $q->where('document_number', $docNumber);
+        })->first();
+        if ($existingApprentice) {
             return redirect()->route('login', ['redirect' => route('egresados.dashboard_egresado')])
-                ->with('info', 'Ya existe una cuenta registrada con el correo ' . $cleanEmail . '. Por favor inicia sesión con tu contraseña.');
+                ->with('info', "El documento {$docNumber} ya se encuentra registrado como egresado en el sistema. Por favor inicia sesión.");
+        }
+
+        // 2. SEGURIDAD: Verificar unicidad del correo electrónico (no correos duplicados)
+        $personWithEmail = Person::where(function($q) use ($cleanEmail) {
+            $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+        })->where('document_number', '!=', $docNumber)->first();
+
+        if ($personWithEmail) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra registrado a nombre de otra persona (Documento: {$personWithEmail->document_number}). Los datos de contacto deben ser únicos.")->withInput();
+        }
+
+        $existingUser = User::where('email', $cleanEmail)->first();
+        if ($existingUser) {
+            if ($existingUser->person_id) {
+                $uPerson = Person::find($existingUser->person_id);
+                if ($uPerson && $uPerson->document_number != $docNumber) {
+                    return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya pertenece a otra cuenta de usuario en el sistema. Cada egresado debe tener un correo único.")->withInput();
+                }
+            }
+            if ($existingUser->password) {
+                return redirect()->route('login', ['redirect' => route('egresados.dashboard_egresado')])
+                    ->with('info', 'Ya existe una cuenta registrada con el correo ' . $cleanEmail . '. Por favor inicia sesión con tu contraseña.');
+            }
+        }
+
+        // 3. SEGURIDAD: Verificar unicidad del número de teléfono (no teléfonos duplicados)
+        $cleanTel = null;
+        if ($request->filled('telephone1')) {
+            $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telephone1);
+            if (!empty($cleanTelDigits)) {
+                if (strlen($cleanTelDigits) < 7 || strlen($cleanTelDigits) > 15) {
+                    return redirect()->back()->with('error', 'El número de teléfono debe tener entre 7 y 15 dígitos numéricos.')->withInput();
+                }
+                $personWithPhone = Person::where('telephone1', (int)$cleanTelDigits)
+                    ->where('document_number', '!=', $docNumber)
+                    ->first();
+                if ($personWithPhone) {
+                    return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra registrado a nombre de otra persona en el sistema. Cada egresado debe contar con un teléfono de contacto único.")->withInput();
+                }
+                $cleanTel = (int)$cleanTelDigits;
+            }
         }
 
         DB::beginTransaction();
         try {
-            // 1. Obtener IDs por defecto de tablas maestras
-            $epsId = DB::table('e_p_s')->value('id') ?? 1;
+            // 1. Obtener IDs por defecto de tablas maestras del ERP
+            $epsId = DB::table('e_p_s')->value('id');
+            $epsId = $epsId !== null ? $epsId : 0;
             $populationGroupId = DB::table('population_groups')->value('id') ?? 1;
             $pensionEntityId = DB::table('pension_entities')->value('id') ?? 1;
 
-            // 2. Buscar o crear la Persona
+            // 2. Buscar o crear la Persona asegurando tipos de la BD ERP
             $person = Person::firstOrNew(['document_number' => $docNumber]);
-            $person->document_type = strip_tags($request->document_type);
+            $person->document_type = self::normalizeDocumentType($request->document_type);
             $person->first_name = strip_tags(trim($request->first_name));
             $person->first_last_name = strip_tags(trim($request->first_last_name));
             if ($request->filled('second_last_name')) {
@@ -88,7 +309,7 @@ class EgresadosController extends Controller
             if ($request->filled('gender')) {
                 $person->gender = strip_tags($request->gender);
             }
-            $person->telephone1 = strip_tags(trim($request->telephone1));
+            $person->telephone1 = $cleanTel;
             $person->personal_email = $cleanEmail;
             if ($request->filled('misena_email')) {
                 $person->misena_email = filter_var(trim($request->misena_email), FILTER_SANITIZE_EMAIL);
@@ -96,17 +317,18 @@ class EgresadosController extends Controller
             $person->eps_id = $person->eps_id ?: $epsId;
             $person->population_group_id = $person->population_group_id ?: $populationGroupId;
             $person->pension_entity_id = $person->pension_entity_id ?: $pensionEntityId;
+            self::ensurePersonDefaults($person);
             $person->save();
 
-            // 3. Crear o actualizar el Usuario
+            // 3. Crear o actualizar el Usuario de manera segura
             $baseNickname = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $person->first_name . '.' . $person->first_last_name));
-            $nickname = $baseNickname;
+            $nickname = $baseNickname ?: 'egresado.' . $person->document_number;
             $count = 1;
             while (User::where('nickname', $nickname)->where('id', '!=', $existingUser?->id)->exists()) {
                 $nickname = $baseNickname . $count++;
             }
 
-            $user = $existingUser ?: new User();
+            $user = $existingUser ?: (User::where('person_id', $person->id)->first() ?: new User());
             $user->person_id = $person->id;
             $user->email = $cleanEmail;
             $user->nickname = $user->nickname ?: $nickname;
@@ -133,7 +355,7 @@ class EgresadosController extends Controller
             // 5. Vincular registro en Aprendiz
             $apprentice = Apprentice::firstOrNew(['person_id' => $person->id]);
             $apprentice->course_id = (int) $request->course_id;
-            $apprentice->apprentice_status = $request->input('estado_egresado', 'CERTIFICADO');
+            $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->input('estado_egresado', 'CERTIFICADO'));
             $apprentice->save();
 
             DB::commit();
@@ -158,10 +380,10 @@ class EgresadosController extends Controller
      */
     public function welcome()
     {
-        $totalEgresados = Apprentice::count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
+        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
         $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'CONDICIONADO')->count();
+        $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
 
         return view('egresados::welcome', compact(
             'totalEgresados',
@@ -176,17 +398,47 @@ class EgresadosController extends Controller
      */
     public function dashboard()
     {
-        $totalEgresados = Apprentice::count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
-        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'CONDICIONADO')->count();
-        
-        $totalActivos = $totalEgresados;
-        $tasaEmpleo = 45;
+        $baseQuery = Apprentice::where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
 
-        $recentEgresados = Apprentice::with(['person', 'course.program'])
+        $totalEgresados = (clone $baseQuery)->count();
+        $totalActivos = $totalEgresados;
+        $totalEmpleados = (clone $baseQuery)->where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = (clone $baseQuery)->where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = (clone $baseQuery)->where('apprentice_status', 'EN FORMACIÓN')->count();
+        
+        $tasaEmpleo = $totalActivos > 0 ? round(($totalEmpleados / $totalActivos) * 100) : 100;
+
+        $recentEgresados = (clone $baseQuery)
+            ->with(['person', 'course.program'])
+            ->orderBy('updated_at', 'desc')
             ->orderBy('id', 'desc')
-            ->take(5)
+            ->take(6)
+            ->get();
+
+        // Métricas reales de egresados por programa de formación
+        $programStats = DB::table('programs')
+            ->join('courses', 'programs.id', '=', 'courses.program_id')
+            ->join('apprentices', 'courses.id', '=', 'apprentices.course_id')
+            ->whereNull('apprentices.deleted_at')
+            ->where(function($q) {
+                $q->whereExists(function($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('people')
+                        ->join('users', 'people.id', '=', 'users.person_id')
+                        ->join('role_user', 'users.id', '=', 'role_user.user_id')
+                        ->join('roles', 'role_user.role_id', '=', 'roles.id')
+                        ->whereColumn('people.id', 'apprentices.person_id')
+                        ->where('roles.slug', 'egresados.egresado');
+                })->orWhere('apprentices.apprentice_status', 'CERTIFICADO');
+            })
+            ->select('programs.name', DB::raw('count(apprentices.id) as total'))
+            ->groupBy('programs.id', 'programs.name')
+            ->orderByDesc('total')
+            ->take(4)
             ->get();
 
         return view('egresados::superadmin.dashboard', compact(
@@ -196,7 +448,8 @@ class EgresadosController extends Controller
             'totalEstudiantes',
             'totalActivos',
             'tasaEmpleo',
-            'recentEgresados'
+            'recentEgresados',
+            'programStats'
         ));
     }
 
@@ -255,66 +508,301 @@ class EgresadosController extends Controller
     public function instructoresStore(Request $request)
     {
         $request->validate([
-            'documento' => 'required|string',
-            'nombre'    => 'required|string|max:255',
-            'correo'    => 'required|email|max:255',
-            'rol'       => 'nullable|string',
-            'programa'  => 'nullable|string',
+            'tipo_documento' => 'nullable|string|max:50',
+            'documento'      => 'required|string',
+            'nombres'        => 'nullable|string|max:255',
+            'apellidos'      => 'nullable|string|max:255',
+            'nombre'         => 'nullable|string|max:255',
+            'correo'         => 'required|email|max:255',
+            'programa'       => 'nullable|string|max:255',
+            'telefono'       => 'nullable|string',
+        ], [
+            'documento.required' => 'El número de documento es obligatorio.',
+            'correo.required'    => 'El correo electrónico es obligatorio.',
+            'correo.email'       => 'El formato de correo no es válido.',
         ]);
+
+        $docNum = (int) preg_replace('/\D/', '', (string)$request->documento);
+        if ($docNum <= 0 || strlen((string)$docNum) < 5) {
+            return redirect()->back()->with('error', 'El número de documento del instructor debe ser numérico válido (mínimo 5 dígitos).')->withInput();
+        }
+
+        $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
+
+        // 1. SEGURIDAD: Verificar unicidad de correo
+        $personWithEmail = Person::where(function($q) use ($cleanEmail) {
+            $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+        })->where('document_number', '!=', $docNum)->first();
+
+        if ($personWithEmail) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra registrado por otra persona en el sistema (Documento: {$personWithEmail->document_number}). Los correos deben ser únicos.")->withInput();
+        }
+
+        $userWithEmail = \App\Models\User::where('email', $cleanEmail)->first();
+        if ($userWithEmail && $userWithEmail->person_id) {
+            $uPerson = Person::find($userWithEmail->person_id);
+            if ($uPerson && $uPerson->document_number != $docNum) {
+                return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está asignado a otra cuenta de usuario en el sistema.")->withInput();
+            }
+        } elseif ($userWithEmail && !$userWithEmail->person_id) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está reservado por una cuenta de usuario existente.")->withInput();
+        }
+
+        // 2. SEGURIDAD: Verificar unicidad de teléfono
+        $cleanTel = null;
+        if ($request->filled('telefono')) {
+            $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telefono);
+            if (!empty($cleanTelDigits)) {
+                if (strlen($cleanTelDigits) < 7 || strlen($cleanTelDigits) > 15) {
+                    return redirect()->back()->with('error', 'El número de teléfono del instructor debe tener entre 7 y 15 dígitos numéricos.')->withInput();
+                }
+                $personWithPhone = Person::where('telephone1', (int)$cleanTelDigits)->where('document_number', '!=', $docNum)->first();
+                if ($personWithPhone) {
+                    return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra registrado por otra persona en el sistema. Los teléfonos deben ser únicos.")->withInput();
+                }
+                $cleanTel = (int)$cleanTelDigits;
+            }
+        }
 
         \DB::beginTransaction();
         try {
-            // 1. Separar nombre y apellidos
-            $partesNombre = explode(' ', trim($request->nombre), 2);
-            $firstName = $partesNombre[0] ?? 'Instructor';
-            $firstLastName = $partesNombre[1] ?? 'SENA';
+            // 1. Separar o procesar nombre y apellidos inteligentemente
+            if ($request->filled('nombres')) {
+                $firstName = strip_tags(trim($request->nombres));
+                $firstLastName = strip_tags(trim($request->apellidos ?? 'SENA'));
+                $secondLastName = null;
+            } else {
+                $partesNombre = preg_split('/\s+/', trim(strip_tags($request->nombre ?? 'Instructor SENA')));
+                $firstName = $partesNombre[0] ?? 'Instructor';
+                $firstLastName = $partesNombre[1] ?? 'SENA';
+                $secondLastName = isset($partesNombre[2]) ? implode(' ', array_slice($partesNombre, 2)) : null;
+            }
 
-            // 2. Crear o buscar Persona en SICA
-            $person = Person::firstOrNew(['document_number' => $request->documento]);
-            $person->document_type = $person->document_type ?: 'CC';
+            // 2. Crear o buscar Persona en el ERP (SICA) con normalización estricta (incluyendo soft-deleted)
+            $person = Person::withTrashed()->where('document_number', $docNum)->first();
+            if (!$person) {
+                $person = new Person(['document_number' => $docNum]);
+            } elseif (method_exists($person, 'trashed') && $person->trashed()) {
+                $person->restore();
+            }
+            $person->document_type = self::normalizeDocumentType($request->tipo_documento ?? $person->document_type ?? 'Cédula de ciudadanía');
             $person->first_name = $firstName;
             $person->first_last_name = $firstLastName;
-            $person->personal_email = $request->correo;
-            $person->misena_email = $request->correo;
+            if ($secondLastName) {
+                $person->second_last_name = $secondLastName;
+            }
+
+            $person->personal_email = $cleanEmail;
+            $person->misena_email = $cleanEmail;
+            $person->telephone1 = $cleanTel;
+
+            self::ensurePersonDefaults($person);
             $person->save();
 
-            // 3. Crear o buscar Usuario
-            $user = \App\Models\User::firstOrNew(['email' => $request->correo]);
-            if (!$user->exists) {
-                $user->nickname = strtolower(str_replace(' ', '.', $firstName . '.' . $firstLastName));
+            // 3. Crear o asociar Usuario en la tabla users sin colisiones
+            $user = \App\Models\User::where('person_id', $person->id)->orWhere('email', $cleanEmail)->first();
+            if (!$user) {
+                $user = new \App\Models\User();
                 $user->person_id = $person->id;
+                $user->email = $cleanEmail;
+
+                $baseNickname = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstName . '.' . $firstLastName));
+                $nickname = $baseNickname ?: 'instructor.' . $docNum;
+                $count = 1;
+                while (\App\Models\User::where('nickname', $nickname)->exists()) {
+                    $nickname = $baseNickname . $count++;
+                }
+                $user->nickname = $nickname;
                 $user->password = bcrypt('Sena12345*');
+                $user->save();
+            } else {
+                $user->person_id = $person->id;
+                if (!\App\Models\User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
+                    $user->email = $cleanEmail;
+                }
                 $user->save();
             }
 
-            // 4. Asignar rol si existe en la BD
-            if ($request->filled('rol')) {
-                $roleInput = $request->rol;
-                $roleMapping = [
-                    'instructor_egresados' => 'egresados.instructor',
-                    'superadmin_egresados' => 'egresados.admin',
-                    'coordinador'          => 'sica.coordinator',
-                    'instructor'           => 'egresados.instructor',
-                    'superadmin'           => 'egresados.admin',
-                    'admin'                => 'egresados.admin',
-                ];
-                $targetSlug = $roleMapping[$roleInput] ?? $roleInput;
+            // 4. Asignar rol exclusivo de Instructor en la BD del ERP (sin superadmin ni coordinador)
+            $app = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+            $appId = $app ? $app->id : 30;
+            $role = \Modules\SICA\Entities\Role::firstOrCreate(
+                ['slug' => 'egresados.instructor'],
+                [
+                    'name' => 'Instructor Egresados',
+                    'description' => 'Docente o evaluador de seguimiento a egresados en CEFA La Angostura',
+                    'description_english' => 'Instructor / Trainer tracking graduates at CEFA',
+                    'full_access' => 'No',
+                    'app_id' => $appId,
+                ]
+            );
 
-                $role = \Modules\SICA\Entities\Role::where('slug', $targetSlug)
-                    ->orWhere('slug', 'like', "%{$targetSlug}%")
-                    ->orWhere('name', 'like', "%{$roleInput}%")
-                    ->first();
-                if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
-                    $user->roles()->attach($role->id);
+            if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
+                $user->roles()->syncWithoutDetaching([$role->id]);
+            }
+
+            // 5. Vincular programa de formación en curso si se especificó
+            if ($request->filled('programa')) {
+                $progInput = trim(strip_tags($request->programa));
+                $course = \Modules\SICA\Entities\Course::whereHas('program', function($q) use ($progInput) {
+                    $q->where('name', 'like', "%{$progInput}%");
+                })->first();
+
+                if ($course) {
+                    $course->person_id = $person->id;
+                    $course->save();
                 }
             }
 
             \DB::commit();
 
-            return redirect()->back()->with('success', '¡Instructor registrado y rol asignado exitosamente (HU-0004 / HU-0005)!');
+            return redirect()->back()->with('success', '¡Instructor registrado y rol asignado exitosamente en el ERP!');
         } catch (\Exception $e) {
             \DB::rollBack();
+            \Log::error('Error en instructoresStore: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al registrar instructor: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Actualiza la información de un instructor existente en el ERP.
+     */
+    public function instructoresUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'documento' => 'required|string',
+            'nombre'    => 'required|string|max:255',
+            'correo'    => 'required|email|max:255',
+            'rol'       => 'nullable|string',
+            'telefono'  => 'nullable|string',
+            'programa'  => 'nullable|string',
+        ], [
+            'documento.required' => 'El número de documento es obligatorio.',
+            'nombre.required'    => 'El nombre del instructor es obligatorio.',
+            'correo.required'    => 'El correo electrónico es obligatorio.',
+            'correo.email'       => 'El formato de correo no es válido.',
+        ]);
+
+        \DB::beginTransaction();
+        try {
+            $user = \App\Models\User::with('person')->findOrFail($id);
+            $person = $user->person;
+
+            $docNum = (int) preg_replace('/\D/', '', (string)$request->documento);
+            if ($docNum <= 0 || strlen((string)$docNum) < 5) {
+                return redirect()->back()->with('error', 'El número de documento no es válido (mínimo 5 dígitos).')->withInput();
+            }
+
+            // 1. SEGURIDAD: Unicidad del documento contra otras personas
+            if ($person) {
+                $otherPersonWithDoc = Person::where('document_number', $docNum)->where('id', '!=', $person->id)->first();
+                if ($otherPersonWithDoc) {
+                    return redirect()->back()->with('error', "El número de documento {$docNum} ya se encuentra asignado a otra persona en el sistema.")->withInput();
+                }
+            }
+
+            // 2. SEGURIDAD: Unicidad del correo electrónico (nada de correos duplicados)
+            $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
+            if ($person) {
+                $otherPersonWithEmail = Person::where(function($q) use ($cleanEmail) {
+                    $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+                })->where('id', '!=', $person->id)->first();
+
+                if ($otherPersonWithEmail) {
+                    return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya pertenece a otra persona en el sistema (Documento: {$otherPersonWithEmail->document_number}). Los correos deben ser únicos.")->withInput();
+                }
+            }
+
+            $otherUserWithEmail = \App\Models\User::where('email', $cleanEmail)->where('id', '!=', $user->id)->first();
+            if ($otherUserWithEmail) {
+                return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está asignado a otra cuenta de usuario. Ingrese un correo único.")->withInput();
+            }
+
+            if (!$person) {
+                $person = Person::firstOrNew(['document_number' => $docNum]);
+            } else {
+                $person->document_number = $docNum;
+            }
+
+            $partesNombre = preg_split('/\s+/', trim(strip_tags($request->nombre)));
+            $person->first_name = $partesNombre[0] ?? 'Instructor';
+            $person->first_last_name = $partesNombre[1] ?? 'SENA';
+            $person->second_last_name = isset($partesNombre[2]) ? implode(' ', array_slice($partesNombre, 2)) : null;
+
+            if ($request->filled('tipo_documento')) {
+                $person->document_type = self::normalizeDocumentType($request->tipo_documento);
+            }
+
+            $person->personal_email = $cleanEmail;
+            $person->misena_email = $cleanEmail;
+
+            // 3. SEGURIDAD: Unicidad del número de teléfono (nada de teléfonos duplicados)
+            $cleanTel = null;
+            if ($request->filled('telefono')) {
+                $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telefono);
+                if (!empty($cleanTelDigits)) {
+                    if (strlen($cleanTelDigits) < 7 || strlen($cleanTelDigits) > 15) {
+                        return redirect()->back()->with('error', 'El número de teléfono del instructor debe tener entre 7 y 15 dígitos numéricos.')->withInput();
+                    }
+                    $otherPersonWithPhone = Person::where('telephone1', (int)$cleanTelDigits)
+                        ->where('id', '!=', $person->id)
+                        ->first();
+                    if ($otherPersonWithPhone) {
+                        return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra registrado por otra persona en el sistema. Los teléfonos deben ser únicos.")->withInput();
+                    }
+                    $cleanTel = (int)$cleanTelDigits;
+                }
+            }
+            $person->telephone1 = $cleanTel;
+
+            self::ensurePersonDefaults($person);
+            $person->save();
+
+            // Sincronizar datos del usuario
+            $user->person_id = $person->id;
+            if (!\App\Models\User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
+                $user->email = $cleanEmail;
+            }
+            $user->save();
+
+            // Asegurar rol exclusivo de Instructor (sin superadmin ni coordinador)
+            $app = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+            $appId = $app ? $app->id : 30;
+            $role = \Modules\SICA\Entities\Role::firstOrCreate(
+                ['slug' => 'egresados.instructor'],
+                [
+                    'name' => 'Instructor Egresados',
+                    'description' => 'Docente o evaluador de seguimiento a egresados en CEFA La Angostura',
+                    'description_english' => 'Instructor / Trainer tracking graduates at CEFA',
+                    'full_access' => 'No',
+                    'app_id' => $appId,
+                ]
+            );
+
+            if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
+                $user->roles()->syncWithoutDetaching([$role->id]);
+            }
+
+            // Vincular o actualizar programa de formación
+            if ($request->filled('programa')) {
+                $progInput = trim(strip_tags($request->programa));
+                $course = \Modules\SICA\Entities\Course::whereHas('program', function($q) use ($progInput) {
+                    $q->where('name', 'like', "%{$progInput}%");
+                })->first();
+
+                if ($course) {
+                    $course->person_id = $person->id;
+                    $course->save();
+                }
+            }
+
+            \DB::commit();
+
+            return redirect()->back()->with('success', '¡Información del instructor actualizada exitosamente!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Error en instructoresUpdate: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al actualizar instructor: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -672,12 +1160,12 @@ class EgresadosController extends Controller
     public function dashboardInstructor(Request $request)
     {
         $courses = Course::with('program')->get();
-        $totalEgresados = Apprentice::count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
+        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
         $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'CONDICIONADO')->count();
+        $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
 
-        $query = Apprentice::with(['person', 'course.program']);
+        $query = Apprentice::where('apprentice_status', 'CERTIFICADO')->with(['person', 'course.program']);
 
         if ($request->filled('course_id')) {
             $query->where('course_id', $request->input('course_id'));
@@ -752,7 +1240,13 @@ class EgresadosController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Apprentice::with(['person', 'course.program']);
+        // Consulta base: Egresados vinculados a SIGE o con estado CERTIFICADO (evita los 5,600 aprendices de otros módulos)
+        $query = Apprentice::with(['person.users.roles', 'course.program'])
+            ->where(function($q) {
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
+            });
 
         // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
@@ -765,21 +1259,27 @@ class EgresadosController extends Controller
             });
         }
 
-        // Filtro por estado
-        if ($request->filled('apprentice_status')) {
-            $query->where('apprentice_status', strip_tags($request->input('apprentice_status')));
+        // Filtro por estado solo si se selecciona uno específico distinto de TODOS
+        if ($request->filled('apprentice_status') && $request->input('apprentice_status') !== 'TODOS') {
+            $query->where('apprentice_status', $request->input('apprentice_status'));
         }
 
         $egresados = $query->orderBy('id', 'desc')->paginate(10);
 
-        // Estadísticas rápidas para las tarjetas superiores
-        $totalEgresados = Apprentice::count();
-        $totalEmpleados = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
-        $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
-        $totalEstudiantes = Apprentice::where('apprentice_status', 'CONDICIONADO')->count();
-        $actualizacionPendiente = Apprentice::whereIn('apprentice_status', ['CONDICIONADO', 'CANCELADO', 'APLAZADO'])->count() ?: 189;
-        $seguimientosRealizados = 300;
-        $alertasEnviadas = 243;
+        // Estadísticas de egresados de este módulo
+        $baseCount = Apprentice::where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
+
+        $totalEgresados = (clone $baseCount)->count();
+        $totalEmpleados = (clone $baseCount)->where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = (clone $baseCount)->where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = (clone $baseCount)->where('apprentice_status', 'EN FORMACIÓN')->count();
+        $actualizacionPendiente = 0;
+        $seguimientosRealizados = $totalEgresados;
+        $alertasEnviadas = 0;
 
         return view('egresados::superadmin.index', compact(
             'egresados',
@@ -834,7 +1334,7 @@ class EgresadosController extends Controller
             if ($request->filled('nuevo_estado_laboral')) {
                 $apprentice = Apprentice::find($request->egresado_id);
                 if ($apprentice) {
-                    $apprentice->apprentice_status = strip_tags($request->nuevo_estado_laboral);
+                    $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->nuevo_estado_laboral);
                     $apprentice->save();
                 }
             }
@@ -858,6 +1358,7 @@ class EgresadosController extends Controller
             'correo'         => 'required|email|max:255',
             'telefono'       => 'nullable|string|max:50',
             'ficha'          => 'nullable|string|max:50',
+            'programa'       => 'nullable|string|max:255',
             'estado'         => 'nullable|string|max:50',
         ], [
             'documento.required' => 'El número de documento es obligatorio.',
@@ -866,20 +1367,67 @@ class EgresadosController extends Controller
             'correo.email'       => 'Debe ingresar un formato de correo electrónico válido.',
         ]);
 
+        $apprentice = Apprentice::with(['person', 'course.program'])->findOrFail($id);
+        $person = $apprentice->person;
+
+        $cleanDoc = (int) preg_replace('/\D/', '', (string)$request->documento);
+        if ($cleanDoc <= 0 || strlen((string)$cleanDoc) < 5) {
+            return redirect()->back()->with('error', 'El número de documento debe contener solo dígitos válidos (mínimo 5 dígitos).')->withInput();
+        }
+
+        if (!$person) {
+            $person = Person::firstOrNew(['document_number' => $cleanDoc]);
+            $person->save();
+            $apprentice->person_id = $person->id;
+        }
+
+        // SEGURIDAD: 1. Unicidad del documento contra otras personas
+        $otherPersonWithDoc = Person::where('document_number', $cleanDoc)->where('id', '!=', $person->id)->first();
+        if ($otherPersonWithDoc) {
+            // Si ya existe otra persona con ese documento en el ERP, asociamos el aprendiz a esa persona existente
+            $person = $otherPersonWithDoc;
+            $apprentice->person_id = $person->id;
+        }
+
+        // SEGURIDAD: 2. Unicidad del correo electrónico
+        $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
+        $otherPersonWithEmail = Person::where(function($q) use ($cleanEmail) {
+            $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+        })->where('id', '!=', $person->id)->first();
+
+        if ($otherPersonWithEmail && $otherPersonWithEmail->document_number != $cleanDoc) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra asignado a otra persona en el sistema (Documento: {$otherPersonWithEmail->document_number}). Los correos deben ser únicos.")->withInput();
+        }
+
+        $otherUserWithEmail = User::where('email', $cleanEmail)->where('person_id', '!=', $person->id)->first();
+        if ($otherUserWithEmail) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está en uso por otra cuenta de usuario. Ingrese un correo único.")->withInput();
+        }
+
+        // SEGURIDAD: 3. Unicidad del número de teléfono
+        $cleanTel = null;
+        if ($request->filled('telefono')) {
+            $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telefono);
+            if (!empty($cleanTelDigits)) {
+                if (strlen($cleanTelDigits) < 7 || strlen($cleanTelDigits) > 15) {
+                    return redirect()->back()->with('error', 'El número de teléfono debe tener entre 7 y 15 dígitos numéricos.')->withInput();
+                }
+                $otherPersonWithPhone = Person::where('telephone1', (int)$cleanTelDigits)->where('id', '!=', $person->id)->first();
+                if ($otherPersonWithPhone && $otherPersonWithPhone->document_number != $cleanDoc) {
+                    return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra asignado a otra persona en el sistema (Documento: {$otherPersonWithPhone->document_number}). Los teléfonos deben ser únicos.")->withInput();
+                }
+                $cleanTel = (int)$cleanTelDigits;
+            }
+        }
+
         \DB::beginTransaction();
         try {
-            $apprentice = Apprentice::with('person')->findOrFail($id);
-            $person = $apprentice->person;
-
-            if (!$person) {
-                $person = Person::firstOrNew(['document_number' => $request->documento]);
-            }
-
             // Sanitizar y separar nombres inteligentemente
             $nombreLimpio = strip_tags(trim($request->nombre));
             $partes = preg_split('/\s+/', $nombreLimpio);
             if (count($partes) === 1) {
                 $person->first_name = $partes[0];
+                $person->first_last_name = $person->first_last_name ?: 'SENA';
             } elseif (count($partes) === 2) {
                 $person->first_name = $partes[0];
                 $person->first_last_name = $partes[1];
@@ -894,56 +1442,74 @@ class EgresadosController extends Controller
             }
 
             if ($request->filled('tipo_documento')) {
-                $person->document_type = strip_tags($request->tipo_documento);
+                $person->document_type = self::normalizeDocumentType($request->tipo_documento);
             }
-            if ($request->filled('documento')) {
-                $person->document_number = strip_tags($request->documento);
+            $person->document_number = $cleanDoc;
+            $person->personal_email = $cleanEmail;
+            if (str_contains($cleanEmail, 'misena.edu.co') || str_contains($cleanEmail, 'sena.edu.co')) {
+                $person->misena_email = $cleanEmail;
             }
-            if ($request->filled('correo')) {
-                $correoLimpio = filter_var($request->correo, FILTER_SANITIZE_EMAIL);
-                $person->personal_email = $correoLimpio;
-                if (str_contains($correoLimpio, 'misena.edu.co') || str_contains($correoLimpio, 'sena.edu.co')) {
-                    $person->misena_email = $correoLimpio;
-                }
-            }
-            if ($request->filled('telefono')) {
-                $person->telephone1 = strip_tags($request->telefono);
-            }
+            $person->telephone1 = $cleanTel;
+
+            self::ensurePersonDefaults($person);
             $person->save();
 
-            // Actualizar curso si se especificó ficha
-            if ($request->filled('ficha')) {
-                $course = Course::where('code', trim(strip_tags($request->ficha)))->first();
-                if ($course) {
-                    $apprentice->course_id = $course->id;
+            // Actualizar curso y programa según lo que el usuario editó
+            $cleanFicha = $request->filled('ficha') ? preg_replace('/\D/', '', (string)$request->ficha) : null;
+            $progName = $request->filled('programa') ? trim(strip_tags($request->programa)) : null;
+
+            $course = null;
+            if ($cleanFicha) {
+                $course = Course::where('code', $cleanFicha)->orWhere('code', trim(strip_tags($request->ficha)))->first();
+            }
+
+            $program = self::findOrCreateProgram($progName);
+
+            if (!$course && ($cleanFicha || $program)) {
+                $municipalityId = \DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha ?: rand(1000000, 9999999)],
+                    [
+                        'program_id'      => $program ? $program->id : ($apprentice->course ? $apprentice->course->program_id : 1),
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
+            } elseif ($course && $program) {
+                if ($course->program_id !== $program->id) {
+                    $course->program_id = $program->id;
+                    $course->save();
                 }
             }
 
-            // Actualizar estado ocupacional si se especificó
+            if ($course) {
+                $apprentice->course_id = $course->id;
+            } elseif ($program && $apprentice->course) {
+                $apprentice->course->program_id = $program->id;
+                $apprentice->course->save();
+            }
+
+            // Actualizar estado ocupacional normalizado a enum del ERP
             if ($request->filled('estado')) {
-                $statusMap = [
-                    'CERTIFICADO'       => 'CERTIFICADO',
-                    'EN_FORMACION'      => 'EN FORMACIÓN',
-                    'EN FORMACION'      => 'EN FORMACIÓN',
-                    'EN FORMACIÓN'      => 'EN FORMACIÓN',
-                    'CANCELADO'         => 'CANCELADO',
-                    'CONDICIONADO'      => 'CONDICIONADO',
-                    'APLAZADO'          => 'APLAZADO',
-                    'INDUCCIÓN'         => 'INDUCCIÓN',
-                    'INDUCCION'         => 'INDUCCIÓN',
-                    'RETIRO VOLUNTARIO' => 'RETIRO VOLUNTARIO',
-                ];
-                $apprentice->apprentice_status = $statusMap[strtoupper(trim($request->estado))] ?? strip_tags($request->estado);
+                $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->estado);
             }
 
             $apprentice->person_id = $person->id;
+            $apprentice->touch();
             $apprentice->save();
 
-            // Si tiene usuario vinculado por person_id, sincronizar su email
-            $user = User::where('person_id', $person->id)->first();
-            if ($user && $request->filled('correo')) {
-                $user->email = filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL);
-                $user->save();
+            // Si tiene usuario vinculado por person_id, sincronizar su email de forma segura
+            if ($request->filled('correo')) {
+                $correoLimpio = filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL);
+                $user = User::where('person_id', $person->id)->first();
+                if ($user) {
+                    if (!User::where('email', $correoLimpio)->where('id', '!=', $user->id)->exists()) {
+                        $user->email = $correoLimpio;
+                        $user->save();
+                    }
+                }
             }
 
             \DB::commit();
@@ -967,16 +1533,68 @@ class EgresadosController extends Controller
             'nombres'        => 'nullable|string|max:255',
             'apellidos'      => 'nullable|string|max:255',
             'nombre'         => 'nullable|string|max:255',
-            'correo'         => 'nullable|email|max:255',
+            'correo'         => 'required|email|max:255',
             'telefono'       => 'nullable|string|max:30',
             'ficha'          => 'nullable|string|max:50',
-            'programa'       => 'nullable|string|max:100',
+            'programa'       => 'nullable|string|max:255',
             'estado'         => 'nullable|string|max:50',
         ], [
             'documento.required' => 'El número de documento es obligatorio.',
             'documento.numeric'  => 'El número de documento debe contener solo dígitos.',
+            'correo.required'    => 'El correo electrónico es obligatorio para garantizar un registro único e institucional.',
             'correo.email'       => 'El formato de correo institucional o personal no es válido.',
         ]);
+
+        $docNumber = (int) preg_replace('/\D/', '', (string)$request->documento);
+        if ($docNumber <= 0 || strlen((string)$docNumber) < 5) {
+            return redirect()->back()->with('error', 'El número de documento debe contener solo dígitos válidos (mínimo 5 dígitos).')->withInput();
+        }
+
+        // SEGURIDAD: 1. Unicidad del egresado por documento
+        $existingApprentice = Apprentice::whereHas('person', function($q) use ($docNumber) {
+            $q->where('document_number', $docNumber);
+        })->first();
+        if ($existingApprentice) {
+            return redirect()->back()->with('error', "El documento {$docNumber} ya se encuentra registrado como egresado en el sistema.")->withInput();
+        }
+
+        // SEGURIDAD: 2. Unicidad estricta del correo electrónico (nada de correos duplicados)
+        $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
+        $personWithEmail = Person::where(function($q) use ($cleanEmail) {
+            $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
+        })->where('document_number', '!=', $docNumber)->first();
+
+        if ($personWithEmail) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra registrado en el sistema por otra persona (Documento: {$personWithEmail->document_number}). Los correos deben ser únicos.")->withInput();
+        }
+
+        $userWithEmail = User::where('email', $cleanEmail)->first();
+        if ($userWithEmail && $userWithEmail->person_id) {
+            $uPerson = Person::find($userWithEmail->person_id);
+            if ($uPerson && $uPerson->document_number != $docNumber) {
+                return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya está asignado a otra cuenta de usuario en el sistema. Los correos deben ser únicos.")->withInput();
+            }
+        } elseif ($userWithEmail && !$userWithEmail->person_id) {
+            return redirect()->back()->with('error', "El correo electrónico '{$cleanEmail}' ya se encuentra reservado por una cuenta de usuario existente. Ingrese un correo único.")->withInput();
+        }
+
+        // SEGURIDAD: 3. Unicidad estricta del número de teléfono (nada de teléfonos duplicados)
+        $cleanTel = null;
+        if ($request->filled('telefono')) {
+            $cleanTelDigits = preg_replace('/\D/', '', (string)$request->telefono);
+            if (!empty($cleanTelDigits)) {
+                if (strlen($cleanTelDigits) < 7 || strlen($cleanTelDigits) > 15) {
+                    return redirect()->back()->with('error', 'El número de teléfono debe tener entre 7 y 15 dígitos numéricos.')->withInput();
+                }
+                $personWithPhone = Person::where('telephone1', (int)$cleanTelDigits)
+                    ->where('document_number', '!=', $docNumber)
+                    ->first();
+                if ($personWithPhone) {
+                    return redirect()->back()->with('error', "El número de teléfono {$cleanTelDigits} ya se encuentra registrado a nombre de otra persona en el sistema (Documento: {$personWithPhone->document_number}). Los teléfonos deben ser únicos.")->withInput();
+                }
+                $cleanTel = (int)$cleanTelDigits;
+            }
+        }
 
         \DB::beginTransaction();
         try {
@@ -990,111 +1608,99 @@ class EgresadosController extends Controller
                 $firstLastName = $partesNombre[1] ?? 'SENA';
             }
 
-            // 2. Buscar o instanciar la Persona
-            $docNumber = (int) $request->documento;
-            $person = Person::firstOrNew(['document_number' => $docNumber]);
-
-            $mapDoc = [
-                'CC'  => 'Cédula de ciudadanía',
-                'CEDULA' => 'Cédula de ciudadanía',
-                'CEDULA DE CIUDADANIA' => 'Cédula de ciudadanía',
-                'CE'  => 'Cédula de extranjería',
-                'CEDULA DE EXTRANJERIA' => 'Cédula de extranjería',
-                'TI'  => 'Tarjeta de identidad',
-                'TARJETA DE IDENTIDAD' => 'Tarjeta de identidad',
-                'PAS' => 'Pasaporte',
-                'PASAPORTE' => 'Pasaporte',
-                'DNI' => 'Documento nacional de identidad',
-                'RC'  => 'Registro civil',
-                'PEP' => 'Permiso de Protección Temporal',
-                'PPT' => 'Permiso de Protección Temporal',
-            ];
-            $tipoDocIn = $request->tipo_documento ? strip_tags($request->tipo_documento) : null;
-            $cleanDocType = strtoupper(trim(str_replace(['á','é','í','ó','ú','Á','É','Í','Ó','Ú'], ['a','e','i','o','u','A','E','I','O','U'], (string)$tipoDocIn)));
-            $person->document_type = $mapDoc[$cleanDocType] ?? ($tipoDocIn ?: ($person->document_type ?: 'Cédula de ciudadanía'));
+            // 2. Buscar o instanciar la Persona (incluyendo soft-deleted)
+            $person = Person::withTrashed()->where('document_number', $docNumber)->first();
+            if (!$person) {
+                $person = new Person(['document_number' => $docNumber]);
+            } elseif (method_exists($person, 'trashed') && $person->trashed()) {
+                $person->restore();
+            }
+            $person->document_type = self::normalizeDocumentType($request->tipo_documento ?? $person->document_type);
             $person->first_name = $firstName;
             $person->first_last_name = $firstLastName;
-            if ($request->filled('correo')) {
-                $correoLimpio = filter_var($request->correo, FILTER_SANITIZE_EMAIL);
-                $person->personal_email = $correoLimpio;
-                $person->misena_email = $correoLimpio;
-            }
-            if ($request->filled('telefono')) {
-                $person->telephone1 = strip_tags($request->telefono);
-            }
+            $person->personal_email = $cleanEmail;
+            $person->misena_email = $cleanEmail;
+            $person->telephone1 = $cleanTel;
 
-            // Claves foráneas requeridas por defecto de tablas maestras si es un registro nuevo
-            if (!$person->exists) {
-                $person->eps_id = $person->eps_id ?: (\DB::table('e_p_s')->value('id') ?? 1);
-                $person->population_group_id = $person->population_group_id ?: (\DB::table('population_groups')->value('id') ?? 1);
-                $person->pension_entity_id = $person->pension_entity_id ?: (\DB::table('pension_entities')->value('id') ?? 1);
-            }
+            self::ensurePersonDefaults($person);
             $person->save();
 
             // 3. Crear o asociar usuario de acceso si se proporcionó correo
             if ($request->filled('correo')) {
                 $cleanEmail = filter_var($request->correo, FILTER_SANITIZE_EMAIL);
-                $user = User::firstOrNew(['person_id' => $person->id]);
-                if (!$user->exists) {
+                $user = User::where('person_id', $person->id)->orWhere('email', $cleanEmail)->first();
+                if (!$user) {
+                    $user = new User();
+                    $user->person_id = $person->id;
                     $user->email = $cleanEmail;
                     $baseNickname = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $person->first_name . '.' . $person->first_last_name));
-                    $nickname = $baseNickname;
+                    $nickname = $baseNickname ?: 'egresado.' . $person->document_number;
                     $count = 1;
-                    while (User::where('nickname', $nickname)->where('id', '!=', $user->id)->exists()) {
+                    while (User::where('nickname', $nickname)->exists()) {
                         $nickname = $baseNickname . $count++;
                     }
                     $user->nickname = $nickname;
                     $user->password = Hash::make('Sena' . $person->document_number . '*');
                     $user->save();
-
-                    // Asignar rol de egresado
-                    $app = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
-                    $appId = $app ? $app->id : 30;
-                    $roleEgresado = Role::firstOrCreate(
-                        ['slug' => 'egresados.egresado'],
-                        [
-                            'name' => 'Egresado',
-                            'description' => 'Graduado / Egresado de formación profesional del CEFA',
-                            'description_english' => 'Graduate / Alumni of vocational training at CEFA',
-                            'full_access' => 'No',
-                            'app_id' => $appId,
-                        ]
-                    );
-                    $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                } else {
+                    $user->person_id = $person->id;
+                    if (!User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
+                        $user->email = $cleanEmail;
+                    }
+                    $user->save();
                 }
+
+                // Asignar rol de egresado
+                $app = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                $appId = $app ? $app->id : 30;
+                $roleEgresado = Role::firstOrCreate(
+                    ['slug' => 'egresados.egresado'],
+                    [
+                        'name' => 'Egresado',
+                        'description' => 'Graduado / Egresado de formación profesional del CEFA',
+                        'description_english' => 'Graduate / Alumni of vocational training at CEFA',
+                        'full_access' => 'No',
+                        'app_id' => $appId,
+                    ]
+                );
+                $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
             }
 
-            // 4. Buscar el curso/ficha si existe, o usar el primero disponible
+            // 4. Buscar el curso/ficha si existe, o crearlo/asociarlo fielmente
             $courseId = null;
-            if ($request->filled('ficha')) {
-                $cleanFicha = preg_replace('/[^0-9]/', '', (string)$request->ficha);
+            $cleanFicha = $request->filled('ficha') ? preg_replace('/\D/', '', (string)$request->ficha) : null;
+            $progName = $request->filled('programa') ? strip_tags(trim($request->programa)) : null;
+
+            $course = null;
+            if ($cleanFicha) {
                 $course = Course::where('code', $cleanFicha)->orWhere('code', strip_tags($request->ficha))->first();
-                if ($course) {
-                    $courseId = $course->id;
-                }
             }
-            if (!$courseId && $request->filled('programa')) {
-                $course = Course::whereHas('program', function($q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->programa . '%');
-                })->first();
-                if ($course) {
-                    $courseId = $course->id;
-                }
+
+            $program = self::findOrCreateProgram($progName);
+
+            if (!$course && ($cleanFicha || $program)) {
+                $municipalityId = \DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha ?: rand(1000000, 9999999)],
+                    [
+                        'program_id'      => $program ? $program->id : 1,
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
             }
-            if (!$courseId) {
+
+            if ($course) {
+                $courseId = $course->id;
+            } else {
                 $firstCourse = Course::first();
                 $courseId = $firstCourse ? $firstCourse->id : 1;
             }
 
             // 5. Mapear estado
-            $statusMap = [
-                'CERTIFICADO'  => 'CERTIFICADO',
-                'EN_FORMACION' => 'EN FORMACIÓN',
-                'EN FORMACIÓN' => 'EN FORMACIÓN',
-                'EN FORMACION' => 'EN FORMACIÓN',
-                'EMPLEADO'     => 'EN FORMACIÓN',
-            ];
-            $apprenticeStatus = $statusMap[$request->estado] ?? 'EN FORMACIÓN';
+            $apprenticeStatus = self::normalizeApprenticeStatus($request->estado ?? 'CERTIFICADO');
 
             // 6. Crear o actualizar registro de Aprendiz (Egresado)
             $apprentice = Apprentice::firstOrNew([
@@ -1102,6 +1708,7 @@ class EgresadosController extends Controller
             ]);
             $apprentice->course_id = $courseId;
             $apprentice->apprentice_status = $apprenticeStatus;
+            $apprentice->touch();
             $apprentice->save();
 
             \DB::commit();
