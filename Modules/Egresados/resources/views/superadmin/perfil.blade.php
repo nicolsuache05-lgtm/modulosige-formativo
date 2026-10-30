@@ -320,38 +320,7 @@
       </a>
     </nav>
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-      <a href="{{ route('egresados.dashboard_instructor') }}">
-        <i class="fa-solid fa-chalkboard-user"></i>
-        <span>Panel Instructores</span>
-      </a>
-    </nav>
 
-    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
-    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
-          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
-        </div>
-        <div style="overflow: hidden;">
-          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
-          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST">
-        @csrf
-        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      </form>
-    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -361,12 +330,7 @@
     
     <!-- Topbar -->
     <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
+      <div class="topbar-left"></div>
 
       @include('egresados::superadmin.partials._topbar_right')
     </div>

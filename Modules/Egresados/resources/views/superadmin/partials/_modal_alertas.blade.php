@@ -7,6 +7,7 @@
     
     // Detección contextual por tipo de entidad y acción
     $lowerMsg = strtolower($successMsg);
+    $isInvitacion = str_contains($lowerMsg, 'invitaci');
     $isInstructor = str_contains($lowerMsg, 'instructor');
     $isEncuesta = str_contains($lowerMsg, 'encuesta');
     $isReporte = str_contains($lowerMsg, 'reporte');
@@ -16,10 +17,16 @@
     $isSync = str_contains($lowerMsg, 'sincroniz');
     $isUpdated = str_contains($lowerMsg, 'actualiz');
     $isDeleted = str_contains($lowerMsg, 'elimin');
+    $isCancelado = str_contains($lowerMsg, 'cancelad');
     $isCerrada = str_contains($lowerMsg, 'cerrad') || str_contains($lowerMsg, 'cierre');
 
     // Título dinámico inteligente
-    if ($isInstructor) {
+    if ($isInvitacion) {
+        $successTitle = '¡Invitación Enviada Correctamente!';
+        $badgeText = 'Invitación y enlace de registro enviados a los egresados';
+        $tagIcon = 'fa-paper-plane';
+        $tagLabel = 'CONVOCATORIA Y EVENTOS · SIGE ERP';
+    } elseif ($isInstructor) {
         if ($isUpdated) {
             $successTitle = '¡Instructor Actualizado Correctamente!';
             $badgeText = 'Información del instructor actualizada en la base de datos';
@@ -62,10 +69,17 @@
             $tagLabel = 'GENERADOR DE REPORTES · SIGE ERP';
         }
     } elseif ($isEvento) {
-        $successTitle = $isUpdated ? '¡Evento Actualizado Correctamente!' : '¡Evento Creado Exitosamente!';
-        $badgeText = 'Evento institucional programado en el sistema';
-        $tagIcon = 'fa-calendar-check';
-        $tagLabel = 'GESTIÓN DE EVENTOS SIGE';
+        if ($isCancelado) {
+            $successTitle = '¡Evento Cancelado Correctamente!';
+            $badgeText = 'El evento ha sido cancelado en el sistema';
+            $tagIcon = 'fa-calendar-xmark';
+            $tagLabel = 'GESTIÓN DE EVENTOS SIGE';
+        } else {
+            $successTitle = $isUpdated ? '¡Evento Actualizado Correctamente!' : '¡Evento Creado Exitosamente!';
+            $badgeText = 'Evento institucional programado en el sistema';
+            $tagIcon = 'fa-calendar-check';
+            $tagLabel = 'GESTIÓN DE EVENTOS SIGE';
+        }
     } elseif ($isSeguimiento) {
         $successTitle = '¡Seguimiento Registrado con Éxito!';
         $badgeText = 'Bitácora de seguimiento registrada en el expediente';

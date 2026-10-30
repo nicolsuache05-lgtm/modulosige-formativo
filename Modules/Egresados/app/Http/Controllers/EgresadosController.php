@@ -1206,7 +1206,15 @@ class EgresadosController extends Controller
 
         $encuestasPendientes = 2;
         $oportunidadesLaborales = 8;
-        $notificaciones = 3;
+
+        // Obtener invitaciones a eventos enviadas institucionalmente
+        $invitacionesEventos = \Illuminate\Support\Facades\Cache::get('sige_invitaciones_eventos', []);
+        if (empty($invitacionesEventos) && session()->has('sige_invitaciones_eventos')) {
+            $invitacionesEventos = session('sige_invitaciones_eventos', []);
+        }
+
+        $notificaciones = 3 + count($invitacionesEventos);
+        $totalEventosActivos = 2 + count($invitacionesEventos);
 
         return view('egresados::egresados.dashboard', compact(
             'user',
@@ -1214,7 +1222,9 @@ class EgresadosController extends Controller
             'apprentice',
             'encuestasPendientes',
             'oportunidadesLaborales',
-            'notificaciones'
+            'notificaciones',
+            'invitacionesEventos',
+            'totalEventosActivos'
         ));
     }
 

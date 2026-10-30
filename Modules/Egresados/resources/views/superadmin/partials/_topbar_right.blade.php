@@ -156,52 +156,12 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
-        <a href="{{ route('egresados.dashboard') }}" class="user-menu-item {{ Route::is('egresados.dashboard') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-emerald-icon">
-            <i class="fa-solid fa-gauge-high"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Panel de Control</div>
-            <div class="menu-item-desc">Métricas y resumen general</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.index') }}" class="user-menu-item {{ Route::is('egresados.index') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-blue-icon">
-            <i class="fa-solid fa-user-graduate"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Directorio de Egresados</div>
-            <div class="menu-item-desc">Gestión y seguimiento laboral</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.instructores') }}" class="user-menu-item {{ Route::is('egresados.instructores') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-purple-icon">
-            <i class="fa-solid fa-chalkboard-user"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Gestión de Instructores</div>
-            <div class="menu-item-desc">Acompañamiento y fichas</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.welcome') }}" class="user-menu-item">
-          <div class="menu-item-icon bg-amber-icon">
-            <i class="fa-solid fa-globe"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Portal Público Egresados</div>
-            <div class="menu-item-desc">Vista pública institucional</div>
-          </div>
-        </a>
-
         <a href="{{ route('home') }}" class="user-menu-item">
           <div class="menu-item-icon bg-blue-icon">
             <i class="fa-solid fa-layer-group"></i>
           </div>
           <div class="menu-item-content">
-            <div class="menu-item-title">Portal ERP Principal</div>
+            <div class="menu-item-title">Panel ERP Principal</div>
             <div class="menu-item-desc">Menú general de SENA Empresa</div>
           </div>
         </a>

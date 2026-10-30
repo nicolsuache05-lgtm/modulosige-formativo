@@ -6,8 +6,8 @@
     <!-- Card de Filtros Interactivos -->
     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3.5">
         <div class="flex items-center justify-between pb-2 border-b border-gray-50">
-            <span class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-sliders text-emerald-600"></i>
+            <span class="text-xs font-bold text-[#00131E] uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders text-[#39A900]"></i>
                 Filtros de Búsqueda Rápida
             </span>
             <span class="text-[11px] text-gray-400">Filtrado en tiempo real</span>
@@ -59,11 +59,13 @@
     <!-- Tabla Principal de Reportes -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         <div class="p-4 border-b border-gray-50 flex items-center justify-between">
-            <h2 class="font-editorial text-base font-bold text-[#00131E] flex items-center gap-2">
-                <i class="fa-solid fa-table-list text-emerald-600 text-sm"></i>
-                Listado de Reportes Disponibles
-            </h2>
-            <span class="text-xs font-semibold text-gray-400">Haz clic en una fila para ver su desglose lateral</span>
+            <div>
+                <h2 class="font-editorial text-base font-bold text-[#00131E] flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-[#39A900] text-sm"></i>
+                    Listado de Reportes Disponibles
+                </h2>
+                <span class="text-[11px] text-gray-400 mt-0.5 block">Haz clic en una fila para ver su desglose o gestionarla</span>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -135,16 +137,31 @@
                                 <div class="flex items-center justify-center gap-1.5">
                                     <button type="button" 
                                             onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}')" 
-                                            class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition cursor-pointer" 
+                                            class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition cursor-pointer" 
                                             title="Ver Detalle">
                                         <i class="fa-solid fa-eye text-xs"></i>
                                     </button>
-                                    <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $item['id'], 'formato' => strtolower($item['format'] ?? 'excel')]) }}?title={{ urlencode($item['full_title'] ?? $item['title']) }}" 
-                                       class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition cursor-pointer" 
-                                       title="Descargar {{ $item['format'] ?? 'Excel' }}"
-                                       download>
-                                        <i class="fa-solid fa-download text-xs"></i>
-                                    </a>
+                                    <button type="button" 
+                                            onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}'); abrirModalGraficas({{ $jsonData }});" 
+                                            class="w-7 h-7 rounded-lg bg-[#001A29] hover:bg-[#00283d] text-[#62E31D] flex items-center justify-center transition shadow-2xs cursor-pointer" 
+                                            title="Ver Gráficas e Indicadores (SIGE ERP)">
+                                        <i class="fa-solid fa-chart-pie text-xs"></i>
+                                    </button>
+                                    @if(strtoupper($item['format'] ?? '') === 'PDF')
+                                        <button type="button" 
+                                                onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}'); descargarReportePDF({{ $jsonData }});" 
+                                                class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 flex items-center justify-center transition cursor-pointer" 
+                                                title="Descargar Reporte (PDF)">
+                                            <i class="fa-solid fa-file-pdf text-xs"></i>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $item['id'], 'formato' => 'excel']) }}?title={{ urlencode($item['full_title'] ?? $item['title']) }}&program={{ urlencode($item['program'] ?? '') }}" 
+                                           class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition cursor-pointer" 
+                                           title="Descargar Excel"
+                                           download>
+                                            <i class="fa-solid fa-download text-xs"></i>
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

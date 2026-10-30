@@ -1523,6 +1523,25 @@
           <img src="{{ route('egresados.assets.image', 'egresados-banner-transparent.png') }}" class="hero-image-decor" alt="Egresados SENA">
         </div>
 
+        @if(isset($invitacionesEventos) && count($invitacionesEventos) > 0)
+          @php $primeraInv = reset($invitacionesEventos); @endphp
+          <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); border-left: 5px solid #39A900; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 16px rgba(0,19,30,0.12);">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: #39A900; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0;">
+                <i class="fa-solid fa-paper-plane"></i>
+              </div>
+              <div>
+                <span style="font-size: 10px; font-weight: 800; color: #62E31D; text-transform: uppercase; letter-spacing: 0.5px;">¡Nueva Invitación Institucional!</span>
+                <h4 style="font-size: 14px; font-weight: 700; margin: 2px 0 0; color: #fff;">{{ $primeraInv['title'] ?? 'Evento Institucional CEFA' }}</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin: 2px 0 0;">{{ $primeraInv['date'] ?? 'Próximamente' }} | {{ $primeraInv['location'] ?? 'CEFA' }} · Dirigido a: {{ $primeraInv['program'] ?? 'Egresados' }}</p>
+              </div>
+            </div>
+            <button type="button" class="btn-green-submit" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 10px; white-space: nowrap; cursor: pointer;" onclick="showSection('noticias');">
+              Ver e Inscribirme
+            </button>
+          </div>
+        @endif
+
         <!-- Solo las 3 Tarjetas KPI solicitadas explícitamente -->
         <div class="kpi-row-grid">
           <!-- KPI 1: Encuestas Pendientes -->
@@ -1553,7 +1572,7 @@
           <div class="kpi-metric-card" onclick="showSection('noticias')">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">EVENTOS ACTIVOS</span>
-              <span class="kpi-big-number" id="kpi-inicio-eventos-count">2</span>
+              <span class="kpi-big-number" id="kpi-inicio-eventos-count">{{ $totalEventosActivos ?? 2 }}</span>
               <span class="kpi-sub-text">Talleres y encuentros</span>
             </div>
             <div class="kpi-icon-badge purple">
@@ -2027,7 +2046,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">EVENTOS ACTIVOS</span>
-              <span class="kpi-big-number" id="kpi-eventos-activos-count">2</span>
+              <span class="kpi-big-number" id="kpi-eventos-activos-count">{{ $totalEventosActivos ?? 2 }}</span>
               <span class="kpi-sub-text">Disponibles</span>
             </div>
             <div class="kpi-icon-badge purple"><i class="fa-regular fa-calendar-days"></i></div>
@@ -2043,6 +2062,44 @@
         </div>
 
         <div style="display: flex; flex-direction: column;">
+
+          @if(isset($invitacionesEventos) && count($invitacionesEventos) > 0)
+            @foreach($invitacionesEventos as $invKey => $invItem)
+              <!-- Evento Invitado Dinámico por la Coordinación -->
+              <div class="portal-item-card event-card-item" data-event-id="event-inv-{{ $invItem['id'] ?? $invKey }}" style="border-left: 4px solid var(--sena-green);">
+                <div class="card-icon-pill green">
+                  <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="card-body-content">
+                  <div class="card-top-header">
+                    <div>
+                      <h3 class="card-title-text">{{ $invItem['title'] ?? 'Evento Institucional' }}</h3>
+                      <span class="card-tag-badge" style="background:#DCFCE7; color:#166534; font-weight:700;">
+                        <i class="fa-solid fa-envelope-open" style="font-size:10px;"></i> Convocatoria Oficial · {{ $invItem['type'] ?? 'Institucional' }}
+                      </span>
+                    </div>
+                    <button type="button" class="btn-green-submit" id="btn-inscribir-event-inv-{{ $invItem['id'] ?? $invKey }}" onclick="openInscripcionModal('{{ addslashes($invItem['title'] ?? 'Evento') }}', this, 'event-inv-{{ $invItem['id'] ?? $invKey }}')">
+                      <i class="fa-solid fa-ticket"></i>
+                      <span>Inscribirme</span>
+                    </button>
+                  </div>
+                  <div class="card-meta-list">
+                    <span><i class="fa-regular fa-calendar"></i> {{ $invItem['date'] ?? 'Próximamente' }}</span>
+                    <span><i class="fa-regular fa-clock"></i> {{ $invItem['time'] ?? '09:00 AM' }}</span>
+                    <span><i class="fa-solid fa-location-dot"></i> {{ $invItem['location'] ?? 'Centro de Formación CEFA' }}</span>
+                    <span><i class="fa-solid fa-graduation-cap"></i> {{ $invItem['program'] ?? 'Todos los Programas' }}</span>
+                  </div>
+                  <p class="card-desc-paragraph">
+                    {{ $invItem['description'] ?? 'Invitación oficial dirigida a la comunidad de egresados SENA.' }}
+                  </p>
+                  <div class="card-action-bar">
+                    <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupo Máximo: {{ $invItem['cupo'] ?? 200 }} asistentes</span>
+                    <button type="button" class="btn-card-outline" onclick="openInscripcionModal('{{ addslashes($invItem['title'] ?? 'Evento') }}', document.getElementById('btn-inscribir-event-inv-{{ $invItem['id'] ?? $invKey }}'), 'event-inv-{{ $invItem['id'] ?? $invKey }}')">Ver temario y apartar cupo</button>
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          @endif
 
           <!-- Evento 1 -->
           <div class="portal-item-card event-card-item" data-event-id="event-1">
@@ -2127,7 +2184,7 @@
           <div class="kpi-metric-card">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">NO LEÍDAS</span>
-              <span class="kpi-big-number" id="kpi-notif-noleidas-count">3</span>
+              <span class="kpi-big-number" id="kpi-notif-noleidas-count">{{ $notificaciones ?? 3 }}</span>
               <span class="kpi-sub-text">Mensajes nuevos</span>
             </div>
             <div class="kpi-icon-badge green"><i class="fa-regular fa-envelope"></i></div>
@@ -2151,6 +2208,39 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 12px;">
+
+          @if(isset($invitacionesEventos) && count($invitacionesEventos) > 0)
+            @foreach($invitacionesEventos as $invKey => $invItem)
+              <!-- Notificación Dinámica de Invitación a Evento -->
+              <div class="portal-item-card notif-card-item" id="notif-card-inv-{{ $invItem['id'] ?? $invKey }}" data-notif-id="notif-inv-{{ $invItem['id'] ?? $invKey }}" style="padding:16px 20px; transition:var(--transition); margin-bottom:0; border-left: 4px solid var(--sena-green); background: #FAFDF7;">
+                <div class="card-icon-pill green" style="width:40px; height:40px; font-size:16px; background:#EAF7EE; color:#166534;">
+                  <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <div class="card-body-content" style="flex:1;">
+                  <div class="card-top-header" style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                    <h4 style="font-size:14px; font-weight:700; color:var(--sena-dark); margin:0;">
+                      ¡Invitación Oficial: {{ $invItem['title'] ?? 'Evento Institucional' }}!
+                    </h4>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <button type="button" class="btn-star-notif" id="btn-star-notif-inv-{{ $invItem['id'] ?? $invKey }}" onclick="toggleNotifImportante('notif-inv-{{ $invItem['id'] ?? $invKey }}', this)" title="Marcar como importante" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:#cbd5e1; padding:3px 6px; border-radius:6px; transition:var(--transition);">
+                        <i class="fa-regular fa-star"></i>
+                      </button>
+                      <span class="card-tag-badge" style="background:#DCFCE7; color:#166534; font-weight:700;">Invitación a Evento</span>
+                    </div>
+                  </div>
+                  <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;">
+                    Has sido invitado por la Coordinación Académica al evento <strong>{{ $invItem['title'] ?? '' }}</strong> para el programa <em>{{ $invItem['program'] ?? 'General' }}</em>. Fecha: {{ $invItem['date'] ?? 'Próximamente' }} ({{ $invItem['time'] ?? '09:00 AM' }}) | Lugar: {{ $invItem['location'] ?? 'CEFA' }}.
+                  </p>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:11px; color:var(--ink-muted);"><i class="fa-regular fa-clock"></i> {{ $invItem['tiempo_relativo'] ?? 'Reciente' }}</span>
+                    <button type="button" class="btn-green-submit" style="padding:6px 14px; font-size:11.5px; border-radius:10px; cursor:pointer;" onclick="showSection('noticias');">
+                      <i class="fa-solid fa-calendar-check" style="margin-right:4px;"></i> Ver evento e inscribirme
+                    </button>
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          @endif
 
           <!-- Notificación 1 -->
           <div class="portal-item-card notif-card-item" id="notif-card-1" data-notif-id="notif-1" style="padding:16px 20px; transition:var(--transition); margin-bottom:0;">

@@ -3,7 +3,7 @@
 <!-- ============================================== -->
 <div class="lg:col-span-1">
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 sticky top-20" 
-         x-data="{ confirmarEliminar: false, confirmarEnvio: false, activeId: 'REP_002', activeTitle: 'Reporte de empleabilidad ADSO' }">
+         x-data="{ confirmarEliminar: false, activeId: 'REP_002', activeTitle: 'Reporte de empleabilidad ADSO' }">
         
         <div class="flex items-center justify-between border-b border-gray-100 pb-3">
             <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Detalle del Reporte</h3>
@@ -44,79 +44,120 @@
             
             <!-- 1. Descargar Excel -->
             <a id="btnActionExcel" 
-               href="{{ route('egresados.superadmin.reportes.exportar', ['id' => 'REP_002', 'formato' => 'excel']) }}?title=Reporte%20de%20empleabilidad%20ADSO" 
+               href="{{ route('egresados.superadmin.reportes.exportar', ['id' => 'REP_002', 'formato' => 'excel']) }}?title=Reporte%20de%20empleabilidad%20ADSO&program=ADSO" 
                download
-               class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Descargar Excel
+               class="w-full py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-file-excel text-xs"></i>
+                <span>Descargar Excel</span>
             </a>
 
             <!-- 2. Descargar PDF -->
-            <a id="btnActionPdf" 
-               href="{{ route('egresados.superadmin.reportes.exportar', ['id' => 'REP_002', 'formato' => 'pdf']) }}" 
-               class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                Descargar PDF
-            </a>
-
-            <!-- 3. Ver Gráficas (Lleva a una vista detallada como la de encuestas) -->
-            <a id="btnActionGraficas" 
-               href="{{ route('egresados.superadmin.reportes.graficas', ['id' => 'REP_002']) }}" 
-               class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Ver Gráficas
-            </a>
-
-            <!-- 4. Enviar por Correo -->
-            <button @click="confirmarEnvio = true" type="button" class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                Enviar por Correo
+            <button type="button" 
+               id="btnActionPdf" 
+               onclick="descargarReportePDF()" 
+               class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-file-pdf text-red-500 text-xs"></i>
+                <span id="btnPdfText">Descargar Reporte (PDF)</span>
             </button>
 
-            <!-- 5. Eliminar Reporte -->
-            <button @click="confirmarEliminar = true" type="button" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-sm">
+            <!-- 3. Ver Gráficas (Abre ventanita modal con gráficos e indicadores SENA ERP) -->
+            <button type="button" 
+               id="btnActionGraficas" 
+               onclick="abrirModalGraficas()" 
+               class="w-full py-2.5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] hover:from-[#001A29] hover:to-[#00283d] text-white border border-white/10 text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-chart-pie text-[#62E31D] text-xs"></i>
+                <span>Ver Gráficas</span>
+            </button>
+
+            <!-- 4. Eliminar Reporte -->
+            <button @click="confirmarEliminar = true" type="button" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                Eliminar Reporte
+                <span>Eliminar Reporte</span>
             </button>
         </div>
 
         <!-- =============== MODALES FLOTANTES =============== -->
         
-        <!-- Modal: Enviar por Correo -->
-        <div x-show="confirmarEnvio" style="display: none;" class="fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4" x-cloak>
-            <div @click.away="confirmarEnvio = false" class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-100">
-                <h3 class="text-lg font-bold text-gray-900 mb-1">Enviar Reporte</h3>
-                <p class="text-xs text-gray-500 mb-4">El reporte seleccionado será enviado con los datos consolidados en formato PDF y Excel.</p>
-                <form id="formEnviarCorreo" action="{{ route('egresados.superadmin.reportes.enviar', ['id' => 'REP_002']) }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Destinatario</label>
-                        <input type="email" name="email_destino" required class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none" placeholder="correo@sena.edu.co">
+        <!-- Modal: Eliminar Reporte (Estilo SENA ERP) -->
+        <div x-show="confirmarEliminar" 
+             style="display: none;" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @keydown.window.escape="confirmarEliminar = false"
+             class="fixed inset-0 z-[60] overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-start justify-center pt-14 sm:pt-20 p-4" 
+             x-cloak>
+            
+            <div @click.away="confirmarEliminar = false" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
+                 class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-gray-100 overflow-hidden transform">
+                
+                <!-- Encabezado con Identidad SENA ERP -->
+                <div class="flex items-center justify-between border-b-2 border-red-500 px-6 py-4 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 text-white flex items-center justify-center text-base shadow-md shadow-black/20 flex-shrink-0">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <div>
+                            <div class="text-[9.5px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE REPORTES · SIGE ERP</div>
+                            <h3 class="text-base font-bold text-white tracking-tight">Confirmar Eliminación</h3>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="button" @click="confirmarEnvio = false" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">Cancelar</button>
-                        <button type="submit" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">Enviar ahora</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                    <button @click="confirmarEliminar = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
 
-        <!-- Modal: Eliminar Reporte -->
-        <div x-show="confirmarEliminar" style="display: none;" class="fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4" x-cloak>
-            <div @click.away="confirmarEliminar = false" class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-100 text-center">
-                <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <!-- Contenido y Advertencia Institucional -->
+                <div class="p-6 space-y-4 bg-white">
+                    <div class="p-4 rounded-2xl bg-red-50/80 border border-red-200/80 flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                        </div>
+                        <div class="text-xs text-red-950 flex-1">
+                            <div class="font-bold text-red-900">¿Desea eliminar este reporte permanentemente?</div>
+                            <p class="text-red-700 text-[11px] mt-1 leading-relaxed">
+                                Esta acción borrará el registro del reporte seleccionado en la plataforma SIGE ERP. Los datos generados ya no estarán disponibles para su consulta.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Identificación del reporte a eliminar -->
+                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 flex items-center justify-between">
+                        <div class="overflow-hidden">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Reporte Seleccionado</span>
+                            <span id="modalEliminarTitulo" class="text-xs font-bold text-gray-800 truncate block mt-0.5" x-text="activeTitle">Reporte de empleabilidad ADSO</span>
+                        </div>
+                        <span id="modalEliminarId" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-[#001A29] text-[#62E31D] flex-shrink-0 ml-3" x-text="activeId">REP_002</span>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="button" 
+                                @click="confirmarEliminar = false" 
+                                class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                            Cancelar
+                        </button>
+                        <form id="formEliminarReporte" action="{{ route('egresados.superadmin.reportes.destroy', ['id' => 'REP_002']) }}" method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="w-full py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs font-bold rounded-xl transition shadow-md shadow-red-600/25 flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                <span>Eliminar Reporte</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-1">¿Eliminar reporte?</h3>
-                <p class="text-xs text-gray-500 mb-5">Esta acción borrará el registro del reporte seleccionado de manera permanente. Esta acción no se puede deshacer.</p>
-                <div class="flex items-center gap-3">
-                    <button type="button" @click="confirmarEliminar = false" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">Cancelar</button>
-                    <form id="formEliminarReporte" action="{{ route('egresados.superadmin.reportes.destroy', ['id' => 'REP_002']) }}" method="POST" class="flex-1">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer">Eliminar</button>
-                    </form>
-                </div>
+
             </div>
         </div>
     </div>

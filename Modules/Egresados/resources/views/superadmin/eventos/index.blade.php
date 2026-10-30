@@ -285,7 +285,13 @@
       [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body x-data="{ 
+    openModal: false,
+    openDetalleModal: false,
+    openEditModal: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}" @abrir-modal-detalle-evento.window="openDetalleModal = true" @abrir-modal-editar-evento.window="openDetalleModal = false; openEditModal = true">
 
 <div class="app">
 
@@ -332,39 +338,6 @@
         <span>Eventos</span>
       </a>
     </nav>
-
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-      <a href="{{ route('egresados.dashboard_instructor') }}">
-        <i class="fa-solid fa-chalkboard-user"></i>
-        <span>Panel Instructores</span>
-      </a>
-    </nav>
-
-    <!-- Sidebar Footer: Usuario y Cerrar Sesión -->
-    <div style="margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 6px 8px;">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sena-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 2px solid var(--sena-neon); flex-shrink: 0;">
-          {{ Auth::check() ? (Auth::user()->initials ?? 'SA') : 'SA' }}
-        </div>
-        <div style="overflow: hidden;">
-          <div style="font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::check() ? Auth::user()->full_name : 'Super Admin Sige' }}</div>
-          <div style="font-size: 10.5px; color: var(--sena-neon); font-weight: 600;">Coordinación Académica</div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST">
-        @csrf
-        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#fca5a5';">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      </form>
-    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -374,31 +347,13 @@
     
     <!-- Topbar -->
     <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
+      <div class="topbar-left"></div>
 
       @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Main Content con Alpine.js -->
-    <div class="content space-y-6" x-data="{ openModal: false }">
-
-      <!-- Alertas Flash -->
-      @if(session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 cursor-pointer">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-      @endif
+    <div class="content space-y-6">
 
       @if(isset($errors) && $errors->any())
         <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs sm:text-sm font-semibold flex items-start gap-2 shadow-xs">
@@ -447,17 +402,138 @@
       <!-- 4. Modal para Crear Evento -->
       @include('egresados::superadmin.eventos.partials._modal_crear')
 
+      <!-- 5. Modal para Ver Detalle Completo (Identidad SENA ERP) -->
+      @include('egresados::superadmin.eventos.partials._modal_detalle')
+
+      <!-- 6. Modal para Editar Evento Institucional (Identidad SENA ERP) -->
+      @include('egresados::superadmin.eventos.partials._modal_editar')
+
     </div>
 
   </div>
 
 </div>
 
+<!-- Modal de Alertas y Notificaciones Institucionales (Ventanita de Éxito SENA ERP) -->
+@include('egresados::superadmin.partials._modal_alertas')
+
 <!-- Scripts interactivos de Eventos -->
 <script>
+    // Variable global con el evento activo seleccionado
+    let currentEventoData = null;
+
+    // Función interactiva para abrir el modal con el detalle completo del evento (SENA ERP)
+    function abrirModalDetalleEvento(customData) {
+        const data = customData || currentEventoData;
+        if (!data) return;
+
+        const idElem = document.getElementById('modalDetalleId');
+        if (idElem) idElem.innerText = data.id || 'EVT-000';
+
+        const statusElem = document.getElementById('modalDetalleStatus');
+        if (statusElem) statusElem.innerText = data.status || 'PROGRAMADO';
+
+        const tituloElem = document.getElementById('modalDetalleTitulo');
+        if (tituloElem) tituloElem.innerText = data.title || 'Evento Institucional';
+
+        const cupoElem = document.getElementById('modalDetalleCupo');
+        if (cupoElem) cupoElem.innerText = data.cupo || 0;
+
+        const regElem = document.getElementById('modalDetalleRegistrados');
+        if (regElem) regElem.innerText = data.registrados || 0;
+
+        const pendElem = document.getElementById('modalDetallePendientes');
+        if (pendElem) pendElem.innerText = data.pendientes || 0;
+
+        const rateElem = document.getElementById('modalDetalleRate');
+        if (rateElem) rateElem.innerText = data.rate || '0%';
+
+        const progBar = document.getElementById('modalDetalleProgressBar');
+        if (progBar) progBar.style.width = (data.rate_num || parseInt(data.rate) || 0) + '%';
+
+        const tipoElem = document.getElementById('modalDetalleTipo');
+        if (tipoElem) tipoElem.innerText = data.type || 'Evento';
+
+        const fechaElem = document.getElementById('modalDetalleFecha');
+        if (fechaElem) fechaElem.innerText = (data.date || 'N/A') + ' | ' + (data.time || '08:00 AM - 05:00 PM');
+
+        const lugarElem = document.getElementById('modalDetalleLugar');
+        if (lugarElem) lugarElem.innerText = data.location || 'Centro de Formación CEFA';
+
+        const respElem = document.getElementById('modalDetalleResp');
+        if (respElem) respElem.innerText = data.responsible || 'Coordinación Académica';
+
+        const progsElem = document.getElementById('modalDetalleProg');
+        if (progsElem) progsElem.innerText = data.program || 'Todos los Programas';
+
+        const descElem = document.getElementById('modalDetalleDesc');
+        if (descElem) descElem.innerText = data.description || 'Sin descripción detallada.';
+
+        const currentId = encodeURIComponent(data.id || 'EVT-012');
+        const baseUrl = "{{ url('egresados/superadmin/eventos') }}/" + currentId;
+
+        const btnEdit = document.getElementById('modalDetalleBtnEdit');
+        if (btnEdit) btnEdit.href = baseUrl + "/editar";
+
+        const btnExport = document.getElementById('modalDetalleBtnExport');
+        if (btnExport) btnExport.href = baseUrl + "/exportar";
+
+        window.dispatchEvent(new CustomEvent('abrir-modal-detalle-evento'));
+    }
+
+    // Función interactiva para abrir el modal con el formulario de edición (SENA ERP)
+    function abrirModalEditarEvento(customData) {
+        const data = customData || currentEventoData;
+        if (!data) return;
+
+        // Código en el badge
+        const codElem = document.getElementById('modalEditCodigo');
+        if (codElem) codElem.innerText = data.id || 'EVT-000';
+
+        // URL del formulario de edición (PUT)
+        const currentId = encodeURIComponent(data.id || 'EVT-012');
+        const formEdit = document.getElementById('form-editar-evento');
+        if (formEdit) {
+            formEdit.action = "{{ url('egresados/superadmin/eventos') }}/" + currentId;
+        }
+
+        // Asignación de campos con los valores del evento
+        const titleInput = document.getElementById('edit_title');
+        if (titleInput) titleInput.value = data.title || '';
+
+        const typeInput = document.getElementById('edit_type');
+        if (typeInput) typeInput.value = data.type || '';
+
+        const statusSelect = document.getElementById('edit_status');
+        if (statusSelect) {
+            statusSelect.value = (data.status || 'PROGRAMADO').toUpperCase();
+        }
+
+        const dateInput = document.getElementById('edit_date');
+        if (dateInput) dateInput.value = data.date || '';
+
+        const timeInput = document.getElementById('edit_time');
+        if (timeInput) timeInput.value = data.time || '08:00 AM - 04:00 PM';
+
+        const locInput = document.getElementById('edit_location');
+        if (locInput) locInput.value = data.location || '';
+
+        const cupoInput = document.getElementById('edit_cupo');
+        if (cupoInput) cupoInput.value = data.cupo || 200;
+
+        const progInput = document.getElementById('edit_program');
+        if (progInput) progInput.value = data.program || 'Todos los Programas';
+
+        const descInput = document.getElementById('edit_description');
+        if (descInput) descInput.value = data.description || '';
+
+        window.dispatchEvent(new CustomEvent('abrir-modal-editar-evento'));
+    }
+
     // Función interactiva para actualizar el panel de detalles reactivo
     function selectEvento(data, rowId) {
         if (!data) return;
+        currentEventoData = data;
 
         // Actualizar fila activa
         document.querySelectorAll('.event-row').forEach(row => {
@@ -492,15 +568,15 @@
             badge.innerText = data.status || 'PROGRAMADO';
             const statusUpper = (data.status || 'PROGRAMADO').toUpperCase();
             if (statusUpper === 'REALIZADO') {
-                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+                badge.className = 'px-2.5 py-1 rounded-full text-[10.5px] font-extrabold bg-[#001A29] text-[#62E31D]';
             } else if (statusUpper === 'PROGRAMADO') {
-                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200';
+                badge.className = 'px-2.5 py-1 rounded-full text-[10.5px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]';
             } else if (statusUpper === 'EN CURSO') {
-                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
+                badge.className = 'px-2.5 py-1 rounded-full text-[10.5px] font-extrabold bg-emerald-100/70 text-emerald-900 border border-emerald-300';
             } else if (statusUpper === 'CANCELADO') {
-                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200';
+                badge.className = 'px-2.5 py-1 rounded-full text-[10.5px] font-extrabold bg-red-50 text-red-700 border border-red-200';
             } else {
-                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-gray-50 text-gray-700 border border-gray-200';
+                badge.className = 'px-2.5 py-1 rounded-full text-[10.5px] font-extrabold bg-gray-50 text-gray-700 border border-gray-200';
             }
         }
 
@@ -528,12 +604,16 @@
 
         const modalAsist = document.getElementById('modalCancelarAsistentes');
         if (modalAsist) modalAsist.innerText = data.registrados || 0;
+
+        const modalCancelTitle = document.getElementById('modalCancelarTitulo');
+        if (modalCancelTitle) modalCancelTitle.innerText = data.title || 'Evento Institucional';
     }
 
     // Filtrado interactivo en tabla
     function filterEventsTable() {
         const query = (document.getElementById('eventSearchInput')?.value || '').toLowerCase();
         const statusFilter = document.getElementById('eventStatusFilter')?.value || '';
+        const typeFilter = (document.getElementById('eventTypeFilter')?.value || '').toLowerCase();
         const rows = document.querySelectorAll('#eventosTable tbody tr.event-row');
 
         rows.forEach(row => {
@@ -544,8 +624,9 @@
 
             const matchesQuery = !query || id.includes(query) || title.includes(query) || type.includes(query);
             const matchesStatus = !statusFilter || status === statusFilter;
+            const matchesType = !typeFilter || type.includes(typeFilter);
 
-            if (matchesQuery && matchesStatus) {
+            if (matchesQuery && matchesStatus && matchesType) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
