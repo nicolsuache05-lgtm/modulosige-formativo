@@ -42,6 +42,8 @@ class EgresadosServiceProvider extends ModuleServiceProvider
 
         Route::middleware('web')
             ->group(module_path($this->name, '/routes/web.php'));
+
+        \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
     }
 
     /**
@@ -60,15 +62,5 @@ class EgresadosServiceProvider extends ModuleServiceProvider
         if (!class_exists('App\Models\Egresado')) {
             class_alias(\Modules\Egresados\Models\Egresado::class, 'App\Models\Egresado');
         }
-    }
-
-    /**
-     * Boot the application events.
-     */
-    public function boot(): void
-    {
-        parent::boot();
-
-        \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
     }
 }
