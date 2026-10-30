@@ -579,6 +579,234 @@
   .user-chevron-icon.rotate {
     transform: rotate(180deg);
   }
+
+  /* ================= ESTILOS MODAL DETALLE NOTIFICACIÓN (SENA ERP) ================= */
+  .notif-item {
+    position: relative;
+    transition: all 0.18s ease;
+  }
+  .notif-item:hover {
+    background: #f0fdf4 !important;
+    transform: translateX(3px);
+  }
+  .notif-item:hover .notif-text {
+    color: #00131E;
+  }
+
+  .sige-notif-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 19, 30, 0.72);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 999999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 50px 16px 30px 16px;
+    overflow-y: auto;
+    animation: sigeNotifFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes sigeNotifFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .sige-notif-modal-card {
+    background: #ffffff;
+    border-radius: 20px;
+    max-width: 580px;
+    width: 100%;
+    box-shadow: 0 25px 65px rgba(0, 19, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    animation: sigeNotifScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    margin-bottom: 24px;
+  }
+
+  @keyframes sigeNotifScaleUp {
+    from {
+      opacity: 0;
+      transform: translateY(-16px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .sige-notif-modal-header {
+    background: linear-gradient(135deg, #00131E 0%, #002235 100%);
+    border-bottom: 3px solid #39A900;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ffffff;
+  }
+
+  .sige-notif-modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(57, 169, 0, 0.2);
+    border: 1px solid rgba(98, 227, 29, 0.4);
+    color: #62E31D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+
+  .sige-notif-pill {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(98, 227, 29, 0.2);
+    color: #62E31D;
+    border: 1px solid rgba(98, 227, 29, 0.35);
+    margin-bottom: 3px;
+  }
+
+  .sige-notif-modal-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.25;
+    font-family: 'Poppins', 'Nunito', sans-serif;
+  }
+
+  .sige-notif-close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-size: 14px;
+  }
+  .sige-notif-close-btn:hover {
+    background: rgba(239, 68, 68, 0.85);
+    color: #fff;
+    transform: rotate(90deg);
+  }
+
+  .sige-notif-modal-body {
+    padding: 20px 22px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+
+  .sige-notif-summary-box {
+    background: #f8faf9;
+    border: 1px solid #e2e8e4;
+    border-left: 4px solid #39A900;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .sige-notif-grid-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 580px) {
+    .sige-notif-grid-fields {
+      grid-template-columns: 1fr;
+    }
+    .sige-notif-modal-backdrop {
+      padding-top: 20px;
+    }
+  }
+
+  .sige-notif-field-card {
+    background: #ffffff;
+    border: 1px solid #e6ece8;
+    border-radius: 10px;
+    padding: 9px 12px;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-field-card:hover {
+    border-color: #39A900;
+    box-shadow: 0 2px 8px rgba(57, 169, 0, 0.1);
+  }
+  .sige-notif-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 2px;
+  }
+  .sige-notif-field-value {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #00131E;
+    word-break: break-word;
+  }
+
+  .sige-notif-modal-footer {
+    background: #f8faf9;
+    border-top: 1px solid #e6ece8;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .sige-notif-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #334155;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-secondary:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .sige-notif-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+    border: 1px solid #39A900;
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-primary:hover {
+    background: linear-gradient(135deg, #2e8b00 0%, #226700 100%);
+    box-shadow: 0 6px 16px rgba(57, 169, 0, 0.4);
+    color: #ffffff;
+  }
 </style>
 
 <script>
