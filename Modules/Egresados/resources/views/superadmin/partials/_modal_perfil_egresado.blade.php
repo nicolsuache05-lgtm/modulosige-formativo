@@ -27,6 +27,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10.5px] font-extrabold text-[#62E31D] uppercase tracking-wider">EXPEDIENTE DEL EGRESADO · SIGE</span>
+                        <span id="modalEgresadoActivePill" class="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 uppercase">
+                            ACTIVO
+                        </span>
                         <span id="modalEgresadoStatusPill" class="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-[#39A900]/20 text-[#62E31D] border border-[#39A900]/40 uppercase">
                             CERTIFICADO
                         </span>
@@ -215,6 +218,17 @@
 
         const mpCode = document.getElementById('modalEgresadoCode');
         if (mpCode) mpCode.innerText = data.code || 'N/A';
+
+        const mpActivePill = document.getElementById('modalEgresadoActivePill');
+        if (mpActivePill) {
+            if (data.is_active) {
+                mpActivePill.innerText = 'ACTIVO';
+                mpActivePill.className = 'px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 uppercase';
+            } else {
+                mpActivePill.innerText = 'INACTIVO';
+                mpActivePill.className = 'px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/40 uppercase';
+            }
+        }
 
         const statusText = data.status || 'CERTIFICADO';
         const mpStatusPill = document.getElementById('modalEgresadoStatusPill');

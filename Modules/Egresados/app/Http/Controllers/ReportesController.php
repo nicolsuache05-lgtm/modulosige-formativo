@@ -27,12 +27,12 @@ class ReportesController extends Controller
 
         $totalGenerados = session('custom_reports') ? count(session('custom_reports')) + 5 : 5;
         $totalEgresados = number_format($totalEgresadosCount, 0, ',', '.');
-        $totalEncuestas = 890;
-        $totalVisitas = '3.420';
 
         // Cursos / Programas disponibles para el filtro
         $programs = Program::orderBy('name')->get();
         $courses = Course::with('program')->orderBy('code')->get();
+        $totalProgramas = $programs->count() ?: 12;
+        $totalFormatos = 3;
 
         // Reportes Base preconfigurados y guardados en sesión si existen
         $baseReports = $this->getBaseReports($totalEgresadosCount, $totalEmpleadosCount, $totalDesempleadosCount, $tasaEmpleabilidad, $rateValue);
@@ -45,9 +45,8 @@ class ReportesController extends Controller
             'reportes',
             'totalGenerados',
             'totalEgresados',
-            'tasaEmpleabilidad',
-            'totalEncuestas',
-            'totalVisitas',
+            'totalProgramas',
+            'totalFormatos',
             'programs',
             'courses'
         ));

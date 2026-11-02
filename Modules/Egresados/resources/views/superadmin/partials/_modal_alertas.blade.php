@@ -7,6 +7,11 @@
     
     // Detección contextual por tipo de entidad y acción
     $lowerMsg = strtolower($successMsg);
+
+    // Si es un saludo de bienvenida o inicio de sesion, no debe disparar modal de alerta
+    if (str_contains($lowerMsg, 'bienvenid') || str_contains($lowerMsg, 'sesion') || str_contains($lowerMsg, 'sesión') || str_contains($lowerMsg, 'iniciado')) {
+        $hasSuccess = false;
+    }
     $isInvitacion = str_contains($lowerMsg, 'invitaci');
     $isInstructor = str_contains($lowerMsg, 'instructor');
     $isEncuesta = str_contains($lowerMsg, 'encuesta');
@@ -26,6 +31,23 @@
         $badgeText = 'Invitación y enlace de registro enviados a los egresados';
         $tagIcon = 'fa-paper-plane';
         $tagLabel = 'CONVOCATORIA Y EVENTOS · SIGE ERP';
+    } elseif ($isEncuesta) {
+        if ($isCerrada) {
+            $successTitle = '¡Encuesta Cerrada Exitosamente!';
+            $badgeText = 'Instrumento cerrado y recolección de respuestas finalizada';
+            $tagIcon = 'fa-lock';
+            $tagLabel = 'CIERRE DE ENCUESTA · SIGE ERP';
+        } elseif ($isUpdated) {
+            $successTitle = '¡Encuesta Actualizada Correctamente!';
+            $badgeText = 'Información de la encuesta actualizada en el sistema';
+            $tagIcon = 'fa-clipboard-question';
+            $tagLabel = 'MÓDULO DE ENCUESTAS · SIGE ERP';
+        } else {
+            $successTitle = '¡Encuesta Registrada Correctamente!';
+            $badgeText = 'Encuesta institucional guardada y disponible para egresados';
+            $tagIcon = 'fa-clipboard-question';
+            $tagLabel = 'MÓDULO DE ENCUESTAS · SIGE ERP';
+        }
     } elseif ($isInstructor) {
         if ($isUpdated) {
             $successTitle = '¡Instructor Actualizado Correctamente!';
@@ -39,23 +61,6 @@
         }
         $tagIcon = 'fa-chalkboard-user';
         $tagLabel = 'GESTIÓN DE INSTRUCTORES SIGE';
-    } elseif ($isEncuesta) {
-        if ($isCerrada) {
-            $successTitle = '¡Encuesta Cerrada Exitosamente!';
-            $badgeText = 'Instrumento cerrado y recolección de respuestas finalizada';
-            $tagIcon = 'fa-lock';
-            $tagLabel = 'CIERRE DE ENCUESTA · SIGE ERP';
-        } elseif ($isUpdated) {
-            $successTitle = '¡Encuesta Actualizada Correctamente!';
-            $badgeText = 'Información de la encuesta actualizada en el sistema';
-            $tagIcon = 'fa-clipboard-question';
-            $tagLabel = 'MÓDULO DE ENCUESTAS SIGE ERP';
-        } else {
-            $successTitle = '¡Encuesta Publicada Exitosamente!';
-            $badgeText = 'Encuesta institucional publicada y disponible para egresados';
-            $tagIcon = 'fa-clipboard-question';
-            $tagLabel = 'MÓDULO DE ENCUESTAS SIGE ERP';
-        }
     } elseif ($isReporte) {
         if ($isDeleted) {
             $successTitle = '¡Reporte Eliminado Correctamente!';
@@ -213,36 +218,81 @@
         from { transform: scaleX(1); }
         to { transform: scaleX(0); }
     }
+
+    .sena-modal-alert-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        overflow-y: auto;
+        background: rgba(0, 19, 30, 0.65);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+    
+    .sena-modal-card, .sena-modal-card-error {
+        position: relative;
+        background: #ffffff;
+        border-radius: 24px;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 25px 50px -12px rgba(0, 19, 30, 0.35);
+        border: 1px solid rgba(57, 169, 0, 0.2);
+        overflow: hidden;
+        text-align: center;
+        padding: 32px 28px;
+        font-family: inherit;
+        margin: auto;
+    }
+    .sena-modal-card-error {
+        border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .sena-modal-alert-backdrop.show-alert {
+        display: flex !important;
+    }
 </style>
 
 <!-- ============================================== -->
-<!-- 1. MODAL DE ÉXITO
+<!-- 1. MODAL DE ÉXITO (DISEÑO OFICIAL SENA ERP) -->
 <!-- ============================================== -->
-<div x-show="openSuccessModal" 
+<div id="senaModalSuccessAlert" 
+     class="sena-modal-alert-backdrop fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" 
+     x-show="openSuccessModal" 
      @open-success-modal.window="openSuccessModal = true; if($event.detail?.title) document.getElementById('modalSuccessTitle').innerText = $event.detail.title; if($event.detail?.message) document.getElementById('modalSuccessMessage').innerText = $event.detail.message;"
      @close-success-modal.window="openSuccessModal = false"
-     style="display: none;"
+     style="position: fixed; inset: 0; z-index: 99999; background: rgba(0, 19, 30, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     @keydown.window.escape="openSuccessModal = false"
-     @click.self="openSuccessModal = false"
-     class="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" x-cloak>
+     @keydown.window.escape="window.closeSuccessModal ? window.closeSuccessModal() : (openSuccessModal = false)"
+     @click.self="window.closeSuccessModal ? window.closeSuccessModal() : (openSuccessModal = false)"
+     x-cloak>
     
-    <div x-transition:enter="transition ease-out duration-300"
+    <div class="sena-modal-card"
+         x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90 translate-y-4"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-         class="sena-modal-card relative bg-white rounded-3xl max-w-md w-full shadow-2xl border border-emerald-100/80 overflow-hidden text-center p-7 sm:p-8">
+         style="position: relative; background: #ffffff; border-radius: 28px; max-width: 440px; width: 100%; box-shadow: 0 25px 60px -10px rgba(0, 19, 30, 0.45); border: 1.5px solid rgba(57, 169, 0, 0.25); overflow: hidden; text-align: center; padding: 36px 30px; font-family: 'Poppins', 'Nunito', -apple-system, sans-serif; margin: auto;">
         
-        <!-- Botón cerrar (X) en esquina -->
-        <button @click="openSuccessModal = false" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer" title="Cerrar">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <!-- Botón cerrar (X) en esquina superior derecha -->
+        <button type="button" 
+                onclick="window.closeSuccessModal ? window.closeSuccessModal() : null" 
+                @click="openSuccessModal = false"
+                style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+                onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+                onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+                title="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
         </button>
 
         <!-- CHULITO ANIMADO SENA -->
@@ -255,40 +305,43 @@
             </div>
         </div>
 
-        <!-- Encabezado / Tag -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[10.5px] font-extrabold text-[#39A900] uppercase tracking-wider mb-2">
-            <i class="fa-solid {{ $tagIcon }}"></i>
+        <!-- Encabezado / Tag Oficial -->
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #EAF7EE; border: 1px solid #BBF7D0; color: #166534; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+            <i class="fa-solid {{ $tagIcon }}" style="font-size: 11px; color: #39A900;"></i>
             <span>{{ $tagLabel }}</span>
         </div>
 
         <!-- Título Principal -->
-        <h3 id="modalSuccessTitle" class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight leading-snug">
+        <h3 id="modalSuccessTitle" style="font-size: 22px; font-weight: 800; color: #00131E; margin: 0 0 8px 0; letter-spacing: -0.3px; line-height: 1.25;">
             {{ $successTitle }}
         </h3>
 
         <!-- Mensaje Detallado -->
-        <p id="modalSuccessMessage" class="text-sm text-gray-600 mt-2.5 leading-relaxed font-medium">
+        <p id="modalSuccessMessage" style="font-size: 14px; font-weight: 500; color: #5A6E7D; line-height: 1.5; margin: 0 0 16px 0;">
             {{ $successMsg }}
         </p>
 
-        <!-- Badge de Confirmación y Verificación -->
-        <div class="mt-4 p-3 bg-gradient-to-r from-emerald-50/70 to-green-50/50 rounded-2xl border border-emerald-100/70 flex items-center justify-center gap-2 text-xs text-emerald-800 font-semibold">
-            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
+        <!-- Badge de Confirmación y Verificación Institucional -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 16px; color: #166534; font-size: 12.5px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
+            <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 14px;"></i>
             <span>{{ $badgeText }}</span>
         </div>
 
-        <!-- Botón de Acción Principal -->
-        <div class="mt-6">
+        <!-- Botón de Acción Principal SENA ERP -->
+        <div style="margin-top: 6px;">
             <button type="button" 
-                    @click="openSuccessModal = false" 
-                    class="w-full py-3.5 px-6 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-950/20 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check"></i>
+                    onclick="window.closeSuccessModal ? window.closeSuccessModal() : null" 
+                    @click="openSuccessModal = false"
+                    style="width: 100%; padding: 14px 24px; background: linear-gradient(135deg, #001A29 0%, #39A900 100%); color: #ffffff !important; font-size: 14px; font-weight: 800; border: none; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 24px -4px rgba(57, 169, 0, 0.45), 0 4px 10px rgba(0, 26, 41, 0.25); transition: all 0.25s ease;"
+                    onmouseover="this.style.background='linear-gradient(135deg, #00131E 0%, #2e8b00 100%)'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.background='linear-gradient(135deg, #001A29 0%, #39A900 100%)'; this.style.transform='translateY(0)';">
+                <i class="fa-solid fa-check" style="font-size: 14px;"></i>
                 <span>Aceptar y Continuar</span>
             </button>
         </div>
 
-        <!-- Barra temporizada de autocierre opcional -->
-        <div class="absolute bottom-0 left-0 right-0">
+        <!-- Barra temporizada de autocierre con degradado SENA -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; overflow: hidden;">
             <div class="sena-alert-progress"></div>
         </div>
 
@@ -296,60 +349,74 @@
 </div>
 
 <!-- ============================================== -->
-<!-- 2. MODAL DE ERROR O ADVERTENCIA INSTITUCIONAL -->
+<!-- 2. MODAL DE ERROR O ADVERTENCIA INSTITUCIONAL  -->
 <!-- ============================================== -->
-<div x-show="openErrorModal" 
+<div id="senaModalErrorAlert" 
+     class="sena-modal-alert-backdrop fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" 
+     x-show="openErrorModal" 
      @open-error-modal.window="openErrorModal = true; if($event.detail?.title) document.getElementById('modalErrorTitle').innerText = $event.detail.title; if($event.detail?.message) document.getElementById('modalErrorMessage').innerText = $event.detail.message;"
      @close-error-modal.window="openErrorModal = false"
-     style="display: none;"
+     style="position: fixed; inset: 0; z-index: 99999; background: rgba(0, 19, 30, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     @keydown.window.escape="openErrorModal = false"
-     @click.self="openErrorModal = false"
-     class="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" x-cloak>
+     @keydown.window.escape="window.closeErrorModal ? window.closeErrorModal() : (openErrorModal = false)"
+     @click.self="window.closeErrorModal ? window.closeErrorModal() : (openErrorModal = false)"
+     x-cloak>
     
-    <div x-transition:enter="transition ease-out duration-300"
+    <div class="sena-modal-card-error"
+         x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90 translate-y-4"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-         class="relative bg-white rounded-3xl max-w-md w-full shadow-2xl border border-red-100 overflow-hidden text-center p-7 sm:p-8">
+         style="position: relative; background: #ffffff; border-radius: 28px; max-width: 440px; width: 100%; box-shadow: 0 25px 60px -10px rgba(0, 19, 30, 0.45); border: 1.5px solid rgba(239, 68, 68, 0.25); overflow: hidden; text-align: center; padding: 36px 30px; font-family: 'Poppins', 'Nunito', -apple-system, sans-serif; margin: auto;">
         
-        <button @click="openErrorModal = false" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer" title="Cerrar">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <!-- Botón cerrar (X) en esquina -->
+        <button type="button" 
+                onclick="window.closeErrorModal ? window.closeErrorModal() : null" 
+                @click="openErrorModal = false"
+                style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+                onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+                onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+                title="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
         </button>
 
-        <!-- Icono de Error -->
+        <!-- Icono de Error / Advertencia Animado -->
         <div class="sena-chulito-container">
             <div class="sena-error-badge">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 34px; color: #ffffff;"></i>
             </div>
         </div>
 
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[10.5px] font-extrabold text-red-600 uppercase tracking-wider mb-2">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+        <!-- Tag Institucional -->
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 11px; color: #DC2626;"></i>
             <span>OBSERVACIÓN INSTITUCIONAL</span>
         </div>
 
-        <h3 id="modalErrorTitle" class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight leading-snug">
+        <h3 id="modalErrorTitle" style="font-size: 22px; font-weight: 800; color: #00131E; margin: 0 0 8px 0; letter-spacing: -0.3px; line-height: 1.25;">
             Atención: Ocurrió un problema
         </h3>
 
-        <p id="modalErrorMessage" class="text-sm text-gray-600 mt-2.5 leading-relaxed font-medium">
+        <p id="modalErrorMessage" style="font-size: 14px; font-weight: 500; color: #5A6E7D; line-height: 1.5; margin: 0 0 22px 0;">
             {{ $errorMsg }}
         </p>
 
-        <div class="mt-6">
+        <!-- Botón Entendido -->
+        <div style="margin-top: 6px;">
             <button type="button" 
-                    @click="openErrorModal = false" 
-                    class="w-full py-3.5 px-6 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-red-900/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2">
+                    onclick="window.closeErrorModal ? window.closeErrorModal() : null" 
+                    @click="openErrorModal = false"
+                    style="width: 100%; padding: 14px 24px; background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: #ffffff !important; font-size: 14px; font-weight: 800; border: none; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 24px -4px rgba(220, 38, 38, 0.4); transition: all 0.25s ease;"
+                    onmouseover="this.style.background='linear-gradient(135deg, #B91C1C 0%, #991B1B 100%)'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.background='linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'; this.style.transform='translateY(0)';">
+                <i class="fa-solid fa-check" style="font-size: 14px;"></i>
                 <span>Entendido</span>
             </button>
         </div>
@@ -391,10 +458,20 @@
     }
 
     window.showSuccessAlert = function(title, message) {
+        const modal = document.getElementById('senaModalSuccessAlert');
+        if (modal) {
+            modal.classList.add('show-alert');
+            modal.style.display = 'flex';
+        }
+        if (title && document.getElementById('modalSuccessTitle')) {
+            document.getElementById('modalSuccessTitle').innerText = title;
+        }
+        if (message && document.getElementById('modalSuccessMessage')) {
+            document.getElementById('modalSuccessMessage').innerText = message;
+        }
         window.dispatchEvent(new CustomEvent('open-success-modal', {
             detail: { title: title, message: message }
         }));
-        // Reiniciar barra de animación
         const progressBar = document.querySelector('.sena-alert-progress');
         if (progressBar) {
             progressBar.style.animation = 'none';
@@ -404,14 +481,47 @@
         startSuccessTimer(SUCCESS_DURATION);
     };
 
+    window.closeSuccessModal = function() {
+        const modal = document.getElementById('senaModalSuccessAlert');
+        if (modal) {
+            modal.classList.remove('show-alert');
+            modal.style.display = 'none';
+        }
+        window.dispatchEvent(new CustomEvent('close-success-modal'));
+        clearSuccessTimer();
+    };
+
     window.showErrorAlert = function(title, message) {
+        const modal = document.getElementById('senaModalErrorAlert');
+        if (modal) {
+            modal.classList.add('show-alert');
+            modal.style.display = 'flex';
+        }
+        if (title && document.getElementById('modalErrorTitle')) {
+            document.getElementById('modalErrorTitle').innerText = title;
+        }
+        if (message && document.getElementById('modalErrorMessage')) {
+            document.getElementById('modalErrorMessage').innerText = message;
+        }
         window.dispatchEvent(new CustomEvent('open-error-modal', {
             detail: { title: title, message: message }
         }));
     };
 
+    window.closeErrorModal = function() {
+        const modal = document.getElementById('senaModalErrorAlert');
+        if (modal) {
+            modal.classList.remove('show-alert');
+            modal.style.display = 'none';
+        }
+        window.dispatchEvent(new CustomEvent('close-error-modal'));
+    };
+
     // Autocierre después de 7.5 segundos si está abierto por sesión, con pausa interactiva al pasar el mouse
     @if($hasSuccess)
+    document.addEventListener('DOMContentLoaded', function() {
+        window.showSuccessAlert(@json($successTitle), @json($successMsg));
+    });
     startSuccessTimer(SUCCESS_DURATION);
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -426,4 +536,11 @@
         }
     });
     @endif
+
+    @if($hasError)
+    document.addEventListener('DOMContentLoaded', function() {
+        window.showErrorAlert("Atención en el Registro", @json($errorMsg));
+    });
+    @endif
+    
 </script>

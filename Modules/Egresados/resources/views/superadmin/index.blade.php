@@ -377,6 +377,7 @@
         font-size: 18px;
       }
       .stat-icon.amber { background: #FFF8E6; color: #D97706; }
+      .stat-icon.red { background: #FEE2E2; color: #DC2626; }
       .stat-icon.green { background: var(--green-soft); color: var(--green); }
       .stat-icon.blue { background: #EEF4FF; color: #2563EB; }
 
@@ -406,6 +407,7 @@
         width: fit-content;
       }
       .stat-pill.amber { background: #FEF3C7; color: #92400E; }
+      .stat-pill.red { background: #FEE2E2; color: #991B1B; }
       .stat-pill.green { background: var(--green-soft); color: var(--green-dark); }
       .stat-pill.blue { background: #DBEAFE; color: #1E40AF; }
 
@@ -904,31 +906,31 @@
       <!-- Tarjetas de Estadísticas Superiores (Estilo Inicio) -->
       <div class="stats-grid">
         
-        <!-- Stat 1: Actualización Pendiente -->
+        <!-- Stat 1: Egresados Inactivos -->
         <div class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">Actualización Pendiente</span>
-            <div class="stat-icon amber">
-              <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="stat-label">Egresados Inactivos</span>
+            <div class="stat-icon red">
+              <i class="fa-solid fa-user-xmark"></i>
             </div>
           </div>
-          <div class="stat-num">{{ number_format($actualizacionPendiente) }}</div>
-          <span class="stat-pill amber">
-            <i class="fa-solid fa-clock-rotate-left"></i> Desactualizada
+          <div class="stat-num">{{ number_format($totalInactivos ?? 0) }}</div>
+          <span class="stat-pill red">
+            <i class="fa-solid fa-ban"></i> Desactivados en SIGE
           </span>
         </div>
 
-        <!-- Stat 2: Seguimientos Realizados -->
+        <!-- Stat 2: Egresados Activos -->
         <div class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">Seguimientos Realizados</span>
+            <span class="stat-label">Egresados Activos</span>
             <div class="stat-icon green">
-              <i class="fa-solid fa-magnifying-glass-chart"></i>
+              <i class="fa-solid fa-user-check"></i>
             </div>
           </div>
-          <div class="stat-num">{{ number_format($seguimientosRealizados) }}</div>
+          <div class="stat-num">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
           <span class="stat-pill green">
-            <i class="fa-solid fa-calendar-check"></i> Este mes
+            <i class="fa-solid fa-circle-check"></i> Habilitados en SIGE
           </span>
         </div>
 
@@ -963,6 +965,8 @@
 
             <select name="apprentice_status" onchange="this.form.submit()" class="filter-select">
               <option value="TODOS" {{ request('apprentice_status', 'TODOS') == 'TODOS' ? 'selected' : '' }}>Todos los Egresados (Módulo)</option>
+              <option value="ACTIVOS" {{ request('apprentice_status') == 'ACTIVOS' ? 'selected' : '' }}>🟢 Egresados Activos</option>
+              <option value="INACTIVOS" {{ request('apprentice_status') == 'INACTIVOS' ? 'selected' : '' }}>🔴 Egresados Inactivos</option>
               <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Certificados</option>
               <option value="EN FORMACIÓN" {{ request('apprentice_status') == 'EN FORMACIÓN' ? 'selected' : '' }}>En Formación</option>
               <option value="CONDICIONADO" {{ request('apprentice_status') == 'CONDICIONADO' ? 'selected' : '' }}>Condicionado</option>
@@ -991,7 +995,6 @@
                   <th>Egresado(a)</th>
                   <th>Programa & Ficha</th>
                   <th>Estado</th>
-                  <th style="text-align:center;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -1022,6 +1025,7 @@
                     $phoneRaw = ($person && ($person->telephone1 || $person->telephone2)) ? (string)($person->telephone1 ?: $person->telephone2) : '';
                     $progRaw = ($program && $program->name) ? $program->name : '';
                     $codeRaw = ($course && $course->code) ? (string)$course->code : '';
+                    $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
 
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
@@ -1040,6 +1044,7 @@
                         'code' => $codeRaw ?: 'N/A',
                         'code_raw' => $codeRaw,
                         'status' => $st,
+                        'is_active' => $isApprenticeActive,
                         'pill_class' => $pillClass,
                         'show_url' => route('egresados.show', $item->id),
                     ]);
@@ -1069,37 +1074,24 @@
                     </td>
 
                     <td>
-                      <span class="badge-pill {{ $pillClass }}">{{ $st }}</span>
-                    </td>
-
-                    <td style="text-align:center;">
-                      <div class="action-btns" onclick="event.stopPropagation();">
-                        <button type="button" 
-                            onclick="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}')" 
-                            class="btn-circle-action" 
-                            title="Ver en Panel de Detalle">
-                          <i class="fa-solid fa-eye"></i>
-                        </button>
-                        <button type="button" 
-                            @click.stop="openModalPerfilEgresado = true; selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalPerfilEgresado({{ $jsonData }});" 
-                            class="btn-circle-action" 
-                            title="Ver Perfil Completo (Ventana Flotante)">
-                          <i class="fa-solid fa-id-card text-emerald-700"></i>
-                        </button>
-                        <button type="button" 
-                            @click.stop="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalEditar({{ $jsonData }}); openModalEditar = true;" 
-                            class="btn-circle-action" 
-                            style="color:#d97706;" 
-                            title="Editar Datos del Egresado">
-                          <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
+                      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+                        <span class="badge-pill {{ $pillClass }}">{{ $st }}</span>
+                        @if($isApprenticeActive)
+                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#166534; background:#dcfce7; padding:2px 7px; border-radius:9999px;">
+                            <span style="width:5px; height:5px; border-radius:50%; background:#22c55e;"></span> Activo
+                          </span>
+                        @else
+                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#991b1b; background:#fee2e2; padding:2px 7px; border-radius:9999px;">
+                            <span style="width:5px; height:5px; border-radius:50%; background:#ef4444;"></span> Inactivo
+                          </span>
+                        @endif
                       </div>
                     </td>
 
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="5" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
+                    <td colspan="4" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
                       <i class="fa-solid fa-user-slash" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
                       <div style="font-weight:700; font-size:15px; color:var(--ink);">No se encontraron egresados</div>
                       <p style="font-size:12px; margin-top:4px;">Prueba cambiando los términos de búsqueda o filtros.</p>
@@ -1127,7 +1119,10 @@
               <span class="pulse-dot"></span>
               Detalle del Egresado
             </span>
-            <span id="detailStatusPill" class="badge-pill status-green">CERTIFICADO</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span id="detailActivePill" class="badge-pill status-green">Activo</span>
+              <span id="detailStatusPill" class="badge-pill status-green">CERTIFICADO</span>
+            </div>
           </div>
 
           <!-- Hero del Usuario Seleccionado -->
@@ -1195,6 +1190,15 @@
             <span>Registrar Seguimiento</span>
           </button>
 
+          <!-- Botón Activar / Desactivar Egresado en Panel -->
+          <form id="detailToggleForm" action="" method="POST" style="margin-top:8px;">
+            @csrf
+            <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
+              <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
+              <span id="detailToggleText">Desactivar Egresado</span>
+            </button>
+          </form>
+
         </div>
 
       </div>
@@ -1236,6 +1240,40 @@
             pill.className = 'badge-pill ' + (data.pill_class || 'status-green');
         }
 
+        const activePill = document.getElementById('detailActivePill');
+        if (activePill) {
+            if (data.is_active) {
+                activePill.innerText = '🟢 Activo';
+                activePill.className = 'badge-pill status-green';
+            } else {
+                activePill.innerText = '🔴 Inactivo';
+                activePill.className = 'badge-pill status-red';
+            }
+        }
+
+        const toggleForm = document.getElementById('detailToggleForm');
+        const toggleBtn = document.getElementById('detailToggleBtn');
+        const toggleIcon = document.getElementById('detailToggleIcon');
+        const toggleText = document.getElementById('detailToggleText');
+
+        if (toggleForm && data.id) {
+            toggleForm.action = '{{ url("egresados") }}/' + data.id + '/toggle-status';
+            toggleForm.onsubmit = function() {
+                return confirm(data.is_active ? 
+                    '¿Deseas desactivar a ' + (data.name || 'este egresado') + '? Pasará a estado inactivo en SIGE.' : 
+                    '¿Deseas activar a ' + (data.name || 'este egresado') + '? Volverá a estar habilitado en SIGE.');
+            };
+            if (data.is_active) {
+                toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border border-rose-200 text-rose-700 hover:bg-rose-50 transition cursor-pointer';
+                toggleIcon.className = 'fa-solid fa-user-xmark';
+                toggleText.innerText = 'Desactivar Egresado';
+            } else {
+                toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition cursor-pointer';
+                toggleIcon.className = 'fa-solid fa-user-check';
+                toggleText.innerText = 'Activar Egresado';
+            }
+        }
+
         // Sincronizar ID y Nombre en el modal de seguimiento
         const segInput = document.getElementById('seguimiento_egresado_id');
         if (segInput && data.id) {
@@ -1244,6 +1282,14 @@
         const segLabel = document.getElementById('seguimiento_egresado_name_label');
         if (segLabel && data.name) {
             segLabel.innerText = data.name;
+        }
+        const segDoc = document.getElementById('seguimiento_egresado_doc_label');
+        if (segDoc && data.doc) {
+            segDoc.innerHTML = '<i class="fa-regular fa-id-card mr-1 text-[#39A900]"></i> ' + data.doc;
+        }
+        const segFicha = document.getElementById('seguimiento_egresado_ficha_label');
+        if (segFicha && data.ficha) {
+            segFicha.innerText = 'Ficha: ' + data.ficha;
         }
 
         // Sincronizar automáticamente la ventana flotante de perfil y el modal de edición

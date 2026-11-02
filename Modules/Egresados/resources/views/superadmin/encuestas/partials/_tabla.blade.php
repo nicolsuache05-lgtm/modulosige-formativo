@@ -32,7 +32,7 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm border-collapse" id="encuestasTable">
             <thead>
-                <tr class="bg-[#FAFCF9] text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-200">
+                <tr class="bg-[#FAFCF9] text-[#00131E] text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-gray-200">
                     <th class="py-3.5 px-4 sm:px-5">Código ID</th>
                     <th class="py-3.5 px-4 sm:px-5">Instrumento / Título</th>
                     <th class="py-3.5 px-4 sm:px-5">Estado</th>
@@ -76,17 +76,17 @@
                         <!-- Estado -->
                         <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap">
                             @if($item['status'] === 'ACTIVA')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#39A900]"></span>
                                     ACTIVA
                                 </span>
                             @elseif($item['status'] === 'CERRADA')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gray-100 text-gray-600 border border-gray-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                                     CERRADA
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                     {{ $item['status'] }}
                                 </span>
@@ -95,7 +95,7 @@
 
                         <!-- Dirigido a -->
                         <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-gray-700 font-semibold text-xs border border-gray-200">
+                            <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#EAF7EE] text-[#166534] font-bold text-xs border border-[#BBF7D0]">
                                 {{ $item['target'] }}
                             </span>
                         </td>

@@ -9,7 +9,7 @@
             <span class="w-2 h-2 rounded-full bg-[#39A900] animate-pulse"></span>
             Detalle de la Encuesta
         </span>
-        <span id="detailStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] uppercase">
+        <span id="detailStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0] uppercase">
             ACTIVA
         </span>
     </div>
@@ -27,12 +27,12 @@
         <div class="pt-2 text-[11px] space-y-1.5 text-gray-600 border-t border-gray-50">
             <div><strong class="text-gray-400 uppercase text-[9.5px]">Código ID:</strong> <span id="detailSurveyMeta" class="font-bold text-[#00131E] font-mono ml-1">ENC-025</span></div>
             <div><strong class="text-gray-400 uppercase text-[9.5px]">Lanzamiento:</strong> <span id="detailSurveyDate" class="font-semibold text-gray-800 ml-1">12/06/2026</span></div>
-            <div class="flex items-center gap-1.5 pt-0.5"><strong class="text-gray-400 uppercase text-[9.5px]">Público:</strong> <span id="detailSurveyTarget" class="font-bold text-[#166534] bg-[#EAF7EE] px-2 py-0.5 rounded-md border border-[#bbf7d0]">Egresado ADSO</span></div>
+            <div class="flex items-center gap-1.5 pt-0.5"><strong class="text-gray-400 uppercase text-[9.5px]">Público:</strong> <span id="detailSurveyTarget" class="font-bold text-[#166534] bg-[#EAF7EE] px-2 py-0.5 rounded-md border border-[#BBF7D0]">Egresado ADSO</span></div>
         </div>
     </div>
 
     <!-- Caja de Estadísticas con Identidad SENA ERP -->
-    <div class="bg-[#F8FCF9] border border-emerald-100/70 rounded-xl p-4 space-y-2.5">
+    <div class="bg-[#F8FCF9] border border-[#BBF7D0] rounded-xl p-4 space-y-2.5">
         <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Indicadores de Respuesta</span>
         
         <div class="flex justify-between text-xs">
@@ -47,7 +47,7 @@
         
         <div class="flex justify-between text-xs">
             <span class="text-gray-500 font-medium">Pendientes:</span>
-            <span id="detailPendientes" class="font-bold text-amber-600">30</span>
+            <span id="detailPendientes" class="font-bold text-[#00131E]">30</span>
         </div>
         
         <div class="flex justify-between text-xs pt-1.5 border-t border-gray-200/50">
@@ -66,7 +66,7 @@
         <button type="button" 
                 id="detailResultsBtn" 
                 @click="openModalResultados = true; abrirResultadosModal();"
-                class="w-full py-2.5 px-4 bg-gradient-to-r from-[#001A29] to-[#002336] hover:from-[#00131E] hover:to-[#39A900] text-white text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer text-center">
+                class="w-full py-2.5 px-4 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] hover:from-[#39A900] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer text-center">
             <i class="fa-solid fa-chart-pie text-xs"></i>
             <span>Ver Resultados Completos</span>
         </button>

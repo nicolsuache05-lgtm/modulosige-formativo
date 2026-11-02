@@ -90,7 +90,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(2, 136, 209, 0.6);
+        border: 2px solid rgba(57, 169, 0, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -112,7 +112,7 @@
         font-family: 'Poppins', 'Open Sans', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: #0288d1;
+        background: var(--green);
         color: #ffffff;
         padding: 2px 7px;
         border-radius: 999px;
@@ -160,13 +160,13 @@
         transform: translateX(2px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: var(--green);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
       }
       nav a.active i {
-        color: #0288d1;
+        color: #ffffff;
       }
 
       /* ---------------- MAIN ---------------- */
@@ -174,10 +174,15 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes sigeFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(90deg, #00131E 0%, #001A29 60%, #002336 100%);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -383,21 +388,22 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--forest);
+        background: var(--green);
         color: #ffffff;
-        padding: 10px 18px;
-        border-radius: 12px;
-        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 999px;
+        font-size: 13px;
         font-weight: 700;
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
+        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
       }
       .btn-primary:hover {
-        background: var(--green);
+        background: var(--green-dark);
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.35);
       }
 
       /* Stats Grid */
@@ -706,17 +712,16 @@
   <!-- ============================================== -->
   <!-- 1. SIDEBAR INSTRUCTOR SIGE                     -->
   <!-- ============================================== -->
-  <aside class="sidebar">
-    <a href="{{ route('egresados.instructor.dashboard') }}" class="brand">
+    <aside class="sidebar">
+    <a href="{{ route('egresados.welcome') }}" class="brand">
       <div class="brand-badge">
         <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
       </div>
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">Instructor</span>
         </div>
-        <div class="brand-sub">CEFA La Angostura</div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
 
@@ -728,7 +733,7 @@
       </a>
       <a href="{{ route('egresados.instructor.directorio') }}">
         <i class="fa-solid fa-user-graduate"></i>
-        <span>Egresados Fichas</span>
+        <span>Egresados</span>
       </a>
       <a href="{{ route('egresados.instructor.encuestas.index') }}">
         <i class="fa-solid fa-clipboard-question"></i>
@@ -744,13 +749,28 @@
       </a>
     </nav>
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
+    <!-- Perfil del Instructor en la parte inferior del sidebar -->
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
+          IN
+        </div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
+          </div>
+          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -958,9 +978,18 @@
 <!-- ============================================== -->
 <div class="modal-overlay" id="modalReporte">
   <div class="modal-box">
-    <div class="modal-head">
-      <h3 class="modal-title"><i class="fa-solid fa-file-circle-plus" style="color: var(--green); margin-right: 8px;"></i> Generar Nuevo Reporte</h3>
-      <button type="button" class="modal-close" onclick="closeModal()">
+        <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="modal-head-icon">
+          <i class="fa-solid fa-file-circle-plus"></i>
+        </div>
+        <div>
+          <div class="modal-overtitle"><i class="fa-solid fa-chart-line"></i> REPORTES Y ANALÍTICA · SIGE ERP SENA</div>
+          <h3 class="modal-title">Generar Nuevo Reporte</h3>
+          <div class="modal-sub">Consolidados de empleabilidad, caracterización y métricas de fichas.</div>
+        </div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal()" title="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>

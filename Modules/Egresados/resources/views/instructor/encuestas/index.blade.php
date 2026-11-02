@@ -90,7 +90,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(2, 136, 209, 0.6);
+        border: 2px solid rgba(57, 169, 0, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -112,7 +112,7 @@
         font-family: 'Poppins', 'Open Sans', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: #0288d1;
+        background: var(--green);
         color: #ffffff;
         padding: 2px 7px;
         border-radius: 999px;
@@ -160,13 +160,13 @@
         transform: translateX(2px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: var(--green);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
       }
       nav a.active i {
-        color: #0288d1;
+        color: #ffffff;
       }
 
       /* ---------------- MAIN ---------------- */
@@ -174,10 +174,15 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes sigeFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(90deg, #00131E 0%, #001A29 60%, #002336 100%);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -383,21 +388,22 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--forest);
+        background: var(--green);
         color: #ffffff;
-        padding: 10px 18px;
-        border-radius: 12px;
-        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 999px;
+        font-size: 13px;
         font-weight: 700;
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
+        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
       }
       .btn-primary:hover {
-        background: var(--green);
+        background: var(--green-dark);
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.35);
       }
 
       /* Stats Grid */
@@ -620,34 +626,61 @@
       }
       .modal-box {
         background: #ffffff;
-        border-radius: 20px;
+        border-radius: 24px;
         width: 100%;
-        max-width: 820px;
-        box-shadow: 0 25px 50px rgba(0, 19, 30, 0.35);
-        max-height: 92vh;
+        max-width: 840px;
+        box-shadow: 0 25px 60px rgba(0, 19, 30, 0.45);
+        max-height: 94vh;
         overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       .modal-head {
         padding: 22px 28px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 3px solid #39A900;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        background: #FAFCFB;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
+        background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #002336 100%);
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+        color: #ffffff;
+      }
+      .modal-head-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        flex-shrink: 0;
+      }
+      .modal-overtitle {
+        font-size: 10px;
+        font-weight: 800;
+        color: #62E31D;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
       .modal-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
         font-size: 20px;
-        color: var(--forest-deep);
+        color: #ffffff;
         margin: 0;
+        letter-spacing: -0.3px;
       }
       .modal-sub {
         font-size: 12.5px;
-        color: var(--ink-soft);
-        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: 3px;
       }
       .format-badge {
         display: inline-flex;
@@ -655,31 +688,33 @@
         gap: 6px;
         font-size: 11px;
         font-weight: 800;
-        background: var(--green-soft);
-        color: var(--green-dark);
+        background: rgba(98, 227, 29, 0.15);
+        color: #62E31D;
         padding: 3px 10px;
         border-radius: 999px;
-        margin-bottom: 8px;
-        border: 1px solid rgba(57, 169, 0, 0.25);
+        margin-bottom: 4px;
+        border: 1px solid rgba(98, 227, 29, 0.3);
         letter-spacing: 0.4px;
       }
       .modal-close {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: #ffffff;
-        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ffffff;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ink-soft);
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
       }
       .modal-close:hover {
-        background: #FEE2E2;
-        color: #DC2626;
-        border-color: #FCA5A5;
+        background: rgba(239, 68, 68, 0.8);
+        border-color: rgba(239, 68, 68, 1);
+        color: #ffffff;
+        transform: rotate(90deg);
       }
       .modal-body {
         padding: 26px 28px;
@@ -909,25 +944,33 @@
         .content { padding: 20px 16px; }
       }
     </style>
+    <!-- Tailwind CSS (para el modal constructor institucional) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
 </head>
-<body>
+<body x-data="{ openModal: false, openModalResultados: false }">
 
 <div class="app">
 
   <!-- ============================================== -->
   <!-- 1. SIDEBAR INSTRUCTOR SIGE                     -->
   <!-- ============================================== -->
-  <aside class="sidebar">
-    <a href="{{ route('egresados.instructor.dashboard') }}" class="brand">
+    <aside class="sidebar">
+    <a href="{{ route('egresados.welcome') }}" class="brand">
       <div class="brand-badge">
         <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
       </div>
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">Instructor</span>
         </div>
-        <div class="brand-sub">CEFA La Angostura</div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
 
@@ -939,7 +982,7 @@
       </a>
       <a href="{{ route('egresados.instructor.directorio') }}">
         <i class="fa-solid fa-user-graduate"></i>
-        <span>Egresados Fichas</span>
+        <span>Egresados</span>
       </a>
       <a href="{{ route('egresados.instructor.encuestas.index') }}" class="active">
         <i class="fa-solid fa-clipboard-question"></i>
@@ -955,13 +998,28 @@
       </a>
     </nav>
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
+    <!-- Perfil del Instructor en la parte inferior del sidebar -->
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
+          IN
+        </div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
+          </div>
+          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -1039,7 +1097,7 @@
           <p class="page-desc">Diseña, aplica y evalúa encuestas de inserción y satisfacción para egresados de tus fichas.</p>
         </div>
         <div>
-          <button type="button" class="btn-primary" onclick="openModal()">
+          <button type="button" class="btn-primary" @click="openModal = true">
             <i class="fa-solid fa-plus"></i>
             <span>Nueva Encuesta</span>
           </button>
@@ -1161,209 +1219,20 @@
 </div>
 
 <!-- ============================================== -->
-<!-- MODAL: CREAR NUEVA ENCUESTA (FORMATO OFICIAL)  -->
+<!-- MODAL: CREAR NUEVA ENCUESTA (CONSTRUCTOR OFICIAL SENA ERP) -->
 <!-- ============================================== -->
-<div class="modal-overlay" id="modalEncuesta">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div>
-        <div class="format-badge"><i class="fa-solid fa-certificate"></i> FORMATO OFICIAL SENA SIGE-ENC-04 · CEFA LA ANGOSTURA</div>
-        <h3 class="modal-title"><i class="fa-solid fa-clipboard-question" style="color: var(--green); margin-right: 8px;"></i> Diseñar y Publicar Encuesta</h3>
-        <div class="modal-sub">Configuración integral del instrumento de seguimiento laboral y satisfacción para egresados.</div>
-      </div>
-      <button type="button" class="modal-close" onclick="closeModal()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <form id="formNuevaEncuesta" action="{{ route('egresados.instructor.encuestas.store') }}" method="POST">
-      @csrf
-      <input type="hidden" name="estructura_preguntas" id="estructura_preguntas" value="">
-
-      <div class="modal-body">
-        
-        <!-- Plantillas Rápidas -->
-        <div style="margin-bottom: 8px;">
-          <label class="form-label" style="font-size: 11.5px; color: var(--ink-soft);"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--green); margin-right: 4px;"></i> Plantillas sugeridas de formulario (clic para autocompletar):</label>
-          <div class="template-pills">
-            <button type="button" class="template-pill" onclick="aplicarPlantilla('insercion')">
-              <i class="fa-solid fa-briefcase"></i> Inserción Laboral ADSO
-            </button>
-            <button type="button" class="template-pill" onclick="aplicarPlantilla('satisfaccion')">
-              <i class="fa-solid fa-star"></i> Satisfacción y Pertinencia CEFA
-            </button>
-            <button type="button" class="template-pill" onclick="aplicarPlantilla('emprendimiento')">
-              <i class="fa-solid fa-rocket"></i> Fondo Emprender & Proyectos
-            </button>
-            <button type="button" class="template-pill" onclick="aplicarPlantilla('bilinguismo')">
-              <i class="fa-solid fa-language"></i> Diagnóstico de Bilingüismo & TIC
-            </button>
-          </div>
-        </div>
-
-        <!-- SECCIÓN 1: Identificación del Instrumento -->
-        <div class="form-section">
-          <div class="form-section-title">
-            <span class="step-number">1</span>
-            <span>Identificación y Objetivo de la Encuesta</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Título Oficial del Instrumento *</label>
-            <input type="text" name="titulo" id="enc_titulo" class="form-control" placeholder="Ej. Encuesta de Inserción Laboral y Salarios ADSO 2026" required>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Objetivo Formativo / Área *</label>
-              <select name="area_enfoque" class="form-control" required>
-                <option value="Empleabilidad">Seguimiento de Empleabilidad</option>
-                <option value="Pertinencia Curricular">Pertinencia y Calidad Curricular</option>
-                <option value="Emprendimiento">Emprendimiento y Unidades Productivas</option>
-                <option value="Formación Continua">Demanda de Cursos Complementarios</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Canal Prioritario de Envío</label>
-              <select name="canal_envio" class="form-control">
-                <option value="Portal y Correo">Portal SIGE + Correo Electrónico</option>
-                <option value="Solo Portal">Solo Cartelera de Egresados</option>
-                <option value="Enlace Directo">Enlace Compartible (WhatsApp / Redes)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Descripción orientadora para el egresado</label>
-            <textarea name="descripcion" id="enc_desc" class="form-control" rows="2" placeholder="Explica a los egresados para qué se usarán sus respuestas y el beneficio para el centro de formación..."></textarea>
-          </div>
-        </div>
-
-        <!-- SECCIÓN 2: Convocatoria y Población Objetivo -->
-        <div class="form-section">
-          <div class="form-section-title">
-            <span class="step-number">2</span>
-            <span>Convocatoria y Población Egresada Destino</span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Población Objetivo / Programa *</label>
-              <select name="publico_objetivo" id="enc_target" class="form-control" required>
-                <option value="Egresados ADSO">Egresados ADSO (Software)</option>
-                <option value="Egresados Multimedia">Egresados Producción Multimedia</option>
-                <option value="Egresados Agroindustria">Egresados Agroindustria & Pecuaria</option>
-                <option value="Todas las Fichas del Instructor">Todas mis Fichas Asignadas</option>
-                <option value="Todos los Egresados CEFA">Todos los Egresados del Centro</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Fecha Límite de Recepción *</label>
-              <input type="date" name="fecha_cierre" class="form-control" value="{{ date('Y-m-d', strtotime('+30 days')) }}" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECCIÓN 3: Banco y Preguntas del Instrumento -->
-        <div class="form-section">
-          <div class="form-section-title" style="justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="step-number">3</span>
-              <span>Cuestionario del Formato</span>
-            </div>
-            <span id="qCountBadge" style="font-size: 11px; font-weight: 700; color: var(--green-dark); background: var(--green-soft); padding: 2px 10px; border-radius: 999px;">
-              4 preguntas configuradas
-            </span>
-          </div>
-
-          <div id="questionListContainer">
-            <!-- Pregunta 1 -->
-            <div class="question-card">
-              <div class="question-head">
-                <span class="question-type-badge type-mc"><i class="fa-solid fa-list-ul mr-1"></i> Selección Múltiple</span>
-                <button type="button" class="btn-delete-q" onclick="eliminarPregunta(this)" title="Eliminar pregunta"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-              <input type="text" class="form-control q-input" value="¿Cuál es tu situación laboral o contractual actual en el sector?" placeholder="Texto de la pregunta..." required>
-            </div>
-
-            <!-- Pregunta 2 -->
-            <div class="question-card">
-              <div class="question-head">
-                <span class="question-type-badge type-mc"><i class="fa-solid fa-list-ul mr-1"></i> Selección Múltiple</span>
-                <button type="button" class="btn-delete-q" onclick="eliminarPregunta(this)" title="Eliminar pregunta"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-              <input type="text" class="form-control q-input" value="¿En cuánto tiempo lograste tu primera vinculación tras finalizar la etapa práctica?" placeholder="Texto de la pregunta..." required>
-            </div>
-
-            <!-- Pregunta 3 -->
-            <div class="question-card">
-              <div class="question-head">
-                <span class="question-type-badge type-scale"><i class="fa-solid fa-star mr-1"></i> Escala de Calificación (1 a 5)</span>
-                <button type="button" class="btn-delete-q" onclick="eliminarPregunta(this)" title="Eliminar pregunta"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-              <input type="text" class="form-control q-input" value="¿Cómo calificarías la pertinencia técnica de las herramientas aprendidas en CEFA frente a tu empleo?" placeholder="Texto de la pregunta..." required>
-            </div>
-
-            <!-- Pregunta 4 -->
-            <div class="question-card">
-              <div class="question-head">
-                <span class="question-type-badge type-text"><i class="fa-solid fa-align-left mr-1"></i> Respuesta Libre</span>
-                <button type="button" class="btn-delete-q" onclick="eliminarPregunta(this)" title="Eliminar pregunta"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-              <input type="text" class="form-control q-input" value="¿Qué tecnologías o habilidades complementarias consideras indispensables incluir hoy en el programa?" placeholder="Texto de la pregunta..." required>
-            </div>
-          </div>
-
-          <div style="margin-top: 12px;">
-            <button type="button" class="btn-add-q" onclick="agregarPregunta()">
-              <i class="fa-solid fa-plus-circle"></i> Añadir Otra Pregunta al Cuestionario
-            </button>
-          </div>
-        </div>
-
-        <!-- SECCIÓN 4: Opciones de Difusión y Privacidad -->
-        <div class="form-section" style="margin-bottom: 0;">
-          <div class="form-section-title">
-            <span class="step-number">4</span>
-            <span>Parámetros de Privacidad y Entrega</span>
-          </div>
-
-          <label class="checkbox-label">
-            <input type="checkbox" name="notificar_correo" checked>
-            <span><strong>Enviar notificación automática por correo</strong> a los egresados de las fichas correspondientes.</span>
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" name="publicar_portal" checked>
-            <span><strong>Publicar de inmediato en el Portal de Egresados</strong> con acceso público y botón de respuesta.</span>
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" name="anonima" value="1">
-            <span><strong>Permitir respuestas anónimas</strong> (fomenta mayor franqueza en valoraciones de satisfacción).</span>
-          </label>
-        </div>
-
-      </div>
-
-      <div class="modal-foot">
-        <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
-        <button type="submit" class="btn-submit" onclick="prepararEnvio()">
-          <i class="fa-solid fa-paper-plane mr-1"></i> Publicar y Convocar Encuesta
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+@include('egresados::instructor.encuestas.partials._modal_crear')
 
 <script>
   function openModal() {
-    document.getElementById('modalEncuesta').style.display = 'flex';
+    if (window.Alpine) {
+      Alpine.$data(document.body).openModal = true;
+    }
   }
   function closeModal() {
-    document.getElementById('modalEncuesta').style.display = 'none';
+    if (window.Alpine) {
+      Alpine.$data(document.body).openModal = false;
+    }
   }
 
   function toggleUserMenu(e) {
@@ -1563,13 +1432,18 @@
 <!-- MODAL: VER DETALLE Y RESULTADOS DE ENCUESTA -->
 <div class="modal-overlay" id="modalVerEncuesta">
   <div class="modal-box" style="max-width: 780px;">
-    <div class="modal-head">
-      <div>
-        <div class="format-badge"><i class="fa-solid fa-square-poll-vertical"></i> RESULTADOS Y DETALLE · INSTRUMENTO DE SEGUIMIENTO</div>
-        <h3 class="modal-title" id="verEnc_title">Título de la Encuesta</h3>
-        <div class="modal-sub" id="verEnc_sub">ID: ENC-000 · Creado por: Instructor CEFA</div>
+        <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="modal-head-icon">
+          <i class="fa-solid fa-square-poll-vertical"></i>
+        </div>
+        <div>
+          <div class="modal-overtitle"><i class="fa-solid fa-chart-pie"></i> RESULTADOS Y DETALLE · INSTRUMENTO DE SEGUIMIENTO</div>
+          <h3 class="modal-title" id="verEnc_title">Título de la Encuesta</h3>
+          <div class="modal-sub" id="verEnc_sub">ID: ENC-000 · Creado por: Instructor CEFA</div>
+        </div>
       </div>
-      <button type="button" class="modal-close" onclick="cerrarDetalleEncuesta()">
+      <button type="button" class="modal-close" onclick="cerrarDetalleEncuesta()" title="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -1665,5 +1539,8 @@
   </div>
 </div>
 
+
+<!-- Modal de Alertas y Notificaciones Institucionales -->
+@include('egresados::superadmin.partials._modal_alertas')
 </body>
 </html>

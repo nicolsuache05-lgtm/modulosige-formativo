@@ -90,7 +90,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(2, 136, 209, 0.6);
+        border: 2px solid rgba(57, 169, 0, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -112,7 +112,7 @@
         font-family: 'Poppins', 'Open Sans', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: #0288d1;
+        background: var(--green);
         color: #ffffff;
         padding: 2px 7px;
         border-radius: 999px;
@@ -160,13 +160,13 @@
         transform: translateX(2px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: var(--green);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
       }
       nav a.active i {
-        color: #0288d1;
+        color: #ffffff;
       }
 
       /* ---------------- MAIN ---------------- */
@@ -174,10 +174,15 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes sigeFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(90deg, #00131E 0%, #001A29 60%, #002336 100%);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -383,21 +388,22 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--forest);
+        background: var(--green);
         color: #ffffff;
-        padding: 10px 18px;
-        border-radius: 12px;
-        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 999px;
+        font-size: 13px;
         font-weight: 700;
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
+        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
       }
       .btn-primary:hover {
-        background: var(--green);
+        background: var(--green-dark);
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.35);
       }
 
       /* Stats Grid */
@@ -646,34 +652,61 @@
       }
       .modal-box {
         background: #ffffff;
-        border-radius: 20px;
+        border-radius: 24px;
         width: 100%;
-        max-width: 820px;
-        box-shadow: 0 25px 50px rgba(0, 19, 30, 0.35);
-        max-height: 92vh;
+        max-width: 840px;
+        box-shadow: 0 25px 60px rgba(0, 19, 30, 0.45);
+        max-height: 94vh;
         overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       .modal-head {
         padding: 22px 28px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 3px solid #39A900;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        background: #FAFCFB;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
+        background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #002336 100%);
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+        color: #ffffff;
+      }
+      .modal-head-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        flex-shrink: 0;
+      }
+      .modal-overtitle {
+        font-size: 10px;
+        font-weight: 800;
+        color: #62E31D;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
       .modal-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
         font-size: 20px;
-        color: var(--forest-deep);
+        color: #ffffff;
         margin: 0;
+        letter-spacing: -0.3px;
       }
       .modal-sub {
         font-size: 12.5px;
-        color: var(--ink-soft);
-        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: 3px;
       }
       .format-badge {
         display: inline-flex;
@@ -681,31 +714,33 @@
         gap: 6px;
         font-size: 11px;
         font-weight: 800;
-        background: var(--green-soft);
-        color: var(--green-dark);
+        background: rgba(98, 227, 29, 0.15);
+        color: #62E31D;
         padding: 3px 10px;
         border-radius: 999px;
-        margin-bottom: 8px;
-        border: 1px solid rgba(57, 169, 0, 0.25);
+        margin-bottom: 4px;
+        border: 1px solid rgba(98, 227, 29, 0.3);
         letter-spacing: 0.4px;
       }
       .modal-close {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: #ffffff;
-        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ffffff;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ink-soft);
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
       }
       .modal-close:hover {
-        background: #FEE2E2;
-        color: #DC2626;
-        border-color: #FCA5A5;
+        background: rgba(239, 68, 68, 0.8);
+        border-color: rgba(239, 68, 68, 1);
+        color: #ffffff;
+        transform: rotate(90deg);
       }
       .modal-body {
         padding: 26px 28px;
@@ -911,17 +946,16 @@
   <!-- ============================================== -->
   <!-- 1. SIDEBAR INSTRUCTOR SIGE                     -->
   <!-- ============================================== -->
-  <aside class="sidebar">
-    <a href="{{ route('egresados.instructor.dashboard') }}" class="brand">
+    <aside class="sidebar">
+    <a href="{{ route('egresados.welcome') }}" class="brand">
       <div class="brand-badge">
         <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
       </div>
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">Instructor</span>
         </div>
-        <div class="brand-sub">CEFA La Angostura</div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
 
@@ -933,7 +967,7 @@
       </a>
       <a href="{{ route('egresados.instructor.directorio') }}">
         <i class="fa-solid fa-user-graduate"></i>
-        <span>Egresados Fichas</span>
+        <span>Egresados</span>
       </a>
       <a href="{{ route('egresados.instructor.encuestas.index') }}">
         <i class="fa-solid fa-clipboard-question"></i>
@@ -949,14 +983,28 @@
       </a>
     </nav>
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
-
+    <!-- Perfil del Instructor en la parte inferior del sidebar -->
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
+          IN
+        </div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
+          </div>
+          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- ============================================== -->
@@ -1146,13 +1194,18 @@
 <!-- ============================================== -->
 <div class="modal-overlay" id="modalEvento">
   <div class="modal-box">
-    <div class="modal-head">
-      <div>
-        <div class="format-badge"><i class="fa-solid fa-calendar-days"></i> AGENDA INSTITUCIONAL SENA · CEFA LA ANGOSTURA</div>
-        <h3 class="modal-title"><i class="fa-solid fa-calendar-plus" style="color: var(--green); margin-right: 8px;"></i> Programar y Convocar Evento</h3>
-        <div class="modal-sub">Planificación de encuentros presenciales, talleres técnicos, ferias laborales y networking.</div>
+        <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="modal-head-icon">
+          <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+        <div>
+          <div class="modal-overtitle"><i class="fa-solid fa-calendar-days"></i> AGENDA INSTITUCIONAL SENA · CEFA LA ANGOSTURA</div>
+          <h3 class="modal-title">Programar y Convocar Evento</h3>
+          <div class="modal-sub">Organiza talleres, ferias y encuentros de egresados vinculando fichas formativas.</div>
+        </div>
       </div>
-      <button type="button" class="modal-close" onclick="closeModal()">
+      <button type="button" class="modal-close" onclick="closeModal()" title="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -1492,13 +1545,18 @@
 <!-- MODAL: VER DETALLE COMPLETO DE EVENTO -->
 <div class="modal-overlay" id="modalVerEvento">
   <div class="modal-box" style="max-width: 780px;">
-    <div class="modal-head">
-      <div>
-        <div class="format-badge"><i class="fa-solid fa-calendar-check"></i> AGENDA INSTITUCIONAL · ENCUENTRO DE EGRESADOS</div>
-        <h3 class="modal-title" id="verEvt_title">Encuentro de Egresados Fichas ADSO</h3>
-        <div class="modal-sub" id="verEvt_sub">Código: EVT-INS-001 · Tipo: Encuentro de Ficha</div>
+        <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="modal-head-icon">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+          <div class="modal-overtitle"><i class="fa-solid fa-calendar-check"></i> AGENDA INSTITUCIONAL · ENCUENTRO DE EGRESADOS</div>
+          <h3 class="modal-title" id="verEvt_title">Encuentro de Egresados</h3>
+          <div class="modal-sub" id="verEvt_sub">ID: EVT-000 · Convocatoria activa</div>
+        </div>
       </div>
-      <button type="button" class="modal-close" onclick="cerrarDetalleEvento()">
+      <button type="button" class="modal-close" onclick="cerrarDetalleEvento()" title="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>

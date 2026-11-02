@@ -319,26 +319,26 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--forest);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         color: #ffffff;
         border: none;
-        padding: 9px 18px;
+        padding: 10px 20px;
         border-radius: 999px;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.28);
         cursor: pointer;
       }
       .btn-primary-green:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #2e8b00 0%, #246f00 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.38);
       }
 
-      /* ---------------- 5 MÉTRICAS SUPERIORES ---------------- */
+      /* ---------------- 5 MÉTRICAS SUPERIORES (SENA ERP) ---------------- */
       .metrics-5-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -348,45 +348,66 @@
       .metric-mini-card {
         background: var(--card);
         border-radius: 16px;
-        padding: 16px 18px;
+        padding: 18px 20px;
         border: 1px solid var(--line);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 1px 3px rgba(0, 19, 30, 0.05);
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       }
       .metric-mini-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px rgba(1, 56, 25, 0.06);
-        border-color: rgba(57, 169, 0, 0.35);
+        box-shadow: 0 8px 20px rgba(0, 19, 30, 0.07);
+        border-color: rgba(57, 169, 0, 0.4);
+      }
+      .metric-mini-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
       }
       .metric-mini-label {
-        font-size: 10.5px;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.6px;
         color: var(--ink-soft);
       }
+      .metric-mini-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--green-soft);
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13.5px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(57, 169, 0, 0.12);
+      }
       .metric-mini-num {
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 700;
         color: var(--forest-deep);
         line-height: 1.1;
-        margin: 4px 0;
+        margin: 2px 0 8px;
       }
       .metric-mini-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-size: 10.5px;
         font-weight: 700;
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: 999px;
         width: fit-content;
+        background: var(--green-soft);
+        color: var(--green-badge-text);
+        border: 1px solid var(--green-soft-border);
       }
-      .metric-mini-pill.green { background: var(--green-soft); color: var(--green-dark); }
-      .metric-mini-pill.blue { background: #EEF4FF; color: #1D4ED8; }
-      .metric-mini-pill.indigo { background: #EEF2FF; color: #4338CA; }
-      .metric-mini-pill.amber { background: #FFF8E6; color: #B45309; }
 
       /* ---------------- MAIN 2-COLUMN + 1-COLUMN GRID ---------------- */
       .main-grid {
@@ -446,18 +467,23 @@
       }
 
       .btn-filter {
-        padding: 9px 16px;
-        background: var(--forest);
+        padding: 9px 20px;
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         color: #ffffff;
         border: none;
         border-radius: 10px;
-        font-size: 12.5px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(57, 169, 0, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
       }
       .btn-filter:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #2e8b00 0%, #246f00 100%);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.3);
       }
 
       /* Instructores Table */
@@ -600,19 +626,20 @@
         gap: 14px;
       }
       .detail-avatar-large {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #39A900 100%);
+        border: 2px solid rgba(98, 227, 29, 0.7);
         color: #ffffff;
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
+        font-weight: 800;
+        font-size: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.2);
       }
       .detail-user-name {
         font-family: 'Poppins', 'Nunito', sans-serif;
@@ -675,12 +702,12 @@
       }
       .comp-tag {
         font-size: 11px;
-        font-weight: 600;
-        background: #ffffff;
-        border: 1px solid var(--line);
-        padding: 3px 8px;
-        border-radius: 6px;
-        color: var(--ink);
+        font-weight: 700;
+        background: #EAF7EE;
+        border: 1px solid #BBF7D0;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 8px;
       }
 
       .btn-cta-detail {
@@ -688,35 +715,36 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background: var(--forest);
+        background: linear-gradient(135deg, #00131E 0%, #001A29 100%);
+        border: 1.5px solid rgba(57, 169, 0, 0.35);
         color: #ffffff;
-        border: none;
-        padding: 11px 18px;
+        padding: 12px 18px;
         border-radius: 12px;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         text-align: center;
       }
       .btn-cta-detail:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+        border-color: #39A900;
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.3);
       }
 
       .btn-secondary-action {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        background: var(--green-soft);
-        color: var(--forest);
-        border: 1px solid rgba(57, 169, 0, 0.25);
-        padding: 10px 18px;
+        gap: 8px;
+        background: #EAF7EE;
+        color: #166534;
+        border: 1.5px solid #BBF7D0;
+        padding: 11px 18px;
         border-radius: 12px;
         font-size: 12.5px;
         font-weight: 700;
@@ -724,7 +752,9 @@
         transition: all 0.2s ease;
       }
       .btn-secondary-action:hover {
-        background: #d8f3de;
+        background: #dcfce7;
+        border-color: #39A900;
+        transform: translateY(-1px);
       }
 
       .pagination-wrap {
@@ -838,38 +868,78 @@
       </div>
 
       <!-- ============================================== -->
-      <!-- 5 MÉTRICAS SUPERIORES -->
+      <!-- 5 MÉTRICAS SUPERIORES (SENA ERP) -->
       <!-- ============================================== -->
       <div class="metrics-5-grid">
         
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Total Instructores</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Total Instructores</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($totalInstructores) }}</div>
-          <span class="metric-mini-pill green">Registrados</span>
+          <div class="metric-mini-pill">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-0.5 animate-pulse"></span>
+            <span>Registrados</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Activos</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Activos</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($activos) }}</div>
-          <span class="metric-mini-pill green">En servicio</span>
+          <div class="metric-mini-pill">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-0.5"></span>
+            <span>En servicio</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Programas</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Programas</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($programas) }}</div>
-          <span class="metric-mini-pill blue">Asignados</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-book-bookmark text-[9px] text-[#39A900]"></i>
+            <span>Asignados</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Fichas Activas</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Fichas Activas</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($fichasActivas) }}</div>
-          <span class="metric-mini-pill indigo">En desarrollo</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-users text-[9px] text-[#39A900]"></i>
+            <span>En desarrollo</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Evaluaciones</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Evaluaciones</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($evaluaciones) }}</div>
-          <span class="metric-mini-pill amber">Pendientes</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-clock text-[9px] text-[#39A900]"></i>
+            <span>Pendientes</span>
+          </div>
         </div>
 
       </div>
@@ -1015,6 +1085,19 @@
         </div>
 
         <!-- Columna Derecha: Panel de Detalle Rápido (Sticky) -->
+        @php
+          $firstInst = $instructores->first();
+          $firstPerson = $firstInst?->person;
+          $firstFullName = $firstPerson ? ($firstPerson->first_name . ' ' . $firstPerson->first_last_name . ' ' . ($firstPerson->second_last_name ?? '')) : ($firstInst?->name ?? 'Martha Montealegre');
+          $firstDoc = $firstPerson->document_number ?? '12210254';
+          $firstEmail = $firstInst?->email ?? ($firstPerson?->misena_email ?? 'martha@gmail.com');
+          $firstInitials = '';
+          foreach(array_slice(explode(' ', trim($firstFullName)), 0, 2) as $w) {
+              if (!empty($w)) $firstInitials .= mb_strtoupper(mb_substr($w, 0, 1));
+          }
+          $firstCourse = \Modules\SICA\Entities\Course::with('program')->where('person_id', $firstPerson?->id)->first();
+          $firstProgram = $firstCourse?->program?->name ?? 'Gestión de Empresas Agropecuarias';
+        @endphp
         <div class="detail-card">
           
           <div class="detail-head">
@@ -1027,11 +1110,11 @@
 
           <!-- Hero del Instructor -->
           <div class="detail-user-hero">
-            <div id="detailAvatarLarge" class="detail-avatar-large">CM</div>
+            <div id="detailAvatarLarge" class="detail-avatar-large">{{ $firstInitials ?: 'MM' }}</div>
             <div style="overflow:hidden;">
-              <div id="detailName" class="detail-user-name">Carla Moreno</div>
-              <div id="detailDoc" class="detail-user-doc">Doc: 107584578</div>
-              <div id="detailEmail" class="detail-user-email">CMoreno@gmail.com</div>
+              <div id="detailName" class="detail-user-name">{{ $firstFullName }}</div>
+              <div id="detailDoc" class="detail-user-doc">Doc: {{ $firstDoc }}</div>
+              <div id="detailEmail" class="detail-user-email">{{ $firstEmail }}</div>
             </div>
           </div>
 
@@ -1040,15 +1123,15 @@
             <span class="info-box-label">Información Académica</span>
             <div class="info-row">
               <span class="info-key">Programa Asignado:</span>
-              <span id="detailProgram" class="info-val">ADSO</span>
+              <span id="detailProgram" class="info-val">{{ $firstProgram }}</span>
             </div>
             <div class="info-row">
               <span class="info-key">Especialidad:</span>
-              <span id="detailEspecialidad" class="info-val">Desarrollo de Software</span>
+              <span id="detailEspecialidad" class="info-val">Instructor de Formación</span>
             </div>
             <div class="info-row">
               <span class="info-key">Fichas Asignadas:</span>
-              <span id="detailFichas" class="info-val">6 Fichas</span>
+              <span id="detailFichas" class="info-val">Fichas Activas</span>
             </div>
           </div>
 

@@ -121,6 +121,8 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/{id}', [EgresadosController::class, 'show'])->name('egresados.show')->whereNumber('id');
     Route::put('egresados/{id}/update', [EgresadosController::class, 'update'])->name('egresados.superadmin.update')->whereNumber('id');
     Route::put('egresados/{id}', [EgresadosController::class, 'update'])->name('egresados.update')->whereNumber('id');
+    Route::post('egresados/{id}/toggle-status', [EgresadosController::class, 'toggleStatus'])->name('egresados.superadmin.toggle_status')->whereNumber('id');
+    Route::match(['get', 'post'], 'egresados/{id}/toggle', [EgresadosController::class, 'toggleStatus'])->name('egresados.toggle_status')->whereNumber('id');
 });
 
 
@@ -132,6 +134,9 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::get('egresados/instructor', [InstructorController::class, 'dashboard'])->name('egresados.instructor');
     Route::get('egresados/instructor/dashboard', [InstructorController::class, 'dashboard'])->name('egresados.instructor.dashboard');
     Route::get('egresados/instructor/directorio', [InstructorController::class, 'directorio'])->name('egresados.instructor.directorio');
+    Route::post('egresados/instructor/store', [EgresadosController::class, 'store'])->name('egresados.instructor.store');
+    Route::post('egresados/instructor/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.instructor.seguimiento.store');
+    Route::match(['put', 'post'], 'egresados/instructor/{id}/update', [EgresadosController::class, 'update'])->name('egresados.instructor.update')->whereNumber('id');
     
     // Encuestas Instructor
     Route::get('egresados/instructor/encuestas', [InstructorEncuestasController::class, 'index'])->name('egresados.instructor.encuestas.index');

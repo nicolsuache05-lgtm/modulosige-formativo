@@ -172,6 +172,6 @@ class InstructorEncuestasController extends Controller
         session(['custom_encuestas' => $customEncuestas]);
 
         return redirect()->route('egresados.instructor.encuestas.index')
-            ->with('success', '¡Encuesta "' . $request->titulo . '" creada exitosamente por ' . $creadorNombre . '!');
+            ->with('success', '¡Encuesta "' . $request->titulo . '" registrada exitosamente por ' . $creadorNombre . '!');
     }
 }

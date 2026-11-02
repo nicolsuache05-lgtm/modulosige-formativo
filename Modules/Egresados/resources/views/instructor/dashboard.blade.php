@@ -3,46 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGE · Panel del Instructor — CEFA La Angostura</title>
+    <title>SIGE · Panel de Instructor — CEFA La Angostura</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* PALETA INSTITUCIONAL SENA EMPRESA ERP */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
-        --blue-soft: #EBF3FF;
-        --amber-soft: #FEF7EA;
-        --purple-soft: #F5EFFF;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
+        --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Open Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -51,13 +68,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -91,7 +108,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(2, 136, 209, 0.6);
+        border: 2px solid rgba(98, 227, 29, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -101,7 +118,7 @@
       }
 
       .brand-name {
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -110,15 +127,13 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Poppins', 'Open Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
-        background: #0288d1;
+        background: var(--green);
         color: #ffffff;
         padding: 2px 7px;
         border-radius: 999px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
       }
       .brand-sub {
         font-size: 10.5px;
@@ -150,82 +165,65 @@
         transition: all 0.15s ease;
       }
       nav a i {
-        width: 18px;
         font-size: 15px;
+        width: 20px;
         text-align: center;
-        flex-shrink: 0;
+        opacity: 0.85;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: var(--green);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
       }
       nav a.active i {
-        color: #0288d1;
+        opacity: 1;
+        color: #ffffff;
       }
 
-      /* ---------------- MAIN ---------------- */
+      /* ---------------- MAIN VIEWPORT ---------------- */
       .main {
         display: flex;
         flex-direction: column;
         min-width: 0;
+        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes sigeFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
+      /* ---------------- TOPBAR ---------------- */
       .topbar {
         background: var(--forest);
         color: #ffffff;
+        padding: 0 32px;
+        height: 64px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 36px;
-        border-bottom: 3px solid #39A900;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        border-bottom: 2px solid var(--green);
+        position: sticky;
+        top: 0;
+        z-index: 100;
       }
 
       .topbar-left {
         display: flex;
         align-items: center;
-        gap: 14px;
-      }
-
-      .portal-link-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(57, 169, 0, 0.2);
-        border: 1px solid #39A900;
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 5px 14px;
-        border-radius: 999px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-      }
-      .portal-link-btn:hover {
-        background: var(--green);
-        border-color: #62E31D;
-        box-shadow: 0 2px 10px rgba(57, 169, 0, 0.4);
-        color: #ffffff;
-      }
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
+        gap: 12px;
       }
 
       .icon-btn {
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -233,155 +231,25 @@
         position: relative;
         color: #ffffff;
         transition: all 0.2s ease;
-        border: none;
       }
       .icon-btn:hover {
         background: rgba(57, 169, 0, 0.25);
-        color: #62E31D;
-        transform: translateY(-1px);
+        color: var(--moss);
+        border-color: var(--moss);
       }
       .icon-btn .dot {
         position: absolute;
-        top: 6px;
-        right: 7px;
-        width: 8px;
-        height: 8px;
+        top: 7px;
+        right: 8px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
-        background: #62E31D;
-        border: 1.5px solid var(--forest);
-      }
-
-      .user-chip {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13.5px;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 4px 12px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        transition: all 0.2s ease;
-        color: #ffffff;
-        user-select: none;
-      }
-      .user-chip:hover {
-        background: rgba(57, 169, 0, 0.2);
-        border-color: rgba(98, 227, 29, 0.4);
-      }
-      .user-dropdown-wrapper {
-        position: relative;
-      }
-      .user-dropdown-menu {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        min-width: 230px;
-        background: #001A29;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-top: 2px solid var(--green);
-        border-radius: 14px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-        padding: 6px 0;
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-      }
-      .user-dropdown-menu.show {
-        display: block;
-        animation: dropFade 0.15s ease-out;
-      }
-      @keyframes dropFade {
-        from { opacity: 0; transform: translateY(-6px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .user-dropdown-header {
-        padding: 10px 16px 8px;
-      }
-      .user-dropdown-name {
-        font-weight: 700;
-        font-size: 13.5px;
-        color: #ffffff;
-      }
-      .user-dropdown-role {
-        font-size: 10.5px;
-        font-weight: 700;
-        color: var(--moss);
-        text-transform: uppercase;
-        margin-top: 2px;
-        letter-spacing: 0.4px;
-      }
-      .user-dropdown-email {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 2px;
-      }
-      .user-dropdown-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 5px 0;
-      }
-      .user-dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 9px 16px;
-        font-size: 12.5px;
-        color: rgba(255, 255, 255, 0.85);
-        text-decoration: none;
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        font-family: inherit;
-        font-weight: 600;
-        transition: all 0.15s;
-      }
-      .user-dropdown-item i {
-        width: 16px;
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-      .user-dropdown-item:hover {
-        background: rgba(57, 169, 0, 0.18);
-        color: #62E31D;
-      }
-      .user-dropdown-item:hover i {
-        color: #62E31D;
-      }
-      .user-dropdown-item.logout-item {
-        color: #FCA5A5;
-      }
-      .user-dropdown-item.logout-item i {
-        color: #F87171;
-      }
-      .user-dropdown-item.logout-item:hover {
-        background: rgba(220, 38, 38, 0.2);
-        color: #ffffff;
-      }
-      .user-dropdown-item.logout-item:hover i {
-        color: #ffffff;
-      }
-      .user-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #39A900 0%, #002336 100%);
-        border: 1.5px solid #62E31D;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
-        font-size: 12px;
+        background: var(--moss);
       }
 
       /* ---------------- CONTENT ---------------- */
       .content {
-        padding: 34px 40px 48px;
+        padding: 32px 36px 48px;
         flex: 1;
       }
 
@@ -394,7 +262,7 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 28px;
         margin: 0 0 6px;
@@ -426,7 +294,7 @@
         color: var(--green);
       }
 
-      /* Stat cards */
+      /* Stat cards (Grid de 6 tarjetas igual al Super Admin) */
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -436,18 +304,18 @@
       .stat-card {
         background: var(--card);
         border-radius: 16px;
-        padding: 22px 22px 20px;
+        padding: 22px 22px 18px;
         border: 1px solid var(--line);
         display: flex;
         flex-direction: column;
-        gap: 14px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        gap: 12px;
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
         transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       }
       .stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 24px rgba(1, 56, 25, 0.06);
-        border-color: rgba(57, 169, 0, 0.35);
+        box-shadow: 0 10px 24px rgba(0, 19, 30, 0.08);
+        border-color: rgba(57, 169, 0, 0.4);
       }
 
       .stat-top {
@@ -456,20 +324,27 @@
         gap: 12px;
       }
       .stat-icon {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         background: var(--green-soft);
-        color: var(--forest);
+        color: var(--sena-green);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
         flex-shrink: 0;
+        transition: transform 0.2s ease;
       }
-      .stat-icon.blue { background: rgba(57, 169, 0, 0.12); color: var(--green); }
-      .stat-icon.amber { background: var(--amber-soft); color: #D97706; }
-      .stat-icon.purple { background: rgba(0, 35, 54, 0.1); color: var(--forest); }
+      .stat-card:hover .stat-icon {
+        transform: scale(1.08);
+      }
+      .stat-icon.green   { background: #EAF7EE; color: var(--sena-green); }
+      .stat-icon.blue    { background: #E0F2FE; color: #0284c7; }
+      .stat-icon.emerald { background: #DCFCE7; color: #166534; }
+      .stat-icon.amber   { background: #FEF3C7; color: #d97706; }
+      .stat-icon.purple  { background: #F3E8FF; color: #9333ea; }
+      .stat-icon.cyan    { background: #E0F7FA; color: #00838f; }
 
       .stat-title {
         font-size: 13.5px;
@@ -477,7 +352,7 @@
         font-weight: 600;
       }
       .stat-value {
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 32px;
         color: var(--forest-deep);
@@ -494,14 +369,17 @@
       .stat-trend {
         font-size: 12px;
         font-weight: 700;
-        color: var(--green);
+        color: var(--sena-green);
         display: flex;
         align-items: center;
         gap: 5px;
       }
+      .stat-trend.down {
+        color: #dc2626;
+      }
       .stat-link {
         font-size: 12.5px;
-        color: var(--forest);
+        color: var(--sena-dark);
         font-weight: 700;
         text-decoration: none;
         display: flex;
@@ -510,14 +388,14 @@
         transition: color 0.15s ease;
       }
       .stat-link:hover {
-        color: var(--green);
+        color: var(--sena-green);
         text-decoration: underline;
       }
 
-      /* Lower section */
+      /* Lower section: activity + progress */
       .lower-grid {
         display: grid;
-        grid-template-columns: 1.6fr 1fr;
+        grid-template-columns: 1.55fr 1fr;
         gap: 24px;
       }
 
@@ -526,7 +404,7 @@
         border: 1px solid var(--line);
         border-radius: 16px;
         padding: 24px 26px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
       }
       .panel-head {
         display: flex;
@@ -535,11 +413,9 @@
         margin-bottom: 18px;
         padding-bottom: 12px;
         border-bottom: 1px solid var(--line);
-        flex-wrap: wrap;
-        gap: 10px;
       }
       .panel-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         color: var(--forest-deep);
@@ -564,53 +440,47 @@
         text-decoration: underline;
       }
 
-      /* Custom Table */
-      .table-custom {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 13px;
-      }
-      .table-custom th {
-        background: #F9FBFA;
-        color: var(--ink-soft);
-        font-weight: 700;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        padding: 12px 14px;
+      .activity-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 13px 0;
         border-bottom: 1px solid var(--line);
-        text-align: left;
       }
-      .table-custom td {
-        padding: 13px 14px;
-        border-bottom: 1px solid var(--line);
-        color: var(--ink);
-        vertical-align: middle;
-      }
-      .table-custom tr:last-child td {
+      .activity-row:last-child {
         border-bottom: none;
+        padding-bottom: 0;
       }
-      .table-custom tr:hover td {
-        background: rgba(57, 169, 0, 0.02);
-      }
-
-      .badge-status {
-        display: inline-flex;
+      .activity-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--green-soft);
+        color: var(--forest);
+        display: flex;
         align-items: center;
-        padding: 3px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-top: 1px;
       }
-      .badge-green { background: #EAF7EE; color: #236B00; border: 1px solid #C4ECCB; }
-      .badge-blue { background: #EBF3FF; color: #1E40AF; border: 1px solid #BFDBFE; }
-      .badge-amber { background: #FEF7EA; color: #B45309; border: 1px solid #FDE68A; }
-      .badge-purple { background: #F5EFFF; color: #6D28D9; border: 1px solid #DDD6FE; }
+      .activity-text {
+        font-size: 13.5px;
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      .activity-text b {
+        font-weight: 700;
+        color: var(--forest-deep);
+      }
+      .activity-time {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 3px;
+      }
 
-      /* Progress Bars */
       .progress-item {
-        margin-bottom: 18px;
+        margin-bottom: 20px;
       }
       .progress-item:last-child {
         margin-bottom: 0;
@@ -619,7 +489,7 @@
         display: flex;
         justify-content: space-between;
         font-size: 13.5px;
-        margin-bottom: 7px;
+        margin-bottom: 8px;
       }
       .progress-label span:first-child {
         color: var(--ink);
@@ -631,103 +501,39 @@
       }
       .progress-track {
         height: 8px;
-        background: var(--green-soft);
+        background: var(--line);
         border-radius: 20px;
         overflow: hidden;
       }
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--forest) 0%, var(--green) 100%);
+        background: linear-gradient(90deg, var(--sena-green) 0%, var(--sena-neon) 100%);
         border-radius: 20px;
         transition: width 1s ease-in-out;
       }
 
-      /* Activity List */
-      .activity-row {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--line);
-      }
-      .activity-row:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-      .activity-dot {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: var(--green-soft);
-        color: var(--green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      .activity-text {
-        font-size: 13px;
-        color: var(--ink);
-        line-height: 1.4;
-      }
-      .activity-text b {
-        font-weight: 700;
-        color: var(--forest-deep);
-      }
-      .activity-time {
-        font-size: 11px;
-        color: var(--ink-soft);
-        margin-top: 2px;
+      @media (max-width: 1080px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .lower-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
-      /* Filter bar */
-      .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-      .filter-select, .filter-input {
-        padding: 6px 12px;
-        background: #F9FBFA;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        font-size: 12.5px;
-        color: var(--ink);
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .filter-select:focus, .filter-input:focus {
-        border-color: var(--green);
-        background: #ffffff;
-      }
-      .btn-filter {
-        background: var(--green);
-        color: #ffffff;
-        border: none;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 12.5px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      .btn-filter:hover {
-        background: var(--green-dark);
-      }
-
-      @media (max-width: 1100px) {
-        .app { grid-template-columns: 1fr; }
-        .sidebar { display: none; }
-        .stats-grid { grid-template-columns: 1fr 1fr; }
-        .lower-grid { grid-template-columns: 1fr; }
-      }
-      @media (max-width: 640px) {
-        .stats-grid { grid-template-columns: 1fr; }
-        .content { padding: 20px 16px 36px; }
-        .topbar { padding: 12px 18px; }
+      @media (max-width: 768px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .content {
+          padding: 20px 16px 36px;
+        }
       }
     </style>
 </head>
@@ -735,20 +541,17 @@
 
 <div class="app">
 
-  <!-- ============================================== -->
-  <!-- 1. SIDEBAR INSTRUCTOR SIGE                     -->
-  <!-- ============================================== -->
+  <!-- SIDEBAR DEL INSTRUCTOR -->
   <aside class="sidebar">
-    <a href="{{ route('egresados.instructor.dashboard') }}" class="brand">
+    <a href="{{ route('egresados.welcome') }}" class="brand">
       <div class="brand-badge">
         <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
       </div>
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">Instructor</span>
-        </div>
-        <div class="brand-sub">CEFA La Angostura</div>
+                  </div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
 
@@ -760,7 +563,7 @@
       </a>
       <a href="{{ route('egresados.instructor.directorio') }}">
         <i class="fa-solid fa-user-graduate"></i>
-        <span>Egresados Fichas</span>
+        <span>Egresados</span>
       </a>
       <a href="{{ route('egresados.instructor.encuestas.index') }}">
         <i class="fa-solid fa-clipboard-question"></i>
@@ -776,87 +579,44 @@
       </a>
     </nav>
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
-  </aside>
-
-  <!-- ============================================== -->
-  <!-- 2. MAIN VIEWPORT                               -->
-  <!-- ============================================== -->
-  <div class="main">
-    
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
-
-      <div class="topbar-right">
-        <button class="icon-btn" title="Notificaciones">
-          <i class="fa-regular fa-bell"></i>
-          <span class="dot"></span>
-        </button>
-
-        <div class="user-dropdown-wrapper">
-          <div class="user-chip" id="userMenuBtn" onclick="toggleUserMenu(event)" title="Opciones de Cuenta">
-            <div class="user-avatar">
-              {{ Auth::check() ? (Auth::user()->initials ?? 'IN') : 'IN' }}
-            </div>
-            <span>{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}</span>
-            <i class="fa-solid fa-chevron-down" id="userMenuChevron" style="font-size: 10px; opacity: 0.7; transition: transform 0.2s;"></i>
+    <!-- Perfil del Instructor en la parte inferior del sidebar -->
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
+          IN
+        </div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
           </div>
-
-          <div class="user-dropdown-menu" id="userDropdownMenu">
-            <div class="user-dropdown-header">
-              <div class="user-dropdown-name">{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}</div>
-              <div class="user-dropdown-role"><i class="fa-solid fa-circle" style="font-size: 6px; color: var(--moss); margin-right: 4px;"></i> Rol: Instructor CEFA</div>
-              <div class="user-dropdown-email">{{ Auth::check() ? (Auth::user()->email ?? 'instructor@sena.edu.co') : 'instructor@sena.edu.co' }}</div>
-            </div>
-            
-            <div class="user-dropdown-divider"></div>
-
-            <a href="{{ route('egresados.welcome') }}" class="user-dropdown-item">
-              <i class="fa-solid fa-globe"></i>
-              <span>Portal Público SIGE</span>
-            </a>
-
-<<<<<<< HEAD
-            <div class="user-dropdown-divider"></div>
-=======
-            <!-- Navigation Links -->
-            <nav class="mt-6 space-y-1.5">
-                @if(Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->nickname === 'superadmin_egresados' || Auth::user()->roles->contains('slug', 'egresados.admin')))
-                    <a href="{{ route('egresados.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-300 hover:text-white hover:bg-amber-500/40 font-bold text-xs border border-amber-400/40 shadow-sm transition mb-3">
-                        <i class="fa-solid fa-crown w-4 text-center text-amber-400"></i>
-                        <span>Ir a Panel Superadmin</span>
-                    </a>
-                @endif
-
-                <a href="{{ route('egresados.instructor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
-                    <i class="fa-solid fa-chalkboard-user w-4 text-center"></i>
-                    <span>Panel de Seguimiento</span>
-                </a>
->>>>>>> origin/main
-
-            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-              @csrf
-              <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-              <button type="submit" class="user-dropdown-item logout-item">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Cerrar Sesión</span>
-              </button>
-            </form>
-          </div>
+          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor CEFA</div>
         </div>
       </div>
+      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
+
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <div class="main">
+    
+    <!-- Topbar con Notificaciones y Menú de Usuario Unificado -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span style="font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-chalkboard-user" style="color:var(--moss);"></i>
+          <span>Panel de Acompañamiento y Seguimiento</span>
+        </span>
+      </div>
+
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Main Content -->
@@ -868,7 +628,7 @@
           <h1 class="page-title">
             ¡Bienvenido(a), <span>{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor(a)') : 'Instructor(a)' }}</span>!
           </h1>
-          <p class="page-desc">Monitoreo, estado laboral y seguimiento de aprendices egresados en tus fichas de formación.</p>
+          <p class="page-desc">Monitoreo, consulta y seguimiento de egresados de tus fichas de formación.</p>
         </div>
 
         <div class="period-pill">
@@ -877,401 +637,234 @@
         </div>
       </div>
 
-      <!-- Stats Grid (6 Cards Identical Style) -->
+      <!-- Stats Grid (5 Cards sincronizadas con los módulos del ERP) -->
       <div class="stats-grid">
         
-        <!-- Card 1: Total Egresados -->
+        <!-- Card 1: Total Egresados de Fichas -->
         <div class="stat-card">
           <div class="stat-top">
-            <div class="stat-icon">
-              <i class="fa-solid fa-user-graduate"></i>
+            <div class="stat-icon green">
+              <i class="fa-solid fa-graduation-cap"></i>
             </div>
-<<<<<<< HEAD
-            <div class="stat-title">Total Egresados Fichas</div>
+            <div class="stat-title">Total egresados fichas</div>
           </div>
-          <div class="stat-value">{{ number_format($totalEgresados) }}</div>
-          <div class="stat-meta">
-            <div class="stat-trend">
-              <i class="fa-solid fa-circle-check"></i>
-              <span>Bajo seguimiento</span>
-=======
-
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    Rol: {{ Auth::check() && (Auth::user()->hasSuperAdmin() || Auth::user()->roles->contains('slug', 'egresados.admin') || Auth::user()->nickname === 'superadmin_egresados') ? 'Superadmin / Coordinación' : 'Instructor Egresados' }}
-                </span>
-                <a href="{{ route('home') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                    <span>Portal Principal ERP</span>
-                </a>
->>>>>>> origin/main
-            </div>
-            <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
-              <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
+          <div class="stat-value">
+            {{ number_format($totalEgresados ?? 0) }}
           </div>
-        </div>
-
-        <!-- Card 2: Egresados Empleados -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon blue">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div class="stat-title">Egresados Vinculados</div>
-          </div>
-          <div class="stat-value">{{ number_format($totalEmpleados) }}</div>
           <div class="stat-meta">
             <div class="stat-trend">
               <i class="fa-solid fa-arrow-trend-up"></i>
-              <span>Sector productivo</span>
+              <span>↑ Registros en sistema</span>
             </div>
-            <a href="{{ route('egresados.instructor.directorio', ['status' => 'EN FORMACIÓN']) }}" class="stat-link">
+            <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
               <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
           </div>
         </div>
 
-        <!-- Card 3: Emprendedores -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon amber">
-              <i class="fa-solid fa-rocket"></i>
-            </div>
-            <div class="stat-title">Emprendimientos Activos</div>
-          </div>
-          <div class="stat-value">{{ number_format($totalEmprendedores) }}</div>
-          <div class="stat-meta">
-            <div class="stat-trend">
-              <i class="fa-solid fa-bolt"></i>
-              <span>Fondo Emprender</span>
-            </div>
-            <a href="{{ route('egresados.instructor.directorio', ['status' => 'INDUCCIÓN']) }}" class="stat-link">
-              <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 4: Formación Continua -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon purple">
-              <i class="fa-solid fa-award"></i>
-            </div>
-            <div class="stat-title">Formación Continua</div>
-          </div>
-          <div class="stat-value">{{ number_format($totalEstudiantes) }}</div>
-          <div class="stat-meta">
-            <div class="stat-trend">
-              <i class="fa-solid fa-graduation-cap"></i>
-              <span>Cursos complementarios</span>
-            </div>
-            <a href="{{ route('egresados.instructor.directorio', ['status' => 'CONDICIONADO']) }}" class="stat-link">
-              <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 5: Encuestas Diligenciadas -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon">
-              <i class="fa-solid fa-clipboard-check"></i>
-            </div>
-            <div class="stat-title">Encuestas Respondidas</div>
-          </div>
-          <div class="stat-value">142</div>
-          <div class="stat-meta">
-            <div class="stat-trend">
-              <i class="fa-solid fa-arrow-up"></i>
-              <span>78% de respuesta</span>
-            </div>
-            <a href="{{ route('egresados.instructor.encuestas.index') }}" class="stat-link">
-              <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 6: Fichas Asignadas -->
+        <!-- Card 2: Fichas Asignadas -->
         <div class="stat-card">
           <div class="stat-top">
             <div class="stat-icon blue">
               <i class="fa-solid fa-layer-group"></i>
             </div>
-            <div class="stat-title">Fichas en Monitoreo</div>
+            <div class="stat-title">Fichas asignadas</div>
           </div>
-          <div class="stat-value">{{ count($courses) }}</div>
+          <div class="stat-value">
+            {{ number_format($totalFichas ?? 6) }}
+          </div>
           <div class="stat-meta">
             <div class="stat-trend">
-              <i class="fa-solid fa-chalkboard-user"></i>
-              <span>Sede La Angostura</span>
+              <i class="fa-solid fa-circle-check"></i>
+              <span>En seguimiento activo</span>
             </div>
             <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
               <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right"></i>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3: Encuestas -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon amber">
+              <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <div class="stat-title">Encuestas</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalEncuestas ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Creadas en sistema</span>
+            </div>
+            <a href="{{ route('egresados.instructor.encuestas.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 4: Eventos Programados -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon purple">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <div class="stat-title">Eventos programados</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalEventos ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-bullhorn"></i>
+              <span>Próximos eventos</span>
+            </div>
+            <a href="{{ route('egresados.instructor.eventos.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 5: Reportes Generados -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon cyan">
+              <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <div class="stat-title">Reportes generados</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalReportes ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-file-circle-check"></i>
+              <span>Generados en módulo</span>
+            </div>
+            <a href="{{ route('egresados.instructor.reportes.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
           </div>
         </div>
 
       </div>
 
-      <!-- Lower Section (Table + Widgets) -->
+      <!-- Lower Grid: Actividad Reciente + Avance por Programa -->
       <div class="lower-grid">
         
-        <!-- Left Panel: Table of Egresados with filters -->
+        <!-- Panel Izquierdo: Actividad Reciente de Egresados en Fichas -->
         <div class="panel">
           <div class="panel-head">
-            <h2 class="panel-title">
-              <i class="fa-solid fa-table-list"></i>
-              <span>Seguimiento de Aprendices por Ficha</span>
-            </h2>
-            
-            <form action="{{ route('egresados.instructor.dashboard') }}" method="GET" class="filter-bar">
-              <select name="course_id" onchange="this.form.submit()" class="filter-select">
-                <option value="">-- Todas las Fichas --</option>
-                @foreach($courses as $course)
-                  <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>
-                    Ficha {{ $course->code }}
-                  </option>
-                @endforeach
-              </select>
-
-              <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por nombre o doc..." class="filter-input">
-              <button type="submit" class="btn-filter">Filtrar</button>
-              
-              @if(request('course_id') || request('search'))
-                <a href="{{ route('egresados.instructor.dashboard') }}" style="font-size: 12px; color: #DC2626; text-decoration: none; font-weight: 600;">
-                  <i class="fa-solid fa-xmark"></i> Limpiar
-                </a>
-              @endif
-            </form>
+            <h3 class="panel-title">
+              <i class="fa-solid fa-bolt text-[#39A900]"></i>
+              <span>Actividad reciente</span>
+            </h3>
+            <a href="{{ route('egresados.instructor.directorio') }}" class="panel-action">Ver todo</a>
           </div>
 
-          <div style="overflow-x: auto;">
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>Egresado(a)</th>
-                  <th>Programa / Ficha</th>
-                  <th>Contacto</th>
-                  <th>Estado</th>
-                  <th style="text-align: center;">Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($egresadosSeguimiento as $egresado)
-                  <tr>
-                    <td>
-                      <div style="font-weight: 700; color: var(--forest-deep);">
-                        {{ $egresado->person->first_name ?? 'Sin Nombre' }} {{ $egresado->person->first_last_name ?? '' }}
-                      </div>
-                      <div style="font-size: 11px; color: var(--ink-soft); font-family: monospace;">
-                        {{ $egresado->person->document_type ?? 'CC' }}: {{ $egresado->person->document_number ?? 'S/N' }}
-                      </div>
-                    </td>
-                    <td>
-                      <div style="font-weight: 600; color: var(--ink);">
-                        {{ $egresado->course->program->name ?? 'Programa General' }}
-                      </div>
-                      <div style="font-size: 11px; color: var(--green); font-weight: 700;">
-                        Ficha: {{ $egresado->course->code ?? 'N/A' }}
-                      </div>
-                    </td>
-                    <td>
-                      <div style="font-size: 12px;">
-                        <i class="fa-solid fa-phone" style="font-size: 10px; color: var(--ink-soft); margin-right: 4px;"></i>
-                        {{ $egresado->person->telephone1 ?? 'No registra' }}
-                      </div>
-                      <div style="font-size: 11px; color: var(--ink-soft);">
-                        {{ $egresado->person->misena_email ?? ($egresado->person->personal_email ?? 'No registra') }}
-                      </div>
-                    </td>
-                    <td>
-                      @php
-                        $st = $egresado->apprentice_status;
-                        $badgeClass = match($st) {
-                          'EN FORMACIÓN' => 'badge-blue',
-                          'INDUCCIÓN' => 'badge-amber',
-                          'CONDICIONADO' => 'badge-purple',
-                          default => 'badge-green',
-                        };
-                        $badgeLabel = match($st) {
-                          'EN FORMACIÓN' => 'EMPLEADO',
-                          'INDUCCIÓN' => 'EMPRENDEDOR',
-                          'CONDICIONADO' => 'ESTUDIANDO',
-                          default => 'GRADUADO',
-                        };
-                      @endphp
-                      <span class="badge-status {{ $badgeClass }}">
-                        {{ $badgeLabel }}
-                      </span>
-                    </td>
-                    <td style="text-align: center;">
-                      <a href="{{ route('egresados.superadmin.perfil', ['id' => $egresado->id]) }}" title="Ver Ficha y Hoja de Vida" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--green-soft); color: var(--green); text-decoration: none; transition: all 0.2s;">
-                        <i class="fa-solid fa-arrow-right"></i>
-                      </a>
-                    </td>
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="5" style="text-align: center; padding: 30px; color: var(--ink-soft);">
-                      <i class="fa-regular fa-folder-open" style="font-size: 24px; display: block; margin-bottom: 8px; color: var(--green);"></i>
-                      No se encontraron egresados con los filtros seleccionados.
-                    </td>
-                  </tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
-
-          <div style="margin-top: 16px;">
-            {{ $egresadosSeguimiento->links() }}
-          </div>
+          @forelse($recentEgresados as $item)
+            @php
+              $p = $item->person;
+              $fullName = $p ? trim($p->first_name . ' ' . $p->first_last_name) : 'Aprendiz SENA';
+              $progName = $item->course && $item->course->program ? $item->course->program->name : 'Formación SENA';
+              $isUpdated = $item->updated_at && $item->created_at && ($item->updated_at->timestamp > $item->created_at->timestamp + 60);
+              $timeDiff = $item->updated_at ? $item->updated_at->diffForHumans() : ($item->created_at ? $item->created_at->diffForHumans() : 'Recientemente');
+            @endphp
+            <div class="activity-row">
+              <div class="activity-dot" style="{{ $isUpdated ? 'background:#e0f2fe; color:#0284c7;' : 'background:#dcfce7; color:#166534;' }}">
+                <i class="fa-solid {{ $isUpdated ? 'fa-user-pen' : 'fa-user-plus' }}"></i>
+              </div>
+              <div style="flex:1;">
+                <div class="activity-text">
+                  @if($isUpdated)
+                    Se actualizaron los datos de <b>{{ $fullName }}</b> ({{ $progName }})
+                  @else
+                    Nuevo egresado registrado: <b>{{ $fullName }}</b> ({{ $progName }})
+                  @endif
+                </div>
+                <div class="activity-time" style="display:flex; align-items:center; gap:8px;">
+                  <span>{{ $timeDiff }}</span>
+                  <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(0,19,30,0.06); font-weight:600;">{{ $item->apprentice_status }}</span>
+                </div>
+              </div>
+            </div>
+          @empty
+            <div style="text-align:center; padding: 28px 16px; color: var(--ink-soft); font-size:13px;">
+              <i class="fa-regular fa-clock" style="font-size:24px; margin-bottom:8px; display:block; opacity:0.4;"></i>
+              No hay actividades registradas recientemente en tus fichas.
+            </div>
+          @endforelse
         </div>
 
-        <!-- Right Panels (Avance + Actividad) -->
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-          
-          <!-- Widget: Avance por Programa -->
-          <div class="panel">
-            <div class="panel-head">
-              <h2 class="panel-title">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Avance por Programa</span>
-              </h2>
-            </div>
-
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Gestión Agroempresarial</span>
-                <span>82%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 82%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>ADSO (Desarrollo de Software)</span>
-                <span>68%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 68%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Producción Agropecuaria</span>
-                <span>74%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 74%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Control de Calidad de Alimentos</span>
-                <span>90%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 90%;"></div>
-              </div>
-            </div>
+        <!-- Panel Derecho: Avance por Programa -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 class="panel-title">
+              <i class="fa-solid fa-chart-simple text-[#39A900]"></i>
+              <span>Avance por programa</span>
+            </h3>
           </div>
 
-          <!-- Widget: Actividad Reciente -->
-          <div class="panel">
-            <div class="panel-head">
-              <h2 class="panel-title">
-                <i class="fa-solid fa-bolt"></i>
-                <span>Actividad de Seguimiento</span>
-              </h2>
-              <a href="{{ route('egresados.instructor.directorio') }}" class="panel-action">Ver todo</a>
-            </div>
-
-            <div class="activity-row">
-              <div class="activity-dot">
-                <i class="fa-solid fa-check"></i>
-              </div>
-              <div>
-                <div class="activity-text">
-                  <b>Juan Pérez</b> actualizó su vinculación laboral en <b>ADSO</b>
+          @if(isset($programStats) && count($programStats) > 0)
+            @php
+              $maxTotal = $programStats->max('total') ?: 1;
+            @endphp
+            @foreach($programStats as $prog)
+              @php
+                $pct = round(($prog->total / $maxTotal) * 100);
+              @endphp
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;" title="{{ $prog->name }}">
+                    {{ $prog->name }}
+                  </span>
+                  <span>{{ $prog->total }} egresados ({{ $pct }}%)</span>
                 </div>
-                <div class="activity-time">Hace 20 minutos</div>
-              </div>
-            </div>
-
-            <div class="activity-row">
-              <div class="activity-dot" style="background: var(--green-soft); color: var(--green);">
-                <i class="fa-solid fa-clipboard-check"></i>
-              </div>
-              <div>
-                <div class="activity-text">
-                  <b>Laura Muñoz</b> completó la encuesta de impacto CEFA
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: {{ $pct }}%"></div>
                 </div>
-                <div class="activity-time">Hace 1 hora</div>
+              </div>
+            @endforeach
+          @else
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Gestión de Empresas Agropecuarias</span>
+                <span>3 egresados (100%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 100%"></div>
               </div>
             </div>
-
-            <div class="activity-row">
-              <div class="activity-dot" style="background: var(--amber-soft); color: #D97706;">
-                <i class="fa-solid fa-rocket"></i>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Análisis y Desarrollo de Software (ADSO)</span>
+                <span>2 egresados (66%)</span>
               </div>
-              <div>
-                <div class="activity-text">
-                  <b>Carlos Dussán</b> registró emprendimiento piscícola
-                </div>
-                <div class="activity-time">Hace 3 horas</div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 66%"></div>
               </div>
             </div>
-          </div>
-
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Producción Acuícola</span>
+                <span>1 egresado (33%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 33%"></div>
+              </div>
+            </div>
+          @endif
         </div>
 
       </div>
 
     </div>
-
   </div>
 
 </div>
 
-<script>
-  function toggleUserMenu(e) {
-    e.stopPropagation();
-    const menu = document.getElementById('userDropdownMenu');
-    const chevron = document.getElementById('userMenuChevron');
-    const isOpen = menu.classList.contains('show');
-    if (isOpen) {
-      menu.classList.remove('show');
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
-    } else {
-      menu.classList.add('show');
-      if (chevron) chevron.style.transform = 'rotate(180deg)';
-    }
-  }
-
-  document.addEventListener('click', function(e) {
-    const menu = document.getElementById('userDropdownMenu');
-    const chevron = document.getElementById('userMenuChevron');
-    const btn = document.getElementById('userMenuBtn');
-    if (menu && menu.classList.contains('show')) {
-      if (!menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.classList.remove('show');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      }
-    }
-  });
-</script>
 
 </body>
 </html>

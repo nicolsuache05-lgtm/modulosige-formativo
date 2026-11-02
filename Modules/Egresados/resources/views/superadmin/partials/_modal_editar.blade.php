@@ -110,17 +110,34 @@
                             <input type="text" name="ficha" id="edit_ficha" placeholder="Ej. 3230026" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800">
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Estado Ocupacional</label>
-                        <select name="estado" id="edit_estado" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800">
-                            <option value="CERTIFICADO">CERTIFICADO</option>
-                            <option value="EN FORMACIÓN">EN FORMACIÓN</option>
-                            <option value="CONDICIONADO">CONDICIONADO</option>
-                            <option value="INDUCCIÓN">INDUCCIÓN</option>
-                            <option value="APLAZADO">APLAZADO</option>
-                            <option value="CANCELADO">CANCELADO</option>
-                            <option value="RETIRO VOLUNTARIO">RETIRO VOLUNTARIO</option>
-                        </select>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-power-off text-[#39A900]"></i>
+                                <span>Estado en SIGE (Acceso al Sistema) <span class="text-red-500">*</span></span>
+                            </label>
+                            <select name="is_active" id="edit_is_active" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800">
+                                <option value="1">🟢 Activo (Habilitado)</option>
+                                <option value="0">🔴 Inactivo (Desactivado)</option>
+                            </select>
+                            <p class="text-[11px] text-gray-400 mt-1">Permite activar o desactivar al egresado en el sistema.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap text-[#39A900]"></i>
+                                <span>Estado Ocupacional / Formativo</span>
+                            </label>
+                            <select name="estado" id="edit_estado" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800">
+                                <option value="CERTIFICADO">CERTIFICADO</option>
+                                <option value="EN FORMACIÓN">EN FORMACIÓN</option>
+                                <option value="CONDICIONADO">CONDICIONADO</option>
+                                <option value="INDUCCIÓN">INDUCCIÓN</option>
+                                <option value="APLAZADO">APLAZADO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="RETIRO VOLUNTARIO">RETIRO VOLUNTARIO</option>
+                            </select>
+                            <p class="text-[11px] text-gray-400 mt-1">Situación formativa en el centro CEFA.</p>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -200,6 +217,11 @@
             else if (val.includes('EXTRANJER') || val === 'CE') docTypeSelect.value = 'CE';
             else if (val.includes('PEP') || val.includes('PROTECCI') || val.includes('PPT')) docTypeSelect.value = 'PEP';
             else docTypeSelect.value = 'CC';
+        }
+
+        const activeSelect = document.getElementById('edit_is_active');
+        if (activeSelect) {
+            activeSelect.value = (data.is_active === false || data.is_active === 0 || data.is_active === '0') ? '0' : '1';
         }
 
         const estadoSelect = document.getElementById('edit_estado');

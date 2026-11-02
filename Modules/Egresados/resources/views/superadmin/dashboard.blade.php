@@ -693,65 +693,42 @@
           </div>
         </div>
 
-        <!-- Card 2: Egresados Activos -->
+        <!-- Card 2: Instructores -->
         <div class="stat-card">
           <div class="stat-top">
             <div class="stat-icon blue">
-              <i class="fa-solid fa-user-check"></i>
+              <i class="fa-solid fa-chalkboard-user"></i>
             </div>
-            <div class="stat-title">Egresados activos</div>
+            <div class="stat-title">Instructores</div>
           </div>
           <div class="stat-value">
-            {{ number_format($totalActivos ?? 0) }}
+            {{ number_format($totalInstructores ?? 0) }}
           </div>
           <div class="stat-meta">
             <div class="stat-trend">
               <i class="fa-solid fa-circle-check"></i>
-              <span>Con datos actualizados</span>
+              <span>Registrados en sistema</span>
             </div>
-            <a href="{{ route('egresados.index') }}" class="stat-link">
+            <a href="{{ route('egresados.instructores') }}" class="stat-link">
               <span>Ver detalle</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
           </div>
         </div>
 
-        <!-- Card 3: Egresados Empleados -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <div class="stat-icon emerald">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div class="stat-title">Egresados empleados</div>
-          </div>
-          <div class="stat-value">
-            {{ number_format($totalEmpleados ?? 0) }}
-          </div>
-          <div class="stat-meta">
-            <div class="stat-trend">
-              <i class="fa-solid fa-chart-line"></i>
-              <span>{{ isset($tasaEmpleo) ? $tasaEmpleo . '%' : '0%' }} de vinculación</span>
-            </div>
-            <a href="{{ route('egresados.index', ['employment_status' => 'Empleado']) }}" class="stat-link">
-              <span>Ver detalle</span>
-              <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 4: Encuestas Pendientes -->
+        <!-- Card 3: Encuestas -->
         <div class="stat-card">
           <div class="stat-top">
             <div class="stat-icon amber">
-              <i class="fa-solid fa-clipboard-list"></i>
+              <i class="fa-solid fa-clipboard-question"></i>
             </div>
-            <div class="stat-title">Encuestas pendientes</div>
+            <div class="stat-title">Encuestas</div>
           </div>
-          <div class="stat-value">78</div>
+          <div class="stat-value">{{ number_format($totalEncuestas ?? 5) }}</div>
           <div class="stat-meta">
-            <div class="stat-trend down">
-              <i class="fa-solid fa-clock"></i>
-              <span>Por responder</span>
+            <div class="stat-trend">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Creadas en sistema</span>
             </div>
             <a href="{{ route('egresados.encuestas_superadmin') }}" class="stat-link">
               <span>Ver detalle</span>
@@ -768,7 +745,7 @@
             </div>
             <div class="stat-title">Eventos programados</div>
           </div>
-          <div class="stat-value">5</div>
+          <div class="stat-value">{{ number_format($totalEventos ?? 5) }}</div>
           <div class="stat-meta">
             <div class="stat-trend">
               <i class="fa-solid fa-bullhorn"></i>
@@ -789,11 +766,11 @@
             </div>
             <div class="stat-title">Reportes generados</div>
           </div>
-          <div class="stat-value">12</div>
+          <div class="stat-value">{{ number_format($totalReportes ?? 5) }}</div>
           <div class="stat-meta">
             <div class="stat-trend">
-              <i class="fa-solid fa-arrow-up-right-dots"></i>
-              <span>Este mes</span>
+              <i class="fa-solid fa-file-circle-check"></i>
+              <span>Generados en módulo</span>
             </div>
             <a href="{{ route('egresados.reportes') }}" class="stat-link">
               <span>Ver detalle</span>
