@@ -146,6 +146,9 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::get('egresados/instructor/reportes', [InstructorController::class, 'reportes'])->name('egresados.instructor.reportes.index');
     Route::post('egresados/instructor/reportes/store', [InstructorController::class, 'storeReporte'])->name('egresados.instructor.reportes.store');
     Route::get('egresados/instructor/reportes/exportar/{id?}', [InstructorController::class, 'exportarReporte'])->name('egresados.instructor.reportes.export');
+    Route::get('egresados/instructor/reportes/export/{id?}', [InstructorController::class, 'exportarReporte'])->name('egresados.instructor.reportes.export_alt');
+    Route::get('egresados/instructor/reportes/{id}/exportar/{formato?}', [InstructorController::class, 'exportarReporteFormato'])->name('egresados.instructor.reportes.exportar');
+    Route::delete('egresados/instructor/reportes/{id}', [InstructorController::class, 'destroyReporte'])->name('egresados.instructor.reportes.destroy');
 
     // Eventos Instructor
     Route::get('egresados/instructor/eventos', [InstructorController::class, 'eventos'])->name('egresados.instructor.eventos.index');

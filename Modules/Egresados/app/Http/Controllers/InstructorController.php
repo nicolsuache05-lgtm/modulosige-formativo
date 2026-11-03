@@ -239,12 +239,19 @@ class InstructorController extends Controller
         $customReports = session('custom_instructor_reports', []);
         $reports = array_merge($customReports, $defaultReports);
 
+        $reportes = $reports;
+        $totalProgramas = $programs->count() ?: 12;
+        $totalFormatos = 3;
+
         return view('egresados::instructor.reportes.index', compact(
             'reports',
+            'reportes',
             'courses',
             'programs',
             'totalGenerados',
             'totalEgresados',
+            'totalProgramas',
+            'totalFormatos',
             'tasaEmpleabilidad',
             'totalEncuestas',
             'seguimientosMes'
@@ -293,6 +300,30 @@ class InstructorController extends Controller
     /**
      * Exporta el reporte solicitado a formato CSV/Excel.
      */
+
+    /**
+     * Exporta el reporte solicitado con formato opcional (Excel, PDF).
+     */
+    public function exportarReporteFormato(Request $request, $id, $formato = 'excel')
+    {
+        return app(\Modules\Egresados\Http\Controllers\ReportesController::class)->exportar($request, $id, $formato);
+    }
+
+    /**
+     * Elimina un reporte generado por el Instructor.
+     */
+    public function destroyReporte($id)
+    {
+        $customReports = session('custom_instructor_reports', []);
+        $filtered = array_filter($customReports, function ($r) use ($id) {
+            return ($r['id'] ?? '') !== $id;
+        });
+        session(['custom_instructor_reports' => array_values($filtered)]);
+
+        return redirect()->route('egresados.instructor.reportes.index')
+            ->with('success', '¡Reporte ' . $id . ' eliminado correctamente!');
+    }
+
     public function exportarReporte(Request $request, $id = null)
     {
         $fileName = 'Reporte_Instructor_' . ($id ?? 'Consolidado') . '_' . date('Y-m-d') . '.csv';
