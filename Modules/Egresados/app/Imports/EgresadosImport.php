@@ -215,12 +215,28 @@ class EgresadosImport
                 }
 
                 if (count($header) === count($row)) {
-                    $rowData = array_combine($header, $row);
+                    $combined = array_combine($header, $row);
                 } else {
-                    $rowData = $row;
+                    $combined = $row;
                 }
 
-                $chunk[] = $rowData;
+                // Normalizar nombres de columnas a minúsculas sin acentos ni espacios
+                $normalizedRow = [];
+                $pos = 0;
+                foreach ($combined as $k => $v) {
+                    $cleanKey = strtolower(trim(preg_replace('/[^a-zA-Z0-9_]/', '_', str_replace(
+                        ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ñ'],
+                        ['a', 'e', 'i', 'o', 'u', 'n', 'a', 'e', 'i', 'o', 'u', 'n'],
+                        (string)$k
+                    ))));
+                    $cleanKey = trim(preg_replace('/_+/', '_', $cleanKey), '_');
+                    $valClean = is_string($v) ? trim($v) : $v;
+                    $normalizedRow[$cleanKey] = $valClean;
+                    $normalizedRow[$pos] = $valClean;
+                    $pos++;
+                }
+
+                $chunk[] = $normalizedRow;
 
                 if (count($chunk) >= 500) {
                     $processedCount += $syncService->upsertChunk($chunk);

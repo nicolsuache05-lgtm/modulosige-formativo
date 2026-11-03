@@ -2,8 +2,8 @@
 
 namespace Modules\Egresados\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Support\ModuleServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
 
 class EgresadosServiceProvider extends ModuleServiceProvider
 {
@@ -34,8 +34,17 @@ class EgresadosServiceProvider extends ModuleServiceProvider
      */
     protected array $providers = [
         EventServiceProvider::class,
-        RouteServiceProvider::class,
     ];
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        Route::middleware('web')
+            ->group(module_path($this->name, '/routes/web.php'));
+
+        \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
+    }
 
     /**
      * Register services.
@@ -53,15 +62,5 @@ class EgresadosServiceProvider extends ModuleServiceProvider
         if (!class_exists('App\Models\Egresado')) {
             class_alias(\Modules\Egresados\Models\Egresado::class, 'App\Models\Egresado');
         }
-    }
-
-    /**
-     * Boot the application events.
-     */
-    public function boot(): void
-    {
-        parent::boot();
-
-        \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
     }
 }

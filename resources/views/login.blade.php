@@ -282,11 +282,24 @@
                         </button>
 
                         <!-- Demo test credentials helper -->
-                        <div class="p-2 bg-light rounded-3 border text-center fs-8 text-muted">
-                            <span class="fw-bold text-dark d-block mb-1"><i class="fas fa-key text-warning me-1"></i> Credencial de Acceso Rápido:</span>
-                            <span class="badge bg-dark text-white cursor-pointer px-2 py-1 me-1" style="cursor: pointer;" onclick="fillDemo('damendez', '12345678')">
-                                Usuario: <code>damendez</code> (SuperAdmin / Director)
+                        <div class="p-3 bg-light rounded-3 border text-center fs-8 text-muted">
+                            <span class="fw-bold text-dark d-block mb-2">
+                                <i class="fas fa-key text-warning me-1"></i> Credenciales de Acceso Rápido (Los 3 Paneles):
                             </span>
+                            <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
+                                <button type="button" class="btn btn-sm btn-dark text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('superadmin_egresados', '12345678')" title="Clic para ingresar como SuperAdmin">
+                                    🛡️ <strong>SuperAdmin</strong>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('instructor_egresados', '12345678')" title="Clic para ingresar como Instructor">
+                                    👨‍🏫 <strong>Instructor</strong>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-success text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('egresado_sige', '12345678')" title="Clic para ingresar como Egresado">
+                                    🎓 <strong>Egresado</strong>
+                                </button>
+                            </div>
+                            <div class="small text-muted" style="font-size: 0.75rem;">
+                                Contraseña para todos: <strong class="text-dark">12345678</strong> • <em>Haz clic en cualquiera para autocompletar</em>
+                            </div>
                         </div>
                     </form>
                 </div>

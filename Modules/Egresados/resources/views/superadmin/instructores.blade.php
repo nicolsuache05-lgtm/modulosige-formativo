@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -23,29 +23,47 @@
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+     
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
         --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -54,13 +72,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -69,6 +87,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        overflow-y: auto;
       }
 
       .brand {
@@ -103,7 +122,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -112,12 +131,12 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 999px;
       }
       .brand-sub {
@@ -140,14 +159,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
         width: 18px;
@@ -156,18 +175,30 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
+      }
+      nav a .badge {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      nav a.active .badge {
+        background: rgba(0, 0, 0, 0.25);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN VIEWPORT ---------------- */
@@ -178,13 +209,14 @@
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: sticky;
         top: 0;
         z-index: 20;
@@ -247,7 +279,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
@@ -267,7 +299,7 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 28px;
         margin: 0 0 6px;
@@ -287,26 +319,26 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--forest);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         color: #ffffff;
         border: none;
-        padding: 9px 18px;
+        padding: 10px 20px;
         border-radius: 999px;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.28);
         cursor: pointer;
       }
       .btn-primary-green:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #2e8b00 0%, #246f00 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.38);
       }
 
-      /* ---------------- 5 MÉTRICAS SUPERIORES ---------------- */
+      /* ---------------- 5 MÉTRICAS SUPERIORES (SENA ERP) ---------------- */
       .metrics-5-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -316,45 +348,66 @@
       .metric-mini-card {
         background: var(--card);
         border-radius: 16px;
-        padding: 16px 18px;
+        padding: 18px 20px;
         border: 1px solid var(--line);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 1px 3px rgba(0, 19, 30, 0.05);
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       }
       .metric-mini-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px rgba(1, 56, 25, 0.06);
-        border-color: rgba(57, 169, 0, 0.35);
+        box-shadow: 0 8px 20px rgba(0, 19, 30, 0.07);
+        border-color: rgba(57, 169, 0, 0.4);
+      }
+      .metric-mini-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
       }
       .metric-mini-label {
-        font-size: 10.5px;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.6px;
         color: var(--ink-soft);
       }
+      .metric-mini-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--green-soft);
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13.5px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(57, 169, 0, 0.12);
+      }
       .metric-mini-num {
-        font-family: 'Fraunces', serif;
-        font-size: 24px;
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-size: 26px;
         font-weight: 700;
         color: var(--forest-deep);
         line-height: 1.1;
-        margin: 4px 0;
+        margin: 2px 0 8px;
       }
       .metric-mini-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-size: 10.5px;
         font-weight: 700;
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: 999px;
         width: fit-content;
+        background: var(--green-soft);
+        color: var(--green-badge-text);
+        border: 1px solid var(--green-soft-border);
       }
-      .metric-mini-pill.green { background: var(--green-soft); color: var(--green-dark); }
-      .metric-mini-pill.blue { background: #EEF4FF; color: #1D4ED8; }
-      .metric-mini-pill.indigo { background: #EEF2FF; color: #4338CA; }
-      .metric-mini-pill.amber { background: #FFF8E6; color: #B45309; }
 
       /* ---------------- MAIN 2-COLUMN + 1-COLUMN GRID ---------------- */
       .main-grid {
@@ -414,18 +467,23 @@
       }
 
       .btn-filter {
-        padding: 9px 16px;
-        background: var(--forest);
+        padding: 9px 20px;
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
         color: #ffffff;
         border: none;
         border-radius: 10px;
-        font-size: 12.5px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(57, 169, 0, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
       }
       .btn-filter:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #2e8b00 0%, #246f00 100%);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.3);
       }
 
       /* Instructores Table */
@@ -568,22 +626,23 @@
         gap: 14px;
       }
       .detail-avatar-large {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #39A900 100%);
+        border: 2px solid rgba(98, 227, 29, 0.7);
         color: #ffffff;
-        font-family: 'Fraunces', serif;
-        font-weight: 700;
-        font-size: 18px;
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.2);
       }
       .detail-user-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 16px;
         color: var(--forest-deep);
@@ -643,12 +702,12 @@
       }
       .comp-tag {
         font-size: 11px;
-        font-weight: 600;
-        background: #ffffff;
-        border: 1px solid var(--line);
-        padding: 3px 8px;
-        border-radius: 6px;
-        color: var(--ink);
+        font-weight: 700;
+        background: #EAF7EE;
+        border: 1px solid #BBF7D0;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 8px;
       }
 
       .btn-cta-detail {
@@ -656,35 +715,36 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        background: var(--forest);
+        background: linear-gradient(135deg, #00131E 0%, #001A29 100%);
+        border: 1.5px solid rgba(57, 169, 0, 0.35);
         color: #ffffff;
-        border: none;
-        padding: 11px 18px;
+        padding: 12px 18px;
         border-radius: 12px;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         text-align: center;
       }
       .btn-cta-detail:hover {
-        background: var(--green);
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+        border-color: #39A900;
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.25);
+        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.3);
       }
 
       .btn-secondary-action {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        background: var(--green-soft);
-        color: var(--forest);
-        border: 1px solid rgba(57, 169, 0, 0.25);
-        padding: 10px 18px;
+        gap: 8px;
+        background: #EAF7EE;
+        color: #166534;
+        border: 1.5px solid #BBF7D0;
+        padding: 11px 18px;
         border-radius: 12px;
         font-size: 12.5px;
         font-weight: 700;
@@ -692,7 +752,9 @@
         transition: all 0.2s ease;
       }
       .btn-secondary-action:hover {
-        background: #d8f3de;
+        background: #dcfce7;
+        border-color: #39A900;
+        transform: translateY(-1px);
       }
 
       .pagination-wrap {
@@ -739,7 +801,6 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
         <div class="brand-sub">Gestión de Egresados</div>
       </div>
@@ -774,13 +835,6 @@
     </nav>
 
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
   </aside>
 
   <!-- ============================================== -->
@@ -790,12 +844,7 @@
     
     <!-- Topbar -->
     <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
+      <div class="topbar-left"></div>
 
       @include('egresados::superadmin.partials._topbar_right')
     </div>
@@ -819,38 +868,78 @@
       </div>
 
       <!-- ============================================== -->
-      <!-- 5 MÉTRICAS SUPERIORES -->
+      <!-- 5 MÉTRICAS SUPERIORES (SENA ERP) -->
       <!-- ============================================== -->
       <div class="metrics-5-grid">
         
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Total Instructores</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Total Instructores</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($totalInstructores) }}</div>
-          <span class="metric-mini-pill green">Registrados</span>
+          <div class="metric-mini-pill">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-0.5 animate-pulse"></span>
+            <span>Registrados</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Activos</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Activos</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($activos) }}</div>
-          <span class="metric-mini-pill green">En servicio</span>
+          <div class="metric-mini-pill">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-0.5"></span>
+            <span>En servicio</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Programas</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Programas</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($programas) }}</div>
-          <span class="metric-mini-pill blue">Asignados</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-book-bookmark text-[9px] text-[#39A900]"></i>
+            <span>Asignados</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Fichas Activas</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Fichas Activas</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($fichasActivas) }}</div>
-          <span class="metric-mini-pill indigo">En desarrollo</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-users text-[9px] text-[#39A900]"></i>
+            <span>En desarrollo</span>
+          </div>
         </div>
 
         <div class="metric-mini-card">
-          <span class="metric-mini-label">Evaluaciones</span>
+          <div class="metric-mini-top">
+            <span class="metric-mini-label">Evaluaciones</span>
+            <div class="metric-mini-icon">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+          </div>
           <div class="metric-mini-num">{{ number_format($evaluaciones) }}</div>
-          <span class="metric-mini-pill amber">Pendientes</span>
+          <div class="metric-mini-pill">
+            <i class="fa-solid fa-clock text-[9px] text-[#39A900]"></i>
+            <span>Pendientes</span>
+          </div>
         </div>
 
       </div>
@@ -996,6 +1085,19 @@
         </div>
 
         <!-- Columna Derecha: Panel de Detalle Rápido (Sticky) -->
+        @php
+          $firstInst = $instructores->first();
+          $firstPerson = $firstInst?->person;
+          $firstFullName = $firstPerson ? ($firstPerson->first_name . ' ' . $firstPerson->first_last_name . ' ' . ($firstPerson->second_last_name ?? '')) : ($firstInst?->name ?? 'Martha Montealegre');
+          $firstDoc = $firstPerson->document_number ?? '12210254';
+          $firstEmail = $firstInst?->email ?? ($firstPerson?->misena_email ?? 'martha@gmail.com');
+          $firstInitials = '';
+          foreach(array_slice(explode(' ', trim($firstFullName)), 0, 2) as $w) {
+              if (!empty($w)) $firstInitials .= mb_strtoupper(mb_substr($w, 0, 1));
+          }
+          $firstCourse = \Modules\SICA\Entities\Course::with('program')->where('person_id', $firstPerson?->id)->first();
+          $firstProgram = $firstCourse?->program?->name ?? 'Gestión de Empresas Agropecuarias';
+        @endphp
         <div class="detail-card">
           
           <div class="detail-head">
@@ -1008,11 +1110,11 @@
 
           <!-- Hero del Instructor -->
           <div class="detail-user-hero">
-            <div id="detailAvatarLarge" class="detail-avatar-large">CM</div>
+            <div id="detailAvatarLarge" class="detail-avatar-large">{{ $firstInitials ?: 'MM' }}</div>
             <div style="overflow:hidden;">
-              <div id="detailName" class="detail-user-name">Carla Moreno</div>
-              <div id="detailDoc" class="detail-user-doc">Doc: 107584578</div>
-              <div id="detailEmail" class="detail-user-email">CMoreno@gmail.com</div>
+              <div id="detailName" class="detail-user-name">{{ $firstFullName }}</div>
+              <div id="detailDoc" class="detail-user-doc">Doc: {{ $firstDoc }}</div>
+              <div id="detailEmail" class="detail-user-email">{{ $firstEmail }}</div>
             </div>
           </div>
 
@@ -1021,15 +1123,15 @@
             <span class="info-box-label">Información Académica</span>
             <div class="info-row">
               <span class="info-key">Programa Asignado:</span>
-              <span id="detailProgram" class="info-val">ADSO</span>
+              <span id="detailProgram" class="info-val">{{ $firstProgram }}</span>
             </div>
             <div class="info-row">
               <span class="info-key">Especialidad:</span>
-              <span id="detailEspecialidad" class="info-val">Desarrollo de Software</span>
+              <span id="detailEspecialidad" class="info-val">Instructor de Formación</span>
             </div>
             <div class="info-row">
               <span class="info-key">Fichas Asignadas:</span>
-              <span id="detailFichas" class="info-val">6 Fichas</span>
+              <span id="detailFichas" class="info-val">Fichas Activas</span>
             </div>
           </div>
 
@@ -1051,8 +1153,8 @@
           </button>
 
           <button type="button" @click="openModalAsignarFicha = true" class="btn-secondary-action" style="border:none; cursor:pointer; width:100%;">
-            <i class="fa-solid fa-link"></i>
-            <span>Asignar Ficha / Seguimiento</span>
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Asignar Seguimiento a Egresados</span>
           </button>
 
         </div>
@@ -1185,18 +1287,18 @@
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
          class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 sm:px-8 py-5 bg-gradient-to-r from-[#001A29] to-[#00131E] text-white">
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
             <div class="flex items-center gap-4">
-                <div id="modalInstInitials" class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-inner">
+                <div id="modalInstInitials" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20">
                     CM
                 </div>
                 <div>
-                    <div class="text-[10.5px] font-extrabold text-emerald-300 uppercase tracking-wider">EXPEDIENTE DOCENTE · SIGE</div>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">EXPEDIENTE DOCENTE · SIGE</div>
                     <h3 id="modalInstName" class="text-xl font-bold text-white tracking-tight">Carla Moreno</h3>
-                    <p class="text-xs text-green-100/70 mt-0.5">Centro de Formación Agroindustrial La Angostura</p>
+                    <p class="text-xs text-white/70 mt-0.5">Centro de Formación Agroindustrial La Angostura — CEFA</p>
                 </div>
             </div>
-            <button @click="openModalPerfilInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer">
+            <button @click="openModalPerfilInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -1238,14 +1340,14 @@
                 <div class="flex flex-wrap gap-2">
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Desarrollo de Software Web</span>
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Bases de Datos Relacionales</span>
-                    <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Seguimiento Etapa Productiva</span>
+                    <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Seguimiento a Egresados</span>
                     <span class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Tutoría de Proyectos SENA</span>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end bg-gray-50/50">
-            <button type="button" @click="openModalPerfilInstructor = false" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end bg-gray-50/70">
+            <button type="button" @click="openModalPerfilInstructor = false" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                 Cerrar Expediente
             </button>
         </div>
@@ -1253,7 +1355,7 @@
 </div>
 
 <!-- ============================================== -->
-<!-- MODAL 2: ASIGNAR FICHA / SEGUIMIENTO -->
+<!-- MODAL 2: ASIGNAR SEGUIMIENTO A EGRESADOS -->
 <!-- ============================================== -->
 <div x-show="openModalAsignarFicha" 
      style="display: none;"
@@ -1269,55 +1371,94 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-         class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col">
+         class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900">Asignar Ficha / Seguimiento</h3>
-                <p class="text-xs text-gray-500 mt-1">Instructor: <span id="assignInstructorNameLabel" class="font-bold text-emerald-700">Carla Moreno</span></p>
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20 flex-shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight">Asignar Seguimiento a Egresados</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Instructor asignado: <strong id="assignInstructorNameLabel" class="text-[#62E31D] font-bold">Carla Moreno</strong></p>
+                </div>
             </div>
-            <button @click="openModalAsignarFicha = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+            <button @click="openModalAsignarFicha = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
-        <div class="px-6 py-5">
-            <form id="form-asignar-ficha" onsubmit="event.preventDefault(); alert('¡Ficha asignada exitosamente al instructor en el sistema!');" class="space-y-4">
+        <!-- Cuerpo del Formulario con Estilos ERP -->
+        <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-5">
+            <form id="form-asignar-ficha" 
+                  @submit.prevent="
+                    openModalAsignarFicha = false; 
+                    window.dispatchEvent(new CustomEvent('open-success-modal', { 
+                        detail: { 
+                            title: '¡Seguimiento a Egresados Asignado!', 
+                            message: 'Se ha asignado exitosamente la ficha al docente para el seguimiento y monitoreo exclusivo de egresados.' 
+                        } 
+                    }));
+                  " 
+                  class="space-y-4">
                 <input type="hidden" id="assignInstructorId" value="1">
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Ficha de Formación <span class="text-red-500">*</span></label>
-                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                        <option value="">Seleccione una ficha...</option>
-                        <option value="3145614">3145614 - Análisis y Desarrollo de Software (ADSO)</option>
-                        <option value="55555">55555 - Gestión de Empresas Agropecuarias</option>
-                        <option value="3145615">3145615 - Procesamiento de Alimentos</option>
-                        <option value="2981122">2981122 - Producción Ganadera</option>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-[#39A900]"></i>
+                        <span>Ficha de Formación (Egresados)</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                        <option value="">Seleccione una ficha de egresados...</option>
+                        @if(isset($availableCourses) && $availableCourses->count() > 0)
+                            @foreach($availableCourses as $c)
+                                <option value="{{ $c->code }}">{{ $c->code }} - {{ $c->program?->name ?? 'Programa SENA' }}</option>
+                            @endforeach
+                        @else
+                            <option value="3145614">3145614 - Análisis y Desarrollo de Software (ADSO)</option>
+                            <option value="55555">55555 - Gestión de Empresas Agropecuarias</option>
+                            <option value="3145615">3145615 - Procesamiento de Alimentos</option>
+                            <option value="2981122">2981122 - Producción Ganadera</option>
+                        @endif
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Rol de Acompañamiento <span class="text-red-500">*</span></label>
-                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
-                        <option value="lider">Instructor Líder de Ficha</option>
-                        <option value="etapa_productiva" selected>Seguimiento a Etapa Productiva / Egresados</option>
-                        <option value="tecnico">Instructor Técnico de Especialidad</option>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check text-[#39A900]"></i>
+                        <span>Tipo de Seguimiento al Egresado</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                        <option value="seguimiento_integral" selected>Seguimiento Integral al Egresado</option>
+                        <option value="contacto_permanente">Contacto y Comunicación Permanente con el Egresado</option>
+                        <option value="actualizacion_datos">Actualización y Verificación de Datos del Egresado</option>
+                        <option value="encuestas_caracterizacion">Encuestas y Caracterización del Egresado</option>
+                        <option value="red_encuentros">Red de Egresados y Encuentros Institucionales</option>
+                        <option value="acompanamiento_academico">Acompañamiento y Formación Continua del Egresado</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Observaciones de la asignación</label>
-                    <textarea rows="3" placeholder="Detalle acuerdos de acompañamiento a egresados o cronograma..." class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none resize-none"></textarea>
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-comment-dots text-[#39A900]"></i>
+                        <span>Observaciones del Seguimiento al Egresado</span>
+                    </label>
+                    <textarea rows="3" placeholder="Detalle los objetivos del acompañamiento al egresado, canales de contacto o acuerdos de seguimiento..." class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none resize-none font-medium text-gray-800 transition"></textarea>
                 </div>
             </form>
         </div>
 
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-3xl">
-            <button type="button" @click="openModalAsignarFicha = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end gap-3 bg-gray-50/70 rounded-b-3xl">
+            <button type="button" @click="openModalAsignarFicha = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
                 Cancelar
             </button>
-            <button type="submit" form="form-asignar-ficha" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
-                <i class="fa-solid fa-link text-xs"></i>
+            <button type="submit" form="form-asignar-ficha" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-950/20 transition cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-xs"></i>
                 <span>Guardar Asignación</span>
             </button>
         </div>
@@ -1345,21 +1486,21 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-         class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-green-100 flex flex-col max-h-[92vh] overflow-hidden">
+         class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden">
         
-        <!-- Encabezado del Modal con Icono Verde -->
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 sm:px-8 py-5 bg-[#ffffff]">
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
             <div class="flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-[#008f39] text-white flex items-center justify-center text-lg shadow-md flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-lg shadow-md shadow-black/20 flex-shrink-0">
                     <i class="fa-solid fa-chalkboard-user"></i>
                 </div>
                 <div>
-                    <div class="text-[10.5px] font-extrabold text-[#008f39] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES</div>
-                    <h3 class="text-xl font-extrabold text-gray-900 tracking-tight">Registrar instructor</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Vincular nuevo docente a la plataforma de egresados CEFA La Angostura.</p>
+                    <div class="text-[10.5px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE</div>
+                    <h3 class="text-xl font-bold text-white tracking-tight">Registrar instructor</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Vincular nuevo docente a la plataforma de egresados CEFA La Angostura.</p>
                 </div>
             </div>
-            <button @click="openModalNuevoInstructor = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition cursor-pointer">
+            <button @click="openModalNuevoInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -1373,25 +1514,25 @@
                 <!-- 1. Datos personales -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">1</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Datos personales</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">1</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Datos personales</h4>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Nombres <span class="text-red-500">*</span></label>
-                            <input type="text" name="nombres" required placeholder="Ej. Carlos Alberto" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="text" name="nombres" required placeholder="Ej. Carlos Alberto" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Apellidos <span class="text-red-500">*</span></label>
-                            <input type="text" name="apellidos" required placeholder="Ej. Mendoza Castro" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <input type="text" name="apellidos" required placeholder="Ej. Mendoza Castro" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tipo Doc. <span class="text-red-500">*</span></label>
-                            <select name="tipo_documento" required class="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition">
+                            <select name="tipo_documento" required class="w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                                 <option value="Cédula de ciudadanía">Cédula de Ciudadanía (CC)</option>
                                 <option value="Tarjeta de identidad">Tarjeta de Identidad (TI)</option>
                                 <option value="Cédula de extranjería">Cédula de Extranjería (CE)</option>
@@ -1400,7 +1541,7 @@
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 mb-1">DNI / Cédula <span class="text-red-500">*</span></label>
-                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="text" name="documento" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
@@ -1408,19 +1549,19 @@
                 <!-- 2. Información de contacto -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-2">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">2</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Información de contacto</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">2</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Información de contacto</h4>
                     </div>
                     <p class="text-[11px] text-gray-500 mb-3.5">Datos únicos de contacto: el correo institucional y teléfono deben pertenecer exclusivamente al instructor.</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico Institucional <span class="text-red-500">*</span></label>
-                            <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="email" name="correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono / Celular</label>
-                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium">
+                            <input type="tel" name="telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                         </div>
                     </div>
                 </div>
@@ -1428,8 +1569,8 @@
                 <!-- 3. Información académica y vinculación -->
                 <div>
                     <div class="flex items-center gap-2.5 mb-4">
-                        <span class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-extrabold">3</span>
-                        <h4 class="text-sm font-extrabold text-gray-900">Información académica y vinculación</h4>
+                        <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center text-xs font-bold shadow-xs">3</span>
+                        <h4 class="text-sm font-bold text-[#00131E]">Información académica y vinculación</h4>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1441,7 +1582,7 @@
                                    list="lista_programas_instructor_crear" 
                                    required 
                                    placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
-                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-[#008f39] outline-none transition font-medium text-gray-800">
+                                   class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium text-gray-800">
                             <datalist id="lista_programas_instructor_crear">
                                 <option value="Análisis y Desarrollo de Software (ADSO)">
                                 <option value="Gestión de Empresas Agropecuarias">
@@ -1465,33 +1606,22 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Centro de Formación</label>
-                            <input type="text" name="centro_formacion" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-50 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
+                            <input type="text" name="centro_formacion" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-50 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed font-medium">
                         </div>
                     </div>
                 </div>
 
-                <!-- Banner Informativo -->
-                <div class="bg-[#f0faf3] border border-[#d4eedd] rounded-2xl p-4 flex items-start gap-3.5">
-                    <div class="w-7 h-7 rounded-full bg-[#008f39] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                        <i class="fa-solid fa-info"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-extrabold text-[#008f39]">Rol y vinculación institucional</div>
-                        <p class="text-[11.5px] text-[#2c5239] mt-0.5 leading-relaxed">
-                            Este registro asigna automáticamente el perfil exclusivo de <strong>Instructor</strong> para el seguimiento y gestión de egresados del CEFA La Angostura.
-                        </p>
-                    </div>
-                </div>
+
 
             </form>
         </div>
 
-        <!-- Pie del Modal (Botones Exactos) -->
-        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 bg-[#fbfdfc]">
-            <button type="button" @click="openModalNuevoInstructor = false" class="w-full sm:w-auto px-6 py-3 bg-[#f1f5f3] hover:bg-[#e2ece6] text-[#4b6354] text-xs font-bold rounded-xl transition cursor-pointer text-center">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 bg-[#f8faf9]">
+            <button type="button" @click="openModalNuevoInstructor = false" class="w-full sm:w-auto px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer text-center">
                 Cancelar
             </button>
-            <button type="submit" form="form-crear-instructor" class="w-full sm:w-auto px-7 py-3 bg-[#008f39] hover:bg-[#007a30] text-white text-xs font-extrabold rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2">
+            <button type="submit" form="form-crear-instructor" class="w-full sm:w-auto px-7 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md hover:shadow-lg shadow-[#39A900]/25 cursor-pointer flex items-center justify-center gap-2">
                 <i class="fa-solid fa-chalkboard-user"></i>
                 <span>Registrar instructor</span>
             </button>
@@ -1501,7 +1631,7 @@
 </div>
 
 <!-- ============================================== -->
-<!-- MODAL 4: EDITAR INSTRUCTOR -->
+<!-- MODAL 4: EDITAR INSTRUCTOR (ESTILO INSTITUCIONAL ERP) -->
 <!-- ============================================== -->
 <div x-show="openModalEditarInstructor" 
      style="display: none;"
@@ -1511,38 +1641,44 @@
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" x-cloak>
+     class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-start justify-center p-3 sm:p-4 pt-4 sm:pt-6" x-cloak>
     
     <div @click.away="openModalEditarInstructor = false" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-         class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-gray-100 flex flex-col">
+         class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-gray-100 flex flex-col max-h-[94vh] overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5 bg-gradient-to-r from-[#001A29] to-[#00131E] text-white rounded-t-3xl">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-inner">
-                    <i class="fa-solid fa-pen-to-square"></i>
+        <!-- Encabezado del Modal con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 sm:px-8 py-5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#2e8b00] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-black/20 flex-shrink-0">
+                    <i class="fa-solid fa-user-pen"></i>
                 </div>
                 <div>
-                    <div class="text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">GESTIÓN DOCENTE · SIGE</div>
-                    <h3 class="text-lg font-bold text-white tracking-tight">Editar Instructor</h3>
-                    <p class="text-xs text-white/70 mt-0.5">Modificando datos de: <span id="edit_inst_name_label" class="text-emerald-300 font-bold">Docente</span></p>
+                    <div class="text-[10px] font-extrabold text-[#62E31D] uppercase tracking-wider">GESTIÓN DE INSTRUCTORES · SIGE ERP</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight">Editar Datos del Instructor</h3>
+                    <p class="text-xs text-white/70 mt-0.5">Modificando expediente de: <strong id="edit_inst_name_label" class="text-[#62E31D] font-bold">Docente</strong></p>
                 </div>
             </div>
-            <button @click="openModalEditarInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer">
+            <button @click="openModalEditarInstructor = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
-        <div class="px-6 py-5">
+        <!-- Cuerpo del Formulario con Estilos ERP -->
+        <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-4">
             <form id="form-editar-instructor" action="/egresados/superadmin/instructores/1" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
+                
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Tipo Doc.</label>
-                        <select name="tipo_documento" id="edit_inst_tipo_doc" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-id-card text-[#39A900]"></i>
+                            <span>Tipo Doc.</span>
+                        </label>
+                        <select name="tipo_documento" id="edit_inst_tipo_doc" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                             <option value="Cédula de ciudadanía">CC - Cédula</option>
                             <option value="Tarjeta de identidad">TI - Tarjeta</option>
                             <option value="Cédula de extranjería">CE - Extranjería</option>
@@ -1550,37 +1686,55 @@
                         </select>
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Número de Documento <span class="text-red-500">*</span></label>
-                        <input type="text" name="documento" id="edit_inst_doc" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-fingerprint text-[#39A900]"></i>
+                            <span>Número de Documento</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="documento" id="edit_inst_doc" required pattern="[0-9]{5,15}" inputmode="numeric" title="Ingrese entre 5 y 15 dígitos numéricos sin puntos ni espacios" placeholder="Ej. 107584578" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-semibold text-gray-800 transition">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nombre Completo <span class="text-red-500">*</span></label>
-                    <input type="text" name="nombre" id="edit_inst_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold text-gray-800">
+                    <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-user text-[#39A900]"></i>
+                        <span>Nombre Completo</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="nombre" id="edit_inst_nombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-semibold text-gray-800 transition">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Correo Electrónico <span class="text-red-500">*</span></label>
-                        <input type="email" name="correo" id="edit_inst_correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-envelope text-[#39A900]"></i>
+                            <span>Correo Electrónico</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" name="correo" id="edit_inst_correo" required placeholder="instructor@sena.edu.co" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Teléfono / Celular</label>
-                        <input type="tel" name="telefono" id="edit_inst_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-phone text-[#39A900]"></i>
+                            <span>Teléfono / Celular</span>
+                        </label>
+                        <input type="tel" name="telefono" id="edit_inst_telefono" pattern="[0-9]{7,15}" inputmode="numeric" title="Ingrese entre 7 y 15 dígitos numéricos sin caracteres especiales" placeholder="Ej. 3161234567" class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                     </div>
                 </div>
 
                 <input type="hidden" name="rol" value="instructor_egresados">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Programa Vinculado</label>
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-graduation-cap text-[#39A900]"></i>
+                            <span>Programa Vinculado</span>
+                        </label>
                         <input type="text" 
                                name="programa" 
                                id="edit_inst_programa" 
                                list="lista_programas_instructor_edit" 
-                               placeholder="Escribe el programa de formación (ej. ADSO, Agropecuaria...)" 
-                               class="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-medium text-gray-800">
+                               placeholder="Escribe el programa (ej. ADSO, Agropecuaria...)" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
                         <datalist id="lista_programas_instructor_edit">
                             <option value="Análisis y Desarrollo de Software (ADSO)">
                             <option value="Gestión de Empresas Agropecuarias">
@@ -1603,22 +1757,28 @@
                         </datalist>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Centro de Formación</label>
-                        <input type="text" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed">
+                        <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-building-columns text-[#39A900]"></i>
+                            <span>Centro de Formación</span>
+                        </label>
+                        <input type="text" value="CEFA La Angostura" readonly class="w-full px-3.5 py-2.5 text-sm bg-gray-100 text-gray-500 border border-gray-200 rounded-xl cursor-not-allowed font-medium">
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-3xl">
-            <button type="button" @click="openModalEditarInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <!-- Pie del Modal con Botones Institucionales ERP -->
+        <div class="border-t border-gray-100 px-6 sm:px-8 py-4 flex items-center justify-end gap-3 bg-gray-50/70 rounded-b-3xl">
+            <button type="button" @click="openModalEditarInstructor = false" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
                 Cancelar
             </button>
-            <button type="submit" form="form-editar-instructor" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
+            <button type="submit" form="form-editar-instructor" class="px-6 py-2.5 bg-gradient-to-r from-[#001A29] to-[#39A900] hover:from-[#00131E] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-950/20 transition cursor-pointer flex items-center gap-2 transform hover:-translate-y-0.5">
                 <i class="fa-solid fa-floppy-disk text-xs"></i>
                 <span>Guardar Cambios</span>
             </button>
         </div>
+    </div>
+</div>
     </div>
 </div>
 

@@ -64,18 +64,18 @@
 
     .sena-page-btn:hover:not(.sena-page-disabled):not(.sena-page-active) {
         background: #F8FAFC !important;
-        color: #008f39 !important;
+        color: #39A900 !important;
         border-color: #39A900 !important;
         transform: translateY(-1px);
         box-shadow: 0 3px 8px rgba(57, 169, 0, 0.16);
     }
 
     .sena-page-active {
-        background: linear-gradient(135deg, #001A29 0%, #008f39 100%) !important;
+        background: linear-gradient(135deg, #001A29 0%, #39A900 100%) !important;
         color: #FFFFFF !important;
         border-color: transparent !important;
         font-weight: 700;
-        box-shadow: 0 4px 12px rgba(0, 143, 57, 0.32);
+        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.32);
         cursor: default;
     }
 

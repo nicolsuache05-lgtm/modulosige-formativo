@@ -56,6 +56,17 @@ class CheckEgresadosRole
                     return $next($request);
                 }
 
+                // Permitir a instructores registrar egresados o seguimientos sin redirecciones bruscas
+                if ($request->isMethod('post') && ($request->is('*store*') || $request->is('*seguimiento*'))) {
+                    if ($user->hasRole('egresados.instructor') || 
+                        $user->hasRole('sigac.instructor') || 
+                        $user->hasRole('agrocefa.trainer') ||
+                        $user->nickname === 'instructor_egresados' || 
+                        $user->email === 'instructor.egresados@sena.edu.co') {
+                        return $next($request);
+                    }
+                }
+
                 // Si es instructor, redirigir a su panel correspondiente
                 if ($user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co') {
                     return redirect()->route('egresados.dashboard_instructor')

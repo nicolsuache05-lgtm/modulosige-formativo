@@ -52,7 +52,10 @@ Route::get('egresados/assets/images/{filename}', function ($filename) {
     if (!file_exists($path)) {
         abort(404);
     }
-    return response()->file($path);
+    return response()->file($path, [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+    ]);
 })->name('egresados.assets.image');
 
 
@@ -97,7 +100,7 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/superadmin/reportes', [ReportesController::class, 'index'])->name('egresados.superadmin.reportes.index');
     Route::post('egresados/superadmin/reportes/store', [ReportesController::class, 'store'])->name('egresados.superadmin.reportes.store');
     Route::get('egresados/superadmin/reportes/export/{id?}', [ReportesController::class, 'export'])->name('egresados.superadmin.reportes.export');
-    Route::get('egresados/superadmin/reportes/{id}/exportar/{formato}', [ReportesController::class, 'exportar'])->name('egresados.superadmin.reportes.exportar');
+    Route::get('egresados/superadmin/reportes/{id}/exportar/{formato?}', [ReportesController::class, 'exportar'])->name('egresados.superadmin.reportes.exportar');
     Route::get('egresados/superadmin/reportes/{id}/graficas', [ReportesController::class, 'graficas'])->name('egresados.superadmin.reportes.graficas');
     Route::post('egresados/superadmin/reportes/{id}/enviar', [ReportesController::class, 'enviarCorreo'])->name('egresados.superadmin.reportes.enviar');
     Route::delete('egresados/superadmin/reportes/{id}', [ReportesController::class, 'destroy'])->name('egresados.superadmin.reportes.destroy');
@@ -118,6 +121,8 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/{id}', [EgresadosController::class, 'show'])->name('egresados.show')->whereNumber('id');
     Route::put('egresados/{id}/update', [EgresadosController::class, 'update'])->name('egresados.superadmin.update')->whereNumber('id');
     Route::put('egresados/{id}', [EgresadosController::class, 'update'])->name('egresados.update')->whereNumber('id');
+    Route::post('egresados/{id}/toggle-status', [EgresadosController::class, 'toggleStatus'])->name('egresados.superadmin.toggle_status')->whereNumber('id');
+    Route::match(['get', 'post'], 'egresados/{id}/toggle', [EgresadosController::class, 'toggleStatus'])->name('egresados.toggle_status')->whereNumber('id');
 });
 
 
@@ -129,8 +134,23 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::get('egresados/instructor', [InstructorController::class, 'dashboard'])->name('egresados.instructor');
     Route::get('egresados/instructor/dashboard', [InstructorController::class, 'dashboard'])->name('egresados.instructor.dashboard');
     Route::get('egresados/instructor/directorio', [InstructorController::class, 'directorio'])->name('egresados.instructor.directorio');
+    Route::post('egresados/instructor/store', [EgresadosController::class, 'store'])->name('egresados.instructor.store');
+    Route::post('egresados/instructor/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.instructor.seguimiento.store');
+    Route::match(['put', 'post'], 'egresados/instructor/{id}/update', [EgresadosController::class, 'update'])->name('egresados.instructor.update')->whereNumber('id');
+    
+    // Encuestas Instructor
     Route::get('egresados/instructor/encuestas', [InstructorEncuestasController::class, 'index'])->name('egresados.instructor.encuestas.index');
     Route::post('egresados/instructor/encuestas/store', [InstructorEncuestasController::class, 'store'])->name('egresados.instructor.encuestas.store');
+    
+    // Reportes Instructor
+    Route::get('egresados/instructor/reportes', [InstructorController::class, 'reportes'])->name('egresados.instructor.reportes.index');
+    Route::post('egresados/instructor/reportes/store', [InstructorController::class, 'storeReporte'])->name('egresados.instructor.reportes.store');
+    Route::get('egresados/instructor/reportes/exportar/{id?}', [InstructorController::class, 'exportarReporte'])->name('egresados.instructor.reportes.export');
+
+    // Eventos Instructor
+    Route::get('egresados/instructor/eventos', [InstructorController::class, 'eventos'])->name('egresados.instructor.eventos.index');
+    Route::post('egresados/instructor/eventos/store', [InstructorController::class, 'storeEvento'])->name('egresados.instructor.eventos.store');
+
     Route::get('egresados/instructor/{id}/perfil', [EgresadosController::class, 'show'])->name('egresados.instructor.perfil');
 });
 

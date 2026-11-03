@@ -3,326 +3,868 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGE · Panel del Instructor — CEFA La Angostura</title>
+    <title>SIGE · Panel de Instructor — CEFA La Angostura</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        forest: '#001A29',
-                        forestDeep: '#00131E',
-                        senaNavy: '#001A29',
-                        senaNavyLight: '#002336',
-                        senaDark: '#00131E',
-                        senaGreen: '#39A900',
-                        senaGreenDark: '#2a7c00',
-                        senaNeon: '#62E31D',
-                        senaLight: '#F4F7F6',
-                        ink: '#16261C',
-                        inkSoft: '#6B7A70',
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                        editorial: ['Fraunces', 'serif'],
-                    }
-                }
-            }
+    <style>
+      :root {
+        /* PALETA INSTITUCIONAL SENA EMPRESA ERP */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
+        --sena-dark: #00131E;
+        --sena-navy: #001A29;
+        --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
+        --green: #39A900;
+        --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
+        --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
+        --moss: #62E31D;
+        --bg: #F4F7F6;
+        --card: #FFFFFF;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
+        --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+
+      body {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+
+      /* ---------------- SIDEBAR ---------------- */
+      .sidebar {
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        padding: 22px 16px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 8px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        margin-bottom: 16px;
+        text-decoration: none;
+        color: #ffffff;
+      }
+
+      .brand-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 2px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(98, 227, 29, 0.6);
+      }
+      .brand-badge img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 7px;
+      }
+
+      .brand-name {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .brand-tag {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-size: 9px;
+        font-weight: 800;
+        background: var(--green);
+        color: #ffffff;
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      .brand-sub {
+        font-size: 10.5px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 2px;
+      }
+
+      .nav-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: rgba(255, 255, 255, 0.45);
+        padding: 8px 12px 6px;
+        margin-top: 6px;
+      }
+
+      nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: rgba(255, 255, 255, 0.82);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 500;
+        margin-bottom: 3px;
+        transition: all 0.15s ease;
+      }
+      nav a i {
+        font-size: 15px;
+        width: 20px;
+        text-align: center;
+        opacity: 0.85;
+      }
+      nav a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+      }
+      nav a.active {
+        background: var(--green);
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
+      }
+      nav a.active i {
+        opacity: 1;
+        color: #ffffff;
+      }
+
+      /* ---------------- MAIN VIEWPORT ---------------- */
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes sigeFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ---------------- TOPBAR ---------------- */
+      .topbar {
+        background: var(--forest);
+        color: #ffffff;
+        padding: 0 32px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--green);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        color: #ffffff;
+        transition: all 0.2s ease;
+      }
+      .icon-btn:hover {
+        background: rgba(57, 169, 0, 0.25);
+        color: var(--moss);
+        border-color: var(--moss);
+      }
+      .icon-btn .dot {
+        position: absolute;
+        top: 7px;
+        right: 8px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--moss);
+      }
+
+      /* ---------------- CONTENT ---------------- */
+      .content {
+        padding: 32px 36px 48px;
+        flex: 1;
+      }
+
+      .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .page-title {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        margin: 0 0 6px;
+        color: var(--forest-deep);
+        letter-spacing: -0.5px;
+      }
+      .page-title span {
+        color: var(--green);
+      }
+      .page-desc {
+        font-size: 14.5px;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+      .period-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink-soft);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+      .period-pill i {
+        color: var(--green);
+      }
+
+      /* Stat cards (Grid de 6 tarjetas igual al Super Admin) */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      .stat-card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 22px 22px 18px;
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(0, 19, 30, 0.08);
+        border-color: rgba(57, 169, 0, 0.4);
+      }
+
+      .stat-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--green-soft);
+        color: var(--sena-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+      }
+      .stat-card:hover .stat-icon {
+        transform: scale(1.08);
+      }
+      .stat-icon.green   { background: #EAF7EE; color: var(--sena-green); }
+      .stat-icon.blue    { background: #E0F2FE; color: #0284c7; }
+      .stat-icon.emerald { background: #DCFCE7; color: #166534; }
+      .stat-icon.amber   { background: #FEF3C7; color: #d97706; }
+      .stat-icon.purple  { background: #F3E8FF; color: #9333ea; }
+      .stat-icon.cyan    { background: #E0F7FA; color: #00838f; }
+
+      .stat-title {
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+      .stat-value {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 700;
+        font-size: 32px;
+        color: var(--forest-deep);
+        line-height: 1;
+        letter-spacing: -0.5px;
+      }
+      .stat-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+      }
+      .stat-trend {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sena-green);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .stat-trend.down {
+        color: #dc2626;
+      }
+      .stat-link {
+        font-size: 12.5px;
+        color: var(--sena-dark);
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.15s ease;
+      }
+      .stat-link:hover {
+        color: var(--sena-green);
+        text-decoration: underline;
+      }
+
+      /* Lower section: activity + progress */
+      .lower-grid {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 24px;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px 26px;
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .panel-title {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--forest-deep);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .panel-title i {
+        color: var(--green);
+        font-size: 15px;
+      }
+      .panel-action {
+        font-size: 12.5px;
+        color: var(--green);
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .panel-action:hover {
+        color: var(--forest);
+        text-decoration: underline;
+      }
+
+      .activity-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .activity-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .activity-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--green-soft);
+        color: var(--forest);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .activity-text {
+        font-size: 13.5px;
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      .activity-text b {
+        font-weight: 700;
+        color: var(--forest-deep);
+      }
+      .activity-time {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 3px;
+      }
+
+      .progress-item {
+        margin-bottom: 20px;
+      }
+      .progress-item:last-child {
+        margin-bottom: 0;
+      }
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        margin-bottom: 8px;
+      }
+      .progress-label span:first-child {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .progress-label span:last-child {
+        color: var(--forest);
+        font-weight: 800;
+      }
+      .progress-track {
+        height: 8px;
+        background: var(--line);
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--sena-green) 0%, var(--sena-neon) 100%);
+        border-radius: 20px;
+        transition: width 1s ease-in-out;
+      }
+
+      @media (max-width: 1080px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
         }
-    </script>
+        .lower-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .content {
+          padding: 20px 16px 36px;
+        }
+      }
+    </style>
 </head>
-<body class="bg-[#F4F7F6] font-sans antialiased text-[#16261C] min-h-screen flex selection:bg-senaGreen selection:text-white">
+<body>
 
-    <!-- ============================================== -->
-    <!-- 1. SIDEBAR INSTRUCTOR -->
-    <!-- ============================================== -->
-    <aside class="w-64 bg-gradient-to-b from-[#001A29] to-[#00131E] text-white flex flex-col justify-between p-5 border-r border-white/10 shrink-0 sticky top-0 h-screen z-30">
+<div class="app">
+
+  <!-- SIDEBAR DEL INSTRUCTOR -->
+  <aside class="sidebar">
+    <a href="{{ route('egresados.welcome') }}" class="brand">
+      <div class="brand-badge">
+        <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
+      </div>
+      <div>
+        <div class="brand-name">
+          <span>SIGE</span>
+                  </div>
+        <div class="brand-sub">Gestión de Egresados</div>
+      </div>
+    </a>
+
+    <div class="nav-label">General</div>
+    <nav>
+      <a href="{{ route('egresados.instructor.dashboard') }}" class="active">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Inicio</span>
+      </a>
+      <a href="{{ route('egresados.instructor.directorio') }}">
+        <i class="fa-solid fa-user-graduate"></i>
+        <span>Egresados</span>
+      </a>
+      <a href="{{ route('egresados.instructor.encuestas.index') }}">
+        <i class="fa-solid fa-clipboard-question"></i>
+        <span>Encuestas</span>
+      </a>
+      <a href="{{ route('egresados.instructor.reportes.index') }}">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span>Reportes</span>
+      </a>
+      <a href="{{ route('egresados.instructor.eventos.index') }}">
+        <i class="fa-regular fa-calendar-check"></i>
+        <span>Eventos</span>
+      </a>
+    </nav>
+
+    <!-- Perfil del Instructor en la parte inferior del sidebar -->
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
+          IN
+        </div>
+        <div style="overflow:hidden;">
+          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
+          </div>
+          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor CEFA</div>
+        </div>
+      </div>
+      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+        @csrf
+        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </form>
+    </div>
+
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <div class="main">
+    
+    <!-- Topbar con Notificaciones y Menú de Usuario Unificado -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span style="font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-chalkboard-user" style="color:var(--moss);"></i>
+          <span>Panel de Acompañamiento y Seguimiento</span>
+        </span>
+      </div>
+
+      @include('egresados::superadmin.partials._topbar_right')
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      
+      <!-- Page Head -->
+      <div class="page-head">
         <div>
-            <!-- Brand -->
-            <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 pb-5 border-b border-white/15 no-underline text-white group">
-                <div class="w-10 h-10 rounded-full bg-white p-1 flex items-center justify-center shadow-md shrink-0 border-2 border-[#62E31D]">
-                    <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="SENA" class="w-full h-full object-cover rounded-full">
-                </div>
-                <div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-editorial text-xl font-bold tracking-wide leading-none">SIGE</span>
-                        <span class="bg-blue-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Instructor</span>
-                    </div>
-                    <div class="text-[10px] text-green-200/80 font-medium">CEFA La Angostura</div>
-                </div>
-            </a>
-
-            <!-- Navigation Links -->
-            <nav class="mt-6 space-y-1.5">
-                <a href="{{ route('egresados.instructor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#39A900] text-white font-semibold text-xs shadow-md">
-                    <i class="fa-solid fa-chalkboard-user w-4 text-center"></i>
-                    <span>Panel de Seguimiento</span>
-                </a>
-
-                <a href="{{ route('egresados.instructor.directorio') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
-                    <i class="fa-solid fa-address-book w-4 text-center"></i>
-                    <span>Directorio Completo</span>
-                </a>
-
-                <a href="{{ route('egresados.instructor.encuestas.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
-                    <i class="fa-solid fa-clipboard-question w-4 text-center"></i>
-                    <span>Mis Encuestas</span>
-                </a>
-
-                <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition">
-                    <i class="fa-solid fa-globe w-4 text-center"></i>
-                    <span>Portal Público SIGE</span>
-                </a>
-            </nav>
+          <h1 class="page-title">
+            ¡Bienvenido(a), <span>{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor(a)') : 'Instructor(a)' }}</span>!
+          </h1>
+          <p class="page-desc">Monitoreo, consulta y seguimiento de egresados de tus fichas de formación.</p>
         </div>
 
-        <!-- Sidebar Bottom User & Logout -->
-        <div class="pt-4 border-t border-white/15">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-9 h-9 rounded-full bg-blue-600/60 text-white flex items-center justify-center font-bold text-xs border border-blue-400/40">
-                    {{ Auth::check() ? Auth::user()->initials : 'IN' }}
-                </div>
-                <div class="overflow-hidden">
-                    <div class="text-xs font-bold text-white truncate">{{ Auth::check() ? Auth::user()->full_name : 'Instructor Egresados' }}</div>
-                    <div class="text-[10px] text-green-200/70 truncate">{{ Auth::check() ? Auth::user()->email : 'instructor@sena.edu.co' }}</div>
-                </div>
-            </div>
-
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-bold transition cursor-pointer">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    <span>Cerrar Sesión</span>
-                </button>
-            </form>
+        <div class="period-pill">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span>{{ ucfirst(\Carbon\Carbon::now()->locale('es')->translatedFormat('F Y')) }}</span>
         </div>
-    </aside>
+      </div>
 
-    <!-- ============================================== -->
-    <!-- 2. MAIN CONTENT AREA -->
-    <!-- ============================================== -->
-    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Stats Grid (5 Cards sincronizadas con los módulos del ERP) -->
+      <div class="stats-grid">
         
-        <!-- Topbar -->
-        <header class="bg-white border-b border-gray-200/80 px-6 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                </div>
-                <div>
-                    <h1 class="text-sm font-bold text-gray-800 leading-none">Módulo de Seguimiento para Instructores</h1>
-                    <span class="text-[11px] text-gray-500">Gestión de aprendices egresados, estados laborales y encuestas</span>
-                </div>
+        <!-- Card 1: Total Egresados de Fichas -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon green">
+              <i class="fa-solid fa-graduation-cap"></i>
             </div>
-
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    Rol: Instructor Egresados
-                </span>
-                <a href="{{ route('home') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                    <span>Portal Principal ERP</span>
-                </a>
+            <div class="stat-title">Total egresados fichas</div>
+          </div>
+          <div class="stat-value">
+            {{ number_format($totalEgresados ?? 0) }}
+          </div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>↑ Registros en sistema</span>
             </div>
-        </header>
+            <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
 
-        <!-- Main Body -->
-        <main class="flex-1 p-6 space-y-6 overflow-y-auto">
-            
-            <!-- Feedback Notification Messages -->
-            @if(session('success'))
-                <div class="bg-green-50 border border-green-200 text-green-800 text-xs font-semibold px-4 py-3 rounded-2xl flex items-center gap-2.5 shadow-sm">
-                    <i class="fa-solid fa-circle-check text-green-600 text-base"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
-
-            <!-- Top Metric Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                <div class="bg-white p-5 rounded-2xl border border-gray-200/70 shadow-sm flex items-center justify-between">
-                    <div>
-                        <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Egresados Fichas</div>
-                        <div class="font-editorial text-2xl font-bold text-[#00131E] mt-1">{{ number_format($totalEgresados) }}</div>
-                        <div class="text-[11px] text-green-700 font-semibold mt-0.5">Bajo seguimiento</div>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-green-50 text-[#0d6928] flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-graduate"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl border border-gray-200/70 shadow-sm flex items-center justify-between">
-                    <div>
-                        <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Vinculados (Empleo)</div>
-                        <div class="font-editorial text-2xl font-bold text-[#00131E] mt-1">{{ number_format($totalEmpleados) }}</div>
-                        <div class="text-[11px] text-blue-700 font-semibold mt-0.5">Empresas del sector</div>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl border border-gray-200/70 shadow-sm flex items-center justify-between">
-                    <div>
-                        <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Emprendedores</div>
-                        <div class="font-editorial text-2xl font-bold text-[#00131E] mt-1">{{ number_format($totalEmprendedores) }}</div>
-                        <div class="text-[11px] text-amber-700 font-semibold mt-0.5">Fondo Emprender / Negocios</div>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-rocket"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl border border-gray-200/70 shadow-sm flex items-center justify-between">
-                    <div>
-                        <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Formación Continua</div>
-                        <div class="font-editorial text-2xl font-bold text-[#00131E] mt-1">{{ number_format($totalEstudiantes) }}</div>
-                        <div class="text-[11px] text-purple-700 font-semibold mt-0.5">Cursos complementarios</div>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-award"></i>
-                    </div>
-                </div>
-
+        <!-- Card 2: Fichas Asignadas -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon blue">
+              <i class="fa-solid fa-layer-group"></i>
             </div>
-
-            <!-- Main Panel: Filtros & Tabla de Egresados Asignados -->
-            <div class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
-                
-                <!-- Card Header with Search & Filter by Course -->
-                <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="font-editorial text-lg font-bold text-[#00131E]">Seguimiento de Egresados por Ficha</h2>
-                        <p class="text-xs text-gray-500">Visualiza la información de contacto y situación ocupacional de los egresados.</p>
-                    </div>
-
-                    <form action="{{ route('egresados.instructor.dashboard') }}" method="GET" class="flex flex-wrap items-center gap-2">
-                        <select name="course_id" onchange="this.form.submit()" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:bg-white focus:border-[#39A900] outline-none">
-                            <option value="">-- Todos los cursos / fichas --</option>
-                            @foreach($courses as $course)
-                                <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>
-                                    Ficha {{ $course->code }} {{ $course->program ? '· ' . Str::limit($course->program->name, 25) : '' }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar egresado..." 
-                                class="pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 font-medium focus:bg-white focus:border-[#39A900] outline-none">
-                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
-                        </div>
-
-                        <button type="submit" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-3.5 py-2 rounded-xl text-xs font-bold transition">
-                            Filtrar
-                        </button>
-
-                        @if(request('course_id') || request('search'))
-                            <a href="{{ route('egresados.instructor.dashboard') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2">
-                                <i class="fa-solid fa-xmark"></i> Limpiar
-                            </a>
-                        @endif
-                    </form>
-                </div>
-
-                <!-- Table -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-gray-50/80 text-gray-600 font-bold uppercase tracking-wider text-[10px] border-b border-gray-100">
-                            <tr>
-                                <th class="py-3.5 px-5">Egresado(a)</th>
-                                <th class="py-3.5 px-4">Documento</th>
-                                <th class="py-3.5 px-4">Programa / Ficha</th>
-                                <th class="py-3.5 px-4">Contacto</th>
-                                <th class="py-3.5 px-4">Estado Ocupacional</th>
-                                <th class="py-3.5 px-4 text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-gray-700">
-                            @forelse($egresadosSeguimiento as $egresado)
-                                <tr class="hover:bg-green-50/30 transition">
-                                    <td class="py-3.5 px-5">
-                                        <div class="font-bold text-gray-900">
-                                            {{ $egresado->person->first_name ?? 'Sin Nombre' }} {{ $egresado->person->first_last_name ?? '' }}
-                                        </div>
-                                        <div class="text-[11px] text-gray-400">
-                                            {{ $egresado->person->misena_email ?? ($egresado->person->personal_email ?? 'No registra email') }}
-                                        </div>
-                                    </td>
-                                    <td class="py-3.5 px-4 font-mono text-xs font-semibold">
-                                        {{ $egresado->person->document_type ?? 'CC' }} {{ $egresado->person->document_number ?? 'S/N' }}
-                                    </td>
-                                    <td class="py-3.5 px-4">
-                                        <div class="font-semibold text-gray-800">{{ $egresado->course->program->name ?? 'Programa General' }}</div>
-                                        <div class="text-[11px] text-green-800 font-medium">Ficha: {{ $egresado->course->code ?? 'N/A' }}</div>
-                                    </td>
-                                    <td class="py-3.5 px-4 text-xs">
-                                        <div><i class="fa-solid fa-phone text-[10px] text-gray-400 mr-1"></i>{{ $egresado->person->telephone1 ?? 'No registra' }}</div>
-                                    </td>
-                                    <td class="py-3.5 px-4">
-                                        @php
-                                            $st = $egresado->apprentice_status;
-                                            $badgeClass = match($st) {
-                                                'EN FORMACIÓN' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                                'INDUCCIÓN' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                                'CONDICIONADO' => 'bg-purple-50 text-purple-700 border-purple-200',
-                                                default => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                            };
-                                            $badgeLabel = match($st) {
-                                                'EN FORMACIÓN' => 'EMPLEADO',
-                                                'INDUCCIÓN' => 'EMPRENDEDOR',
-                                                'CONDICIONADO' => 'ESTUDIANDO',
-                                                default => 'GRADUADO',
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $badgeClass }}">
-                                            {{ $badgeLabel }}
-                                        </span>
-                                    </td>
-                                    <td class="py-3.5 px-4 text-center">
-                                        <a href="{{ route('egresados.superadmin.perfil', ['id' => $egresado->id]) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-[#39A900] hover:text-white text-gray-600 transition" title="Ver Perfil Detallado">
-                                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-8 text-center text-gray-400 text-xs">
-                                        No se encontraron aprendices egresados con los filtros seleccionados.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                @if($egresadosSeguimiento->hasPages())
-                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
-                        {{ $egresadosSeguimiento->appends(request()->query())->links() }}
-                    </div>
-                @endif
-
+            <div class="stat-title">Fichas asignadas</div>
+          </div>
+          <div class="stat-value">
+            {{ number_format($totalFichas ?? 6) }}
+          </div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>En seguimiento activo</span>
             </div>
+            <a href="{{ route('egresados.instructor.directorio') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
 
-        </main>
+        <!-- Card 3: Encuestas -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon amber">
+              <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <div class="stat-title">Encuestas</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalEncuestas ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Creadas en sistema</span>
+            </div>
+            <a href="{{ route('egresados.instructor.encuestas.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 4: Eventos Programados -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon purple">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <div class="stat-title">Eventos programados</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalEventos ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-bullhorn"></i>
+              <span>Próximos eventos</span>
+            </div>
+            <a href="{{ route('egresados.instructor.eventos.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 5: Reportes Generados -->
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon cyan">
+              <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <div class="stat-title">Reportes generados</div>
+          </div>
+          <div class="stat-value">{{ number_format($totalReportes ?? 5) }}</div>
+          <div class="stat-meta">
+            <div class="stat-trend">
+              <i class="fa-solid fa-file-circle-check"></i>
+              <span>Generados en módulo</span>
+            </div>
+            <a href="{{ route('egresados.instructor.reportes.index') }}" class="stat-link">
+              <span>Ver detalle</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Lower Grid: Actividad Reciente + Avance por Programa -->
+      <div class="lower-grid">
+        
+        <!-- Panel Izquierdo: Actividad Reciente de Egresados en Fichas -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 class="panel-title">
+              <i class="fa-solid fa-bolt text-[#39A900]"></i>
+              <span>Actividad reciente</span>
+            </h3>
+            <a href="{{ route('egresados.instructor.directorio') }}" class="panel-action">Ver todo</a>
+          </div>
+
+          @forelse($recentEgresados as $item)
+            @php
+              $p = $item->person;
+              $fullName = $p ? trim($p->first_name . ' ' . $p->first_last_name) : 'Aprendiz SENA';
+              $progName = $item->course && $item->course->program ? $item->course->program->name : 'Formación SENA';
+              $isUpdated = $item->updated_at && $item->created_at && ($item->updated_at->timestamp > $item->created_at->timestamp + 60);
+              $timeDiff = $item->updated_at ? $item->updated_at->diffForHumans() : ($item->created_at ? $item->created_at->diffForHumans() : 'Recientemente');
+            @endphp
+            <div class="activity-row">
+              <div class="activity-dot" style="{{ $isUpdated ? 'background:#e0f2fe; color:#0284c7;' : 'background:#dcfce7; color:#166534;' }}">
+                <i class="fa-solid {{ $isUpdated ? 'fa-user-pen' : 'fa-user-plus' }}"></i>
+              </div>
+              <div style="flex:1;">
+                <div class="activity-text">
+                  @if($isUpdated)
+                    Se actualizaron los datos de <b>{{ $fullName }}</b> ({{ $progName }})
+                  @else
+                    Nuevo egresado registrado: <b>{{ $fullName }}</b> ({{ $progName }})
+                  @endif
+                </div>
+                <div class="activity-time" style="display:flex; align-items:center; gap:8px;">
+                  <span>{{ $timeDiff }}</span>
+                  <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(0,19,30,0.06); font-weight:600;">{{ $item->apprentice_status }}</span>
+                </div>
+              </div>
+            </div>
+          @empty
+            <div style="text-align:center; padding: 28px 16px; color: var(--ink-soft); font-size:13px;">
+              <i class="fa-regular fa-clock" style="font-size:24px; margin-bottom:8px; display:block; opacity:0.4;"></i>
+              No hay actividades registradas recientemente en tus fichas.
+            </div>
+          @endforelse
+        </div>
+
+        <!-- Panel Derecho: Avance por Programa -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 class="panel-title">
+              <i class="fa-solid fa-chart-simple text-[#39A900]"></i>
+              <span>Avance por programa</span>
+            </h3>
+          </div>
+
+          @if(isset($programStats) && count($programStats) > 0)
+            @php
+              $maxTotal = $programStats->max('total') ?: 1;
+            @endphp
+            @foreach($programStats as $prog)
+              @php
+                $pct = round(($prog->total / $maxTotal) * 100);
+              @endphp
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;" title="{{ $prog->name }}">
+                    {{ $prog->name }}
+                  </span>
+                  <span>{{ $prog->total }} egresados ({{ $pct }}%)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: {{ $pct }}%"></div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Gestión de Empresas Agropecuarias</span>
+                <span>3 egresados (100%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 100%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Análisis y Desarrollo de Software (ADSO)</span>
+                <span>2 egresados (66%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 66%"></div>
+              </div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>Producción Acuícola</span>
+                <span>1 egresado (33%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 33%"></div>
+              </div>
+            </div>
+          @endif
+        </div>
+
+      </div>
 
     </div>
+  </div>
+
+</div>
+
 
 </body>
 </html>

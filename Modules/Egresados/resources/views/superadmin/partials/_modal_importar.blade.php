@@ -15,13 +15,13 @@
          class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col"
          x-data="{ fileName: '', tipoCarga: 'egresados' }">
         
-        <!-- Encabezado -->
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <!-- Encabezado con Identidad SENA ERP -->
+        <div class="flex items-center justify-between border-b-2 border-[#39A900] px-6 py-4 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] text-white rounded-t-2xl">
             <div>
-                <h3 class="text-lg font-bold text-gray-900">Importación Masiva (Excel)</h3>
-                <p class="text-xs text-gray-500 mt-1">Cargue un archivo .xlsx o .csv para registrar usuarios rápidamente.</p>
+                <h3 class="text-lg font-bold text-white">Importación Masiva (Excel)</h3>
+                <p class="text-xs text-white/70 mt-0.5">Cargue un archivo .xlsx o .csv para registrar usuarios rápidamente.</p>
             </div>
-            <button @click="openModalImportar = false" type="button" class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+            <button @click="openModalImportar = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -88,13 +88,13 @@
         </div>
 
         <!-- Pie del Modal -->
-        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50/50 rounded-b-2xl">
-            <button type="button" @click="openModalImportar = false" class="px-5 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer shadow-sm">
+        <div class="border-t border-gray-100 px-6 py-4 flex items-center justify-end gap-3 bg-[#f8faf9] rounded-b-2xl">
+            <button type="button" @click="openModalImportar = false" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
                 Cancelar
             </button>
-            <button type="submit" form="form-importar-excel" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer flex items-center gap-2">
+            <button type="submit" form="form-importar-excel" class="px-5 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 hover:shadow-lg cursor-pointer flex items-center gap-2 border-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Procesar Archivo
+                <span>Procesar Archivo</span>
             </button>
         </div>
     </div>

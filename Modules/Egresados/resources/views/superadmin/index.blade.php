@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans / Work Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -23,29 +23,49 @@
 
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* ========================================================
+           PALETA INSTITUCIONAL SENA EMPRESA ERP
+           ======================================================== */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
         --sena-navy-light: #002336;
         --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
         --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Plus Jakarta Sans', 'Work Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -54,13 +74,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -69,6 +89,7 @@
         position: sticky;
         top: 0;
         height: 100vh;
+        overflow-y: auto;
       }
 
       .brand {
@@ -103,7 +124,7 @@
       }
 
       .brand-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -112,12 +133,12 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 999px;
       }
       .brand-sub {
@@ -140,14 +161,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
         width: 18px;
@@ -156,18 +177,18 @@
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: #ffffff;
-        color: var(--forest-deep);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
       nav a.active i, nav a.active svg {
-        color: var(--green);
+        color: #ffffff;
       }
       nav a .badge {
         margin-left: auto;
@@ -178,8 +199,8 @@
         border-radius: 999px;
       }
       nav a.active .badge {
-        background: var(--green-soft);
-        color: var(--forest-deep);
+        background: rgba(0, 0, 0, 0.25);
+        color: #ffffff;
       }
 
       /* ---------------- MAIN VIEWPORT ---------------- */
@@ -190,13 +211,14 @@
       }
 
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         position: sticky;
         top: 0;
         z-index: 20;
@@ -259,7 +281,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
@@ -279,7 +301,7 @@
         gap: 14px;
       }
       .page-title {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 28px;
         margin: 0 0 6px;
@@ -355,6 +377,7 @@
         font-size: 18px;
       }
       .stat-icon.amber { background: #FFF8E6; color: #D97706; }
+      .stat-icon.red { background: #FEE2E2; color: #DC2626; }
       .stat-icon.green { background: var(--green-soft); color: var(--green); }
       .stat-icon.blue { background: #EEF4FF; color: #2563EB; }
 
@@ -366,7 +389,7 @@
         color: var(--ink-soft);
       }
       .stat-num {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 30px;
         font-weight: 700;
         color: var(--forest-deep);
@@ -384,6 +407,7 @@
         width: fit-content;
       }
       .stat-pill.amber { background: #FEF3C7; color: #92400E; }
+      .stat-pill.red { background: #FEE2E2; color: #991B1B; }
       .stat-pill.green { background: var(--green-soft); color: var(--green-dark); }
       .stat-pill.blue { background: #DBEAFE; color: #1E40AF; }
 
@@ -626,7 +650,7 @@
         border-radius: 14px;
         background: linear-gradient(135deg, var(--forest) 0%, var(--green) 100%);
         color: #ffffff;
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         display: flex;
@@ -636,7 +660,7 @@
         box-shadow: 0 4px 12px rgba(1, 56, 25, 0.15);
       }
       .detail-user-name {
-        font-family: 'Fraunces', serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 16px;
         color: var(--forest-deep);
@@ -797,7 +821,6 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-          <span class="brand-tag">CEFA</span>
         </div>
         <div class="brand-sub">Gestión de Egresados</div>
       </div>
@@ -832,13 +855,6 @@
     </nav>
 
 
-    <div class="nav-label">Portal Público</div>
-    <nav>
-      <a href="{{ route('egresados.welcome') }}">
-        <i class="fa-solid fa-house"></i>
-        <span>Portal Egresados</span>
-      </a>
-    </nav>
   </aside>
 
   <!-- ============================================== -->
@@ -848,12 +864,7 @@
     
     <!-- Topbar -->
     <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
+      <div class="topbar-left"></div>
 
       @include('egresados::superadmin.partials._topbar_right')
     </div>
@@ -869,23 +880,23 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-          <!-- BOTÓN 1: Sincronizar API (Formulario directo) -->
+          <!-- BOTÓN 1: Sincronizar API (Formulario directo con Azul Noche Institucional) -->
           <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" class="m-0 p-0">
             @csrf
-            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#00131E] to-[#001A29] hover:from-[#001A29] hover:to-[#00283d] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer border border-white/10">
+              <svg class="w-4 h-4 mr-2 text-[#62E31D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               <span>Sincronizar SICEFA</span>
             </button>
           </form>
 
-          <!-- BOTÓN 2: Importar Excel (Abre Modal) -->
-          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer">
-            <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <!-- BOTÓN 2: Importar Excel (Estilo Card Institucional con Verde SENA) -->
+          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-emerald-50/50 border border-gray-200 hover:border-[#39A900]/50 text-gray-700 hover:text-[#00131E] text-xs font-bold rounded-xl transition-all duration-200 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
+            <svg class="w-4 h-4 mr-2 text-[#39A900]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             <span>Importar Excel</span>
           </button>
 
-          <!-- BOTÓN 3: Nuevo Egresado (Abre Modal) -->
-          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition shadow-sm cursor-pointer border-0">
+          <!-- BOTÓN 3: Nuevo Egresado (Verde Principal Institucional SENA) -->
+          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-0">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Nuevo Egresado</span>
           </button>
@@ -895,31 +906,31 @@
       <!-- Tarjetas de Estadísticas Superiores (Estilo Inicio) -->
       <div class="stats-grid">
         
-        <!-- Stat 1: Actualización Pendiente -->
+        <!-- Stat 1: Egresados Inactivos -->
         <div class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">Actualización Pendiente</span>
-            <div class="stat-icon amber">
-              <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="stat-label">Egresados Inactivos</span>
+            <div class="stat-icon red">
+              <i class="fa-solid fa-user-xmark"></i>
             </div>
           </div>
-          <div class="stat-num">{{ number_format($actualizacionPendiente) }}</div>
-          <span class="stat-pill amber">
-            <i class="fa-solid fa-clock-rotate-left"></i> Desactualizada
+          <div class="stat-num">{{ number_format($totalInactivos ?? 0) }}</div>
+          <span class="stat-pill red">
+            <i class="fa-solid fa-ban"></i> Desactivados en SIGE
           </span>
         </div>
 
-        <!-- Stat 2: Seguimientos Realizados -->
+        <!-- Stat 2: Egresados Activos -->
         <div class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">Seguimientos Realizados</span>
+            <span class="stat-label">Egresados Activos</span>
             <div class="stat-icon green">
-              <i class="fa-solid fa-magnifying-glass-chart"></i>
+              <i class="fa-solid fa-user-check"></i>
             </div>
           </div>
-          <div class="stat-num">{{ number_format($seguimientosRealizados) }}</div>
+          <div class="stat-num">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
           <span class="stat-pill green">
-            <i class="fa-solid fa-calendar-check"></i> Este mes
+            <i class="fa-solid fa-circle-check"></i> Habilitados en SIGE
           </span>
         </div>
 
@@ -953,11 +964,13 @@
             </div>
 
             <select name="apprentice_status" onchange="this.form.submit()" class="filter-select">
-              <option value="CERTIFICADO" {{ request('apprentice_status', 'CERTIFICADO') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Solo Certificados (Egresados)</option>
-              <option value="TODOS" {{ request('apprentice_status') == 'TODOS' ? 'selected' : '' }}>-- Ver Todos los Aprendices ERP --</option>
+              <option value="TODOS" {{ request('apprentice_status', 'TODOS') == 'TODOS' ? 'selected' : '' }}>Todos los Egresados (Módulo)</option>
+              <option value="ACTIVOS" {{ request('apprentice_status') == 'ACTIVOS' ? 'selected' : '' }}>🟢 Egresados Activos</option>
+              <option value="INACTIVOS" {{ request('apprentice_status') == 'INACTIVOS' ? 'selected' : '' }}>🔴 Egresados Inactivos</option>
+              <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Certificados</option>
               <option value="EN FORMACIÓN" {{ request('apprentice_status') == 'EN FORMACIÓN' ? 'selected' : '' }}>En Formación</option>
-              <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
               <option value="CONDICIONADO" {{ request('apprentice_status') == 'CONDICIONADO' ? 'selected' : '' }}>Condicionado</option>
+              <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
               <option value="CANCELADO" {{ request('apprentice_status') == 'CANCELADO' ? 'selected' : '' }}>Cancelado</option>
               <option value="RETIRO VOLUNTARIO" {{ request('apprentice_status') == 'RETIRO VOLUNTARIO' ? 'selected' : '' }}>Retiro Voluntario</option>
             </select>
@@ -966,7 +979,7 @@
               Filtrar
             </button>
 
-            @if(request('search') || request('apprentice_status'))
+            @if(request('search') || (request('apprentice_status') && request('apprentice_status') !== 'TODOS'))
               <a href="{{ route('egresados.index') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar">
                 <i class="fa-solid fa-xmark"></i>
               </a>
@@ -982,7 +995,6 @@
                   <th>Egresado(a)</th>
                   <th>Programa & Ficha</th>
                   <th>Estado</th>
-                  <th style="text-align:center;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -1007,18 +1019,32 @@
                     elseif(in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO'])) $pillClass = 'status-red';
                     elseif($st === 'CONDICIONADO') $pillClass = 'status-amber';
 
+                    // Extraer valores limpios para campos de edición
+                    $docRaw = ($person && $person->document_number) ? (string)$person->document_number : '';
+                    $emailRaw = ($person && ($person->personal_email || $person->misena_email)) ? ($person->personal_email ?: $person->misena_email) : '';
+                    $phoneRaw = ($person && ($person->telephone1 || $person->telephone2)) ? (string)($person->telephone1 ?: $person->telephone2) : '';
+                    $progRaw = ($program && $program->name) ? $program->name : '';
+                    $codeRaw = ($course && $course->code) ? (string)$course->code : '';
+                    $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
+
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
                         'id' => $item->id,
                         'name' => $fullName,
                         'initials' => $initials ?: 'EG',
-                        'document' => $person->document_number ?? 'N/A',
+                        'document' => $docRaw ?: 'N/A',
+                        'document_raw' => $docRaw,
                         'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
-                        'email' => $person->misena_email ?? $person->personal_email ?? 'No registra correo',
-                        'phone' => $person->telephone1 ?? $person->telephone2 ?? 'No registra teléfono',
-                        'program' => $program->name ?? 'Programa de Formación CEFA',
-                        'code' => $course->code ?? 'N/A',
+                        'email' => $emailRaw ?: 'No registra correo',
+                        'email_raw' => $emailRaw,
+                        'phone' => $phoneRaw ?: 'No registra teléfono',
+                        'phone_raw' => $phoneRaw,
+                        'program' => $progRaw ?: 'Programa de Formación CEFA',
+                        'program_raw' => $progRaw,
+                        'code' => $codeRaw ?: 'N/A',
+                        'code_raw' => $codeRaw,
                         'status' => $st,
+                        'is_active' => $isApprenticeActive,
                         'pill_class' => $pillClass,
                         'show_url' => route('egresados.show', $item->id),
                     ]);
@@ -1048,37 +1074,24 @@
                     </td>
 
                     <td>
-                      <span class="badge-pill {{ $pillClass }}">{{ $st }}</span>
-                    </td>
-
-                    <td style="text-align:center;">
-                      <div class="action-btns" onclick="event.stopPropagation();">
-                        <button type="button" 
-                            onclick="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}')" 
-                            class="btn-circle-action" 
-                            title="Ver en Panel de Detalle">
-                          <i class="fa-solid fa-eye"></i>
-                        </button>
-                        <button type="button" 
-                            @click.stop="openModalPerfilEgresado = true; selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalPerfilEgresado({{ $jsonData }});" 
-                            class="btn-circle-action" 
-                            title="Ver Perfil Completo (Ventana Flotante)">
-                          <i class="fa-solid fa-id-card text-emerald-700"></i>
-                        </button>
-                        <button type="button" 
-                            @click.stop="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}'); populateModalEditar({{ $jsonData }}); openModalEditar = true;" 
-                            class="btn-circle-action" 
-                            style="color:#d97706;" 
-                            title="Editar Datos del Egresado">
-                          <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
+                      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+                        <span class="badge-pill {{ $pillClass }}">{{ $st }}</span>
+                        @if($isApprenticeActive)
+                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#166534; background:#dcfce7; padding:2px 7px; border-radius:9999px;">
+                            <span style="width:5px; height:5px; border-radius:50%; background:#22c55e;"></span> Activo
+                          </span>
+                        @else
+                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#991b1b; background:#fee2e2; padding:2px 7px; border-radius:9999px;">
+                            <span style="width:5px; height:5px; border-radius:50%; background:#ef4444;"></span> Inactivo
+                          </span>
+                        @endif
                       </div>
                     </td>
 
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="5" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
+                    <td colspan="4" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
                       <i class="fa-solid fa-user-slash" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
                       <div style="font-weight:700; font-size:15px; color:var(--ink);">No se encontraron egresados</div>
                       <p style="font-size:12px; margin-top:4px;">Prueba cambiando los términos de búsqueda o filtros.</p>
@@ -1106,7 +1119,10 @@
               <span class="pulse-dot"></span>
               Detalle del Egresado
             </span>
-            <span id="detailStatusPill" class="badge-pill status-green">CERTIFICADO</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span id="detailActivePill" class="badge-pill status-green">Activo</span>
+              <span id="detailStatusPill" class="badge-pill status-green">CERTIFICADO</span>
+            </div>
           </div>
 
           <!-- Hero del Usuario Seleccionado -->
@@ -1174,6 +1190,15 @@
             <span>Registrar Seguimiento</span>
           </button>
 
+          <!-- Botón Activar / Desactivar Egresado en Panel -->
+          <form id="detailToggleForm" action="" method="POST" style="margin-top:8px;">
+            @csrf
+            <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
+              <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
+              <span id="detailToggleText">Desactivar Egresado</span>
+            </button>
+          </form>
+
         </div>
 
       </div>
@@ -1215,6 +1240,40 @@
             pill.className = 'badge-pill ' + (data.pill_class || 'status-green');
         }
 
+        const activePill = document.getElementById('detailActivePill');
+        if (activePill) {
+            if (data.is_active) {
+                activePill.innerText = '🟢 Activo';
+                activePill.className = 'badge-pill status-green';
+            } else {
+                activePill.innerText = '🔴 Inactivo';
+                activePill.className = 'badge-pill status-red';
+            }
+        }
+
+        const toggleForm = document.getElementById('detailToggleForm');
+        const toggleBtn = document.getElementById('detailToggleBtn');
+        const toggleIcon = document.getElementById('detailToggleIcon');
+        const toggleText = document.getElementById('detailToggleText');
+
+        if (toggleForm && data.id) {
+            toggleForm.action = '{{ url("egresados") }}/' + data.id + '/toggle-status';
+            toggleForm.onsubmit = function() {
+                return confirm(data.is_active ? 
+                    '¿Deseas desactivar a ' + (data.name || 'este egresado') + '? Pasará a estado inactivo en SIGE.' : 
+                    '¿Deseas activar a ' + (data.name || 'este egresado') + '? Volverá a estar habilitado en SIGE.');
+            };
+            if (data.is_active) {
+                toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border border-rose-200 text-rose-700 hover:bg-rose-50 transition cursor-pointer';
+                toggleIcon.className = 'fa-solid fa-user-xmark';
+                toggleText.innerText = 'Desactivar Egresado';
+            } else {
+                toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition cursor-pointer';
+                toggleIcon.className = 'fa-solid fa-user-check';
+                toggleText.innerText = 'Activar Egresado';
+            }
+        }
+
         // Sincronizar ID y Nombre en el modal de seguimiento
         const segInput = document.getElementById('seguimiento_egresado_id');
         if (segInput && data.id) {
@@ -1224,10 +1283,21 @@
         if (segLabel && data.name) {
             segLabel.innerText = data.name;
         }
+        const segDoc = document.getElementById('seguimiento_egresado_doc_label');
+        if (segDoc && data.doc) {
+            segDoc.innerHTML = '<i class="fa-regular fa-id-card mr-1 text-[#39A900]"></i> ' + data.doc;
+        }
+        const segFicha = document.getElementById('seguimiento_egresado_ficha_label');
+        if (segFicha && data.ficha) {
+            segFicha.innerText = 'Ficha: ' + data.ficha;
+        }
 
-        // Sincronizar automáticamente la ventana flotante de perfil
+        // Sincronizar automáticamente la ventana flotante de perfil y el modal de edición
         if (typeof populateModalPerfilEgresado === 'function') {
             populateModalPerfilEgresado(data);
+        }
+        if (typeof populateModalEditar === 'function') {
+            populateModalEditar(data);
         }
     }
 

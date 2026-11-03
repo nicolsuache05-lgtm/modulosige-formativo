@@ -156,52 +156,12 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
-        <a href="{{ route('egresados.dashboard') }}" class="user-menu-item {{ Route::is('egresados.dashboard') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-emerald-icon">
-            <i class="fa-solid fa-gauge-high"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Panel de Control</div>
-            <div class="menu-item-desc">Métricas y resumen general</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.index') }}" class="user-menu-item {{ Route::is('egresados.index') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-blue-icon">
-            <i class="fa-solid fa-user-graduate"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Directorio de Egresados</div>
-            <div class="menu-item-desc">Gestión y seguimiento laboral</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.instructores') }}" class="user-menu-item {{ Route::is('egresados.instructores') ? 'active' : '' }}">
-          <div class="menu-item-icon bg-purple-icon">
-            <i class="fa-solid fa-chalkboard-user"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Gestión de Instructores</div>
-            <div class="menu-item-desc">Acompañamiento y fichas</div>
-          </div>
-        </a>
-
-        <a href="{{ route('egresados.welcome') }}" class="user-menu-item">
-          <div class="menu-item-icon bg-amber-icon">
-            <i class="fa-solid fa-globe"></i>
-          </div>
-          <div class="menu-item-content">
-            <div class="menu-item-title">Portal Público Egresados</div>
-            <div class="menu-item-desc">Vista pública institucional</div>
-          </div>
-        </a>
-
         <a href="{{ route('home') }}" class="user-menu-item">
           <div class="menu-item-icon bg-blue-icon">
             <i class="fa-solid fa-layer-group"></i>
           </div>
           <div class="menu-item-content">
-            <div class="menu-item-title">Portal ERP Principal</div>
+            <div class="menu-item-title">Panel ERP Principal</div>
             <div class="menu-item-desc">Menú general de SENA Empresa</div>
           </div>
         </a>
@@ -226,6 +186,59 @@
 </div>
 
 <style>
+  /* ================= VIEW TRANSITIONS & TRANSICIONES SUAVES ================= */
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: 160ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeOut;
+  }
+  ::view-transition-new(root) {
+    animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeIn;
+  }
+
+  @keyframes sigeFadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-4px); }
+  }
+
+  @keyframes sigeFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mantener el sidebar y topbar firmes durante la navegación sin saltos */
+  .sidebar {
+    view-transition-name: sige-sidebar;
+  }
+  .topbar {
+    view-transition-name: sige-topbar;
+  }
+
+  /* Animación de entrada suave del contenido principal */
+  .content, .content-area {
+    animation: sigePageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes sigePageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Estilo durante la salida suave al hacer clic en un módulo */
+  .sige-page-exit {
+    opacity: 0 !important;
+    transform: translateY(-4px) !important;
+    transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
   /* ================= ESTILOS DE TOPBAR RIGHT & MENÚS PLEGABLES ================= */
   .topbar-right-wrapper {
     display: flex;
@@ -282,7 +295,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Poppins', 'Nunito', sans-serif;
     font-weight: 700;
     font-size: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
@@ -566,6 +579,234 @@
   .user-chevron-icon.rotate {
     transform: rotate(180deg);
   }
+
+  /* ================= ESTILOS MODAL DETALLE NOTIFICACIÓN (SENA ERP) ================= */
+  .notif-item {
+    position: relative;
+    transition: all 0.18s ease;
+  }
+  .notif-item:hover {
+    background: #f0fdf4 !important;
+    transform: translateX(3px);
+  }
+  .notif-item:hover .notif-text {
+    color: #00131E;
+  }
+
+  .sige-notif-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 19, 30, 0.72);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 999999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 50px 16px 30px 16px;
+    overflow-y: auto;
+    animation: sigeNotifFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes sigeNotifFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .sige-notif-modal-card {
+    background: #ffffff;
+    border-radius: 20px;
+    max-width: 580px;
+    width: 100%;
+    box-shadow: 0 25px 65px rgba(0, 19, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    animation: sigeNotifScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    margin-bottom: 24px;
+  }
+
+  @keyframes sigeNotifScaleUp {
+    from {
+      opacity: 0;
+      transform: translateY(-16px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .sige-notif-modal-header {
+    background: linear-gradient(135deg, #00131E 0%, #002235 100%);
+    border-bottom: 3px solid #39A900;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ffffff;
+  }
+
+  .sige-notif-modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(57, 169, 0, 0.2);
+    border: 1px solid rgba(98, 227, 29, 0.4);
+    color: #62E31D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+
+  .sige-notif-pill {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(98, 227, 29, 0.2);
+    color: #62E31D;
+    border: 1px solid rgba(98, 227, 29, 0.35);
+    margin-bottom: 3px;
+  }
+
+  .sige-notif-modal-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.25;
+    font-family: 'Poppins', 'Nunito', sans-serif;
+  }
+
+  .sige-notif-close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-size: 14px;
+  }
+  .sige-notif-close-btn:hover {
+    background: rgba(239, 68, 68, 0.85);
+    color: #fff;
+    transform: rotate(90deg);
+  }
+
+  .sige-notif-modal-body {
+    padding: 20px 22px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+
+  .sige-notif-summary-box {
+    background: #f8faf9;
+    border: 1px solid #e2e8e4;
+    border-left: 4px solid #39A900;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .sige-notif-grid-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 580px) {
+    .sige-notif-grid-fields {
+      grid-template-columns: 1fr;
+    }
+    .sige-notif-modal-backdrop {
+      padding-top: 20px;
+    }
+  }
+
+  .sige-notif-field-card {
+    background: #ffffff;
+    border: 1px solid #e6ece8;
+    border-radius: 10px;
+    padding: 9px 12px;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-field-card:hover {
+    border-color: #39A900;
+    box-shadow: 0 2px 8px rgba(57, 169, 0, 0.1);
+  }
+  .sige-notif-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 2px;
+  }
+  .sige-notif-field-value {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #00131E;
+    word-break: break-word;
+  }
+
+  .sige-notif-modal-footer {
+    background: #f8faf9;
+    border-top: 1px solid #e6ece8;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .sige-notif-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #334155;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-secondary:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .sige-notif-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+    border: 1px solid #39A900;
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-primary:hover {
+    background: linear-gradient(135deg, #2e8b00 0%, #226700 100%);
+    box-shadow: 0 6px 16px rgba(57, 169, 0, 0.4);
+    color: #ffffff;
+  }
 </style>
 
 <script>
@@ -646,6 +887,215 @@
     }
   }
 
+  // ================= DICCIONARIO DE DETALLES DE NOTIFICACIONES =================
+  const sigeNotificacionesData = {
+    'notif-1': {
+      categoria: 'Actualización Laboral',
+      icon: 'fa-solid fa-briefcase',
+      iconColor: '#0d6928',
+      iconBg: '#eaf7ee',
+      tiempo: 'Hace 20 min',
+      titulo: 'Actualización de Situación Laboral',
+      resumen: 'El egresado Juan Pérez ha registrado oportunamente su nuevo estado ocupacional dentro de la plataforma.',
+      campos: [
+        { etiqueta: 'Egresado', valor: 'Juan Pérez' },
+        { etiqueta: 'Documento', valor: 'CC 1.098.765.432' },
+        { etiqueta: 'Programa Formativo', valor: 'Análisis y Desarrollo de Software (ADSO)' },
+        { etiqueta: 'Ficha SOFIA Plus', valor: 'Ficha 2670142 - SENA CEFA' },
+        { etiqueta: 'Nuevo Estado', valor: 'Empleado (Término Indefinido)' },
+        { etiqueta: 'Empresa / Entidad', valor: 'Tech Solutions Colombia S.A.S.' },
+        { etiqueta: 'Cargo Desempeñado', valor: 'Desarrollador Full Stack Junior' },
+        { etiqueta: 'Rango Salarial', valor: '$2.800.000 COP' },
+        { etiqueta: 'Fecha de Reporte', valor: 'Hoy, hace 20 minutos' },
+        { etiqueta: 'Validación', valor: 'Información registrada y verificada' }
+      ],
+      accionTexto: 'Ver Directorio de Egresados',
+      accionUrl: '{{ route("egresados.index") }}',
+      accionIcon: 'fa-solid fa-user-graduate'
+    },
+    'notif-2': {
+      categoria: 'Encuesta Institucional',
+      icon: 'fa-solid fa-clipboard-check',
+      iconColor: '#1e40af',
+      iconBg: '#eff6ff',
+      tiempo: 'Hace 3 horas',
+      titulo: 'Cierre de Encuesta "Seguimiento laboral 2026-1"',
+      resumen: 'La encuesta de seguimiento ocupacional 2026-1 culminó con una destacada participación del 85% de la muestra convocada.',
+      campos: [
+        { etiqueta: 'Encuesta', valor: 'Seguimiento laboral 2026-1' },
+        { etiqueta: 'Población Destinataria', valor: 'Egresados titulados 2024 - 2025' },
+        { etiqueta: 'Participación Lograda', valor: '85.2% (426 / 500 respuestas válidas)' },
+        { etiqueta: 'Tasa de Vinculación', valor: '78% de egresados activos laboralmente' },
+        { etiqueta: 'Estado de Encuesta', valor: 'Cerrada oficialmente' },
+        { etiqueta: 'Hora de Cierre', valor: 'Hoy, 10:30 AM' },
+        { etiqueta: 'Responsable', valor: 'Coordinación Académica & Sistema SIGE' }
+      ],
+      accionTexto: 'Ver Reporte de Encuestas',
+      accionUrl: '{{ route("egresados.encuestas") }}',
+      accionIcon: 'fa-solid fa-chart-pie'
+    },
+    'notif-3': {
+      categoria: 'Evento Institucional',
+      icon: 'fa-solid fa-calendar-check',
+      iconColor: '#b45309',
+      iconBg: '#fef3c7',
+      tiempo: 'Ayer',
+      titulo: 'Feria Laboral Institucional 2026',
+      resumen: 'Convocatoria oficial para egresados SENA orientada a vinculación directa y ruedas de empleo con empresas aliadas.',
+      campos: [
+        { etiqueta: 'Nombre del Evento', valor: 'Feria Laboral 2026' },
+        { etiqueta: 'Código', valor: 'EVT-012' },
+        { etiqueta: 'Tipo de Evento', valor: 'Feria laboral y rueda de empleo' },
+        { etiqueta: 'Fecha y Horario', valor: '20 de Octubre de 2026 | 08:00 AM' },
+        { etiqueta: 'Lugar / Sede', valor: 'Auditorio Principal - SENA CEFA' },
+        { etiqueta: 'Aforo / Confirmados', valor: '156 de 200 cupos reservados (78%)' },
+        { etiqueta: 'Empresas Vinculadas', valor: '18 organizaciones aliadas confirmadas' },
+        { etiqueta: 'Coordinador del Evento', valor: 'Coordinación Académica & Egresados' }
+      ],
+      accionTexto: 'Ver Gestión de Eventos',
+      accionUrl: '{{ route("egresados.eventos") }}',
+      accionIcon: 'fa-solid fa-calendar-days'
+    },
+    'notif-4': {
+      categoria: 'Registro de Egresados',
+      icon: 'fa-solid fa-user-plus',
+      iconColor: '#6b21a8',
+      iconBg: '#f3e8ff',
+      tiempo: 'Hace 2 días',
+      titulo: '15 Nuevos Egresados Registrados en el Portal',
+      resumen: 'Quince egresados completaron su vinculación autónoma y actualización de perfil curricular en la plataforma.',
+      campos: [
+        { etiqueta: 'Periodo de Registro', valor: 'Mes en curso (Octubre 2026)' },
+        { etiqueta: 'Nuevos Registrados', valor: '15 egresados activos' },
+        { etiqueta: 'Programas Académicos', valor: 'ADSO (8), Gestión Empresarial (4), Contabilidad (3)' },
+        { etiqueta: 'Hojas de Vida', valor: '12 cargadas y estructuradas al 100%' },
+        { etiqueta: 'Verificación Documental', valor: 'Certificación SOFIA Plus confirmada' },
+        { etiqueta: 'Próximo Paso', valor: 'Asignación a bolsa de empleo e instructores' }
+      ],
+      accionTexto: 'Ver Directorio de Egresados',
+      accionUrl: '{{ route("egresados.index") }}',
+      accionIcon: 'fa-solid fa-users'
+    }
+  };
+
+  @if(!empty($cacheInvitaciones))
+    @foreach($cacheInvitaciones as $invId => $inv)
+      sigeNotificacionesData['inv-{{ $invId }}'] = {
+        categoria: 'Invitación a Evento Institucional',
+        icon: 'fa-solid fa-envelope-circle-check',
+        iconColor: '#059669',
+        iconBg: '#eaf7ee',
+        tiempo: '{{ $inv["fecha_envio"] ?? "Hoy" }}',
+        titulo: 'Invitación Enviada: {{ addslashes($inv["title"] ?? "Evento") }}',
+        resumen: 'Se ha emitido y enviado satisfactoriamente la invitación masiva y enlace de registro para el evento institucional.',
+        campos: [
+          { etiqueta: 'Evento Institucional', valor: '{{ addslashes($inv["title"] ?? "Evento Institucional") }}' },
+          { etiqueta: 'Código Identificador', valor: '{{ $invId }}' },
+          { etiqueta: 'Programa Dirigido', valor: '{{ addslashes($inv["program"] ?? "Egresados CEFA") }}' },
+          { etiqueta: 'Fecha Programada', valor: '{{ addslashes($inv["date"] ?? "14/10/2026") }} | {{ addslashes($inv["time"] ?? "01:22 PM") }}' },
+          { etiqueta: 'Lugar / Instalación', valor: '{{ addslashes($inv["location"] ?? "CEFA") }}' },
+          { etiqueta: 'Canal de Envío', valor: 'Correo electrónico y Dashboard de Egresados' },
+          { etiqueta: 'Estado de Envío', valor: 'Completado con éxito' }
+        ],
+        accionTexto: 'Ir al Módulo de Eventos',
+        accionUrl: '{{ route("egresados.eventos") }}',
+        accionIcon: 'fa-solid fa-calendar-check'
+      };
+    @endforeach
+  @endif
+
+  // Abrir Modal de Detalle de Notificación
+  function abrirDetalleNotificacion(notifKey, element) {
+    if (element) {
+      element.classList.remove('unread');
+      element.classList.add('read');
+      updateUnreadNotificationCount();
+    }
+
+    const notifMenu = document.getElementById('notifDropdownMenu');
+    if (notifMenu) {
+      notifMenu.style.display = 'none';
+    }
+
+    const notif = sigeNotificacionesData[notifKey];
+    if (!notif) return;
+
+    const modalHeaderIcon = document.getElementById('modalNotifHeaderIcon');
+    if (modalHeaderIcon) {
+      modalHeaderIcon.innerHTML = `<i class="${notif.icon}"></i>`;
+      modalHeaderIcon.style.background = notif.iconBg;
+      modalHeaderIcon.style.color = notif.iconColor;
+      modalHeaderIcon.style.borderColor = notif.iconColor + '40';
+    }
+
+    const badgeElem = document.getElementById('modalNotifBadge');
+    if (badgeElem) {
+      badgeElem.textContent = notif.categoria;
+    }
+
+    const tituloElem = document.getElementById('modalNotifTitulo');
+    if (tituloElem) {
+      tituloElem.textContent = notif.titulo;
+    }
+
+    const tiempoElem = document.getElementById('modalNotifTiempo');
+    if (tiempoElem) {
+      tiempoElem.innerHTML = `<i class="fa-regular fa-clock"></i> <span>${notif.tiempo}</span>`;
+    }
+
+    const resumenElem = document.getElementById('modalNotifResumen');
+    if (resumenElem) {
+      resumenElem.textContent = notif.resumen;
+    }
+
+    const gridElem = document.getElementById('modalNotifGridCampos');
+    if (gridElem) {
+      gridElem.innerHTML = '';
+      if (notif.campos && notif.campos.length > 0) {
+        notif.campos.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'sige-notif-field-card';
+          card.innerHTML = `
+            <div class="sige-notif-field-label">${c.etiqueta}</div>
+            <div class="sige-notif-field-value">${c.valor}</div>
+          `;
+          gridElem.appendChild(card);
+        });
+      }
+    }
+
+    const btnAccion = document.getElementById('modalNotifBtnAccion');
+    const btnIcon = document.getElementById('modalNotifBtnIcon');
+    const btnTexto = document.getElementById('modalNotifBtnTexto');
+    if (btnAccion && notif.accionUrl) {
+      btnAccion.href = notif.accionUrl;
+      btnAccion.style.display = 'inline-flex';
+      if (btnTexto) btnTexto.textContent = notif.accionTexto || 'Ver en el Módulo';
+      if (btnIcon && notif.accionIcon) {
+        btnIcon.className = notif.accionIcon;
+      }
+    } else if (btnAccion) {
+      btnAccion.style.display = 'none';
+    }
+
+    const modal = document.getElementById('modalDetalleNotificacion');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function cerrarDetalleNotificacion(event) {
+    if (event && event.target && event.target.id !== 'modalDetalleNotificacion' && !event.target.closest('.sige-notif-close-btn') && !event.target.closest('.sige-notif-btn-secondary')) {
+      return;
+    }
+    const modal = document.getElementById('modalDetalleNotificacion');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
   // Cerrar menús al hacer click fuera o presionar Escape
   document.addEventListener('click', function(e) {
     const userMenu = document.getElementById('userDropdownMenu');
@@ -666,6 +1116,11 @@
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      const modal = document.getElementById('modalDetalleNotificacion');
+      if (modal && modal.style.display === 'flex') {
+        cerrarDetalleNotificacion();
+        return;
+      }
       const userMenu = document.getElementById('userDropdownMenu');
       const notifMenu = document.getElementById('notifDropdownMenu');
       const chevron = document.getElementById('userChevronIcon');
@@ -673,5 +1128,45 @@
       if (notifMenu) notifMenu.style.display = 'none';
       if (chevron) chevron.classList.remove('rotate');
     }
+  });
+  // ================= TRANSICIÓN FLUIDA ENTRE MÓDULOS =================
+  document.addEventListener('DOMContentLoaded', function() {
+    // 0. Sincronizar contador inicial de notificaciones
+    updateUnreadNotificationCount();
+
+    // 1. Recordar y mantener la posición de scroll del sidebar para evitar saltos
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      const savedScroll = sessionStorage.getItem('sige_superadmin_sidebar_scroll');
+      if (savedScroll !== null) {
+        sidebar.scrollTop = parseInt(savedScroll, 10);
+      }
+      sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sige_superadmin_sidebar_scroll', sidebar.scrollTop);
+      }, { passive: true });
+    }
+
+    // 2. Interceptar clics en los enlaces del menú para salida suave
+    const moduleLinks = document.querySelectorAll('.sidebar nav a, .user-menu-item, .portal-link-btn');
+    moduleLinks.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        // Ignorar enlaces vacíos, anclas, javascript o enlaces que se abran en nueva pestaña
+        if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
+        // Si ya está activo en esta página, no hacer nada
+        if (this.classList.contains('active')) return;
+        // Respetar combinaciones de teclas para abrir en pestaña nueva
+        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+        const mainContent = document.querySelector('.content') || document.querySelector('.content-area') || document.querySelector('.main');
+        if (mainContent) {
+          e.preventDefault();
+          mainContent.classList.add('sige-page-exit');
+          setTimeout(function() {
+            window.location.href = href;
+          }, 140);
+        }
+      });
+    });
   });
 </script>
