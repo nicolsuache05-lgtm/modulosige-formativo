@@ -42,31 +42,30 @@
 <body class="min-h-screen bg-[#F4F7F6]">
 
     <!-- Header / Navbar Minimal -->
-    <header class="bg-[#001A29] text-white py-4 px-6 sm:px-10 shadow-md border-b border-[#39A900]/30 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('egresados.superadmin.reportes.index') }}" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" title="Volver a Reportes">
-                    <i class="fa-solid fa-arrow-left text-sm"></i>
-                </a>
-                <div>
-                    <h1 class="font-editorial text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                        <span>Análisis Gráfico</span>
-                        <span class="text-xs bg-[#39A900] text-white px-2 py-0.5 rounded-full font-sans font-bold uppercase">{{ $id }}</span>
-                    </h1>
-                    <p class="text-[11px] text-green-200/80">Visualización de métricas e indicadores estadísticos del reporte</p>
-                </div>
+    <header class="topbar">
+        <div class="topbar-left">
+            <a href="{{ route('egresados.superadmin.reportes.index') }}" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" title="Volver a Reportes">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="font-editorial text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                    <span>Análisis Gráfico</span>
+                    <span class="text-xs bg-[#39A900] text-white px-2 py-0.5 rounded-full font-sans font-bold uppercase">{{ $id }}</span>
+                </h1>
+                <p class="text-[11px] text-green-200/80">Visualización de métricas e indicadores estadísticos del reporte</p>
             </div>
+        </div>
 
-            <div class="flex items-center gap-3">
-                <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $id, 'formato' => 'excel']) }}" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-file-excel text-xs"></i>
-                    <span class="hidden sm:inline">Exportar Excel</span>
-                </a>
-                <a href="{{ route('egresados.superadmin.reportes.index') }}" class="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-table-list text-xs"></i>
-                    <span class="hidden sm:inline">Volver a Tabla</span>
-                </a>
-            </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $id, 'formato' => 'excel']) }}" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-file-excel text-xs"></i>
+                <span class="hidden sm:inline">Exportar Excel</span>
+            </a>
+            <a href="{{ route('egresados.superadmin.reportes.index') }}" class="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+                <i class="fa-solid fa-table-list text-xs"></i>
+                <span class="hidden sm:inline">Volver a Tabla</span>
+            </a>
+            @include('egresados::superadmin.partials._topbar_right')
         </div>
     </header>
 

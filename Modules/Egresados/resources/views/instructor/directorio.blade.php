@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <title>SIGE · Gestión de Egresados — Instructor CEFA La Angostura</title>
 
     <!-- Favicon -->
@@ -780,28 +781,7 @@
       </a>
     </nav>
 
-    <!-- Perfil del Instructor en la parte inferior del sidebar -->
-    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
-      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
-        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
-          IN
-        </div>
-        <div style="overflow:hidden;">
-          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
-            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
-          </div>
-          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
-        @csrf
-        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      </form>
-    </div>
+
   </aside>
 
   <!-- ============================================== -->
@@ -817,320 +797,398 @@
     </div>
 
     <!-- Main Content -->
-    <div class="content">
+    <div class="content space-y-6">
 
-      <!-- Header de la Página -->
-      <div class="page-head">
+      <!-- Header de la Página y Botón Nuevo Egresado -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="page-title">Gestión de <span>Egresados</span></h1>
-          <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
+          <h1 class="text-2xl sm:text-3xl font-bold font-editorial text-gray-900 tracking-tight">
+            Gestión de <span class="text-[#39A900]">Egresados</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-gray-500 mt-1">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Botón Nuevo Egresado (Verde Principal Institucional SENA) -->
-          <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-0">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <button @click="openModal = true" 
+                  type="button" 
+                  class="inline-flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
+            <i class="fa-solid fa-plus mr-2 text-xs"></i>
             <span>Nuevo Egresado</span>
           </button>
         </div>
       </div>
 
-      <!-- Tarjetas de Estadísticas Superiores (Estilo Inicio) -->
-      <div class="stats-grid">
+      <!-- 1. Estadísticas Superiores (4 Cards · Paleta SENA ERP) -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         
-        <!-- Stat 1: Egresados Inactivos -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">Egresados Inactivos</span>
-            <div class="stat-icon red">
-              <i class="fa-solid fa-user-xmark"></i>
-            </div>
-          </div>
-          <div class="stat-num">{{ number_format($totalInactivos ?? 0) }}</div>
-          <span class="stat-pill red">
-            <i class="fa-solid fa-ban"></i> Desactivados en SIGE
-          </span>
-        </div>
-
-        <!-- Stat 2: Egresados Activos -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">Egresados Activos</span>
-            <div class="stat-icon green">
-              <i class="fa-solid fa-user-check"></i>
-            </div>
-          </div>
-          <div class="stat-num">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
-          <span class="stat-pill green">
-            <i class="fa-solid fa-circle-check"></i> Habilitados en SIGE
-          </span>
-        </div>
-
-        <!-- Stat 3: Total Registrados -->
-        <div class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">Egresados Registrados</span>
-            <div class="stat-icon blue">
+        <!-- Metric 1: Total Egresados -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Total Egresados</span>
+            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
               <i class="fa-solid fa-user-graduate"></i>
-            </div>
+            </span>
           </div>
-          <div class="stat-num">{{ number_format($totalEgresados) }}</div>
-          <span class="stat-pill blue">
-            <i class="fa-solid fa-users"></i> Base general
-          </span>
+          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalEgresados) }}</div>
+          <div class="mt-2 flex items-center gap-1.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+              En base de datos
+            </span>
+          </div>
+        </div>
+
+        <!-- Metric 2: Egresados Activos -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Egresados Activos</span>
+            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+              <i class="fa-solid fa-user-check"></i>
+            </span>
+          </div>
+          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
+          <div class="mt-2 flex items-center gap-1.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-1 animate-pulse"></span>
+              Habilitados en SIGE
+            </span>
+          </div>
+        </div>
+
+        <!-- Metric 3: Egresados Inactivos -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Egresados Inactivos</span>
+            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+              <i class="fa-solid fa-user-xmark"></i>
+            </span>
+          </div>
+          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalInactivos ?? 0) }}</div>
+          <div class="mt-2 flex items-center gap-1.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-700 border border-gray-200">
+              Desactivados
+            </span>
+          </div>
+        </div>
+
+        <!-- Metric 4: Programas SENA -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Programas</span>
+            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </span>
+          </div>
+          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ $programs->count() ?: 4 }}</div>
+          <div class="mt-2 flex items-center gap-1.5">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+              Programas CEFA
+            </span>
+          </div>
         </div>
 
       </div>
 
-      <!-- Grilla Principal: Tabla (2) + Panel de Detalle Rápido (1) -->
-      <div class="main-grid">
+      <!-- Grilla Principal (Tabla 2/3 + Detalle Lateral 1/3) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
-        <!-- Columna Izquierda: Tabla -->
-        <div class="table-card">
+        <!-- Columna Izquierda: Filtros y Tabla de Egresados (2/3) -->
+        <div class="lg:col-span-2 space-y-4">
           
-          <!-- Barra de Búsqueda y Filtros -->
-          <form action="{{ route('egresados.instructor.directorio') }}" method="GET" class="table-toolbar">
-            <div class="search-box">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por documento o nombre...">
+          <!-- Card de Filtros Interactivos -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3.5">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-50">
+              <span class="text-xs font-bold text-[#00131E] uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders text-[#39A900]"></i>
+                Filtros de Búsqueda Rápida
+              </span>
+              <span class="text-[11px] text-gray-400">Filtrado en tiempo real</span>
             </div>
 
-            <select name="apprentice_status" onchange="this.form.submit()" class="filter-select">
-              <option value="TODOS" {{ request('apprentice_status', 'TODOS') == 'TODOS' ? 'selected' : '' }}>Todos los Egresados (Módulo)</option>
-              <option value="ACTIVOS" {{ request('apprentice_status') == 'ACTIVOS' ? 'selected' : '' }}>🟢 Egresados Activos</option>
-              <option value="INACTIVOS" {{ request('apprentice_status') == 'INACTIVOS' ? 'selected' : '' }}>🔴 Egresados Inactivos</option>
-              <option value="CERTIFICADO" {{ request('apprentice_status') == 'CERTIFICADO' ? 'selected' : '' }}>🎓 Certificados</option>
-              <option value="EN FORMACIÓN" {{ request('apprentice_status') == 'EN FORMACIÓN' ? 'selected' : '' }}>En Formación</option>
-              <option value="CONDICIONADO" {{ request('apprentice_status') == 'CONDICIONADO' ? 'selected' : '' }}>Condicionado</option>
-              <option value="INDUCCIÓN" {{ request('apprentice_status') == 'INDUCCIÓN' ? 'selected' : '' }}>Inducción</option>
-              <option value="CANCELADO" {{ request('apprentice_status') == 'CANCELADO' ? 'selected' : '' }}>Cancelado</option>
-              <option value="RETIRO VOLUNTARIO" {{ request('apprentice_status') == 'RETIRO VOLUNTARIO' ? 'selected' : '' }}>Retiro Voluntario</option>
-            </select>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Programa</label>
+                <select id="filterPrograma" onchange="filterDirectorioLive()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                  <option value="">Todos los programas</option>
+                  @foreach($programs as $prog)
+                    <option value="{{ mb_strtoupper($prog->name) }}" {{ request('programa') == $prog->name ? 'selected' : '' }}>{{ $prog->name }}</option>
+                  @endforeach
+                </select>
+              </div>
 
-            <button type="submit" class="btn-filter">
-              Filtrar
-            </button>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Estado</label>
+                <select id="filterEstado" onchange="filterDirectorioLive()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                  <option value="">Todos los estados</option>
+                  <option value="ACTIVO">🟢 Activos en SIGE</option>
+                  <option value="INACTIVO">🔴 Inactivos en SIGE</option>
+                  <option value="CERTIFICADO">🎓 Certificados</option>
+                  <option value="EN FORMACIÓN">En Formación</option>
+                  <option value="CONDICIONADO">Condicionado</option>
+                  <option value="INDUCCIÓN">Inducción</option>
+                  <option value="CANCELADO">Cancelado</option>
+                  <option value="RETIRO VOLUNTARIO">Retiro Voluntario</option>
+                </select>
+              </div>
 
-            @if(request('search') || (request('apprentice_status') && request('apprentice_status') !== 'TODOS'))
-              <a href="{{ route('egresados.instructor.directorio') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar">
-                <i class="fa-solid fa-xmark"></i>
-              </a>
-            @endif
-          </form>
-
-          <!-- Contenido de Tabla -->
-          <div style="overflow-x: auto;">
-            <table class="egresados-table">
-              <thead>
-                <tr>
-                  <th>Documento</th>
-                  <th>Egresado(a)</th>
-                  <th>Programa & Ficha</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($egresados as $index => $item)
-                  @php
-                    $person = $item->person;
-                    $course = $item->course;
-                    $program = $course ? $course->program : null;
-                    $fullName = $person ? ($person->first_name . ' ' . $person->first_last_name . ' ' . ($person->second_last_name ?? '')) : 'Aprendiz #' . $item->id;
-                    
-                    // Iniciales
-                    $words = explode(' ', trim($fullName));
-                    $initials = '';
-                    foreach(array_slice($words, 0, 2) as $w) {
-                        if (!empty($w)) $initials .= mb_strtoupper(mb_substr($w, 0, 1));
-                    }
-
-                    // Clases de píldora
-                    $st = $item->apprentice_status ?? 'CERTIFICADO';
-                    $pillClass = 'status-green';
-                    if(in_array($st, ['EN FORMACIÓN', 'INDUCCIÓN'])) $pillClass = 'status-blue';
-                    elseif(in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO'])) $pillClass = 'status-red';
-                    elseif($st === 'CONDICIONADO') $pillClass = 'status-amber';
-
-                    // Extraer valores limpios para campos de edición
-                    $docRaw = ($person && $person->document_number) ? (string)$person->document_number : '';
-                    $emailRaw = ($person && ($person->personal_email || $person->misena_email)) ? ($person->personal_email ?: $person->misena_email) : '';
-                    $phoneRaw = ($person && ($person->telephone1 || $person->telephone2)) ? (string)($person->telephone1 ?: $person->telephone2) : '';
-                    $progRaw = ($program && $program->name) ? $program->name : '';
-                    $codeRaw = ($course && $course->code) ? (string)$course->code : '';
-                    $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
-
-                    // Serializar datos para JavaScript
-                    $jsonData = json_encode([
-                        'id' => $item->id,
-                        'name' => $fullName,
-                        'initials' => $initials ?: 'EG',
-                        'document' => $docRaw ?: 'N/A',
-                        'document_raw' => $docRaw,
-                        'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
-                        'email' => $emailRaw ?: 'No registra correo',
-                        'email_raw' => $emailRaw,
-                        'phone' => $phoneRaw ?: 'No registra teléfono',
-                        'phone_raw' => $phoneRaw,
-                        'program' => $progRaw ?: 'Programa de Formación CEFA',
-                        'program_raw' => $progRaw,
-                        'code' => $codeRaw ?: 'N/A',
-                        'code_raw' => $codeRaw,
-                        'status' => $st,
-                        'is_active' => $isApprenticeActive,
-                        'pill_class' => $pillClass,
-                        'show_url' => route('egresados.show', $item->id),
-                    ]);
-                  @endphp
-                  <tr class="egresado-row {{ $index === 0 ? 'selected-row' : '' }}" 
-                      id="row-{{ $item->id }}"
-                      data-json="{{ $jsonData }}"
-                      onclick="selectEgresadoFromElement(this)">
-                    
-                    <td style="font-weight:700; color:var(--forest-deep);">
-                      {{ $person->document_number ?? 'N/A' }}
-                    </td>
-
-                    <td>
-                      <div class="avatar-cell">
-                        <div class="avatar-bubble">{{ $initials ?: 'EG' }}</div>
-                        <div>
-                          <div class="name-main">{{ $fullName }}</div>
-                          <div class="name-email">{{ $person->misena_email ?? $person->personal_email ?? 'Sin correo' }}</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <div style="font-weight:600; color:var(--ink);">{{ $program ? Str::limit($program->name, 26) : 'ADSO' }}</div>
-                      <div style="font-size:11px; color:var(--ink-soft); font-weight:600;">Ficha: {{ $course->code ?? 'N/A' }}</div>
-                    </td>
-
-                    <td>
-                      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
-                        <span class="badge-pill {{ $pillClass }}">{{ $st }}</span>
-                        @if($isApprenticeActive)
-                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#166534; background:#dcfce7; padding:2px 7px; border-radius:9999px;">
-                            <span style="width:5px; height:5px; border-radius:50%; background:#22c55e;"></span> Activo
-                          </span>
-                        @else
-                          <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#991b1b; background:#fee2e2; padding:2px 7px; border-radius:9999px;">
-                            <span style="width:5px; height:5px; border-radius:50%; background:#ef4444;"></span> Inactivo
-                          </span>
-                        @endif
-                      </div>
-                    </td>
-
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="4" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
-                      <i class="fa-solid fa-user-slash" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
-                      <div style="font-weight:700; font-size:15px; color:var(--ink);">No se encontraron egresados</div>
-                      <p style="font-size:12px; margin-top:4px;">Prueba cambiando los términos de búsqueda o filtros.</p>
-                    </td>
-                  </tr>
-                @endforelse
-              </tbody>
-            </table>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Buscar por Documento o Nombre</label>
+                <div class="relative">
+                  <input type="text" id="filterText" onkeyup="filterDirectorioLive()" value="{{ request('search') }}" placeholder="Buscar egresado..." 
+                         class="w-full pl-8 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] outline-none transition">
+                  <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Paginación -->
-          @if($egresados->hasPages())
-            <div class="pagination-wrap">
-              {{ $egresados->withQueryString()->links('egresados::partials.pagination') }}
+          <!-- Card de Tabla Principal -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-[#00131E] flex items-center gap-2">
+                  <i class="fa-solid fa-users text-[#39A900]"></i>
+                  Listado de Egresados Registrados
+                </h3>
+                <p class="text-[11px] text-gray-400 mt-0.5">Haz clic en una fila para ver su desglose o gestionarla</p>
+              </div>
+              <span id="filteredCounter" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+                Mostrando {{ count($egresados) }} egresados
+              </span>
             </div>
-          @endif
+
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-[#FAFCF9] border-b border-gray-100 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
+                    <th class="py-3 px-4">Documento</th>
+                    <th class="py-3 px-4">Egresado(a)</th>
+                    <th class="py-3 px-4">Programa & Ficha</th>
+                    <th class="py-3 px-4">Estado</th>
+                    <th class="py-3 px-4 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="egresadosTableBody" class="divide-y divide-gray-100">
+                  @forelse($egresados as $index => $item)
+                    @php
+                      $person = $item->person;
+                      $course = $item->course;
+                      $program = $course ? $course->program : null;
+                      $fullName = $person ? ($person->first_name . ' ' . $person->first_last_name . ' ' . ($person->second_last_name ?? '')) : 'Aprendiz #' . $item->id;
+                      
+                      $words = explode(' ', trim($fullName));
+                      $initials = '';
+                      foreach(array_slice($words, 0, 2) as $w) {
+                          if (!empty($w)) $initials .= mb_strtoupper(mb_substr($w, 0, 1));
+                      }
+
+                      $st = $item->apprentice_status ?? 'CERTIFICADO';
+                      $pillClass = 'status-green';
+                      if(in_array($st, ['EN FORMACIÓN', 'INDUCCIÓN'])) $pillClass = 'status-blue';
+                      elseif(in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO'])) $pillClass = 'status-red';
+                      elseif($st === 'CONDICIONADO') $pillClass = 'status-amber';
+
+                      $docRaw = ($person && $person->document_number) ? (string)$person->document_number : '';
+                      $emailRaw = ($person && ($person->personal_email || $person->misena_email)) ? ($person->personal_email ?: $person->misena_email) : '';
+                      $phoneRaw = ($person && ($person->telephone1 || $person->telephone2)) ? (string)($person->telephone1 ?: $person->telephone2) : '';
+                      $progRaw = ($program && $program->name) ? $program->name : '';
+                      $codeRaw = ($course && $course->code) ? (string)$course->code : '';
+                      $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
+
+                      $jsonData = json_encode([
+                          'id' => $item->id,
+                          'name' => $fullName,
+                          'initials' => $initials ?: 'EG',
+                          'document' => $docRaw ?: 'N/A',
+                          'document_raw' => $docRaw,
+                          'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
+                          'email' => $emailRaw ?: 'No registra correo',
+                          'email_raw' => $emailRaw,
+                          'phone' => $phoneRaw ?: 'No registra teléfono',
+                          'phone_raw' => $phoneRaw,
+                          'program' => $progRaw ?: 'Programa de Formación CEFA',
+                          'program_raw' => $progRaw,
+                          'code' => $codeRaw ?: 'N/A',
+                          'code_raw' => $codeRaw,
+                          'status' => $st,
+                          'is_active' => $isApprenticeActive,
+                          'pill_class' => $pillClass,
+                          'show_url' => route('egresados.show', $item->id),
+                      ]);
+                    @endphp
+                    <tr class="egresado-row cursor-pointer transition hover:bg-emerald-50/40 {{ $index === 0 ? 'bg-emerald-50/60 font-semibold' : '' }}" 
+                        id="row-{{ $item->id }}"
+                        data-json="{{ $jsonData }}"
+                        data-program="{{ mb_strtoupper($progRaw) }}"
+                        data-status="{{ mb_strtoupper($st) }}"
+                        data-active="{{ $isApprenticeActive ? 'ACTIVO' : 'INACTIVO' }}"
+                        data-search="{{ mb_strtolower($docRaw . ' ' . $fullName . ' ' . $emailRaw . ' ' . $progRaw) }}"
+                        onclick="selectEgresadoFromElement(this)">
+                        
+                        <td class="py-3 px-4 font-bold text-[#00131E]">
+                          {{ $person->document_number ?? 'N/A' }}
+                        </td>
+
+                        <td class="py-3 px-4">
+                          <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#00131E] font-bold text-xs flex items-center justify-center border border-[#BBF7D0] shrink-0">
+                              {{ $initials ?: 'EG' }}
+                            </div>
+                            <div class="overflow-hidden">
+                              <div class="font-bold text-gray-900 leading-tight truncate">{{ $fullName }}</div>
+                              <div class="text-[11px] text-gray-400 truncate">{{ $person->misena_email ?? $person->personal_email ?? 'Sin correo' }}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td class="py-3 px-4">
+                          <div class="font-semibold text-gray-800 leading-tight">{{ $program ? Str::limit($program->name, 28) : 'ADSO' }}</div>
+                          <div class="text-[11px] text-gray-400 font-medium">Ficha: {{ $course->code ?? 'N/A' }}</div>
+                        </td>
+
+                        <td class="py-3 px-4">
+                          <div class="flex flex-col gap-1 items-start">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wide {{ $pillClass === 'status-green' ? 'bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]' : ($pillClass === 'status-blue' ? 'bg-blue-50 text-blue-700 border border-blue-200' : ($pillClass === 'status-red' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200')) }}">
+                              {{ $st }}
+                            </span>
+                            @if($isApprenticeActive)
+                              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[#166534]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#39A900]"></span> Activo
+                              </span>
+                            @else
+                              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inactivo
+                              </span>
+                            @endif
+                          </div>
+                        </td>
+
+                        <td class="py-3 px-4 text-center">
+                          <button type="button" 
+                                  class="w-7 h-7 rounded-lg bg-gray-50 text-gray-500 hover:bg-[#39A900] hover:text-white transition inline-flex items-center justify-center text-xs" 
+                                  title="Ver detalle">
+                            <i class="fa-solid fa-eye"></i>
+                          </button>
+                        </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="5" class="py-12 text-center text-gray-400">
+                        <i class="fa-solid fa-user-slash text-3xl text-gray-300 mb-2 block"></i>
+                        <p class="font-semibold text-gray-700 text-sm">No se encontraron egresados</p>
+                        <p class="text-xs text-gray-400">Prueba cambiando los términos de búsqueda o filtros.</p>
+                      </td>
+                    </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            @if($egresados->hasPages())
+              <div class="p-4 border-t border-gray-100 bg-[#FAFCF9]">
+                {{ $egresados->withQueryString()->links('egresados::partials.pagination') }}
+              </div>
+            @endif
+          </div>
 
         </div>
 
-        <!-- Columna Derecha: Panel de Detalle Rápido (Sticky) -->
-        <div class="detail-card">
-          
-          <div class="detail-head">
-            <span class="detail-head-title">
-              <span class="pulse-dot"></span>
-              Detalle del Egresado
-            </span>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <span id="detailActivePill" class="badge-pill status-green">Activo</span>
-              <span id="detailStatusPill" class="badge-pill status-green">CERTIFICADO</span>
+        <!-- Columna Derecha: Panel de Detalle Rápido (1/3 - Sticky) -->
+        <div class="lg:col-span-1 sticky top-20 space-y-4">
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-4">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#39A900] animate-pulse"></span>
+                Detalle del Egresado
+              </span>
+              <div class="flex items-center gap-1.5">
+                <span id="detailActivePill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">Activo</span>
+                <span id="detailStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">CERTIFICADO</span>
+              </div>
             </div>
+
+            <!-- Hero del Usuario Seleccionado -->
+            <div class="flex items-center gap-3">
+              <div id="detailAvatarLarge" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#001A29] to-[#39A900] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                EG
+              </div>
+              <div class="overflow-hidden">
+                <div id="detailName" class="font-bold text-gray-900 text-base leading-tight truncate">Selecciona un egresado</div>
+                <div id="detailDoc" class="text-xs text-gray-500 mt-0.5">Doc: ---</div>
+                <div id="detailEmail" class="text-xs font-semibold text-[#39A900] truncate mt-0.5">correo@sena.edu.co</div>
+              </div>
+            </div>
+
+            <!-- Bloque Académico -->
+            <div class="bg-gray-50/80 p-3.5 rounded-xl border border-gray-100 space-y-2">
+              <span class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">Información Académica</span>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Programa:</span>
+                <span id="detailProgram" class="font-bold text-gray-800 text-right truncate max-w-[160px]">ADSO</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Código Ficha:</span>
+                <span id="detailCode" class="font-bold text-gray-800">3345643</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Centro Formación:</span>
+                <span class="font-bold text-gray-800">CEFA La Angostura</span>
+              </div>
+            </div>
+
+            <!-- Bloque Contacto -->
+            <div class="bg-gray-50/80 p-3.5 rounded-xl border border-gray-100 space-y-2">
+              <span class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">Información de Contacto</span>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Teléfono:</span>
+                <span id="detailPhone" class="font-bold text-gray-800">300 000 0000</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Tipo Documento:</span>
+                <span id="detailDocType" class="font-bold text-gray-800">Cédula</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium">Estado Ocupacional:</span>
+                <span id="detailStatusText" class="font-bold text-[#39A900]">CERTIFICADO</span>
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="space-y-2 pt-1">
+              <button type="button" 
+                      id="detailFullBtn" 
+                      @click="openModalPerfilEgresado = true; if(window.currentSelectedEgresado) populateModalPerfilEgresado(window.currentSelectedEgresado);" 
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 cursor-pointer">
+                <span>Ver Perfil Completo</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+
+              <button type="button" 
+                      @click="openEditarModal(); openModalEditar = true;" 
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl border border-gray-200 transition cursor-pointer">
+                <i class="fa-solid fa-pen-to-square text-[#39A900]"></i>
+                <span>Editar Datos</span>
+              </button>
+
+              <button type="button" 
+                      @click="openModalSeguimiento = true" 
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EAF7EE] hover:bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-xl border border-[#BBF7D0] transition cursor-pointer">
+                <i class="fa-solid fa-notes-medical"></i>
+                <span>Registrar Seguimiento</span>
+              </button>
+
+              <form id="detailToggleForm" action="" method="POST" onsubmit="event.preventDefault(); openConfirmToggleModal();">
+                @csrf
+                <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
+                  <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
+                  <span id="detailToggleText">Desactivar Egresado</span>
+                </button>
+              </form>
+            </div>
+
           </div>
-
-          <!-- Hero del Usuario Seleccionado -->
-          <div class="detail-user-hero">
-            <div id="detailAvatarLarge" class="detail-avatar-large">EG</div>
-            <div style="overflow:hidden;">
-              <div id="detailName" class="detail-user-name">Selecciona un egresado</div>
-              <div id="detailDoc" class="detail-user-doc">Doc: ---</div>
-              <div id="detailEmail" class="detail-user-email">correo@sena.edu.co</div>
-            </div>
-          </div>
-
-          <!-- Bloque Académico -->
-          <div class="info-box">
-            <span class="info-box-label">Información Académica</span>
-            <div class="info-row">
-              <span class="info-key">Programa:</span>
-              <span id="detailProgram" class="info-val">ADSO</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Código Ficha:</span>
-              <span id="detailCode" class="info-val">3345643</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Centro Formación:</span>
-              <span class="info-val">CEFA La Angostura</span>
-            </div>
-          </div>
-
-          <!-- Bloque Laboral & Contacto -->
-          <div class="info-box">
-            <span class="info-box-label">Información de Contacto</span>
-            <div class="info-row">
-              <span class="info-key">Teléfono:</span>
-              <span id="detailPhone" class="info-val">300 000 0000</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Tipo Documento:</span>
-              <span id="detailDocType" class="info-val">Cédula</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Estado Ocupacional:</span>
-              <span id="detailStatusText" class="info-val" style="color:var(--green-dark);">CERTIFICADO</span>
-            </div>
-          </div>
-
-          <!-- Botones de Acción -->
-          <button type="button" 
-              id="detailFullBtn" 
-              @click="openModalPerfilEgresado = true; if(window.currentSelectedEgresado) populateModalPerfilEgresado(window.currentSelectedEgresado);" 
-              class="btn-cta-detail cursor-pointer">
-            <span>Ver Perfil Completo</span>
-            <i class="fa-solid fa-arrow-right text-xs"></i>
-          </button>
-
-          <button type="button" 
-              @click="openEditarModal(); openModalEditar = true;" 
-              class="btn-edit-action cursor-pointer">
-            <i class="fa-solid fa-pen-to-square"></i>
-            <span>Editar Datos</span>
-          </button>
-
-          <button type="button" @click="openModalSeguimiento = true" class="btn-secondary-action cursor-pointer">
-            <i class="fa-solid fa-notes-medical"></i>
-            <span>Registrar Seguimiento</span>
-          </button>
-
-          <!-- Botón Activar / Desactivar Egresado en Panel -->
-          <form id="detailToggleForm" action="" method="POST" style="margin-top:8px;" onsubmit="event.preventDefault(); openConfirmToggleModal();">
-            @csrf
-            <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
-              <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
-              <span id="detailToggleText">Desactivar Egresado</span>
-            </button>
-          </form>
-
         </div>
 
       </div>
@@ -1141,45 +1199,112 @@
 </div>
 
 <script>
-    // Función interactiva para actualizar el panel de detalles reactivo
+    // Filtrado interactivo en tiempo real sin recargar página
+    function filterDirectorioLive() {
+        const textVal = (document.getElementById('filterText')?.value || '').trim().toLowerCase();
+        const progVal = (document.getElementById('filterPrograma')?.value || '').trim().toUpperCase();
+        const estVal = (document.getElementById('filterEstado')?.value || '').trim().toUpperCase();
+
+        const rows = document.querySelectorAll('.egresado-row');
+        let visibleCount = 0;
+        let firstVisibleRow = null;
+
+        rows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search') || '';
+            const rowProg = row.getAttribute('data-program') || '';
+            const rowStatus = row.getAttribute('data-status') || '';
+            const rowActive = row.getAttribute('data-active') || '';
+
+            let matchText = !textVal || rowSearch.includes(textVal);
+            let matchProg = !progVal || rowProg.includes(progVal);
+            let matchEst = true;
+
+            if (estVal) {
+                if (estVal === 'ACTIVO' || estVal === 'INACTIVO') {
+                    matchEst = (rowActive === estVal);
+                } else {
+                    matchEst = (rowStatus === estVal);
+                }
+            }
+
+            if (matchText && matchProg && matchEst) {
+                row.style.display = '';
+                visibleCount++;
+                if (!firstVisibleRow) firstVisibleRow = row;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const counter = document.getElementById('filteredCounter');
+        if (counter) {
+            counter.innerText = 'Mostrando ' + visibleCount + ' egresados';
+        }
+
+        const currentActive = document.querySelector('.egresado-row.bg-emerald-50\\/60');
+        if (!currentActive || currentActive.style.display === 'none') {
+            if (firstVisibleRow) {
+                selectEgresadoFromElement(firstVisibleRow);
+            }
+        }
+    }
+
+    // Actualizar el panel de detalles reactivo
     function selectEgresado(data, rowId) {
         if (!data) return;
         window.currentSelectedEgresado = data;
 
         // Actualizar fila activa
         document.querySelectorAll('.egresado-row').forEach(row => {
-            row.classList.remove('selected-row');
+            row.classList.remove('bg-emerald-50/60', 'font-semibold', 'selected-row');
         });
         const activeRow = document.getElementById(rowId);
-        if (activeRow) activeRow.classList.add('selected-row');
+        if (activeRow) {
+            activeRow.classList.add('bg-emerald-50/60', 'font-semibold');
+        }
 
         // Actualizar datos del panel derecho
-        document.getElementById('detailAvatarLarge').innerText = data.initials || 'EG';
-        document.getElementById('detailName').innerText = data.name || 'Sin nombre';
-        document.getElementById('detailDoc').innerText = 'Doc: ' + (data.document || 'N/A');
-        document.getElementById('detailEmail').innerText = data.email || 'Sin correo';
+        const avatar = document.getElementById('detailAvatarLarge');
+        if (avatar) avatar.innerText = data.initials || 'EG';
+
+        const name = document.getElementById('detailName');
+        if (name) name.innerText = data.name || 'Sin nombre';
+
+        const doc = document.getElementById('detailDoc');
+        if (doc) doc.innerText = 'Doc: ' + (data.document || 'N/A');
+
+        const email = document.getElementById('detailEmail');
+        if (email) email.innerText = data.email || 'Sin correo';
         
-        document.getElementById('detailProgram').innerText = data.program || 'Sin programa';
-        document.getElementById('detailCode').innerText = data.code || 'N/A';
+        const prog = document.getElementById('detailProgram');
+        if (prog) prog.innerText = data.program || 'Sin programa';
+
+        const code = document.getElementById('detailCode');
+        if (code) code.innerText = data.code || 'N/A';
         
-        document.getElementById('detailPhone').innerText = data.phone || 'Sin teléfono';
-        document.getElementById('detailDocType').innerText = data.document_type || 'Cédula';
-        document.getElementById('detailStatusText').innerText = data.status || 'N/A';
+        const phone = document.getElementById('detailPhone');
+        if (phone) phone.innerText = data.phone || 'Sin teléfono';
+
+        const docType = document.getElementById('detailDocType');
+        if (docType) docType.innerText = data.document_type || 'Cédula';
+
+        const statusText = document.getElementById('detailStatusText');
+        if (statusText) statusText.innerText = data.status || 'N/A';
         
         const pill = document.getElementById('detailStatusPill');
         if (pill) {
             pill.innerText = data.status || 'ESTADO';
-            pill.className = 'badge-pill ' + (data.pill_class || 'status-green');
+            pill.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold ' + (data.pill_class === 'status-green' ? 'bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]' : 'bg-gray-100 text-gray-700 border border-gray-200');
         }
 
         const activePill = document.getElementById('detailActivePill');
         if (activePill) {
             if (data.is_active) {
                 activePill.innerText = '🟢 Activo';
-                activePill.className = 'badge-pill status-green';
+                activePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]';
             } else {
                 activePill.innerText = '🔴 Inactivo';
-                activePill.className = 'badge-pill status-red';
+                activePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-red-700 border border-red-200';
             }
         }
 
@@ -1208,29 +1333,19 @@
 
         // Sincronizar ID y Nombre en el modal de seguimiento
         const segInput = document.getElementById('seguimiento_egresado_id');
-        if (segInput && data.id) {
-            segInput.value = data.id;
-        }
-        const segLabel = document.getElementById('seguimiento_egresado_name_label');
-        if (segLabel && data.name) {
-            segLabel.innerText = data.name;
-        }
-        const segDoc = document.getElementById('seguimiento_egresado_doc_label');
-        if (segDoc && data.doc) {
-            segDoc.innerHTML = '<i class="fa-regular fa-id-card mr-1 text-[#39A900]"></i> ' + data.doc;
-        }
-        const segFicha = document.getElementById('seguimiento_egresado_ficha_label');
-        if (segFicha && data.ficha) {
-            segFicha.innerText = 'Ficha: ' + data.ficha;
-        }
+        if (segInput && data.id) segInput.value = data.id;
 
-        // Sincronizar automáticamente la ventana flotante de perfil y el modal de edición
-        if (typeof populateModalPerfilEgresado === 'function') {
-            populateModalPerfilEgresado(data);
-        }
-        if (typeof populateModalEditar === 'function') {
-            populateModalEditar(data);
-        }
+        const segLabel = document.getElementById('seguimiento_egresado_name_label');
+        if (segLabel && data.name) segLabel.innerText = data.name;
+
+        const segDoc = document.getElementById('seguimiento_egresado_doc_label');
+        if (segDoc && data.doc) segDoc.innerHTML = '<i class="fa-regular fa-id-card mr-1 text-[#39A900]"></i> ' + data.doc;
+
+        const segFicha = document.getElementById('seguimiento_egresado_ficha_label');
+        if (segFicha && data.ficha) segFicha.innerText = 'Ficha: ' + data.ficha;
+
+        if (typeof populateModalPerfilEgresado === 'function') populateModalPerfilEgresado(data);
+        if (typeof populateModalEditar === 'function') populateModalEditar(data);
     }
 
     // Decodificador seguro de JSON tolerante a entidades HTML
@@ -1262,11 +1377,9 @@
 
     // Apertura reactiva y garantizada del modal de edición
     function openEditarModal(data) {
+        if (!data) data = window.currentSelectedEgresado;
         if (!data) {
-            data = window.currentSelectedEgresado;
-        }
-        if (!data) {
-            const row = document.querySelector('.egresado-row.selected-row') || document.querySelector('.egresado-row');
+            const row = document.querySelector('.egresado-row.bg-emerald-50\\/60') || document.querySelector('.egresado-row');
             if (row) {
                 const raw = row.getAttribute('data-json');
                 data = parseJsonSafe(raw);

@@ -500,19 +500,22 @@
 
     // Filtrado interactivo en tabla
     function filterSurveysTable() {
-        const query = (document.getElementById('surveySearchInput').value || '').toLowerCase();
-        const statusFilter = document.getElementById('surveyStatusFilter').value;
+        const query = (document.getElementById('surveySearchInput')?.value || '').toLowerCase();
+        const statusFilter = document.getElementById('surveyStatusFilter')?.value || '';
+        const targetFilter = document.getElementById('surveyTargetFilter')?.value || '';
         const rows = document.querySelectorAll('#encuestasTable tbody tr.encuesta-row');
 
         rows.forEach(row => {
             const id = (row.getAttribute('data-id') || '').toLowerCase();
             const title = (row.getAttribute('data-title') || '').toLowerCase();
-            const status = row.getAttribute('data-status');
+            const target = (row.getAttribute('data-target') || '').toLowerCase();
+            const status = row.getAttribute('data-status') || '';
 
-            const matchesQuery = id.includes(query) || title.includes(query);
+            const matchesQuery = !query || id.includes(query) || title.includes(query) || target.includes(query);
             const matchesStatus = !statusFilter || status === statusFilter;
+            const matchesTarget = !targetFilter || target.includes(targetFilter.toLowerCase());
 
-            if (matchesQuery && matchesStatus) {
+            if (matchesQuery && matchesStatus && matchesTarget) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';

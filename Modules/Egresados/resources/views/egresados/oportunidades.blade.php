@@ -65,16 +65,40 @@
         color: #fff;
       }
       .brand-badge {
-        width: 44px; height: 44px;
-        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         background: #fff;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        padding: 2px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(98, 227, 29, 0.6);
       }
-      .brand-badge img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-      .brand-name { font-weight: 700; font-size: 18px; }
-      .brand-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; line-height: 1.2; }
+      .brand-badge img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 7px;
+      }
+      .brand-name {
+        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .brand-sub {
+        font-size: 10.5px;
+        color: var(--moss, #62E31D);
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
       nav { margin-top: 20px; }
       nav a {
         display: flex; align-items: center; gap: 12px;
@@ -359,7 +383,7 @@
       </div>
       <div>
         <div class="brand-name">SIGE</div>
-        <div class="brand-sub">Sistema de Gestión<br>de Egresados</div>
+        <div class="brand-sub">Gestión de Egresados</div>
       </div>
     </a>
     <nav>
@@ -400,76 +424,10 @@
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div>
-        <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-left">
+        <button class="hamburger sm:hidden" style="display:none;"><i class="fa-solid fa-bars"></i></button>
       </div>
-      <div class="topbar-right">
-        <button class="icon-btn">
-          <i class="fa-regular fa-bell"></i>
-          <span class="badge">3</span>
-        </button>
-        <div class="user-profile-wrapper" id="profileDropdownWrapper">
-          <div class="user-profile" id="profileDropdownBtn" onclick="toggleProfileDropdown()">
-            <div class="user-avatar">
-              @auth
-                {{ Auth::user()->initials ?? 'VR' }}
-              @else
-                VR
-              @endauth
-            </div>
-            <div class="user-info">
-              <div class="user-name">
-                @auth {{ Auth::user()->short_name ?? Auth::user()->first_name ?? Auth::user()->name }}
-                @else Valentina Ríos @endauth
-                <i class="fa-solid fa-chevron-down topbar-chevron"></i>
-              </div>
-              <div class="user-role">Egresada</div>
-            </div>
-          </div>
-
-          <!-- Dropdown Menu -->
-          <div class="topbar-dropdown-menu" id="profileDropdownMenu">
-            <div class="dropdown-user-header">
-              <div class="dropdown-user-avatar">
-                @auth {{ Auth::user()->initials ?? 'VR' }} @else VR @endauth
-              </div>
-              <div class="dropdown-user-meta">
-                <span class="dropdown-user-name">
-                  @auth {{ Auth::user()->full_name }} @else Valentina Ríos Egresada @endauth
-                </span>
-                <span class="dropdown-user-email">
-                  @auth {{ Auth::user()->email }} @else egresado.sige@sena.edu.co @endauth
-                </span>
-              </div>
-            </div>
-
-            <div class="dropdown-divider"></div>
-
-            <a href="{{ route('egresados.welcome') }}" class="dropdown-link-item">
-              <i class="fa-solid fa-globe"></i>
-              <span>Portal Público</span>
-            </a>
-
-            <div class="dropdown-divider"></div>
-
-            @auth
-              <form action="{{ route('logout') }}" method="POST" style="margin:0;">
-                @csrf
-                <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-                <button type="submit" class="dropdown-logout-btn">
-                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                  <span>Cerrar Sesión</span>
-                </button>
-              </form>
-            @else
-              <a href="{{ route('login', ['redirect' => route('egresados.oportunidades_egresado')]) }}" class="dropdown-logout-btn">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                <span>Cerrar Sesión</span>
-              </a>
-            @endauth
-          </div>
-        </div>
-      </div>
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- CONTENT -->

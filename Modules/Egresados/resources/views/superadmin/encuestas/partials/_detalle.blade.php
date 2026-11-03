@@ -1,99 +1,87 @@
 <!-- ============================================== -->
-<!-- 3. DETALLE LATERAL REACTIVO (COLUMNA DERECHA 1/3) -->
+<!-- 3. DETALLE LATERAL DE LA ENCUESTA (1/3 DEL GRID - STICKY) -->
 <!-- ============================================== -->
-<div id="panel-resumen-pdf" class="lg:col-span-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 sticky top-20 flex flex-col gap-5">
-    
-    <!-- Encabezado del Detalle -->
-    <div class="flex items-center justify-between pb-3.5 border-b border-gray-100">
-        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#39A900] animate-pulse"></span>
-            Detalle de la Encuesta
-        </span>
-        <span id="detailStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0] uppercase">
-            ACTIVA
-        </span>
-    </div>
-
-    <!-- Información General / Hero de la Encuesta -->
-    <div class="space-y-2">
-        <h3 id="detailSurveyTitle" class="font-editorial text-lg sm:text-xl font-bold text-[#00131E] leading-tight">
-            Encuesta Inserción Laboral ADSO
-        </h3>
+<div class="lg:col-span-1">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 sticky top-20" 
+         x-data="{ confirmarCierre: false }">
         
-        <p id="detailSurveyDesc" class="text-xs text-gray-500 leading-relaxed font-medium">
-            Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.
-        </p>
-
-        <div class="pt-2 text-[11px] space-y-1.5 text-gray-600 border-t border-gray-50">
-            <div><strong class="text-gray-400 uppercase text-[9.5px]">Código ID:</strong> <span id="detailSurveyMeta" class="font-bold text-[#00131E] font-mono ml-1">ENC-025</span></div>
-            <div><strong class="text-gray-400 uppercase text-[9.5px]">Lanzamiento:</strong> <span id="detailSurveyDate" class="font-semibold text-gray-800 ml-1">12/06/2026</span></div>
-            <div class="flex items-center gap-1.5 pt-0.5"><strong class="text-gray-400 uppercase text-[9.5px]">Público:</strong> <span id="detailSurveyTarget" class="font-bold text-[#166534] bg-[#EAF7EE] px-2 py-0.5 rounded-md border border-[#BBF7D0]">Egresado ADSO</span></div>
-        </div>
-    </div>
-
-    <!-- Caja de Estadísticas con Identidad SENA ERP -->
-    <div class="bg-[#F8FCF9] border border-[#BBF7D0] rounded-xl p-4 space-y-2.5">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Indicadores de Respuesta</span>
-        
-        <div class="flex justify-between text-xs">
-            <span class="text-gray-500 font-medium">Enviadas:</span>
-            <span id="detailEnviadas" class="font-bold text-[#00131E]">120</span>
+        <!-- Encabezado con estado -->
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Detalle de la Encuesta</h3>
+            <span id="detailStatusBadge" class="px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald-50 text-emerald-700 uppercase">
+                ACTIVA
+            </span>
         </div>
         
-        <div class="flex justify-between text-xs">
-            <span class="text-gray-500 font-medium">Respondidas:</span>
-            <span id="detailRespondidas" class="font-bold text-[#39A900]">90</span>
-        </div>
-        
-        <div class="flex justify-between text-xs">
-            <span class="text-gray-500 font-medium">Pendientes:</span>
-            <span id="detailPendientes" class="font-bold text-[#00131E]">30</span>
-        </div>
-        
-        <div class="flex justify-between text-xs pt-1.5 border-t border-gray-200/50">
-            <span class="text-gray-700 font-bold">Tasa de respuesta:</span>
-            <span id="detailRate" class="font-extrabold text-[#39A900] text-sm">75%</span>
+        <!-- Título y metadatos principales -->
+        <div>
+            <h4 id="detailSurveyTitle" class="font-bold text-gray-900 text-sm">Inserción Laboral ADSO</h4>
+            <p id="detailSurveyMeta" class="text-xs text-gray-500 mt-0.5">ID: ENC-025 | Fecha: 12/06/2026</p>
+            <p class="text-xs text-gray-600 mt-1"><strong>Público:</strong> <span id="detailSurveyTarget" class="text-[#166534] font-semibold">Egresado ADSO</span></p>
+            <p class="text-xs text-gray-600"><strong>Fecha emisión:</strong> <span id="detailSurveyDate">12/06/2026</span></p>
         </div>
 
-        <!-- Barra de Progreso Dinámica ERP -->
-        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden mt-2">
-            <div id="detailProgressBar" class="bg-gradient-to-r from-[#001A29] to-[#39A900] h-2 rounded-full transition-all duration-500" style="width: 75%;"></div>
+        <!-- Estadísticas de respuesta con barra ERP -->
+        <div class="bg-gray-50 p-3.5 rounded-xl space-y-2">
+            <span class="text-[11px] font-bold text-gray-400 block uppercase tracking-wider">Estadísticas</span>
+            <div class="flex justify-between text-xs text-gray-600"><span>Egresados Convocados:</span> <span id="detailEnviadas" class="font-bold text-gray-900">120</span></div>
+            <div class="flex justify-between text-xs text-gray-600"><span>Cuestionarios Respondidos:</span> <span id="detailRespondidas" class="font-bold text-[#39A900]">90</span></div>
+            <div class="flex justify-between text-xs text-gray-600"><span>En Trámite (Pendientes):</span> <span id="detailPendientes" class="font-bold text-gray-900">30</span></div>
+            <div class="flex justify-between text-xs text-gray-600"><span>Tasa de Respuesta:</span> <span id="detailRate" class="font-bold text-emerald-700">75%</span></div>
+            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mt-1">
+                <div id="detailProgressBar" class="bg-emerald-600 h-full rounded-full transition-all duration-500" style="width: 75%"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Botones de Acción con Paleta SENA ERP -->
-    <div id="detalleActionButtons" class="flex flex-col gap-2 pt-1" x-data="{ confirmarCierre: false }">
-        <button type="button" 
-                id="detailResultsBtn" 
-                @click="openModalResultados = true; abrirResultadosModal();"
-                class="w-full py-2.5 px-4 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] hover:from-[#39A900] hover:to-[#2e8b00] text-white text-xs font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer text-center">
-            <i class="fa-solid fa-chart-pie text-xs"></i>
-            <span>Ver Resultados Completos</span>
-        </button>
+        <!-- Descripción y Alcance Institucional -->
+        <div class="bg-gray-50 p-3.5 rounded-xl space-y-1 text-xs text-gray-600">
+            <span class="text-[11px] font-bold text-gray-400 block uppercase tracking-wider mb-1">Descripción y Propósito</span>
+            <p id="detailSurveyDesc" class="leading-relaxed">Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.</p>
+        </div>
 
-        <button type="button" 
-                id="btnDescargarResumenPDF"
-                onclick="descargarResumenPDF()" 
-                class="w-full py-2.5 px-4 bg-white hover:bg-[#EAF7EE] text-gray-700 hover:text-[#166534] border border-gray-200 hover:border-[#39A900]/50 text-xs font-bold rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
-            <i class="fa-solid fa-file-pdf text-xs text-red-600"></i>
-            <span id="btnDescargarResumenText">Descargar Reporte (PDF)</span>
-        </button>
+        <!-- =============== BOTONES FUNCIONALES ERP =============== -->
+        <div class="space-y-2 pt-2">
+            
+            <!-- 1. Ver Resultados y Gráficas (Estilo SENA ERP) -->
+            <button type="button" 
+                    id="detailResultsBtn" 
+                    @click="openModalResultados = true; abrirResultadosModal();"
+                    class="w-full py-2.5 bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] hover:from-[#001A29] hover:to-[#00283d] text-white border border-white/10 text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-chart-pie text-[#62E31D] text-xs"></i>
+                <span>Ver Resultados y Gráficas</span>
+            </button>
 
-        <!-- Botón que abre la confirmación de cierre -->
-        <button @click="confirmarCierre = true" 
-                type="button" 
-                id="btnCerrarEncuestaTrigger"
-                class="w-full py-2.5 px-4 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold rounded-xl transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
-            <i class="fa-solid fa-ban text-xs"></i>
-            <span>Cerrar Encuesta</span>
-        </button>
+            <!-- 2. Descargar Reporte Escrito (PDF) -->
+            <button type="button" 
+                    id="btnDescargarResumenPDF" 
+                    onclick="descargarResumenPDF()" 
+                    class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-file-pdf text-red-500 text-xs"></i>
+                <span id="btnDescargarResumenText">Descargar Reporte (PDF)</span>
+            </button>
 
-        <!-- Modal de Confirmación Flotante con Identidad SENA ERP (Posicionado en la parte superior) -->
+            <!-- 3. Cerrar Encuesta -->
+            <button @click="confirmarCierre = true" 
+                    type="button" 
+                    id="btnCerrarEncuestaTrigger"
+                    class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                <i class="fa-solid fa-ban text-xs"></i>
+                <span>Cerrar Encuesta</span>
+            </button>
+        </div>
+
+        <!-- =============== MODAL FLOTANTE DE CIERRE =============== -->
         <div x-show="confirmarCierre" 
-             style="display: none;"
-             class="fixed inset-0 z-[70] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-start justify-center pt-16 sm:pt-20 p-4 sm:p-6" 
-             x-cloak
-             @keydown.window.escape="confirmarCierre = false">
+             style="display: none;" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @keydown.window.escape="confirmarCierre = false"
+             class="fixed inset-0 z-[60] overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-start justify-center pt-14 sm:pt-20 p-4" 
+             x-cloak>
             
             <div @click.away="confirmarCierre = false" 
                  x-transition:enter="transition ease-out duration-300"
@@ -163,6 +151,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
+    </div>
 </div>

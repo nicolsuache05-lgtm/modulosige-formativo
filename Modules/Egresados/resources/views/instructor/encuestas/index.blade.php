@@ -1,47 +1,82 @@
+@php
+    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sena-logo.png');
+    $senaLogoBase64 = file_exists($senaLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($senaLogoPath)) : '';
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGE · Encuestas — Instructor CEFA</title>
+    <meta name="view-transition" content="same-origin">
+    <title>SIGE · Gestión de Encuestas — Instructor CEFA</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
 
-    <!-- Google Fonts: Fraunces + Plus Jakarta Sans -->
+    <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Tailwind CSS & Alpine.js CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- html2pdf.js CDN para exportación a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- ApexCharts CDN para análisis visual y gráficas estadísticas -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <style>
       :root {
-        --forest: #001A29;
-        --forest-deep: #00131E;
+        /* ========================================================
+           PALETA INSTITUCIONAL SENA EMPRESA ERP
+           ======================================================== */
+        --sena-green: #39A900;
+        --sena-green-hover: #2d8500;
+        --sena-neon: #62E31D;
         --sena-dark: #00131E;
         --sena-navy: #001A29;
+        --sena-navy-light: #002336;
+        --sena-light-navy: #00324D;
+
+        --forest-deep: #00131E;
+        --forest: #001A29;
+        --forest-dark: #000F17;
+        --forest-card: #002336;
         --green: #39A900;
         --green-dark: #2a7c00;
+        --green-active: #39A900;
+        --green-light: #62E31D;
         --green-soft: #EAF7EE;
-        --blue-soft: #EBF3FF;
-        --amber-soft: #FEF7EA;
-        --purple-soft: #F5EFFF;
+        --green-soft-border: #BBF7D0;
+        --green-badge: #dcfce7;
+        --green-badge-text: #166534;
         --moss: #62E31D;
         --bg: #F4F7F6;
         --card: #FFFFFF;
-        --ink: #16261C;
-        --ink-soft: #6B7A70;
-        --line: #E8EFE9;
+        --ink: #00131E;
+        --ink-soft: #5A6E7D;
+        --ink-muted: #8B9FA9;
+        --line: #E2E8F0;
+        --line-subtle: #EEF2F6;
+        --gold: #D9A441;
+        --shadow-sm: 0 1px 3px rgba(0, 19, 30, 0.05);
+        --shadow-md: 0 4px 14px rgba(0, 19, 30, 0.07);
+        --shadow-lg: 0 10px 28px rgba(0, 19, 30, 0.12);
+        --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Open Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
@@ -50,13 +85,13 @@
 
       .app {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        grid-template-columns: 260px 1fr;
         min-height: 100vh;
       }
 
-      /* ---------------- SIDEBAR ---------------- */
+      /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
-        background: linear-gradient(180deg, var(--forest) 0%, var(--forest-deep) 100%);
+        background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -90,7 +125,7 @@
         flex-shrink: 0;
         padding: 2px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(57, 169, 0, 0.6);
+        border: 2px solid rgba(98, 227, 29, 0.6);
       }
       .brand-badge img {
         width: 100%;
@@ -100,7 +135,7 @@
       }
 
       .brand-name {
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 18px;
         letter-spacing: 0.5px;
@@ -109,15 +144,13 @@
         gap: 6px;
       }
       .brand-tag {
-        font-family: 'Poppins', 'Open Sans', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-size: 9px;
         font-weight: 800;
         background: var(--green);
         color: #ffffff;
         padding: 2px 7px;
         border-radius: 999px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
       }
       .brand-sub {
         font-size: 10.5px;
@@ -139,90 +172,87 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      nav a i {
+      nav a i, nav a svg {
         width: 18px;
         font-size: 15px;
         text-align: center;
         flex-shrink: 0;
       }
       nav a:hover {
-        background: rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(3px);
       }
       nav a.active {
-        background: var(--green);
+        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
         color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
-      nav a.active i {
+      nav a.active i, nav a.active svg {
+        color: #ffffff;
+      }
+      nav a .badge {
+        margin-left: auto;
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      nav a.active .badge {
+        background: rgba(0, 0, 0, 0.25);
         color: #ffffff;
       }
 
-      /* ---------------- MAIN ---------------- */
+      /* ---------------- MAIN VIEWPORT ---------------- */
       .main {
         display: flex;
         flex-direction: column;
         min-width: 0;
-        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      @keyframes sigeFadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
       }
 
       .topbar {
-        background: linear-gradient(90deg, #00131E 0%, #001A29 60%, #002336 100%);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+        border-bottom: 3px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 12px 36px;
-        border-bottom: 3px solid #39A900;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-      }
-
-      .topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 14px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
       }
 
       .portal-link-btn {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(57, 169, 0, 0.2);
-        border: 1px solid #39A900;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: #ffffff;
         font-size: 12px;
-        font-weight: 700;
-        padding: 5px 14px;
+        font-weight: 600;
+        padding: 5px 12px;
         border-radius: 999px;
         text-decoration: none;
         transition: all 0.2s ease;
       }
       .portal-link-btn:hover {
         background: var(--green);
-        border-color: #62E31D;
-        box-shadow: 0 2px 10px rgba(57, 169, 0, 0.4);
+        border-color: var(--green);
         color: #ffffff;
-      }
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
       }
 
       .user-chip {
@@ -232,736 +262,54 @@
         font-size: 13.5px;
         font-weight: 600;
         cursor: pointer;
-        padding: 4px 12px;
+        padding: 4px 10px;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        transition: all 0.2s ease;
-        color: #ffffff;
-        user-select: none;
-      }
-      .user-chip:hover {
-        background: rgba(57, 169, 0, 0.2);
-        border-color: rgba(98, 227, 29, 0.4);
-      }
-      .user-dropdown-wrapper {
-        position: relative;
-      }
-      .user-dropdown-menu {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        min-width: 230px;
-        background: #001A29;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-top: 2px solid var(--green);
-        border-radius: 14px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-        padding: 6px 0;
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-      }
-      .user-dropdown-menu.show {
-        display: block;
-        animation: dropFade 0.15s ease-out;
-      }
-      @keyframes dropFade {
-        from { opacity: 0; transform: translateY(-6px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .user-dropdown-header {
-        padding: 10px 16px 8px;
-      }
-      .user-dropdown-name {
-        font-weight: 700;
-        font-size: 13.5px;
-        color: #ffffff;
-      }
-      .user-dropdown-role {
-        font-size: 10.5px;
-        font-weight: 700;
-        color: var(--moss);
-        text-transform: uppercase;
-        margin-top: 2px;
-        letter-spacing: 0.4px;
-      }
-      .user-dropdown-email {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 2px;
-      }
-      .user-dropdown-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 5px 0;
-      }
-      .user-dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 9px 16px;
-        font-size: 12.5px;
-        color: rgba(255, 255, 255, 0.85);
-        text-decoration: none;
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        font-family: inherit;
-        font-weight: 600;
-        transition: all 0.15s;
-      }
-      .user-dropdown-item i {
-        width: 16px;
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-      .user-dropdown-item:hover {
-        background: rgba(57, 169, 0, 0.18);
-        color: #62E31D;
-      }
-      .user-dropdown-item:hover i {
-        color: #62E31D;
-      }
-      .user-dropdown-item.logout-item {
-        color: #FCA5A5;
-      }
-      .user-dropdown-item.logout-item i {
-        color: #F87171;
-      }
-      .user-dropdown-item.logout-item:hover {
-        background: rgba(220, 38, 38, 0.2);
-        color: #ffffff;
-      }
-      .user-dropdown-item.logout-item:hover i {
-        color: #ffffff;
       }
       .user-avatar {
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #39A900 0%, #002336 100%);
-        border: 1.5px solid #62E31D;
+        background: var(--green);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Poppins', 'Jost', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif;
         font-weight: 700;
         font-size: 12px;
       }
 
-      /* ---------------- CONTENT ---------------- */
       .content {
-        padding: 34px 40px 48px;
+        padding: 30px 36px 48px;
         flex: 1;
       }
 
-      .page-head {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        margin-bottom: 28px;
-        flex-wrap: wrap;
-        gap: 14px;
-      }
-      .page-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
-        font-size: 28px;
-        margin: 0 0 6px;
-        color: var(--forest-deep);
-        letter-spacing: -0.5px;
-      }
-      .page-title span {
-        color: var(--green);
-      }
-      .page-desc {
-        font-size: 14px;
-        color: var(--ink-soft);
-        margin: 0;
-      }
-
-      .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--green);
-        color: #ffffff;
-        padding: 9px 18px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
-      }
-      .btn-primary:hover {
-        background: var(--green-dark);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(57, 169, 0, 0.35);
-      }
-
-      /* Stats Grid */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 18px;
-        margin-bottom: 28px;
-      }
-      .stat-card {
-        background: var(--card);
-        border-radius: 16px;
-        padding: 20px 22px;
-        border: 1px solid var(--line);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
-        transition: all 0.25s ease;
-      }
-      .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-        border-color: rgba(57, 169, 0, 0.3);
-      }
-      .stat-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-      }
-      .stat-label {
-        font-size: 12.5px;
-        font-weight: 600;
-        color: var(--ink-soft);
-      }
-      .stat-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-      }
-      .stat-icon.blue { background: rgba(57, 169, 0, 0.12); color: var(--green); }
-      .stat-icon.green { background: var(--green-soft); color: var(--green); }
-      .stat-icon.amber { background: var(--amber-soft); color: #D97706; }
-      .stat-icon.purple { background: rgba(0, 35, 54, 0.08); color: var(--forest); }
-
-      .stat-value {
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
-        font-size: 26px;
-        color: var(--forest-deep);
-        margin-bottom: 4px;
-      }
-      .stat-sub {
-        font-size: 11.5px;
-        color: var(--ink-soft);
-      }
-
-      /* Flash alert */
-      .flash-alert {
-        background: #ECFDF5;
-        border: 1px solid #A7F3D0;
-        color: #065F46;
-        padding: 12px 18px;
-        border-radius: 12px;
-        margin-bottom: 22px;
-        font-size: 13.5px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      /* Card Container */
-      .card-box {
-        background: var(--card);
-        border-radius: 16px;
-        border: 1px solid var(--line);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
-        overflow: hidden;
-      }
-      .card-box-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid var(--line);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-      .card-box-title {
-        font-family: 'Poppins', 'Jost', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
-        color: var(--forest-deep);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .card-box-desc {
-        font-size: 12.5px;
-        color: var(--ink-soft);
-        margin: 2px 0 0;
-      }
-
-      /* Surveys Table */
-      .table-wrapper {
-        overflow-x: auto;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-      }
-      th {
-        background: #F9FBFA;
-        padding: 12px 20px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        color: var(--ink-soft);
-        border-bottom: 1px solid var(--line);
-      }
-      td {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--line);
-        vertical-align: middle;
-      }
-      tr:last-child td {
-        border-bottom: none;
-      }
-      tr:hover td {
-        background: #FAFCFB;
-      }
-
-      .survey-title {
-        font-weight: 700;
-        color: var(--forest-deep);
-        font-size: 14px;
-        margin-bottom: 2px;
-      }
-      .survey-desc {
-        font-size: 12px;
-        color: var(--ink-soft);
-        max-width: 360px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 10.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-      }
-      .badge-green { background: #DCFCE7; color: #15803D; }
-      .badge-gray { background: #F3F4F6; color: #6B7280; }
-      .badge-blue { background: #DBEAFE; color: #1E40AF; }
-
-      .progress-bar {
-        width: 100px;
-        height: 6px;
-        background: #E5E7EB;
-        border-radius: 999px;
-        overflow: hidden;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 8px;
-      }
-      .progress-fill {
-        height: 100%;
-        background: var(--green);
-        border-radius: 999px;
-      }
-
-      .action-btns {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .btn-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: var(--green-soft);
-        color: var(--green);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-        transition: all 0.15s;
-        text-decoration: none;
-        font-size: 13px;
-      }
-      .btn-icon:hover {
-        background: var(--green);
-        color: #ffffff;
-      }
-
-      /* Modal */
-      .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 19, 30, 0.6);
-        backdrop-filter: blur(4px);
-        z-index: 100;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-      .modal-box {
-        background: #ffffff;
-        border-radius: 24px;
-        width: 100%;
-        max-width: 840px;
-        box-shadow: 0 25px 60px rgba(0, 19, 30, 0.45);
-        max-height: 94vh;
-        overflow-y: auto;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .modal-head {
-        padding: 22px 28px;
-        border-bottom: 3px solid #39A900;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #002336 100%);
-        border-top-left-radius: 24px;
-        border-top-right-radius: 24px;
-        color: #ffffff;
-      }
-      .modal-head-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        flex-shrink: 0;
-      }
-      .modal-overtitle {
-        font-size: 10px;
-        font-weight: 800;
-        color: #62E31D;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 3px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .modal-title {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 800;
-        font-size: 20px;
-        color: #ffffff;
-        margin: 0;
-        letter-spacing: -0.3px;
-      }
-      .modal-sub {
-        font-size: 12.5px;
-        color: rgba(255, 255, 255, 0.75);
-        margin-top: 3px;
-      }
-      .format-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        font-weight: 800;
-        background: rgba(98, 227, 29, 0.15);
-        color: #62E31D;
-        padding: 3px 10px;
-        border-radius: 999px;
-        margin-bottom: 4px;
-        border: 1px solid rgba(98, 227, 29, 0.3);
-        letter-spacing: 0.4px;
-      }
-      .modal-close {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #ffffff;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-      }
-      .modal-close:hover {
-        background: rgba(239, 68, 68, 0.8);
-        border-color: rgba(239, 68, 68, 1);
-        color: #ffffff;
-        transform: rotate(90deg);
-      }
-      .modal-body {
-        padding: 26px 28px;
-      }
-      .template-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 18px;
-      }
-      .template-pill {
-        background: #F0F6F2;
-        border: 1px solid #D1E5D7;
-        color: #1A4723;
-        font-size: 11.5px;
-        font-weight: 600;
-        padding: 6px 13px;
-        border-radius: 999px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .template-pill:hover {
-        background: var(--green);
-        color: #ffffff;
-        border-color: var(--green);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 10px rgba(57, 169, 0, 0.25);
-      }
-      .form-section {
-        background: #FAFCFB;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 20px;
-        margin-bottom: 18px;
-      }
-      .form-section-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13.5px;
-        font-weight: 700;
-        color: var(--forest);
-        margin-bottom: 14px;
-        font-family: 'Poppins', 'Jost', sans-serif;
-      }
-      .step-number {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: var(--green);
-        color: #ffffff;
-        font-size: 11.5px;
-        font-weight: 800;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .form-group {
-        margin-bottom: 16px;
-      }
-      .form-group:last-child {
-        margin-bottom: 0;
-      }
-      .form-label {
-        display: block;
-        font-size: 12.5px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        color: var(--ink);
-      }
-      .form-control {
-        width: 100%;
-        padding: 10px 14px;
-        background: #ffffff;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        font-size: 13px;
-        font-family: 'Poppins', 'Open Sans', sans-serif;
-        outline: none;
-        transition: all 0.2s;
-      }
-      .form-control:focus {
-        border-color: var(--green);
-        box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.15);
-      }
-      .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-      .question-card {
-        background: #ffffff;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        transition: all 0.2s;
-      }
-      .question-card:hover {
-        border-color: #A3D4AF;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      }
-      .question-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .question-type-badge {
-        font-size: 10.5px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 6px;
-        letter-spacing: 0.3px;
-      }
-      .type-mc { background: #EBF3FF; color: #1E40AF; }
-      .type-scale { background: #FEF7EA; color: #9A3412; }
-      .type-text { background: #F5EFFF; color: #6B21A8; }
-      .type-bool { background: #EAF7EE; color: #065F46; }
-      .btn-delete-q {
-        background: none;
-        border: none;
-        color: #EF4444;
-        cursor: pointer;
-        font-size: 13px;
-        padding: 4px 6px;
-        border-radius: 6px;
-        transition: background 0.15s;
-      }
-      .btn-delete-q:hover {
-        background: #FEE2E2;
-      }
-      .btn-add-q {
-        background: #ffffff;
-        border: 1.5px dashed var(--green);
-        color: var(--green-dark);
-        font-size: 12.5px;
-        font-weight: 700;
-        padding: 10px 18px;
-        border-radius: 10px;
-        width: 100%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.2s;
-      }
-      .btn-add-q:hover {
-        background: var(--green-soft);
-        border-color: var(--green);
-      }
-      .checkbox-label {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        font-size: 12.5px;
-        color: var(--ink);
-        margin-bottom: 8px;
-        cursor: pointer;
-        user-select: none;
-      }
-      .checkbox-label input {
-        margin-top: 2px;
-        accent-color: var(--green);
-        width: 16px;
-        height: 16px;
-      }
-      .modal-foot {
-        padding: 20px 28px;
-        border-top: 1px solid var(--line);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #FAFCFB;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-      }
-      .btn-cancel {
-        padding: 10px 20px;
-        background: #F4F7F6;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--ink-soft);
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .btn-cancel:hover {
-        background: #E5EBE7;
-        color: var(--ink);
-      }
-      .btn-submit {
-        padding: 10px 24px;
-        background: linear-gradient(135deg, #39A900 0%, #2A7C00 100%);
-        color: #ffffff;
-        border: none;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
-        transition: all 0.2s;
-      }
-      .btn-submit:hover {
-        background: linear-gradient(135deg, #44C700 0%, #308F00 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(57, 169, 0, 0.45);
-      }
-
-      @media (max-width: 1100px) {
+      @media (max-width: 1080px) {
         .app { grid-template-columns: 1fr; }
         .sidebar { display: none; }
-        .stats-grid { grid-template-columns: 1fr 1fr; }
       }
       @media (max-width: 640px) {
-        .stats-grid { grid-template-columns: 1fr; }
-        .content { padding: 20px 16px; }
+        .content { padding: 20px 16px 36px; }
+        .topbar { padding: 12px 16px; }
       }
-    </style>
-    <!-- Tailwind CSS (para el modal constructor institucional) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <style>
       [x-cloak] { display: none !important; }
     </style>
 </head>
-<body x-data="{ openModal: false, openModalResultados: false }">
+<body x-data="{ 
+    openModal: false, 
+    openModalResultados: false,
+    openSuccessModal: {{ session('success') ? 'true' : 'false' }},
+    openErrorModal: {{ session('error') ? 'true' : 'false' }}
+}">
 
 <div class="app">
 
   <!-- ============================================== -->
-  <!-- 1. SIDEBAR INSTRUCTOR SIGE                     -->
+  <!-- 1. SIDEBAR INSTITUCIONAL INSTRUCTOR -->
   <!-- ============================================== -->
-    <aside class="sidebar">
+  <aside class="sidebar">
     <a href="{{ route('egresados.welcome') }}" class="brand">
       <div class="brand-badge">
         <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
@@ -998,549 +346,598 @@
       </a>
     </nav>
 
-    <!-- Perfil del Instructor en la parte inferior del sidebar -->
-    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
-      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
-        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
-          IN
-        </div>
-        <div style="overflow:hidden;">
-          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
-            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
-          </div>
-          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
-        @csrf
-        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      </form>
-    </div>
+
   </aside>
 
   <!-- ============================================== -->
-  <!-- 2. MAIN VIEWPORT                               -->
+  <!-- 2. MAIN VIEWPORT -->
   <!-- ============================================== -->
   <div class="main">
     
     <!-- Topbar -->
     <div class="topbar">
-      <div class="topbar-left">
-        <a href="{{ route('egresados.welcome') }}" class="portal-link-btn">
-          <i class="fa-solid fa-globe text-xs"></i>
-          <span>Ver Portal Público</span>
-        </a>
-      </div>
+      <div class="topbar-left"></div>
 
-      <div class="topbar-right">
-        <div class="user-dropdown-wrapper">
-          <div class="user-chip" id="userMenuBtn" onclick="toggleUserMenu(event)" title="Opciones de Cuenta">
-            <div class="user-avatar">
-              {{ Auth::check() ? (Auth::user()->initials ?? 'IN') : 'IN' }}
-            </div>
-            <span>{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}</span>
-            <i class="fa-solid fa-chevron-down" id="userMenuChevron" style="font-size: 10px; opacity: 0.7; transition: transform 0.2s;"></i>
-          </div>
-
-          <div class="user-dropdown-menu" id="userDropdownMenu">
-            <div class="user-dropdown-header">
-              <div class="user-dropdown-name">{{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}</div>
-              <div class="user-dropdown-role"><i class="fa-solid fa-circle" style="font-size: 6px; color: var(--moss); margin-right: 4px;"></i> Rol: Instructor CEFA</div>
-              <div class="user-dropdown-email">{{ Auth::check() ? (Auth::user()->email ?? 'instructor@sena.edu.co') : 'instructor@sena.edu.co' }}</div>
-            </div>
-            
-            <div class="user-dropdown-divider"></div>
-
-            <a href="{{ route('egresados.welcome') }}" class="user-dropdown-item">
-              <i class="fa-solid fa-globe"></i>
-              <span>Portal Público SIGE</span>
-            </a>
-
-            <div class="user-dropdown-divider"></div>
-
-            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-              @csrf
-              <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-              <button type="submit" class="user-dropdown-item logout-item">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <span>Cerrar Sesión</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+      @include('egresados::superadmin.partials._topbar_right')
     </div>
 
     <!-- Main Content -->
-    <div class="content">
+    <div class="content space-y-6">
 
-      @if(session('success'))
-      <div class="flash-alert">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <i class="fa-solid fa-circle-check" style="font-size: 18px; color: var(--green);"></i>
-          <span>{{ session('success') }}</span>
+      @if(isset($errors) && $errors->any())
+        <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs sm:text-sm font-semibold flex items-start gap-2 shadow-xs">
+            <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5"></i>
+            <div>
+                <strong>Por favor corrige los siguientes errores:</strong>
+                <ul class="list-disc list-inside mt-1 font-normal">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
-        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: #065F46;">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
       @endif
 
-      <!-- Page Header -->
-      <div class="page-head">
-        <div>
-          <h1 class="page-title">Gestión de <span>Encuestas</span></h1>
-          <p class="page-desc">Diseña, aplica y evalúa encuestas de inserción y satisfacción para egresados de tus fichas.</p>
-        </div>
-        <div>
-          <button type="button" class="btn-primary" @click="openModal = true">
-            <i class="fa-solid fa-plus"></i>
-            <span>Nueva Encuesta</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Total Encuestas</span>
-            <div class="stat-icon blue"><i class="fa-solid fa-clipboard-list"></i></div>
-          </div>
-          <div class="stat-value">{{ count($encuestas) }}</div>
-          <div class="stat-sub">Instrumentos creados</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Enviadas a Egresados</span>
-            <div class="stat-icon green"><i class="fa-solid fa-paper-plane"></i></div>
-          </div>
-          <div class="stat-value">{{ $totalEnviadas }}</div>
-          <div class="stat-sub">Destinatarios totales</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Respondidas</span>
-            <div class="stat-icon amber"><i class="fa-solid fa-circle-check"></i></div>
-          </div>
-          <div class="stat-value">{{ $totalRespondidas }}</div>
-          <div class="stat-sub">{{ $totalPendientes }} pendientes</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Tasa de Respuesta</span>
-            <div class="stat-icon purple"><i class="fa-solid fa-chart-pie"></i></div>
-          </div>
-          <div class="stat-value">{{ $tasaRespuestaGeneral }}</div>
-          <div class="stat-sub">Participación promedio</div>
-        </div>
-      </div>
-
-      <!-- Surveys Table Box -->
-      <div class="card-box">
-        <div class="card-box-header">
+      <!-- Encabezado y botón Crear Encuesta -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 class="card-box-title"><i class="fa-solid fa-list-check" style="color: var(--green);"></i> Encuestas Activas y Realizadas</h2>
-            <p class="card-box-desc">Monitorea el avance de recolección de información por instrumento.</p>
+              <h1 class="text-2xl sm:text-3xl font-bold font-editorial text-gray-900 tracking-tight">
+                  Gestión de <span class="text-[#39A900]">Encuestas</span>
+              </h1>
+              <p class="text-xs sm:text-sm text-gray-500 mt-1">Creación, seguimiento y análisis de encuestas institucionales del CEFA.</p>
           </div>
-        </div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Código / Instrumento</th>
-                <th>Público Objetivo</th>
-                <th>Fecha Creación</th>
-                <th>Estado</th>
-                <th>Participación</th>
-                <th style="text-align: right;">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($encuestas as $enc)
-              <tr>
-                <td>
-                  <div class="survey-title">{{ $enc['title'] }}</div>
-                  <div class="survey-desc">{{ $enc['description'] }}</div>
-                  <span style="font-family: monospace; font-size: 11px; color: var(--ink-soft);">ID: {{ $enc['id'] }}</span>
-                </td>
-                <td>
-                  <span style="font-weight: 600; color: var(--forest-deep);">{{ $enc['target'] }}</span>
-                  <div style="font-size: 11px; color: var(--ink-soft);">{{ $enc['creado_por'] ?? 'Instructor CEFA' }}</div>
-                </td>
-                <td>
-                  <span style="color: var(--ink-soft); font-size: 12.5px;">{{ $enc['date'] }}</span>
-                </td>
-                <td>
-                  @if(($enc['status'] ?? 'ACTIVA') === 'ACTIVA')
-                    <span class="badge badge-green"><i class="fa-solid fa-circle" style="font-size: 7px; margin-right: 4px;"></i> Activa</span>
-                  @else
-                    <span class="badge badge-gray">Cerrada</span>
-                  @endif
-                </td>
-                <td>
-                  <div>
-                    <div class="progress-bar">
-                      <div class="progress-fill" style="width: {{ $enc['rate_num'] ?? 75 }}%;"></div>
-                    </div>
-                    <span style="font-weight: 700; font-size: 12px; color: var(--forest-deep);">{{ $enc['rate'] ?? '75%' }}</span>
-                  </div>
-                  <div style="font-size: 11px; color: var(--ink-soft); margin-top: 2px;">
-                    {{ $enc['respondidas'] ?? 0 }} de {{ $enc['enviadas'] ?? 0 }} respuestas
-                  </div>
-                </td>
-                <td style="text-align: right;">
-                  <div class="action-btns" style="justify-content: flex-end;">
-                    <button type="button" class="btn-icon" title="Copiar enlace público" onclick="copiarEnlaceEncuesta('{{ $enc['id'] }}')">
-                      <i class="fa-solid fa-link"></i>
-                    </button>
-                    <button type="button" class="btn-icon" title="Ver detalles y resultados" onclick='abrirDetalleEncuesta(@json($enc))'>
-                      <i class="fa-solid fa-chart-simple"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
+          <div class="flex items-center gap-3">
+              <button @click="openModal = true" 
+                      type="button" 
+                      class="inline-flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs sm:text-sm font-bold rounded-full transition shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
+                  <i class="fa-solid fa-plus mr-2 text-xs"></i>
+                  <span>Crear Encuesta</span>
+              </button>
+          </div>
       </div>
+
+      <!-- 1. Estadísticas Superiores -->
+      @include('egresados::instructor.encuestas.partials._estadisticas')
+
+      <!-- Layout de la Grilla (Tabla 2/3 + Detalle 1/3) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          <!-- 2. Tabla de Encuestas -->
+          @include('egresados::instructor.encuestas.partials._tabla')
+          
+          <!-- 3. Detalle lateral reactivo -->
+          @include('egresados::instructor.encuestas.partials._detalle')
+      </div>
+
+      <!-- 4. Modal para Crear Encuesta -->
+      @include('egresados::instructor.encuestas.partials._modal_crear')
+
+      <!-- 5. Modal de Resultados Completos y Estadísticas -->
+      @include('egresados::instructor.encuestas.partials._modal_resultados')
 
     </div>
   </div>
+
 </div>
-
-<!-- ============================================== -->
-<!-- MODAL: CREAR NUEVA ENCUESTA (CONSTRUCTOR OFICIAL SENA ERP) -->
-<!-- ============================================== -->
-@include('egresados::instructor.encuestas.partials._modal_crear')
-
-<script>
-  function openModal() {
-    if (window.Alpine) {
-      Alpine.$data(document.body).openModal = true;
-    }
-  }
-  function closeModal() {
-    if (window.Alpine) {
-      Alpine.$data(document.body).openModal = false;
-    }
-  }
-
-  function toggleUserMenu(e) {
-    e.stopPropagation();
-    const menu = document.getElementById('userDropdownMenu');
-    const chevron = document.getElementById('userMenuChevron');
-    const isOpen = menu.classList.contains('show');
-    if (isOpen) {
-      menu.classList.remove('show');
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
-    } else {
-      menu.classList.add('show');
-      if (chevron) chevron.style.transform = 'rotate(180deg)';
-    }
-  }
-
-  document.addEventListener('click', function(e) {
-    const menu = document.getElementById('userDropdownMenu');
-    const chevron = document.getElementById('userMenuChevron');
-    const btn = document.getElementById('userMenuBtn');
-    if (menu && menu.classList.contains('show')) {
-      if (!menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.classList.remove('show');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-      }
-    }
-  });
-
-  // Gestor interactivo de preguntas y plantillas
-  function actualizarContador() {
-    const items = document.querySelectorAll('#questionListContainer .question-card');
-    const badge = document.getElementById('qCountBadge');
-    if (badge) {
-      badge.textContent = items.length + (items.length === 1 ? ' pregunta configurada' : ' preguntas configuradas');
-    }
-  }
-
-  function eliminarPregunta(btn) {
-    const card = btn.closest('.question-card');
-    const container = document.getElementById('questionListContainer');
-    if (container.querySelectorAll('.question-card').length <= 1) {
-      alert('El formato debe contener al menos una pregunta para poder publicarse.');
-      return;
-    }
-    card.remove();
-    actualizarContador();
-  }
-
-  function agregarPregunta(texto = '', tipo = 'mc', label = 'Selección Múltiple') {
-    const container = document.getElementById('questionListContainer');
-    const card = document.createElement('div');
-    card.className = 'question-card';
-    card.innerHTML = `
-      <div class="question-head">
-        <span class="question-type-badge type-${tipo}"><i class="fa-solid fa-pen mr-1"></i> ${label}</span>
-        <button type="button" class="btn-delete-q" onclick="eliminarPregunta(this)" title="Eliminar pregunta"><i class="fa-solid fa-trash-can"></i></button>
-      </div>
-      <input type="text" class="form-control q-input" value="${texto}" placeholder="Escribe aquí el texto de la nueva pregunta..." required>
-    `;
-    container.appendChild(card);
-    actualizarContador();
-    card.querySelector('input').focus();
-  }
-
-  function aplicarPlantilla(tipo) {
-    const titulo = document.getElementById('enc_titulo');
-    const desc = document.getElementById('enc_desc');
-    const target = document.getElementById('enc_target');
-    const container = document.getElementById('questionListContainer');
-    container.innerHTML = '';
-
-    if (tipo === 'insercion') {
-      titulo.value = 'Encuesta de Inserción Laboral y Estabilidad 2026';
-      desc.value = 'Conoce el estado contractual, rango salarial y formalidad laboral de los egresados formados en CEFA La Angostura.';
-      target.value = 'Egresados ADSO';
-      agregarPregunta('¿Actualmente te encuentras vinculado formalmente en tu área de formación?', 'bool', 'Sí / No');
-      agregarPregunta('¿Cuál es tu tipo de vinculación laboral actual (Término indefinido, Obra labor, Prestación de servicios, Emprendimiento)?', 'mc', 'Selección Múltiple');
-      agregarPregunta('¿Cuál es tu rango salarial mensual aproximado?', 'mc', 'Selección Múltiple');
-      agregarPregunta('¿Qué competencias técnicas del programa consideras que marcaron la diferencia en tu contratación?', 'text', 'Respuesta Libre');
-    } else if (tipo === 'satisfaccion') {
-      titulo.value = 'Evaluación de Satisfacción Formativa y Calidad Institucional CEFA';
-      desc.value = 'Monitoreo de la percepción del egresado sobre la calidad académica, infraestructura y acompañamiento del Centro.';
-      target.value = 'Todas las Fichas del Instructor';
-      agregarPregunta('¿Cómo calificas la preparación técnica recibida por tus instructores?', 'scale', 'Escala 1 a 5');
-      agregarPregunta('¿Los ambientes y laboratorios de formación contaban con las herramientas necesarias?', 'scale', 'Escala 1 a 5');
-      agregarPregunta('¿Recomendarías a otras personas formarse en el Centro de Formación Agroindustrial La Angostura?', 'bool', 'Sí / No');
-      agregarPregunta('¿Qué aspectos consideras que deben mejorar en la formación técnica del centro?', 'text', 'Respuesta Libre');
-    } else if (tipo === 'emprendimiento') {
-      titulo.value = 'Sondeo de Unidades Productivas y Emprendimiento Rural';
-      desc.value = 'Identificación de egresados que han constituido empresas o proyectos agropecuarios/tecnológicos en el Huila.';
-      target.value = 'Egresados Agroindustria';
-      agregarPregunta('¿Has iniciado alguna empresa o negocio propio a partir de lo aprendido en el SENA?', 'bool', 'Sí / No');
-      agregarPregunta('¿En qué sector económico se encuentra clasificado tu emprendimiento?', 'mc', 'Selección Múltiple');
-      agregarPregunta('¿Has recibido o tienes interés en acompañamiento de Fondo Emprender?', 'bool', 'Sí / No');
-      agregarPregunta('Describe brevemente el producto o servicio principal que ofrece tu iniciativa:', 'text', 'Respuesta Libre');
-    } else if (tipo === 'bilinguismo') {
-      titulo.value = 'Diagnóstico de Competencias en Bilingüismo & Tecnologías Emergentes';
-      desc.value = 'Evaluación de habilidades en idioma inglés y tecnologías de inteligencia artificial requeridas por las empresas.';
-      target.value = 'Todos los Egresados CEFA';
-      agregarPregunta('¿En tu puesto de trabajo utilizas el idioma inglés para comunicarte o redactar documentación?', 'mc', 'Selección Múltiple');
-      agregarPregunta('¿Tu empresa exige conocimientos en herramientas de Inteligencia Artificial o Cloud?', 'bool', 'Sí / No');
-      agregarPregunta('¿Qué temas te gustaría recibir en cursos complementarios de actualización profesional?', 'text', 'Respuesta Libre');
-    }
-  }
-
-  function prepararEnvio() {
-    const inputs = document.querySelectorAll('#questionListContainer .q-input');
-    const preguntas = [];
-    inputs.forEach((inp, idx) => {
-      if (inp.value.trim() !== '') {
-        preguntas.push({ id: idx + 1, texto: inp.value.trim() });
-      }
-    });
-    document.getElementById('estructura_preguntas').value = JSON.stringify(preguntas);
-  }
-
-  // Visualizador modal de Detalle y Resultados de Encuesta
-  let encuestaActual = null;
-
-  function abrirDetalleEncuesta(enc) {
-    encuestaActual = enc;
-    document.getElementById('verEnc_title').textContent = enc.title || 'Detalle de la Encuesta';
-    document.getElementById('verEnc_sub').textContent = 'Código: ' + (enc.id || 'ENC') + ' · Autor: ' + (enc.creado_por || 'Instructor CEFA');
-    document.getElementById('verEnc_enviadas').textContent = enc.enviadas ?? 120;
-    document.getElementById('verEnc_respondidas').textContent = enc.respondidas ?? 90;
-    document.getElementById('verEnc_pendientes').textContent = enc.pendientes ?? 30;
-    document.getElementById('verEnc_rate').textContent = enc.rate || '75%';
-    document.getElementById('verEnc_rateLabel').textContent = enc.rate || '75%';
-    document.getElementById('verEnc_progressFill').style.width = (enc.rate_num || 75) + '%';
-    document.getElementById('verEnc_target').textContent = enc.target || 'Egresados CEFA';
-    document.getElementById('verEnc_fecha').textContent = enc.date || 'Reciente';
-    document.getElementById('verEnc_desc').textContent = enc.description || 'Sin descripción detallada.';
-
-    // Renderizar preguntas
-    const list = document.getElementById('verEnc_preguntasList');
-    list.innerHTML = '';
-    const preguntas = enc.preguntas && enc.preguntas.length > 0 ? enc.preguntas : [
-      { id: 1, texto: '¿Actualmente te encuentras laborando en tu área de formación técnica?', tipo: 'mc', label: 'Selección Múltiple' },
-      { id: 2, texto: '¿En cuánto tiempo lograste tu vinculación laboral tras egresar?', tipo: 'mc', label: 'Selección Múltiple' },
-      { id: 3, texto: '¿Calificación de satisfacción con las competencias adquiridas en CEFA?', tipo: 'scale', label: 'Escala 1 a 5' },
-      { id: 4, texto: '¿Qué herramientas tecnológicas recomiendas profundizar en el plan de estudios?', tipo: 'text', label: 'Respuesta Libre' }
-    ];
-
-    preguntas.forEach((q, idx) => {
-      const item = document.createElement('div');
-      item.style.cssText = 'background: #ffffff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 12.5px; color: var(--ink); display: flex; align-items: center; justify-content: space-between;';
-      item.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-weight: 700; color: var(--green-dark);">P${idx + 1}.</span>
-          <span>${q.texto || q}</span>
-        </div>
-        <span class="question-type-badge type-${q.tipo || 'mc'}">${q.label || 'Múltiple'}</span>
-      `;
-      list.appendChild(item);
-    });
-
-    document.getElementById('modalVerEncuesta').style.display = 'flex';
-  }
-
-  function cerrarDetalleEncuesta() {
-    document.getElementById('modalVerEncuesta').style.display = 'none';
-  }
-
-  function copiarEnlaceEncuesta(id) {
-    const url = window.location.origin + '/egresados/encuestas/' + id;
-    navigator.clipboard.writeText(url).then(() => {
-      mostrarToast('¡Enlace de encuesta copiado al portapapeles!');
-    }).catch(() => {
-      mostrarToast('Enlace: ' + url);
-    });
-  }
-
-  function copiarEnlaceDesdeModal() {
-    if (encuestaActual && encuestaActual.id) {
-      copiarEnlaceEncuesta(encuestaActual.id);
-    }
-  }
-
-  function mostrarToast(mensaje) {
-    let toast = document.getElementById('sigeToastNotification');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'sigeToastNotification';
-      toast.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: #001A29; color: #ffffff; padding: 14px 22px; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-left: 4px solid #39A900; z-index: 9999; display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(20px); transition: all 0.3s ease;';
-      document.body.appendChild(toast);
-    }
-    toast.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #62E31D; font-size: 16px;"></i><span>' + mensaje + '</span>';
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateY(0)';
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(20px)';
-    }, 3200);
-  }
-</script>
-
-<!-- MODAL: VER DETALLE Y RESULTADOS DE ENCUESTA -->
-<div class="modal-overlay" id="modalVerEncuesta">
-  <div class="modal-box" style="max-width: 780px;">
-        <div class="modal-head">
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <div class="modal-head-icon">
-          <i class="fa-solid fa-square-poll-vertical"></i>
-        </div>
-        <div>
-          <div class="modal-overtitle"><i class="fa-solid fa-chart-pie"></i> RESULTADOS Y DETALLE · INSTRUMENTO DE SEGUIMIENTO</div>
-          <h3 class="modal-title" id="verEnc_title">Título de la Encuesta</h3>
-          <div class="modal-sub" id="verEnc_sub">ID: ENC-000 · Creado por: Instructor CEFA</div>
-        </div>
-      </div>
-      <button type="button" class="modal-close" onclick="cerrarDetalleEncuesta()" title="Cerrar">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <!-- Grid de Métricas de la Encuesta -->
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
-        <div style="background: #FAFCFB; border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase;">Enviadas</div>
-          <div style="font-size: 24px; font-weight: 800; color: var(--forest); margin-top: 4px;" id="verEnc_enviadas">0</div>
-          <div style="font-size: 11px; color: var(--ink-soft);">Egresados convocados</div>
-        </div>
-
-        <div style="background: var(--green-soft); border: 1px solid rgba(57,169,0,0.25); border-radius: 12px; padding: 14px; text-align: center;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--green-dark); text-transform: uppercase;">Respondidas</div>
-          <div style="font-size: 24px; font-weight: 800; color: var(--green-dark); margin-top: 4px;" id="verEnc_respondidas">0</div>
-          <div style="font-size: 11px; color: var(--green-dark);">Completadas</div>
-        </div>
-
-        <div style="background: #FEF7EA; border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 14px; text-align: center;">
-          <div style="font-size: 11px; font-weight: 700; color: #9A3412; text-transform: uppercase;">Pendientes</div>
-          <div style="font-size: 24px; font-weight: 800; color: #9A3412; margin-top: 4px;" id="verEnc_pendientes">0</div>
-          <div style="font-size: 11px; color: #9A3412;">Sin responder</div>
-        </div>
-
-        <div style="background: #EBF3FF; border: 1px solid rgba(37,99,235,0.25); border-radius: 12px; padding: 14px; text-align: center;">
-          <div style="font-size: 11px; font-weight: 700; color: #1E40AF; text-transform: uppercase;">Tasa Respuesta</div>
-          <div style="font-size: 24px; font-weight: 800; color: #1E40AF; margin-top: 4px;" id="verEnc_rate">0%</div>
-          <div style="font-size: 11px; color: #1E40AF;">Participación</div>
-        </div>
-      </div>
-
-      <!-- Barra de progreso visual -->
-      <div class="form-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-weight: 700; font-size: 12.5px; color: var(--forest);">Avance de Recolección de Información</span>
-          <span id="verEnc_rateLabel" style="font-weight: 800; font-size: 12px; color: var(--green-dark);">75%</span>
-        </div>
-        <div class="progress-bar" style="height: 10px;">
-          <div id="verEnc_progressFill" class="progress-fill" style="width: 75%;"></div>
-        </div>
-      </div>
-
-      <!-- Datos del Instrumento -->
-      <div class="form-section">
-        <div class="form-section-title">
-          <i class="fa-solid fa-circle-info" style="color: var(--green);"></i>
-          <span>Información de la Convocatoria</span>
-        </div>
-        <div class="form-row" style="margin-bottom: 12px;">
-          <div>
-            <span style="font-size: 11.5px; color: var(--ink-soft); display: block;">Público Objetivo:</span>
-            <strong style="font-size: 13px; color: var(--forest);" id="verEnc_target">Egresados ADSO</strong>
-          </div>
-          <div>
-            <span style="font-size: 11.5px; color: var(--ink-soft); display: block;">Fecha de Emisión:</span>
-            <strong style="font-size: 13px; color: var(--forest);" id="verEnc_fecha">12/06/2026</strong>
-          </div>
-        </div>
-        <div>
-          <span style="font-size: 11.5px; color: var(--ink-soft); display: block; margin-bottom: 4px;">Propósito / Descripción:</span>
-          <p id="verEnc_desc" style="font-size: 13px; color: var(--ink); line-height: 1.5; margin: 0; background: #ffffff; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;">
-            Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.
-          </p>
-        </div>
-      </div>
-
-      <!-- Preguntas y Estructura del Cuestionario -->
-      <div class="form-section" style="margin-bottom: 0;">
-        <div class="form-section-title" style="justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-clipboard-list" style="color: var(--green);"></i>
-            <span>Preguntas del Instrumento Evaluado</span>
-          </div>
-          <span style="font-size: 11px; font-weight: 700; color: var(--green-dark); background: var(--green-soft); padding: 2px 8px; border-radius: 999px;">
-            Preguntas Activas
-          </span>
-        </div>
-        <div id="verEnc_preguntasList" style="display: flex; flex-direction: column; gap: 8px;">
-          <!-- Items dinámicos o preguntas base -->
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-foot">
-      <button type="button" class="btn-cancel" onclick="copiarEnlaceDesdeModal()">
-        <i class="fa-solid fa-copy mr-1"></i> Copiar Enlace
-      </button>
-      <button type="button" class="btn-submit" onclick="cerrarDetalleEncuesta()">
-        <span>Cerrar Vista</span>
-      </button>
-    </div>
-  </div>
-</div>
-
 
 <!-- Modal de Alertas y Notificaciones Institucionales -->
 @include('egresados::superadmin.partials._modal_alertas')
+
+<!-- Script interactivo de Encuestas -->
+<script>
+    let currentEncuestaData = null;
+
+    // Función interactiva para actualizar el panel de detalles reactivo
+    function selectEncuesta(data, rowId) {
+        if (!data) return;
+
+        // Actualizar fila activa en la tabla con colores del SENA ERP
+        document.querySelectorAll('.encuesta-row').forEach(row => {
+            row.classList.remove('selected-row', 'bg-[#EAF7EE]', 'border-l-4', 'border-[#39A900]', 'bg-emerald-50/60', 'border-emerald-600');
+        });
+        const activeRow = document.getElementById(rowId);
+        if (activeRow) {
+            activeRow.classList.add('selected-row', 'bg-[#EAF7EE]', 'border-l-4', 'border-[#39A900]');
+        }
+
+        // Actualizar datos del panel lateral
+        document.getElementById('detailSurveyTitle').innerText = data.full_title || data.title || 'Encuesta Institucional';
+        document.getElementById('detailSurveyDesc').innerText = data.description || 'Encuesta de seguimiento institucional para la comunidad de egresados del CEFA.';
+        document.getElementById('detailSurveyMeta').innerText = data.id || 'ENC-000';
+        document.getElementById('detailSurveyDate').innerText = data.date || 'N/A';
+        document.getElementById('detailSurveyTarget').innerText = data.target || 'Público general';
+
+        document.getElementById('detailEnviadas').innerText = data.enviadas || 0;
+        document.getElementById('detailRespondidas').innerText = data.respondidas || 0;
+        document.getElementById('detailPendientes').innerText = data.pendientes || 0;
+        document.getElementById('detailRate').innerText = data.rate || '0%';
+
+        const progressBar = document.getElementById('detailProgressBar');
+        if (progressBar) {
+            progressBar.style.width = (data.rate_num || parseInt(data.rate) || 0) + '%';
+        }
+
+        const badge = document.getElementById('detailStatusBadge');
+        if (badge) {
+            badge.innerText = data.status || 'ACTIVA';
+            if (data.status === 'ACTIVA') {
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] uppercase';
+            } else if (data.status === 'CERRADA') {
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-600 border border-gray-200 uppercase';
+            } else {
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 uppercase';
+            }
+        }
+
+        currentEncuestaData = data;
+
+        // Actualizar formulario y modal de cierre
+        const closeForm = document.getElementById('formCerrarEncuesta');
+        if (closeForm && data.id) {
+            closeForm.action = "{{ url('egresados/instructor/encuestas') }}/" + data.id + "/cerrar";
+        }
+
+        const modalSurveyId = document.getElementById('modalSurveyId');
+        if (modalSurveyId && data.id) {
+            modalSurveyId.innerText = data.id;
+        }
+
+        const closeBtn = document.getElementById('btnCerrarEncuestaTrigger');
+        if (closeBtn) {
+            if (data.status === 'CERRADA') {
+                closeBtn.disabled = true;
+                closeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                closeBtn.innerHTML = '<i class="fa-solid fa-lock text-xs"></i> <span>Encuesta Ya Cerrada</span>';
+            } else {
+                closeBtn.disabled = false;
+                closeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                closeBtn.innerHTML = '<i class="fa-solid fa-ban text-xs"></i> <span>Cerrar Encuesta</span>';
+            }
+        }
+    }
+
+    // Filtrado interactivo en tabla
+    function filterSurveysTable() {
+        const query = (document.getElementById('surveySearchInput')?.value || '').toLowerCase();
+        const statusFilter = document.getElementById('surveyStatusFilter')?.value || '';
+        const targetFilter = document.getElementById('surveyTargetFilter')?.value || '';
+        const rows = document.querySelectorAll('#encuestasTable tbody tr.encuesta-row');
+
+        rows.forEach(row => {
+            const id = (row.getAttribute('data-id') || '').toLowerCase();
+            const title = (row.getAttribute('data-title') || '').toLowerCase();
+            const target = (row.getAttribute('data-target') || '').toLowerCase();
+            const status = row.getAttribute('data-status') || '';
+
+            const matchesQuery = !query || id.includes(query) || title.includes(query) || target.includes(query);
+            const matchesStatus = !statusFilter || status === statusFilter;
+            const matchesTarget = !targetFilter || target.includes(targetFilter.toLowerCase());
+
+            if (matchesQuery && matchesStatus && matchesTarget) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Inicializar seleccionando la primera encuesta disponible al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstRow = document.querySelector('.encuesta-row');
+        if (firstRow) {
+            firstRow.click();
+        }
+    });
+
+    // Función para descargar el reporte ejecutivo escrito de la encuesta en PDF (1 Página exacta, Formato Oficial ERP)
+    function descargarResumenPDF() {
+        const btn = document.getElementById('btnDescargarResumenPDF');
+        const btnText = document.getElementById('btnDescargarResumenText');
+
+        const data = currentEncuestaData || {};
+        const surveyId = (data.id || document.getElementById('detailSurveyMeta')?.innerText || 'ENC-025').trim();
+        const surveyTitle = (data.full_title || data.title || document.getElementById('detailSurveyTitle')?.innerText || 'Encuesta Institucional').trim();
+        const surveyDesc = (data.description || document.getElementById('detailSurveyDesc')?.innerText || 'Instrumento para el diagnóstico, seguimiento a la inserción laboral y pertinencia de las competencias adquiridas en el Centro Agroindustrial La Angostura.').trim();
+        const surveyDate = (data.date || document.getElementById('detailSurveyDate')?.innerText || new Date().toLocaleDateString('es-CO')).trim();
+        const surveyTarget = (data.target || document.getElementById('detailSurveyTarget')?.innerText || 'Comunidad de Egresados CEFA').trim();
+        const surveyStatus = (data.status || document.getElementById('detailStatusBadge')?.innerText || 'ACTIVA').trim();
+        const surveyCreator = (data.creado_por || 'Coordinación Académica y Seguimiento a Egresados').trim();
+
+        const envVal = (data.enviadas || document.getElementById('detailEnviadas')?.innerText || '0').toString().trim();
+        const respVal = (data.respondidas || document.getElementById('detailRespondidas')?.innerText || '0').toString().trim();
+        const pendVal = (data.pendientes || document.getElementById('detailPendientes')?.innerText || '0').toString().trim();
+        const rateVal = (data.rate || document.getElementById('detailRate')?.innerText || '0%').toString().trim();
+
+        if (btnText) btnText.innerText = 'Generando Reporte...';
+        if (btn) btn.disabled = true;
+
+        const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}";
+
+        const container = document.createElement('div');
+        container.style.padding = '4px 18px 14px 18px';
+        container.style.fontFamily = 'Arial, Helvetica, sans-serif';
+        container.style.color = '#1e293b';
+        container.style.backgroundColor = '#ffffff';
+        container.style.lineHeight = '1.45';
+
+        container.innerHTML = `
+            <!-- Encabezado Institucional SENA ERP con Logo Oficial -->
+            <div style="background: #001A29; border-bottom: 4px solid #39A900; border-radius: 8px 8px 0 0; padding: 14px 18px; color: #ffffff;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 48px; vertical-align: middle;">
+                            <img src="${senaLogo}" style="width: 38px; height: 38px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                        </td>
+                        <td style="vertical-align: middle; padding-left: 10px;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #62E31D; text-transform: uppercase; letter-spacing: 1px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>
+                            <div style="font-size: 14.5px; font-weight: bold; color: #ffffff; margin-top: 2px;">Centro de Formación Agroindustrial La Angostura — CEFA</div>
+                            <div style="font-size: 10px; color: #cbd5e1; margin-top: 1px;">Sistema Institucional de Gestión y Seguimiento a Egresados (SIGE)</div>
+                        </td>
+                        <td style="text-align: right; vertical-align: middle;">
+                            <span style="background: #39A900; color: #ffffff; padding: 4px 10px; font-size: 9.5px; font-weight: bold; border-radius: 4px; text-transform: uppercase;">INFORME ESCRITO</span>
+                            <div style="font-size: 9.5px; color: #94a3b8; margin-top: 3px;">Fecha: ${new Date().toLocaleDateString('es-CO')}</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Franja de Identificación del Instrumento -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; padding: 10px 18px; margin-bottom: 14px; border-radius: 0 0 8px 8px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <tr>
+                        <td style="color: #001A29; font-weight: bold;">
+                            <span style="color: #39A900; margin-right: 4px;">●</span> Encuesta: <span style="color: #0f172a;">${surveyTitle}</span>
+                        </td>
+                        <td style="text-align: right; color: #64748b;">
+                            Código: <strong style="color: #001A29;">${surveyId}</strong> &nbsp;|&nbsp; 
+                            Estado: <strong style="color: ${surveyStatus === 'ACTIVA' ? '#166534' : '#475569'};">${surveyStatus}</strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Ficha Técnica de Registro -->
+            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #edf2f7; padding-bottom: 5px; margin-bottom: 8px;">
+                    Ficha Técnica y Datos de Emisión
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; background: #f8fafc; border-radius: 6px;">
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Código de Control:</strong> <span style="color:#0f172a;">${surveyId}</span></td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Fecha de Publicación:</strong> ${surveyDate}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 34%;"><strong>Población Citada:</strong> <span style="color:#166534; font-weight:bold;">${surveyTarget}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Responsable de Gestión:</strong> ${surveyCreator}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Ámbito:</strong> Regional Huila — CEFA</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Descripción y Objetivo Institucional (Lo Escrito) -->
+            <div style="border: 1px solid #e2e8f0; border-left: 4px solid #39A900; border-radius: 6px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 5px;">
+                    Objetivo y Alcance del Instrumento
+                </div>
+                <p style="font-size: 10.5px; color: #334155; margin: 0; line-height: 1.5; text-align: justify;">
+                    ${surveyDesc} Este instrumento permite recolectar evidencias fácticas sobre el desempeño laboral de los egresados, el grado de pertinencia formativa respecto a las demandas de los sectores productivos y la efectividad de las competencias técnicas y transversales orientadas por la entidad.
+                </p>
+            </div>
+
+            <!-- Consolidado Numérico y Desempeño Operativo -->
+            <div style="font-size: 11px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 7px;">
+                Consolidado de Participación y Efectividad
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 11px;">
+                <thead>
+                    <tr style="background: #001A29; color: #ffffff;">
+                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Indicador de Recolección</th>
+                        <th style="padding: 8px 10px; text-align: center; border: 1px solid #001A29; width: 90px;">Muestra</th>
+                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Detalle Operativo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Egresados Convocados (Enviadas)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #0f172a;">${envVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Cuestionarios enviados y convocatorias oficiales notificadas</td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Cuestionarios Completados (Respondidas)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #39A900;">${respVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Respuestas válidas procesadas y consolidadas en base de datos</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Cuestionarios en Trámite (Pendientes)</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #d97706;">${pendVal}</td>
+                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Egresados en proceso de diligenciamiento dentro del cronograma</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; font-weight: bold; color: #166534;">Tasa Global de Respuesta</td>
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; text-align: center; font-weight: 900; font-size: 15px; color: #15803d;">${rateVal}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 10px; font-weight: 600;">Nivel de representatividad estadística alcanzado en el instrumento</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Ejes Temáticos del Cuestionario -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 6px;">
+                    Dimensiones Evaluadas en el Cuestionario
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                    <tr>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Situación y Vinculación Laboral Actual</td>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Pertinencia de las Competencias del CEFA</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Rangos Salariales y Estabilidad Económica</td>
+                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Percepción y Calidad de la Formación Profesional</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Dictamen Institucional y Conclusiones -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 10px; color: #334155; line-height: 1.45;">
+                <strong style="color: #001A29; text-transform: uppercase;">Conclusión del Seguimiento:</strong> La muestra recolectada permite validar la trazabilidad ocupacional y aporta información estratégica para los procesos de autoevaluación, mejoramiento curricular y acreditación institucional del Centro de Formación Agroindustrial La Angostura — CEFA.
+            </div>
+
+            <!-- Certificación de Confidencialidad (Habeas Data) -->
+            <div style="background: #f0faf3; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; font-size: 9.5px; color: #166534; margin-bottom: 22px; line-height: 1.4;">
+                <strong>Tratamiento de Información (Ley 1581 de 2012):</strong> Los datos suministrados por los egresados gozan de reserva estadística y su procesamiento tiene fines exclusivamente académicos y de caracterización institucional bajo los estándares del SENA.
+            </div>
+
+            <!-- Firmas Institucionales de Responsabilidad -->
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px;">
+                <tr>
+                    <td style="width: 46%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
+                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Coordinación Académica</div>
+                            <div style="font-size: 9px; color: #64748b;">CEFA La Angostura — SENA</div>
+                        </div>
+                    </td>
+                    <td style="width: 8%;"></td>
+                    <td style="width: 46%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
+                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Líder de Seguimiento a Egresados</div>
+                            <div style="font-size: 9px; color: #64748b;">Sistema Institucional SIGE</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Pie de Página Institucional -->
+            <div style="border-top: 1px solid #cbd5e1; padding-top: 8px; text-align: center; font-size: 9px; color: #64748b; margin-top: 10px;">
+                SISTEMA DE GESTIÓN DE EGRESADOS (SIGE) • SENA EMPRESA ERP • CEFA LA ANGOSTURA — {{ date('Y') }}
+            </div>
+        `;
+
+        const opt = {
+            margin:       [3, 6, 6, 6],
+            filename:     'Reporte_Ejecutivo_' + surveyId + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(container).save().then(() => {
+            if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
+            if (btn) btn.disabled = false;
+        }).catch(err => {
+            console.error('Error generando reporte escrito:', err);
+            if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
+            if (btn) btn.disabled = false;
+            alert('Ocurrió un error al generar el reporte.');
+        });
+    }
+
+    // Variables de gráficas de ApexCharts en Modal de Resultados
+    let chartDonaModal = null;
+    let chartBarrasModal = null;
+    let chartPertinenciaModal = null;
+
+    // Abrir Modal de Resultados Completos con datos sincronizados
+    function abrirResultadosModal(customData) {
+        const data = customData || currentEncuestaData;
+        if (!data) return;
+
+        const titleEl = document.getElementById('modalResTitle');
+        if (titleEl) titleEl.innerText = data.full_title || data.title || 'Encuesta Institucional';
+
+        const idEl = document.getElementById('modalResId');
+        if (idEl) idEl.innerText = data.id || 'ENC-000';
+
+        const pdfCodeEl = document.getElementById('modalPdfCode');
+        if (pdfCodeEl) pdfCodeEl.innerText = data.id || 'ENC-000';
+
+        const targetEl = document.getElementById('modalResTarget');
+        if (targetEl) targetEl.innerText = data.target || 'Egresados CEFA';
+
+        const statusEl = document.getElementById('modalResStatus');
+        if (statusEl) {
+            statusEl.innerText = data.status || 'ACTIVA';
+            if (data.status === 'CERRADA') {
+                statusEl.className = 'font-bold text-[11px] text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full';
+            } else {
+                statusEl.className = 'font-bold text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full';
+            }
+        }
+
+        const envEl = document.getElementById('modalResEnviadas');
+        if (envEl) envEl.innerText = data.enviadas || 0;
+
+        const respEl = document.getElementById('modalResRespondidas');
+        if (respEl) respEl.innerText = data.respondidas || 0;
+
+        const pendEl = document.getElementById('modalResPendientes');
+        if (pendEl) pendEl.innerText = data.pendientes || 0;
+
+        const rateEl = document.getElementById('modalResRate');
+        if (rateEl) rateEl.innerText = data.rate || '0%';
+
+        const pdfSub = document.getElementById('modalPdfSub');
+        if (pdfSub) pdfSub.innerText = 'Reporte: ' + (data.full_title || data.title) + ' (ID: ' + data.id + ')';
+
+        window.dispatchEvent(new CustomEvent('open-modal-resultados'));
+
+        // Renderizar gráficas tras la transición de apertura
+        setTimeout(() => {
+            renderizarGraficasModal(data);
+        }, 100);
+    }
+
+    function renderizarGraficasModal(data) {
+        if (typeof ApexCharts === 'undefined') return;
+
+        const respondidas = parseInt(data.respondidas) || 90;
+        const empleados = Math.round(respondidas * 0.65);
+        const desempleados = Math.round(respondidas * 0.20);
+        const estudiando = Math.max(1, respondidas - empleados - desempleados);
+
+        // 1. Gráfica de Dona: Estado Laboral (Compacta para 1 Página A4)
+        const donaContainer = document.querySelector("#modal-grafica-estado-laboral");
+        if (donaContainer) {
+            donaContainer.innerHTML = '';
+            const optionsDona = {
+                series: [empleados, desempleados, estudiando],
+                labels: ['Empleados', 'En Búsqueda / Desempleados', 'Estudiando / Emprendiendo'],
+                chart: { type: 'donut', height: 185, fontFamily: 'inherit', animations: { enabled: false } },
+                colors: ['#39A900', '#001A29', '#62E31D'],
+                plotOptions: { pie: { donut: { size: '65%' }, expandOnClick: false } },
+                dataLabels: { enabled: false },
+                legend: { position: 'bottom', fontSize: '10px', fontWeight: 600 },
+                tooltip: { theme: 'light', y: { formatter: val => val + ' Egresados' } }
+            };
+            if (chartDonaModal) { try { chartDonaModal.destroy(); } catch(e){} }
+            chartDonaModal = new ApexCharts(donaContainer, optionsDona);
+            chartDonaModal.render();
+        }
+
+        // 2. Gráfica de Barras: Salarios (Compacta para 1 Página A4)
+        const barrasContainer = document.querySelector("#modal-grafica-salarios");
+        if (barrasContainer) {
+            barrasContainer.innerHTML = '';
+            const optionsBarras = {
+                series: [{ name: 'Egresados', data: [Math.round(empleados * 0.2), Math.round(empleados * 0.45), Math.round(empleados * 0.25), Math.round(empleados * 0.1)] }],
+                chart: { type: 'bar', height: 175, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: false } },
+                colors: ['#39A900', '#2e8b00', '#001A29', '#002336'],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '40%', distributed: true } },
+                dataLabels: { enabled: false },
+                legend: { show: false },
+                xaxis: {
+                    categories: ['1 SMMLV', '1 a 2 SMMLV', '2 a 3 SMMLV', 'Más de 3'],
+                    labels: { style: { fontSize: '10px', cssClass: 'font-semibold text-gray-500' } }
+                },
+                tooltip: { theme: 'light' }
+            };
+            if (chartBarrasModal) { try { chartBarrasModal.destroy(); } catch(e){} }
+            chartBarrasModal = new ApexCharts(barrasContainer, optionsBarras);
+            chartBarrasModal.render();
+        }
+
+        // 3. Gráfica Apilada: Pertinencia (Compacta para 1 Página A4)
+        const pertContainer = document.querySelector("#modal-grafica-pertinencia");
+        if (pertContainer) {
+            pertContainer.innerHTML = '';
+            const optionsPert = {
+                series: [
+                    { name: 'Totalmente relacionado', data: [Math.round(empleados * 0.6), Math.round(empleados * 0.55)] },
+                    { name: 'No relacionado', data: [Math.round(empleados * 0.15), Math.round(empleados * 0.2)] }
+                ],
+                chart: { type: 'bar', stacked: true, height: 120, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: false } },
+                colors: ['#008f39', '#ef4444'],
+                plotOptions: { bar: { horizontal: true, borderRadius: 3 } },
+                dataLabels: { enabled: true, style: { fontSize: '9.5px' } },
+                xaxis: { categories: [data.target || 'ADSO', 'Otros programas CEFA'] },
+                legend: { position: 'top', horizontalAlign: 'left', fontSize: '10px' }
+            };
+            if (chartPertinenciaModal) { try { chartPertinenciaModal.destroy(); } catch(e){} }
+            chartPertinenciaModal = new ApexCharts(pertContainer, optionsPert);
+            chartPertinenciaModal.render();
+        }
+    }
+
+    // Exportar el contenido del reporte a PDF en EXACTAMENTE 1 PÁGINA (Sin páginas en blanco)
+    function descargarModalResultadosPDF() {
+        const elemento = document.getElementById('modal-area-imprimir');
+        if (!elemento) return;
+        const btn = document.getElementById('btn-modal-pdf');
+        const btnText = document.getElementById('btn-modal-pdf-text');
+        const surveyId = (document.getElementById('modalResId')?.innerText || 'ENC-025').trim();
+
+        if (btnText) btnText.innerText = 'Generando PDF...';
+        if (btn) btn.disabled = true;
+
+        // 1. Mostrar encabezado oficial para PDF
+        const printHeader = document.getElementById('modalPrintHeader');
+        if (printHeader) printHeader.classList.remove('hidden');
+
+        // 2. Elementos del modal a acomodar temporalmente
+        const modalBox = elemento.closest('.bg-white.rounded-3xl');
+        const modalBackdrop = elemento.closest('.fixed.inset-0');
+        const modalHeader = modalBox ? modalBox.querySelector('.border-b-2') : null;
+
+        const prevModalScroll = elemento.scrollTop;
+        const prevWindowScroll = window.scrollY;
+
+        // Ajustes para captura al ras exacta sin huecos ni desbordes
+        if (modalHeader) modalHeader.style.display = 'none';
+        if (modalBackdrop) {
+            modalBackdrop.style.paddingTop = '0px';
+            modalBackdrop.style.alignItems = 'flex-start';
+        }
+        if (modalBox) {
+            modalBox.style.marginTop = '0px';
+            modalBox.style.borderRadius = '0px';
+            modalBox.style.maxHeight = 'none';
+        }
+        elemento.scrollTop = 0;
+        window.scrollTo(0, 0);
+
+        const opciones = {
+            margin:       [4, 4, 4, 4],
+            filename:     'Reporte_Resultados_' + surveyId + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true, 
+                logging: false,
+                letterRendering: true,
+                scrollY: 0,
+                scrollX: 0
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: 'avoid-all' }
+        };
+
+        const restoreModal = () => {
+            if (printHeader) printHeader.classList.add('hidden');
+            if (modalHeader) modalHeader.style.display = '';
+            if (modalBackdrop) {
+                modalBackdrop.style.paddingTop = '';
+                modalBackdrop.style.alignItems = '';
+            }
+            if (modalBox) {
+                modalBox.style.marginTop = '';
+                modalBox.style.borderRadius = '';
+                modalBox.style.maxHeight = '';
+            }
+            elemento.scrollTop = prevModalScroll;
+            window.scrollTo(0, prevWindowScroll);
+            if (btnText) btnText.innerText = 'Descargar Reporte (PDF)';
+            if (btn) btn.disabled = false;
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opciones).from(elemento).save().then(() => {
+                restoreModal();
+            }).catch(err => {
+                console.error('Error generando PDF resultados:', err);
+                restoreModal();
+                alert('Ocurrió un error al generar el PDF de resultados.');
+            });
+        }, 150);
+    }
+</script>
+
 </body>
 </html>

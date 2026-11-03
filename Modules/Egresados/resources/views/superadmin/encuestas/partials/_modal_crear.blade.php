@@ -71,7 +71,7 @@
 
         <!-- Cuerpo del Formulario con Scroll Suave -->
         <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-6 bg-[#f8fafc]/80">
-            <form id="form-crear-encuesta" action="{{ route('egresados.superadmin.encuestas.store') }}" method="POST" class="space-y-6">
+            <form id="form-crear-encuesta" action="{{ request()->routeIs('egresados.instructor.*') ? route('egresados.instructor.encuestas.store') : route('egresados.superadmin.encuestas.store') }}" method="POST" class="space-y-6">
                 @csrf
                 
                 <!-- Input serializado con las preguntas para el backend -->

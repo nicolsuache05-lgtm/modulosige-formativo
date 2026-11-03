@@ -186,6 +186,105 @@
 </div>
 
 <style>
+  /* ================= ESTILOS GLOBALES DE TOPBAR INSTITUCIONAL SENA ERP ================= */
+  .topbar {
+    background: linear-gradient(135deg, var(--sena-dark, #00131E) 0%, var(--sena-navy, #001A29) 100%) !important;
+    border-bottom: 3px solid var(--sena-green, #39A900) !important;
+    box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 36px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar-right-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+
+  /* Chip de Usuario y Botones de Barra Superior */
+  .user-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    padding: 4px 12px 4px 5px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+    user-select: none !important;
+  }
+  .user-chip:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+  .user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 999px !important;
+    background: var(--sena-green, #39A900) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    flex-shrink: 0 !important;
+  }
+  .user-chevron-icon {
+    font-size: 10.5px !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: transform 0.2s ease !important;
+  }
+  .user-chevron-icon.rotate {
+    transform: rotate(180deg) !important;
+    color: #62E31D !important;
+  }
+  .icon-btn, .notif-toggle-btn {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+  }
+  .icon-btn:hover, .notif-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: #62E31D !important;
+  }
+  .dot, .notif-badge-dot {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background: var(--moss, #62E31D) !important;
+    box-shadow: 0 0 6px rgba(98, 227, 29, 0.8) !important;
+  }
+
   /* ================= VIEW TRANSITIONS & TRANSICIONES SUAVES ================= */
   @view-transition {
     navigation: auto;
@@ -1146,8 +1245,8 @@
       }, { passive: true });
     }
 
-    // 2. Interceptar clics en los enlaces del menú para salida suave
-    const moduleLinks = document.querySelectorAll('.sidebar nav a, .user-menu-item, .portal-link-btn');
+    // 2. Interceptar clics en los enlaces del menú y cards para salida suave sin parpadeos
+    const moduleLinks = document.querySelectorAll('.sidebar nav a, aside nav a, .user-menu-item, .portal-link-btn, .stat-link, .panel-action, a[href*="directorio"], a[href*="encuestas"], a[href*="reportes"], a[href*="eventos"], a[href*="dashboard"]');
     moduleLinks.forEach(function(link) {
       link.addEventListener('click', function(e) {
         const href = this.getAttribute('href');
@@ -1158,13 +1257,13 @@
         // Respetar combinaciones de teclas para abrir en pestaña nueva
         if (e.ctrlKey || e.metaKey || e.shiftKey) return;
 
-        const mainContent = document.querySelector('.content') || document.querySelector('.content-area') || document.querySelector('.main');
+        const mainContent = document.querySelector('.content') || document.querySelector('.content-area') || document.querySelector('.main') || document.querySelector('main');
         if (mainContent) {
           e.preventDefault();
           mainContent.classList.add('sige-page-exit');
           setTimeout(function() {
             window.location.href = href;
-          }, 140);
+          }, 120);
         }
       });
     });

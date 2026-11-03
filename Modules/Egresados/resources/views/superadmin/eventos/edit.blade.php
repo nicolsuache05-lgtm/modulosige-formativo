@@ -54,8 +54,8 @@
 <div class="min-h-screen flex flex-col">
     
     <!-- Topbar -->
-    <header class="bg-[#001A29] text-white px-6 py-3.5 flex items-center justify-between border-b border-[#39A900]/30 sticky top-0 z-30 shadow-sm">
-        <div class="flex items-center gap-3">
+    <header class="topbar">
+        <div class="topbar-left">
             <a href="{{ route('egresados.superadmin.eventos.index') }}" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition cursor-pointer" title="Volver">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
@@ -67,6 +67,8 @@
                 </h1>
             </div>
         </div>
+
+        @include('egresados::superadmin.partials._topbar_right')
     </header>
 
     <!-- Main Content -->

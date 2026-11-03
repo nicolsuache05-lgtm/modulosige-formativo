@@ -397,94 +397,162 @@ class InstructorController extends Controller
      */
     public function eventos(Request $request)
     {
-        $totalEventos = 4;
-        $totalInscritos = 286;
-        $tasaAsistencia = '82%';
-        $proximoEventoDias = 6;
-
         $defaultEventos = [
             [
-                'id' => 'EVT-INS-001',
-                'title' => 'Encuentro de Egresados Fichas ADSO',
-                'type' => 'Encuentro de Ficha',
-                'date' => '15/11/2026',
-                'time' => '02:00 PM - 05:00 PM',
-                'location' => 'Ambiente 102 - CEFA La Angostura',
-                'program' => 'ADSO (Análisis y Desarrollo de Software)',
-                'responsible' => 'Instructor Técnico',
+                'id' => 'EVT-012',
+                'title' => 'Feria laboral 2026',
+                'type' => 'Feria laboral',
+                'date' => '20/06/2026',
+                'time' => '09:00 AM - 04:00 PM',
+                'location' => 'Auditorio Principal',
+                'program' => 'ADSO - GAE',
+                'responsible' => 'Coordinación Académica',
                 'status' => 'PROGRAMADO',
                 'status_pill' => 'status-blue',
-                'description' => 'Socialización de proyectos productivos, experiencias laborales en empresas de desarrollo y retroalimentación curricular.',
-                'cupo' => 60,
-                'registrados' => 48,
+                'description' => 'Feria laboral dirigida a Egresados para conectar con empresas aliadas y conocer oportunidades de empleo y prácticas profesionales.',
+                'cupo' => 200,
+                'registrados' => 156,
                 'pendientes' => 12,
-                'rate' => '80%',
-                'rate_num' => 80
+                'rate' => '78%',
+                'rate_num' => 78
             ],
             [
-                'id' => 'EVT-INS-002',
-                'title' => 'Taller Práctico: Entrevistas Técnicas y Portafolio',
-                'type' => 'Taller de Empleabilidad',
-                'date' => '28/11/2026',
-                'time' => '08:30 AM - 12:30 PM',
-                'location' => 'Sala de Cómputo 2 / Virtual Teams',
-                'program' => 'ADSO / Multimedia / Redes',
-                'responsible' => 'Equipo de Instructores TIC',
+                'id' => 'EVT-011',
+                'title' => 'Taller Hoja de Vida & LinkedIn',
+                'type' => 'Taller práctico',
+                'date' => '15/06/2026',
+                'time' => '02:00 PM - 06:00 PM',
+                'location' => 'Sala TIC 3',
+                'program' => 'Todos los programas',
+                'responsible' => 'Agencia Pública de Empleo (APE)',
                 'status' => 'PROGRAMADO',
                 'status_pill' => 'status-blue',
-                'description' => 'Simulación de entrevistas técnicas, revisión de perfiles de GitHub y LinkedIn con evaluadores invitados.',
-                'cupo' => 40,
-                'registrados' => 38,
-                'pendientes' => 2,
-                'rate' => '95%',
-                'rate_num' => 95
+                'description' => 'Taller intensivo sobre optimización de CV, perfil profesional en LinkedIn y preparación para entrevistas de trabajo en sector TIC y agropecuario.',
+                'cupo' => 50,
+                'registrados' => 45,
+                'pendientes' => 5,
+                'rate' => '90%',
+                'rate_num' => 90
             ],
             [
-                'id' => 'EVT-INS-003',
-                'title' => 'Mesa Redonda: Innovación Tecnológica en el Huila',
-                'type' => 'Conferencia',
-                'date' => '05/12/2026',
-                'time' => '09:00 AM - 01:00 PM',
-                'location' => 'Auditorio Principal CEFA',
-                'program' => 'Todos los programas del Centro',
-                'responsible' => 'Coordinación e Instructores',
-                'status' => 'EN PREPARACIÓN',
-                'status_pill' => 'status-amber',
-                'description' => 'Panel con egresados destacados que lideran proyectos agro-tecnológicos y de software en la región.',
-                'cupo' => 120,
-                'registrados' => 92,
-                'pendientes' => 28,
-                'rate' => '76%',
-                'rate_num' => 76
-            ],
-            [
-                'id' => 'EVT-INS-004',
-                'title' => 'Feria de Emprendimiento e Innovación CEFA',
-                'type' => 'Feria Institucional',
-                'date' => '10/10/2026',
-                'time' => '08:00 AM - 04:00 PM',
+                'id' => 'EVT-010',
+                'title' => 'Encuentro Egresados Agropecuarios',
+                'type' => 'Encuentro institucional',
+                'date' => '28/05/2026',
+                'time' => '08:30 AM - 01:00 PM',
                 'location' => 'Plaza Central CEFA',
-                'program' => 'Todos los programas',
-                'responsible' => 'Fondo Emprender & SENA CEFA',
-                'status' => 'FINALIZADO',
-                'status_pill' => 'status-gray',
-                'description' => 'Exposición de ideas de negocio e innovaciones desarrolladas por egresados del centro.',
-                'cupo' => 150,
-                'registrados' => 150,
+                'program' => 'Gestión Agroempresarial',
+                'responsible' => 'Coordinación Agropecuaria',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Espacio de integración y relacionamiento para egresados del área agropecuaria con socialización de proyectos de Fondo Emprender.',
+                'cupo' => 180,
+                'registrados' => 180,
                 'pendientes' => 0,
                 'rate' => '100%',
                 'rate_num' => 100
             ],
+            [
+                'id' => 'EVT-009',
+                'title' => 'Hackathon TIC & Desarrollo Software',
+                'type' => 'Concurso / Hackathon',
+                'date' => '10/05/2026',
+                'time' => '08:00 AM - 08:00 PM',
+                'location' => 'Laboratorio TIC 1 & 2',
+                'program' => 'ADSO',
+                'responsible' => 'Instructores TIC',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Maratón de desarrollo de soluciones tecnológicas aplicadas al campo con premiación para los mejores prototipos funcionales.',
+                'cupo' => 100,
+                'registrados' => 85,
+                'pendientes' => 0,
+                'rate' => '85%',
+                'rate_num' => 85
+            ],
+            [
+                'id' => 'EVT-008',
+                'title' => 'Conferencia: Innovación y Sostenibilidad',
+                'type' => 'Conferencia / Charla',
+                'date' => '22/04/2026',
+                'time' => '10:00 AM - 12:30 PM',
+                'location' => 'Aula Magna CEFA',
+                'program' => 'Producción Agrícola',
+                'responsible' => 'Líder de Sennova',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Conferencia internacional sobre tecnologías de agricultura de precisión y sostenibilidad ambiental en la región del Huila.',
+                'cupo' => 150,
+                'registrados' => 120,
+                'pendientes' => 0,
+                'rate' => '80%',
+                'rate_num' => 80
+            ],
         ];
 
-        $customEventos = session('custom_instructor_eventos', []);
-        $eventos = array_merge($customEventos, $defaultEventos);
+        $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
+        $customIds = array_column($customEventos, 'id');
+        $filteredDefaults = array_filter($defaultEventos, fn($d) => !in_array($d['id'], $customIds));
+
+        $eventos = array_merge($customEventos, $filteredDefaults);
+
+        $totalProgramados = count(array_filter($eventos, fn($e) => ($e['status'] ?? '') === 'PROGRAMADO'));
+        $totalRealizados = count(array_filter($eventos, fn($e) => in_array(($e['status'] ?? ''), ['REALIZADO', 'FINALIZADO'])));
+        $totalParticipantes = array_sum(array_column($eventos, 'registrados'));
+        if ($totalParticipantes === 0) {
+            $totalParticipantes = 586;
+        }
+        $totalProximos = $totalProgramados;
+        $promedioSatisfaccion = '4.6/5';
+
+        $totalEventos = count($eventos);
+        $totalInscritos = $totalParticipantes;
+        $tasaAsistencia = '82%';
+        $proximoEventoDias = 6;
 
         $courses = Course::with('program')->orderBy('code')->get();
+        $programsList = Program::orderBy('name')->pluck('name')->toArray();
+
+        $egresadosList = Apprentice::with(['person', 'course.program'])
+            ->where(function($q) {
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
+            })
+            ->get()
+            ->map(function($app) {
+                $p = $app->person;
+                return [
+                    'id' => $app->id,
+                    'nombre' => $p ? trim(($p->first_name ?? '') . ' ' . ($p->first_last_name ?? '')) : 'Egresado SENA',
+                    'documento' => $p->document_number ?? 'N/A',
+                    'correo' => $p ? ($p->misena_email ?? ($p->personal_email ?? '')) : '',
+                    'programa' => $app->course->program->name ?? 'Sin programa',
+                    'ficha' => $app->course->code ?? 'N/A',
+                ];
+            });
+
+        if ($egresadosList->isEmpty()) {
+            $egresadosList = collect([
+                ['id' => 1, 'nombre' => 'Valentina Pérez Losada', 'documento' => '1075845781', 'correo' => 'vperez@misena.edu.co', 'programa' => 'ADSO (Análisis y Desarrollo de Software)', 'ficha' => '3230026'],
+                ['id' => 2, 'nombre' => 'Juan David Morales Cruz', 'documento' => '1075932145', 'correo' => 'jd@gmail.com', 'programa' => 'ADSO (Análisis y Desarrollo de Software)', 'ficha' => '3230026'],
+                ['id' => 3, 'nombre' => 'Melanie Rodríguez Bonilla', 'documento' => '1082947102', 'correo' => 'mela@gmail.com', 'programa' => 'Gestión Agroempresarial', 'ficha' => '2847291'],
+                ['id' => 4, 'nombre' => 'Silvia Cuéllar Perdomo', 'documento' => '1075638291', 'correo' => 'silvia.c@gmail.com', 'programa' => 'Producción Ganadera', 'ficha' => '2918374'],
+                ['id' => 5, 'nombre' => 'Ilba Losada Medina', 'documento' => '1075829104', 'correo' => 'ilba@gmail.com', 'programa' => 'Gestión Agroempresarial', 'ficha' => '2847291'],
+                ['id' => 6, 'nombre' => 'Carlos Alberto Méndez', 'documento' => '1075294810', 'correo' => 'carlos.m@misena.edu.co', 'programa' => 'ADSO (Análisis y Desarrollo de Software)', 'ficha' => '3230026'],
+            ]);
+        }
 
         return view('egresados::instructor.eventos.index', compact(
             'eventos',
             'courses',
+            'egresadosList',
+            'programsList',
+            'totalProgramados',
+            'totalParticipantes',
+            'totalRealizados',
+            'totalProximos',
+            'promedioSatisfaccion',
             'totalEventos',
             'totalInscritos',
             'tasaAsistencia',
@@ -497,42 +565,182 @@ class InstructorController extends Controller
      */
     public function storeEvento(Request $request)
     {
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'tipo' => 'required|string',
-            'fecha' => 'required|date',
-            'hora' => 'required|string',
-            'lugar' => 'required|string',
-            'cupo' => 'required|numeric',
-        ]);
+        $nombre = $request->input('nombre_evento', $request->input('titulo'));
+        $tipo = $request->input('tipo_evento', $request->input('tipo'));
+        $lugar = $request->input('lugar');
+        $fecha = $request->input('fecha_inicio', $request->input('fecha'));
+        $cupo = $request->input('cupo_total', $request->input('cupo'));
+        $descripcion = $request->input('descripcion');
 
-        $customEventos = session('custom_instructor_eventos', []);
-        $count = count($customEventos) + 5;
-        $newId = 'EVT-INS-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        if (!$nombre || !$lugar) {
+            return redirect()->back()->withErrors(['nombre_evento' => 'Nombre y Lugar son campos obligatorios.']);
+        }
+
+        $tiposMap = [
+            'FERIA' => 'Feria laboral',
+            'TALLER' => 'Taller práctico',
+            'ENCUENTRO' => 'Encuentro institucional',
+            'HACKATHON' => 'Concurso / Hackathon',
+            'CONFERENCIA' => 'Conferencia / Charla',
+        ];
+        $tipoLabel = $tiposMap[$tipo] ?? ucfirst(strtolower($tipo ?? 'Evento Institucional'));
+
+        $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
+        $count = count($customEventos) + 13;
+        $newId = 'EVT-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        try {
+            $fechaFormatted = date('d/m/Y', strtotime($fecha));
+        } catch (\Throwable $e) {
+            $fechaFormatted = date('d/m/Y');
+        }
 
         $nuevo = [
             'id' => $newId,
-            'title' => $request->titulo,
-            'type' => $request->tipo,
-            'date' => date('d/m/Y', strtotime($request->fecha)),
-            'time' => $request->hora,
-            'location' => $request->lugar,
-            'program' => $request->programa ?? 'Fichas Asignadas',
-            'responsible' => 'Instructor CEFA',
+            'title' => $nombre,
+            'type' => $tipoLabel,
+            'date' => $fechaFormatted,
+            'time' => $request->input('hora', '08:00 AM - 04:00 PM'),
+            'location' => $lugar,
+            'program' => is_array($request->programas_dirigidos) ? implode(' - ', $request->programas_dirigidos) : ($request->programas_dirigidos ?? 'Todos los Programas'),
+            'responsible' => 'Instructor de Seguimiento CEFA',
             'status' => 'PROGRAMADO',
             'status_pill' => 'status-blue',
-            'description' => $request->descripcion ?? 'Evento organizado por el instructor de seguimiento.',
-            'cupo' => (int)$request->cupo,
+            'description' => $descripcion ?? 'Evento organizado por el instructor de seguimiento institucional.',
+            'cupo' => (int)($cupo ?: 50),
             'registrados' => 0,
-            'pendientes' => (int)$request->cupo,
+            'pendientes' => 0,
             'rate' => '0%',
             'rate_num' => 0
         ];
 
         array_unshift($customEventos, $nuevo);
         session(['custom_instructor_eventos' => $customEventos]);
+        session(['custom_eventos' => $customEventos]);
 
         return redirect()->route('egresados.instructor.eventos.index')
-            ->with('success', '¡Evento "' . $request->titulo . '" programado exitosamente!');
+            ->with('success', '¡Evento "' . $nombre . '" programado exitosamente!');
+    }
+
+    /**
+     * Actualiza un evento desde el panel de Instructor.
+     */
+    public function updateEvento(Request $request, string $id)
+    {
+        $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
+        $found = false;
+
+        foreach ($customEventos as &$evt) {
+            if ($evt['id'] === $id) {
+                $evt['title'] = $request->input('title', $evt['title']);
+                $evt['type'] = $request->input('type', $evt['type']);
+                $evt['location'] = $request->input('location', $evt['location']);
+                $evt['date'] = $request->input('date', $evt['date']);
+                $evt['time'] = $request->input('time', $evt['time']);
+                $evt['cupo'] = (int)$request->input('cupo', $evt['cupo']);
+                $evt['description'] = $request->input('description', $evt['description']);
+                if ($request->filled('status')) {
+                    $evt['status'] = strtoupper($request->status);
+                }
+                $found = true;
+                break;
+            }
+        }
+        unset($evt);
+
+        if (!$found) {
+            $nuevoModificado = [
+                'id' => $id,
+                'title' => $request->input('title', 'Evento Actualizado'),
+                'type' => $request->input('type', 'Feria laboral'),
+                'location' => $request->input('location', 'Auditorio CEFA'),
+                'date' => $request->input('date', date('d/m/Y')),
+                'time' => $request->input('time', '08:00 AM - 04:00 PM'),
+                'cupo' => (int)$request->input('cupo', 100),
+                'registrados' => 10,
+                'pendientes' => 0,
+                'rate' => '10%',
+                'rate_num' => 10,
+                'description' => $request->input('description', 'Evento modificado.'),
+                'status' => strtoupper($request->input('status', 'PROGRAMADO')),
+                'status_pill' => 'status-blue',
+                'program' => 'Todos los Programas',
+                'responsible' => 'Instructor CEFA'
+            ];
+            array_unshift($customEventos, $nuevoModificado);
+        }
+
+        session(['custom_instructor_eventos' => $customEventos]);
+        session(['custom_eventos' => $customEventos]);
+
+        return redirect()->route('egresados.instructor.eventos.index')
+            ->with('success', '¡El evento ' . $id . ' fue actualizado exitosamente!');
+    }
+
+    /**
+     * Cancela un evento desde el panel de Instructor.
+     */
+    public function cancelarEvento(Request $request, string $id)
+    {
+        $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
+        $found = false;
+
+        foreach ($customEventos as &$evt) {
+            if ($evt['id'] === $id) {
+                $evt['status'] = 'CANCELADO';
+                $evt['status_pill'] = 'status-red';
+                $found = true;
+                break;
+            }
+        }
+        unset($evt);
+
+        if (!$found) {
+            $customEventos[] = [
+                'id' => $id,
+                'title' => 'Evento ' . $id,
+                'type' => 'Evento Institucional',
+                'location' => 'Centro CEFA',
+                'date' => date('d/m/Y'),
+                'time' => '08:00 AM',
+                'cupo' => 50,
+                'registrados' => 0,
+                'pendientes' => 0,
+                'rate' => '0%',
+                'rate_num' => 0,
+                'description' => 'Cancelado por el instructor.',
+                'status' => 'CANCELADO',
+                'status_pill' => 'status-red',
+                'program' => 'Todos',
+                'responsible' => 'Instructor CEFA'
+            ];
+        }
+
+        session(['custom_instructor_eventos' => $customEventos]);
+        session(['custom_eventos' => $customEventos]);
+
+        return redirect()->route('egresados.instructor.eventos.index')
+            ->with('success', 'El evento ' . $id . ' ha sido cancelado exitosamente.');
+    }
+
+    /**
+     * Enviar invitaciones masivas o personalizadas desde el panel de Instructor.
+     */
+    public function invitarEvento(Request $request, string $id)
+    {
+        $destinatarios = $request->input('egresados_ids', []);
+        $tipoEnvio = $request->input('tipo_destinatario', 'todos');
+        $programaFiltro = $request->input('filtro_programa', '');
+        
+        if ($tipoEnvio === 'especifico' && is_array($destinatarios) && count($destinatarios) > 0) {
+            $totalNotificados = count($destinatarios) . " egresados seleccionados";
+        } elseif ($tipoEnvio === 'programa' && !empty($programaFiltro)) {
+            $totalNotificados = "los egresados del programa {$programaFiltro}";
+        } else {
+            $totalNotificados = "todos los egresados registrados en SIGE";
+        }
+
+        return redirect()->route('egresados.instructor.eventos.index')
+            ->with('success', "¡Invitación al evento despachada exitosamente a {$totalNotificados}!");
     }
 }

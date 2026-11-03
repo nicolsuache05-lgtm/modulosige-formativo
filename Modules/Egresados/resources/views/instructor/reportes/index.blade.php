@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <title>SIGE · Gestión de Reportes — CEFA La Angostura</title>
 
     <!-- Favicon -->
@@ -349,28 +350,7 @@
       </a>
     </nav>
 
-    <!-- Perfil del Instructor en la parte inferior del sidebar -->
-    <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
-      <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:12px;">
-        <div style="width:36px; height:36px; border-radius:50%; background:#39A900; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; border:2px solid #62E31D;">
-          IN
-        </div>
-        <div style="overflow:hidden;">
-          <div style="font-weight:700; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
-            {{ Auth::check() ? (Auth::user()->first_name ?? Auth::user()->name ?? 'Instructor Egresados') : 'Instructor Egresados' }}
-          </div>
-          <div style="font-size:11px; color:#62E31D; font-weight:600;">Instructor Egresados</div>
-        </div>
-      </div>
-      <form action="{{ route('logout') }}" method="POST" style="margin:0;">
-        @csrf
-        <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-        <button type="submit" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border-radius:10px; background:rgba(239,68,68,0.12); color:#FCA5A5; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:12.5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.12)'; this.style.color='#FCA5A5';">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
-        </button>
-      </form>
-    </div>
+
   </aside>
 
   <!-- ============================================== -->

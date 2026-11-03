@@ -144,6 +144,8 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     // Encuestas Instructor
     Route::get('egresados/instructor/encuestas', [InstructorEncuestasController::class, 'index'])->name('egresados.instructor.encuestas.index');
     Route::post('egresados/instructor/encuestas/store', [InstructorEncuestasController::class, 'store'])->name('egresados.instructor.encuestas.store');
+    Route::get('egresados/instructor/encuestas/{id}/resultados', [InstructorEncuestasController::class, 'resultados'])->name('egresados.instructor.encuestas.resultados');
+    Route::put('egresados/instructor/encuestas/{id}/cerrar', [InstructorEncuestasController::class, 'cerrar'])->name('egresados.instructor.encuestas.cerrar');
     
     // Reportes Instructor
     Route::get('egresados/instructor/reportes', [InstructorController::class, 'reportes'])->name('egresados.instructor.reportes.index');
@@ -156,6 +158,9 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     // Eventos Instructor
     Route::get('egresados/instructor/eventos', [InstructorController::class, 'eventos'])->name('egresados.instructor.eventos.index');
     Route::post('egresados/instructor/eventos/store', [InstructorController::class, 'storeEvento'])->name('egresados.instructor.eventos.store');
+    Route::put('egresados/instructor/eventos/{id}', [InstructorController::class, 'updateEvento'])->name('egresados.instructor.eventos.update');
+    Route::post('egresados/instructor/eventos/{id}/invitar', [InstructorController::class, 'invitarEvento'])->name('egresados.instructor.eventos.invitar');
+    Route::put('egresados/instructor/eventos/{id}/cancelar', [InstructorController::class, 'cancelarEvento'])->name('egresados.instructor.eventos.cancelar');
 
     Route::get('egresados/instructor/{id}/perfil', [EgresadosController::class, 'show'])->name('egresados.instructor.perfil');
 });

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -88,11 +88,8 @@
                     <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="SENA" class="w-full h-full object-contain">
                 </div>
                 <div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-editorial text-2xl font-bold tracking-tight text-white leading-none">SIGE</span>
-                        <span class="bg-[#62E31D] text-[#012410] text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Admin</span>
-                    </div>
-                    <div class="text-[11px] text-green-200/80 font-medium mt-1">GestiÃ³n de Egresados</div>
+                    <div class="font-editorial text-lg font-extrabold tracking-wide text-white leading-none">SIGE</div>
+                    <div class="text-[10.5px] text-[#62E31D] font-bold tracking-wider uppercase mt-1">GESTIÓN DE EGRESADOS</div>
                 </div>
             </a>
 
@@ -184,28 +181,25 @@
     <!-- ============================================== -->
     <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- Topbar Modernizada HomogÃ©nea -->
-        <header class="glass-header border-b border-gray-200/80 px-7 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-xs">
-            <div class="flex items-center gap-3.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-[#0d6928] border border-emerald-100 flex items-center justify-center font-bold text-base shadow-xs">
+        <!-- Topbar Modernizada Homogénea -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center font-bold text-base shadow-xs">
                     <i class="fa-solid fa-file-invoice"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-sm font-extrabold text-gray-900 leading-none tracking-tight">Reportes & MÃ©tricas Â· Panel Administrador</h1>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-full border border-emerald-200">
-                            MÃ³dulo Exclusivo
+                        <h1 class="text-sm font-extrabold text-white leading-none tracking-tight">Reportes & Métricas · Panel Administrador</h1>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
+                            Módulo Exclusivo
                         </span>
                     </div>
-                    <span class="text-[11px] text-gray-500 font-medium">Consolidado institucional, auditorÃ­a y mÃ©tricas de empleabilidad</span>
+                    <span class="text-[11px] text-green-200/80 font-medium">Consolidado institucional, auditoría y métricas de empleabilidad</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('egresados.dashboard_admin') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                    <span>Volver a Panel Principal</span>
-                </a>
+                @include('egresados::superadmin.partials._topbar_right')
             </div>
         </header>
 

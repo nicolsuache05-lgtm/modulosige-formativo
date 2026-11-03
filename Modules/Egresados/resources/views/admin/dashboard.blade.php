@@ -52,17 +52,14 @@
     <!-- ============================================== -->
     <aside class="w-64 bg-gradient-to-b from-[#001A29] to-[#00131E] text-white flex flex-col justify-between p-5 border-r border-white/10 shrink-0 sticky top-0 h-screen z-30">
         <div>
-            <!-- Brand -->
+            <!-- Brand Institucional -->
             <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 pb-5 border-b border-white/15 no-underline text-white group">
-                <div class="w-10 h-10 rounded-full bg-white p-1 flex items-center justify-center shadow-md shrink-0 border-2 border-[#62E31D]">
-                    <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="SENA" class="w-full h-full object-cover rounded-full">
+                <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0 border-2 border-[#62E31D]">
+                    <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="SENA" class="w-full h-full object-cover rounded-lg">
                 </div>
                 <div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-editorial text-xl font-bold tracking-wide leading-none">SIGE</span>
-                        <span class="bg-blue-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Instructor</span>
-                    </div>
-                    <div class="text-[10px] text-green-200/80 font-medium">CEFA La Angostura</div>
+                    <div class="font-editorial text-lg font-extrabold tracking-wide text-white leading-none">SIGE</div>
+                    <div class="text-[10.5px] text-[#62E31D] font-bold tracking-wider uppercase mt-1">GESTIÓN DE EGRESADOS</div>
                 </div>
             </a>
 
@@ -84,28 +81,6 @@
                 </a>
             </nav>
         </div>
-
-        <!-- Sidebar Bottom User & Logout -->
-        <div class="pt-4 border-t border-white/15">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-9 h-9 rounded-full bg-blue-600/60 text-white flex items-center justify-center font-bold text-xs border border-blue-400/40">
-                    {{ Auth::check() ? Auth::user()->initials : 'IN' }}
-                </div>
-                <div class="overflow-hidden">
-                    <div class="text-xs font-bold text-white truncate">{{ Auth::check() ? Auth::user()->full_name : 'Instructor Egresados' }}</div>
-                    <div class="text-[10px] text-green-200/70 truncate">{{ Auth::check() ? Auth::user()->email : 'instructor@sena.edu.co' }}</div>
-                </div>
-            </div>
-
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-bold transition">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    <span>Cerrar Sesión</span>
-                </button>
-            </form>
-        </div>
     </aside>
 
     <!-- ============================================== -->
@@ -114,26 +89,23 @@
     <div class="flex-1 flex flex-col min-w-0">
         
         <!-- Topbar -->
-        <header class="bg-white border-b border-gray-200/80 px-6 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-sm">
                     <i class="fa-solid fa-chalkboard-user"></i>
                 </div>
                 <div>
-                    <h1 class="text-sm font-bold text-gray-800 leading-none">Módulo de Seguimiento para Instructores</h1>
-                    <span class="text-[11px] text-gray-500">Gestión de aprendices egresados, estados laborales y encuestas</span>
+                    <h1 class="text-sm font-bold text-white leading-none">Módulo de Seguimiento para Instructores</h1>
+                    <span class="text-[11px] text-green-200/80">Gestión de aprendices egresados, estados laborales y encuestas</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <span class="inline-flex items-center gap-1.5 bg-white/10 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-white/15">
+                    <span class="w-2 h-2 rounded-full bg-[#62E31D] animate-pulse"></span>
                     Rol: Instructor Egresados
                 </span>
-                <a href="{{ route('home') }}" class="text-xs font-semibold text-gray-600 hover:text-[#39A900] flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                    <span>Portal Principal ERP</span>
-                </a>
+                @include('egresados::superadmin.partials._topbar_right')
             </div>
         </header>
 

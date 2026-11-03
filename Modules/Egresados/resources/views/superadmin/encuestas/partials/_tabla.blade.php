@@ -1,157 +1,179 @@
 <!-- ============================================== -->
-<!-- 2. TABLA DE ENCUESTAS (COLUMNA IZQUIERDA 2/3) -->
+<!-- 2. FILTROS Y TABLA DE ENCUESTAS (2/3 DEL GRID) -->
 <!-- ============================================== -->
-<div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-    
-    <!-- Toolbar de Búsqueda y Filtros con Colores SENA ERP -->
-    <div class="p-4 sm:p-5 border-b border-gray-100 bg-[#FAFCF9] flex flex-wrap items-center justify-between gap-3">
-        
-        <!-- Buscador -->
-        <div class="relative flex-1 min-w-[220px]">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input type="text" 
-                   id="surveySearchInput" 
-                   onkeyup="filterSurveysTable()" 
-                   placeholder="Buscar encuesta por ID, título o público..." 
-                   class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
+<div class="lg:col-span-2 space-y-4">
+
+    <!-- Card de Filtros Interactivos (Paleta SENA ERP) -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3.5">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-50">
+            <span class="text-xs font-bold text-[#00131E] uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders text-[#39A900]"></i>
+                Filtros de Búsqueda Rápida
+            </span>
+            <span class="text-[11px] text-gray-400">Filtrado en tiempo real</span>
         </div>
 
-        <!-- Filtro por Estado -->
-        <select id="surveyStatusFilter" 
-                onchange="filterSurveysTable()" 
-                class="px-3.5 py-2.5 text-xs sm:text-sm font-semibold bg-white border border-gray-200 rounded-xl text-gray-700 outline-none focus:border-[#39A900] cursor-pointer">
-            <option value="">-- Todos los Estados --</option>
-            <option value="ACTIVA">Activas</option>
-            <option value="CERRADA">Cerradas</option>
-            <option value="BORRADOR">Borrador</option>
-        </select>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Estado</label>
+                <select id="surveyStatusFilter" onchange="filterSurveysTable()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                    <option value="">Todos los estados</option>
+                    <option value="ACTIVA">Activas</option>
+                    <option value="CERRADA">Cerradas</option>
+                    <option value="BORRADOR">Borrador</option>
+                </select>
+            </div>
 
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Público Objetivo</label>
+                <select id="surveyTargetFilter" onchange="filterSurveysTable()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                    <option value="">Todos los públicos</option>
+                    <option value="ADSO">Egresados ADSO</option>
+                    <option value="Tecnólogos">Egresados Tecnólogos</option>
+                    <option value="Todas">Todas las Especialidades</option>
+                    <option value="Emprendedores">Egresados Emprendedores</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Buscar por Nombre o ID</label>
+                <div class="relative">
+                    <input type="text" id="surveySearchInput" onkeyup="filterSurveysTable()" placeholder="Buscar encuesta..." 
+                           class="w-full pl-8 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] outline-none transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Contenedor con Scroll Horizontal -->
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs sm:text-sm border-collapse" id="encuestasTable">
-            <thead>
-                <tr class="bg-[#FAFCF9] text-[#00131E] text-[11px] font-extrabold uppercase tracking-wider border-b-2 border-gray-200">
-                    <th class="py-3.5 px-4 sm:px-5">Código ID</th>
-                    <th class="py-3.5 px-4 sm:px-5">Instrumento / Título</th>
-                    <th class="py-3.5 px-4 sm:px-5">Estado</th>
-                    <th class="py-3.5 px-4 sm:px-5">Dirigido a</th>
-                    <th class="py-3.5 px-4 sm:px-5">Progreso</th>
-                    <th class="py-3.5 px-4 sm:px-5 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse($encuestas as $index => $item)
-                    @php
-                        $jsonData = json_encode($item);
-                        $isFirst = ($index === 0);
-                    @endphp
-                    <tr class="encuesta-row hover:bg-[#F4FAF5] transition cursor-pointer {{ $isFirst ? 'selected-row bg-[#EAF7EE] border-l-4 border-[#39A900]' : '' }}"
-                        id="survey-row-{{ $item['id'] }}"
-                        data-id="{{ $item['id'] }}"
-                        data-title="{{ $item['title'] }}"
-                        data-status="{{ $item['status'] }}"
-                        onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}')">
-                        
-                        <!-- ID con Insignia Institucional -->
-                        <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black bg-[#EAF7EE] text-[#00131E] border border-[#39A900]/30 shadow-2xs font-mono">
-                                {{ $item['id'] }}
-                            </span>
-                        </td>
+    <!-- Tabla Principal de Encuestas (Paleta SENA ERP) -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-gray-50 flex items-center justify-between">
+            <div>
+                <h2 class="font-editorial text-base font-bold text-[#00131E] flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-[#39A900] text-sm"></i>
+                    Listado de Encuestas Disponibles
+                </h2>
+                <span class="text-[11px] text-gray-400 mt-0.5 block">Haz clic en una fila para ver su desglose o gestionarla</span>
+            </div>
+        </div>
 
-                        <!-- Título y Autor -->
-                        <td class="py-3.5 px-4 sm:px-5">
-                            <div class="font-bold text-gray-900 leading-snug">{{ $item['title'] }}</div>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <i class="fa-solid fa-user-pen text-gray-400 text-[10px]"></i>
-                                <p class="text-[11px] text-gray-500">
-                                    Creado por: <span class="font-semibold text-[#001A29]">{{ $item['creado_por'] ?? 'Coordinación Académica' }}</span>
-                                </p>
-                            </div>
-                            <div class="text-[10.5px] text-gray-400 mt-0.5">Fecha: {{ $item['date'] }}</div>
-                        </td>
-
-                        <!-- Estado -->
-                        <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap">
-                            @if($item['status'] === 'ACTIVA')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#39A900]"></span>
-                                    ACTIVA
-                                </span>
-                            @elseif($item['status'] === 'CERRADA')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gray-100 text-gray-600 border border-gray-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                    CERRADA
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                    {{ $item['status'] }}
-                                </span>
-                            @endif
-                        </td>
-
-                        <!-- Dirigido a -->
-                        <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap">
-                            <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#EAF7EE] text-[#166534] font-bold text-xs border border-[#BBF7D0]">
-                                {{ $item['target'] }}
-                            </span>
-                        </td>
-
-                        <!-- Barra de Progreso con Colores del ERP -->
-                        <td class="py-3.5 px-4 sm:px-5 whitespace-nowrap min-w-[130px]">
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-[11px] font-bold text-gray-700">
-                                    <span>{{ $item['respondidas'] }}/{{ $item['enviadas'] }}</span>
-                                    <span class="text-[#39A900] font-extrabold">{{ $item['rate'] }}</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                                    <div class="bg-gradient-to-r from-[#001A29] to-[#39A900] h-1.5 rounded-full transition-all duration-500" 
-                                         style="width: {{ $item['rate_num'] }}%;"></div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <!-- Acciones -->
-                        <td class="py-3.5 px-4 sm:px-5 text-center whitespace-nowrap">
-                            <div class="inline-flex items-center gap-1.5" onclick="event.stopPropagation();">
-                                <button type="button" 
-                                        onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}')" 
-                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#39A900] hover:bg-[#EAF7EE] border border-gray-200 hover:border-[#39A900]/40 transition shadow-2xs" 
-                                        title="Ver detalles en panel lateral">
-                                    <i class="fa-solid fa-eye text-xs"></i>
-                                </button>
-                                <button type="button" 
-                                        onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}'); abrirResultadosModal({{ $jsonData }});" 
-                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-white hover:bg-[#001A29] border border-gray-200 hover:border-[#001A29] transition shadow-2xs" 
-                                        title="Ver Estadísticas y Resultados">
-                                    <i class="fa-solid fa-chart-pie text-xs"></i>
-                                </button>
-                                @if(!empty($item['url']))
-                                    <a href="{{ $item['url'] }}" 
-                                       target="_blank" 
-                                       class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#39A900] hover:bg-[#EAF7EE] border border-gray-200 hover:border-[#39A900]/40 transition shadow-2xs" 
-                                       title="Abrir formulario externo">
-                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                                    </a>
-                                @endif
-                            </div>
-                        </td>
-
-                    </tr>
-                @empty
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" id="encuestasTable">
+                <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase tracking-wider text-[10px] border-b border-gray-100">
                     <tr>
-                        <td colspan="6" class="text-center py-10 px-4 text-gray-500">
-                            <i class="fa-regular fa-folder-open text-3xl text-gray-300 mb-2 block"></i>
-                            <span class="font-bold text-gray-700 block">No se encontraron encuestas registradas</span>
-                            <span class="text-xs text-gray-400">Haga clic en "+ Crear Encuesta" para registrar una nueva.</span>
-                        </td>
+                        <th class="py-3.5 px-4">ID</th>
+                        <th class="py-3.5 px-4">Encuesta / Título</th>
+                        <th class="py-3.5 px-4">Fecha</th>
+                        <th class="py-3.5 px-4">Generado por</th>
+                        <th class="py-3.5 px-4">Población</th>
+                        <th class="py-3.5 px-4">Estado</th>
+                        <th class="py-3.5 px-4 text-center">Acciones</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-gray-700">
+                    @forelse($encuestas as $index => $item)
+                        @php
+                            $jsonData = json_encode($item);
+                            $isFirst = ($index === 0);
+                        @endphp
+                        <tr class="encuesta-row hover:bg-emerald-50/40 cursor-pointer transition {{ $isFirst ? 'bg-emerald-50/60 font-semibold border-l-4 border-[#39A900]' : '' }}" 
+                            id="survey-row-{{ $item['id'] }}"
+                            data-id="{{ $item['id'] }}"
+                            data-title="{{ $item['title'] }}"
+                            data-target="{{ $item['target'] }}"
+                            data-status="{{ $item['status'] }}"
+                            onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}')">
+                            
+                            <!-- ID con color institucional -->
+                            <td class="py-3.5 px-4 font-bold text-emerald-800 whitespace-nowrap">
+                                {{ $item['id'] }}
+                            </td>
+
+                            <!-- Título y objetivo -->
+                            <td class="py-3.5 px-4">
+                                <div class="font-bold text-gray-900 leading-snug">{{ $item['title'] }}</div>
+                                <div class="text-[10px] text-gray-400 mt-0.5">
+                                    <i class="fa-solid fa-clipboard-question text-[9px] mr-1"></i>{{ Str::limit($item['description'] ?? '', 45) }}
+                                </div>
+                            </td>
+
+                            <!-- Fecha -->
+                            <td class="py-3.5 px-4 text-gray-500 font-medium whitespace-nowrap">
+                                {{ $item['date'] }}
+                            </td>
+
+                            <!-- Generado por -->
+                            <td class="py-3.5 px-4 font-medium text-gray-600 whitespace-nowrap">
+                                {{ $item['creado_por'] ?? 'Coordinación Académica' }}
+                            </td>
+
+                            <!-- Dirigido a -->
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+                                    <i class="fa-solid fa-users text-[9px]"></i> {{ $item['target'] }}
+                                </span>
+                            </td>
+
+                            <!-- Estado -->
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                @if($item['status'] === 'ACTIVA')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        ACTIVA
+                                    </span>
+                                @elseif($item['status'] === 'CERRADA')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-600 border border-gray-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                        CERRADA
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        {{ $item['status'] }}
+                                    </span>
+                                @endif
+                            </td>
+
+                            <!-- Acciones con estilo ERP -->
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap" onclick="event.stopPropagation();">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <button type="button" 
+                                            onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}')" 
+                                            class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition cursor-pointer" 
+                                            title="Ver Detalle">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button type="button" 
+                                            onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}'); abrirResultadosModal({{ $jsonData }});" 
+                                            class="w-7 h-7 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-[#62E31D] flex items-center justify-center transition cursor-pointer shadow-xs" 
+                                            title="Ver Gráficas y Resultados">
+                                        <i class="fa-solid fa-chart-pie text-xs"></i>
+                                    </button>
+                                    @if(!empty($item['url']))
+                                        <a href="{{ $item['url'] }}" 
+                                           target="_blank" 
+                                           class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition" 
+                                           title="Abrir Cuestionario">
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-10 px-4 text-gray-500">
+                                <i class="fa-regular fa-folder-open text-3xl text-gray-300 mb-2 block"></i>
+                                <span class="font-bold text-gray-700 block">No se encontraron encuestas registradas</span>
+                                <span class="text-xs text-gray-400">Haga clic en "+ Crear Encuesta" para registrar una nueva.</span>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>
