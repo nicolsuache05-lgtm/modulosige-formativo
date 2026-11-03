@@ -364,6 +364,19 @@
     <!-- Main Content -->
     <div class="content space-y-6">
 
+      <!-- Alertas Flash -->
+      @if(session('success'))
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+      @endif
+
       @if(isset($errors) && $errors->any())
         <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs sm:text-sm font-semibold flex items-start gap-2 shadow-xs">
             <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5"></i>
@@ -413,7 +426,6 @@
 
       <!-- 5. Modal Interactivo de Análisis Gráfico e Indicadores -->
       @include('egresados::superadmin.reportes.partials._modal_graficas')
-
     </div>
 
   </div>
@@ -427,11 +439,13 @@
 <script>
     // Variable global con los datos del reporte seleccionado actualmente
     let currentReportData = null;
+    let currentReporteData = null;
 
     // Función interactiva para actualizar el panel de detalles reactivo
     function selectReporte(data, rowId) {
         if (!data) return;
         currentReportData = data;
+        currentReporteData = data;
 
         // Actualizar fila activa
         document.querySelectorAll('.report-row').forEach(row => {
@@ -481,8 +495,13 @@
             btnExcel.href = baseUrl + "/exportar/excel?title=" + encodeURIComponent(fullTitle) + "&program=" + encodeURIComponent(data.program || '');
         }
 
+        const formEnvio = document.getElementById('formEnviarCorreo');
+        if (formEnvio) {
+            formEnvio.action = baseUrl + "/enviar";
+        }
+
         const btnGraficas = document.getElementById('btnActionGraficas');
-        if (btnGraficas) {
+        if (btnGraficas && btnGraficas.tagName === 'A') {
             btnGraficas.href = baseUrl + "/graficas";
         }
 
@@ -495,6 +514,11 @@
         if (deleteTitle) deleteTitle.innerText = fullTitle;
         const deleteId = document.getElementById('modalEliminarId');
         if (deleteId) deleteId.innerText = currentId;
+    }
+
+    // Compatibilidad: abrir modal de gráficas
+    function abrirGraficasReporteModal(customData) {
+        abrirModalGraficas(customData);
     }
 
     // Filtrado interactivo en tabla

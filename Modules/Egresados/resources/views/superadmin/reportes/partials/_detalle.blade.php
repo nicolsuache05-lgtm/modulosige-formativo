@@ -52,12 +52,14 @@
             </a>
 
             <!-- 2. Descargar PDF -->
+            <!-- 2. Descargar PDF -->
             <button type="button" 
                id="btnActionPdf" 
                onclick="descargarReportePDF()" 
                class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-file-pdf text-red-500 text-xs"></i>
                 <span id="btnPdfText">Descargar Reporte (PDF)</span>
+            </button>
             </button>
 
             <!-- 3. Ver Gráficas (Abre ventanita modal con gráficos e indicadores SENA ERP) -->
