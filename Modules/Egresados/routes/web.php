@@ -137,6 +137,9 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::post('egresados/instructor/store', [EgresadosController::class, 'store'])->name('egresados.instructor.store');
     Route::post('egresados/instructor/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.instructor.seguimiento.store');
     Route::match(['put', 'post'], 'egresados/instructor/{id}/update', [EgresadosController::class, 'update'])->name('egresados.instructor.update')->whereNumber('id');
+    Route::post('egresados/instructor/{id}/toggle-status', [EgresadosController::class, 'toggleStatus'])->name('egresados.instructor.toggle_status')->whereNumber('id');
+    Route::post('egresados/instructor/sincronizar', [EgresadosController::class, 'sincronizarSicefa'])->name('egresados.instructor.sincronizar');
+    Route::post('egresados/instructor/importar', [EgresadosController::class, 'importarExcel'])->name('egresados.instructor.importar');
     
     // Encuestas Instructor
     Route::get('egresados/instructor/encuestas', [InstructorEncuestasController::class, 'index'])->name('egresados.instructor.encuestas.index');

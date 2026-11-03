@@ -10,6 +10,7 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      @keydown.window.escape="openModalEditar = false"
+     x-effect="if (openModalEditar) openEditarModal()"
      class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" x-cloak>
     
     <div @click.away="openModalEditar = false" 
@@ -158,79 +159,141 @@
 </div>
 
 <script>
+    if (typeof parseJsonSafe !== 'function') {
+        window.parseJsonSafe = function(raw) {
+            if (!raw) return null;
+            try {
+                return JSON.parse(raw);
+            } catch(e1) {
+                try {
+                    const doc = new DOMParser().parseFromString(raw, 'text/html');
+                    const decoded = doc.body.textContent;
+                    return JSON.parse(decoded);
+                } catch(e2) {
+                    console.error('Error parseando json de egresado:', e2, raw);
+                    return null;
+                }
+            }
+        };
+    }
+
+    /**
+     * Función global para abrir y sincronizar el modal de edición
+     */
+    function openEditarModal(data) {
+        if (!data) {
+            data = window.currentSelectedEgresado;
+        }
+        if (!data) {
+            const selRow = document.querySelector('.egresado-row.selected-row') || document.querySelector('.egresado-row');
+            if (selRow) {
+                const raw = selRow.getAttribute('data-json');
+                data = window.parseJsonSafe(raw);
+            }
+        }
+        if (data) {
+            populateModalEditar(data);
+        }
+    }
+
     /**
      * Rellena dinámicamente el formulario modal de edición con los datos del egresado
      */
     function populateModalEditar(data) {
+        if (!data) {
+            data = window.currentSelectedEgresado;
+        }
+        if (!data) {
+            const selRow = document.querySelector('.egresado-row.selected-row') || document.querySelector('.egresado-row');
+            if (selRow) {
+                const raw = selRow.getAttribute('data-json');
+                data = window.parseJsonSafe(raw);
+            }
+        }
         if (!data) return;
+
+        // Mantener referencia global sincronizada
+        window.currentSelectedEgresado = data;
 
         // Actualizar URL canónica de acción del formulario
         const form = document.getElementById('form-editar-perfil');
         if (form && data.id) {
-            form.action = '{{ url("egresados") }}/' + data.id + '/update';
+            const isInstructor = window.location.pathname.includes('/instructor');
+            form.action = (isInstructor ? '{{ url("egresados/instructor") }}' : '{{ url("egresados") }}') + '/' + data.id + '/update';
         }
 
         const editNameLabel = document.getElementById('edit_egresado_name_label');
-        if (editNameLabel && data.name) {
-            editNameLabel.innerText = data.name;
+        if (editNameLabel) {
+            editNameLabel.innerText = data.name || data.fullName || 'Egresado';
         }
 
-        const docInput = document.getElementById('edit_documento');
-        if (docInput) {
-            const rawDoc = String(data.document_raw || data.document || '').replace(/\D/g, '');
-            docInput.value = rawDoc;
-        }
-
-        const nameInput = document.getElementById('edit_nombre');
-        if (nameInput) {
-            nameInput.value = (data.name && data.name !== 'Sin nombre' && data.name !== 'Aprendiz SENA') ? data.name : '';
-        }
-
-        const emailInput = document.getElementById('edit_correo');
-        if (emailInput) {
-            const rawEmail = String(data.email_raw || data.email || '').trim();
-            emailInput.value = (rawEmail && !rawEmail.includes('No registra') && !rawEmail.includes('Sin correo')) ? rawEmail : '';
-        }
-
-        const phoneInput = document.getElementById('edit_telefono');
-        if (phoneInput) {
-            const rawPhone = String(data.phone_raw || data.phone || '').replace(/\D/g, '');
-            phoneInput.value = (rawPhone && rawPhone.length >= 7) ? rawPhone : '';
-        }
-
-        const fichaInput = document.getElementById('edit_ficha');
-        if (fichaInput) {
-            const rawCode = String(data.code_raw || data.code || '').trim();
-            fichaInput.value = (rawCode && rawCode !== 'N/A' && rawCode !== 'Sin ficha') ? rawCode : '';
-        }
-
-        const progInput = document.getElementById('edit_programa');
-        if (progInput) {
-            const rawProg = String(data.program_raw || data.program || '').trim();
-            progInput.value = (rawProg && rawProg !== 'Programa de Formación CEFA' && rawProg !== 'Sin programa') ? rawProg : '';
-        }
-
+        // 1. Tipo de documento
         const docTypeSelect = document.getElementById('edit_tipo_documento');
-        if (docTypeSelect && data.document_type) {
-            const val = String(data.document_type).toUpperCase();
+        if (docTypeSelect && (data.document_type || data.doc_type || data.tipo_documento)) {
+            const val = String(data.document_type || data.doc_type || data.tipo_documento).toUpperCase();
             if (val.includes('TARJETA') || val === 'TI') docTypeSelect.value = 'TI';
             else if (val.includes('EXTRANJER') || val === 'CE') docTypeSelect.value = 'CE';
-            else if (val.includes('PEP') || val.includes('PROTECCI') || val.includes('PPT')) docTypeSelect.value = 'PEP';
+            else if (val.includes('PEP') || val.includes('PROTECCI') || val.includes('PPT') || val.includes('PERMISO')) docTypeSelect.value = 'PEP';
             else docTypeSelect.value = 'CC';
         }
 
-        const activeSelect = document.getElementById('edit_is_active');
-        if (activeSelect) {
-            activeSelect.value = (data.is_active === false || data.is_active === 0 || data.is_active === '0') ? '0' : '1';
+        // 2. Número de documento
+        const docInput = document.getElementById('edit_documento');
+        if (docInput) {
+            const rawDoc = String(data.document_raw || data.document_number || data.document || data.doc || '').replace(/\D/g, '');
+            docInput.value = rawDoc;
         }
 
+        // 3. Nombre completo
+        const nameInput = document.getElementById('edit_nombre');
+        if (nameInput) {
+            nameInput.value = data.name || data.fullName || data.nombre || '';
+        }
+
+        // 4. Correo electrónico
+        const emailInput = document.getElementById('edit_correo');
+        if (emailInput) {
+            const rawEmail = String(data.email_raw || data.email || data.correo || data.personal_email || data.misena_email || '').trim();
+            emailInput.value = (!rawEmail.includes('No registra') && !rawEmail.includes('Sin correo')) ? rawEmail : '';
+        }
+
+        // 5. Teléfono
+        const phoneInput = document.getElementById('edit_telefono');
+        if (phoneInput) {
+            const rawPhone = String(data.phone_raw || data.phone || data.telefono || data.telephone1 || '').replace(/\D/g, '');
+            phoneInput.value = rawPhone;
+        }
+
+        // 6. Código de Ficha
+        const fichaInput = document.getElementById('edit_ficha');
+        if (fichaInput) {
+            const rawCode = String(data.code_raw || data.code || data.ficha || '').trim();
+            fichaInput.value = (rawCode && rawCode !== 'N/A' && rawCode !== 'Sin ficha') ? rawCode : '';
+        }
+
+        // 7. Programa de Formación
+        const progInput = document.getElementById('edit_programa');
+        if (progInput) {
+            let rawProg = String(data.program_raw || data.program || data.programa || '').trim();
+            if (rawProg === 'Sin programa') rawProg = '';
+            progInput.value = rawProg;
+        }
+
+        // 8. Estado en SIGE (is_active)
+        const activeSelect = document.getElementById('edit_is_active');
+        if (activeSelect) {
+            const isAct = (data.is_active === true || data.is_active === 1 || data.is_active === '1' || data.is_active === 'true');
+            activeSelect.value = isAct ? '1' : '0';
+        }
+
+        // 9. Estado Ocupacional / Formativo
         const estadoSelect = document.getElementById('edit_estado');
-        if (estadoSelect && data.status) {
-            const cleanSt = String(data.status).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        if (estadoSelect && (data.status || data.estado)) {
+            const cleanSt = String(data.status || data.estado).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             for (let i = 0; i < estadoSelect.options.length; i++) {
                 const opt = estadoSelect.options[i];
                 const optClean = opt.value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-                if (optClean === cleanSt || opt.value === data.status) {
+                if (optClean === cleanSt || opt.value === (data.status || data.estado)) {
                     estadoSelect.value = opt.value;
                     break;
                 }

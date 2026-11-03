@@ -56,8 +56,8 @@ class CheckEgresadosRole
                     return $next($request);
                 }
 
-                // Permitir a instructores registrar egresados o seguimientos sin redirecciones bruscas
-                if ($request->isMethod('post') && ($request->is('*store*') || $request->is('*seguimiento*'))) {
+                // Permitir a instructores registrar egresados, seguimientos, sincronizar, importar o actualizar sin redirecciones bruscas
+                if (($request->isMethod('post') || $request->isMethod('put')) && ($request->is('*store*') || $request->is('*seguimiento*') || $request->is('*sincronizar*') || $request->is('*importar*') || $request->is('*update*') || $request->is('*toggle*'))) {
                     if ($user->hasRole('egresados.instructor') || 
                         $user->hasRole('sigac.instructor') || 
                         $user->hasRole('agrocefa.trainer') ||

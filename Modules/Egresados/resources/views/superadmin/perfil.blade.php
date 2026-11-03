@@ -272,6 +272,25 @@
     $estado = $apprentice->apprentice_status ?? 'CERTIFICADO';
     $programaNombre = $program->name ?? 'Gestión de Empresas Agropecuarias';
     $fichaCodigo = $course->code ?? '55555';
+
+    $perfilJsonData = json_encode([
+        'id' => $apprentice->id,
+        'name' => $nombreCompleto,
+        'initials' => $iniciales,
+        'document' => $docNum,
+        'document_raw' => $docNum,
+        'document_type' => $docType,
+        'email' => ($correo !== 'egresado.siga@sena.edu.co') ? $correo : '',
+        'email_raw' => ($correo !== 'egresado.siga@sena.edu.co') ? $correo : '',
+        'phone' => ($telefono !== 'No registra') ? $telefono : '',
+        'phone_raw' => ($telefono !== 'No registra') ? $telefono : '',
+        'program' => $programaNombre,
+        'program_raw' => $programaNombre,
+        'code' => $fichaCodigo,
+        'code_raw' => $fichaCodigo,
+        'status' => $estado,
+        'is_active' => !$apprentice->trashed() && !in_array($estado, ['CANCELADO', 'RETIRO VOLUNTARIO']),
+    ]);
 @endphp
 
 <div class="app">
@@ -388,7 +407,7 @@
                           <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg> {{ $telefono }}</span>
                       </div>
                       <div class="mt-4 flex gap-3">
-                          <button @click="openModalEditar = true" type="button" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition cursor-pointer shadow-sm flex items-center gap-2">
+                          <button @click="openEditarModal(window.currentSelectedEgresado); openModalEditar = true" type="button" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition cursor-pointer shadow-sm flex items-center gap-2">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                               Editar Perfil
                           </button>
@@ -503,6 +522,15 @@
 <!-- INCLUSIÓN DE MODALES -->
 @include('egresados::superadmin.partials._modal_seguimiento')
 @include('egresados::superadmin.partials._modal_editar')
+
+<script>
+    window.currentSelectedEgresado = {!! $perfilJsonData !!};
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof populateModalEditar === 'function') {
+            populateModalEditar(window.currentSelectedEgresado);
+        }
+    });
+</script>
 
 </body>
 </html>

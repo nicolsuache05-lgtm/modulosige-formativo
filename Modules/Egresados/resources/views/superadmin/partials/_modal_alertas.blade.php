@@ -24,6 +24,8 @@
     $isDeleted = str_contains($lowerMsg, 'elimin');
     $isCancelado = str_contains($lowerMsg, 'cancelad');
     $isCerrada = str_contains($lowerMsg, 'cerrad') || str_contains($lowerMsg, 'cierre');
+    $isDesactivado = str_contains($lowerMsg, 'desactivad');
+    $isActivado = str_contains($lowerMsg, 'activad') && !$isDesactivado;
 
     // Título dinámico inteligente
     if ($isInvitacion) {
@@ -37,7 +39,17 @@
             $badgeText = 'Instrumento cerrado y recolección de respuestas finalizada';
             $tagIcon = 'fa-lock';
             $tagLabel = 'CIERRE DE ENCUESTA · SIGE ERP';
-        } elseif ($isUpdated) {
+        } elseif ($isDesactivado) {
+        $successTitle = '¡Egresado Desactivado Correctamente!';
+        $badgeText = 'El egresado ha pasado a estado inactivo en el sistema';
+        $tagIcon = 'fa-user-slash';
+        $tagLabel = 'GESTIÓN DE ESTADO · SIGE ERP';
+    } elseif ($isActivado) {
+        $successTitle = '¡Egresado Activado Correctamente!';
+        $badgeText = 'El egresado ha sido habilitado nuevamente en el sistema';
+        $tagIcon = 'fa-user-check';
+        $tagLabel = 'GESTIÓN DE ESTADO · SIGE ERP';
+    } elseif ($isUpdated) {
             $successTitle = '¡Encuesta Actualizada Correctamente!';
             $badgeText = 'Información de la encuesta actualizada en el sistema';
             $tagIcon = 'fa-clipboard-question';
@@ -48,19 +60,6 @@
             $tagIcon = 'fa-clipboard-question';
             $tagLabel = 'MÓDULO DE ENCUESTAS · SIGE ERP';
         }
-    } elseif ($isInstructor) {
-        if ($isUpdated) {
-            $successTitle = '¡Instructor Actualizado Correctamente!';
-            $badgeText = 'Información del instructor actualizada en la base de datos';
-        } elseif ($isDeleted) {
-            $successTitle = '¡Instructor Retirado Correctamente!';
-            $badgeText = 'Registro de instructor modificado en la base de datos';
-        } else {
-            $successTitle = '¡Instructor Registrado Correctamente!';
-            $badgeText = 'Instructor guardado y verificado en la base de datos';
-        }
-        $tagIcon = 'fa-chalkboard-user';
-        $tagLabel = 'GESTIÓN DE INSTRUCTORES SIGE';
     } elseif ($isReporte) {
         if ($isDeleted) {
             $successTitle = '¡Reporte Eliminado Correctamente!';
@@ -90,6 +89,19 @@
         $badgeText = 'Bitácora de seguimiento registrada en el expediente';
         $tagIcon = 'fa-chart-line';
         $tagLabel = 'SEGUIMIENTO A EGRESADOS';
+    } elseif ($isInstructor) {
+        if ($isUpdated) {
+            $successTitle = '¡Instructor Actualizado Correctamente!';
+            $badgeText = 'Información del instructor actualizada en la base de datos';
+        } elseif ($isDeleted) {
+            $successTitle = '¡Instructor Retirado Correctamente!';
+            $badgeText = 'Registro de instructor modificado en la base de datos';
+        } else {
+            $successTitle = '¡Instructor Registrado Correctamente!';
+            $badgeText = 'Instructor guardado y verificado en la base de datos';
+        }
+        $tagIcon = 'fa-chalkboard-user';
+        $tagLabel = 'GESTIÓN DE INSTRUCTORES SIGE';
     } elseif ($isSync) {
         $successTitle = '¡Sincronización Completada!';
         $badgeText = 'Datos sincronizados exitosamente con SICA';
@@ -100,6 +112,16 @@
         $badgeText = 'Egresados cargados y registrados en la base de datos';
         $tagIcon = 'fa-file-excel';
         $tagLabel = 'IMPORTACIÓN MASIVA SIGE';
+    } elseif ($isDesactivado) {
+        $successTitle = '¡Egresado Desactivado Correctamente!';
+        $badgeText = 'El egresado ha pasado a estado inactivo en el sistema';
+        $tagIcon = 'fa-user-slash';
+        $tagLabel = 'GESTIÓN DE ESTADO · SIGE ERP';
+    } elseif ($isActivado) {
+        $successTitle = '¡Egresado Activado Correctamente!';
+        $badgeText = 'El egresado ha sido habilitado nuevamente en el sistema';
+        $tagIcon = 'fa-user-check';
+        $tagLabel = 'GESTIÓN DE ESTADO · SIGE ERP';
     } elseif ($isUpdated) {
         $successTitle = '¡Datos Actualizados Correctamente!';
         $badgeText = 'Expediente actualizado y verificado en la base de datos';

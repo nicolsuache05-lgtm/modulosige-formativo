@@ -1169,7 +1169,7 @@ class ReportesController extends Controller
      * Retorna los reportes institucionales preconfigurados del sistema,
      * calculados de forma dinámica y exacta con los aprendices y egresados reales del módulo SIGE.
      */
-    protected function getBaseReports($totalEgresadosCount = null, $totalEmpleadosCount = null, $totalDesempleadosCount = null, $tasaEmpleabilidad = null, $rateValue = null)
+    public function getBaseReports($totalEgresadosCount = null, $totalEmpleadosCount = null, $totalDesempleadosCount = null, $tasaEmpleabilidad = null, $rateValue = null)
     {
         try {
             // Egresados certificados (Consolidado General REP_001)

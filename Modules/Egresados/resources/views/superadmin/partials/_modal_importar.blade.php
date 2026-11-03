@@ -27,7 +27,7 @@
         </div>
 
         <div class="px-6 py-5">
-            <form id="form-importar-excel" action="{{ route('egresados.superadmin.importar') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+            <form id="form-importar-excel" action="{{ (request()->is('*instructor*') || (Auth::check() && Auth::user()->hasRole('instructor'))) ? route('egresados.instructor.importar') : route('egresados.superadmin.importar') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 
                 <!-- Selector de Tipo de Carga -->

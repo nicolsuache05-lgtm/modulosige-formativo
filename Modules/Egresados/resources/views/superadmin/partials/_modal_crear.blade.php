@@ -38,7 +38,7 @@
 
         <!-- Cuerpo del Formulario (Con scroll suave) -->
         <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-6">
-            <form id="form-crear-egresado-modal" action="{{ route('egresados.superadmin.store') }}" method="POST" class="space-y-6">
+            <form id="form-crear-egresado-modal" action="{{ (request()->is('*instructor*') || (Auth::check() && Auth::user()->hasRole('instructor'))) ? route('egresados.instructor.store') : route('egresados.superadmin.store') }}" method="POST" class="space-y-6">
                 @csrf
                 
                 <!-- 1. Datos personales -->

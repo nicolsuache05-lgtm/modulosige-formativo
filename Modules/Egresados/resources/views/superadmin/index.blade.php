@@ -804,9 +804,22 @@
     openModalImportar: false, 
     openModalEditar: false, 
     openModalPerfilEgresado: false,
+    openModalToggleStatus: false,
+    toggleModalTitle: '¿Desactivar Egresado?',
+    toggleModalMessage: '',
+    toggleModalConfirmText: 'Sí, Desactivar',
+    toggleModalConfirmIcon: 'fa-solid fa-user-xmark',
+    toggleModalIsActive: true,
     openSuccessModal: {{ session('success') ? 'true' : 'false' }},
     openErrorModal: {{ session('error') ? 'true' : 'false' }}
-}">
+}" @open-toggle-modal.window="
+    openModalToggleStatus = true;
+    toggleModalTitle = $event.detail.title;
+    toggleModalMessage = $event.detail.message;
+    toggleModalConfirmText = $event.detail.confirmText;
+    toggleModalConfirmIcon = $event.detail.confirmIcon;
+    toggleModalIsActive = $event.detail.isActive;
+">
 
 <div class="app">
 
@@ -879,23 +892,8 @@
           <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- BOTÓN 1: Sincronizar API (Formulario directo con Azul Noche Institucional) -->
-          <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" class="m-0 p-0">
-            @csrf
-            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#00131E] to-[#001A29] hover:from-[#001A29] hover:to-[#00283d] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer border border-white/10">
-              <svg class="w-4 h-4 mr-2 text-[#62E31D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span>Sincronizar SICEFA</span>
-            </button>
-          </form>
-
-          <!-- BOTÓN 2: Importar Excel (Estilo Card Institucional con Verde SENA) -->
-          <button @click="openModalImportar = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-emerald-50/50 border border-gray-200 hover:border-[#39A900]/50 text-gray-700 hover:text-[#00131E] text-xs font-bold rounded-xl transition-all duration-200 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 cursor-pointer">
-            <svg class="w-4 h-4 mr-2 text-[#39A900]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            <span>Importar Excel</span>
-          </button>
-
-          <!-- BOTÓN 3: Nuevo Egresado (Verde Principal Institucional SENA) -->
+        <div class="flex items-center gap-3">
+          <!-- Botón Nuevo Egresado (Verde Principal Institucional SENA) -->
           <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-0">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Nuevo Egresado</span>
@@ -1051,8 +1049,8 @@
                   @endphp
                   <tr class="egresado-row {{ $index === 0 ? 'selected-row' : '' }}" 
                       id="row-{{ $item->id }}"
-                      data-json="{{ htmlspecialchars($jsonData, ENT_QUOTES, 'UTF-8') }}"
-                      onclick="selectEgresado({{ $jsonData }}, 'row-{{ $item->id }}')">
+                      data-json="{{ $jsonData }}"
+                      onclick="selectEgresadoFromElement(this)">
                     
                     <td style="font-weight:700; color:var(--forest-deep);">
                       {{ $person->document_number ?? 'N/A' }}
@@ -1179,7 +1177,7 @@
           </button>
 
           <button type="button" 
-              @click="if(window.currentSelectedEgresado) populateModalEditar(window.currentSelectedEgresado); openModalEditar = true;" 
+              @click="openEditarModal(); openModalEditar = true;" 
               class="btn-edit-action cursor-pointer">
             <i class="fa-solid fa-pen-to-square"></i>
             <span>Editar Datos</span>
@@ -1191,7 +1189,7 @@
           </button>
 
           <!-- Botón Activar / Desactivar Egresado en Panel -->
-          <form id="detailToggleForm" action="" method="POST" style="margin-top:8px;">
+          <form id="detailToggleForm" action="" method="POST" style="margin-top:8px;" onsubmit="event.preventDefault(); openConfirmToggleModal();">
             @csrf
             <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
               <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
@@ -1258,10 +1256,10 @@
 
         if (toggleForm && data.id) {
             toggleForm.action = '{{ url("egresados") }}/' + data.id + '/toggle-status';
-            toggleForm.onsubmit = function() {
-                return confirm(data.is_active ? 
-                    '¿Deseas desactivar a ' + (data.name || 'este egresado') + '? Pasará a estado inactivo en SIGE.' : 
-                    '¿Deseas activar a ' + (data.name || 'este egresado') + '? Volverá a estar habilitado en SIGE.');
+            toggleForm.onsubmit = function(e) {
+                if (e) e.preventDefault();
+                openConfirmToggleModal(data);
+                return false;
             };
             if (data.is_active) {
                 toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border border-rose-200 text-rose-700 hover:bg-rose-50 transition cursor-pointer';
@@ -1301,20 +1299,58 @@
         }
     }
 
-    // Seleccionar automáticamente el primer egresado al cargar sin disparar click() sintético
+    // Decodificador seguro de JSON tolerante a entidades HTML
+    function parseJsonSafe(raw) {
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw);
+        } catch(e1) {
+            try {
+                const doc = new DOMParser().parseFromString(raw, 'text/html');
+                const decoded = doc.body.textContent;
+                return JSON.parse(decoded);
+            } catch(e2) {
+                console.error('Error parseando json de egresado:', e2, raw);
+                return null;
+            }
+        }
+    }
+
+    // Selector a partir del elemento <tr> en el DOM
+    function selectEgresadoFromElement(el) {
+        if (!el) return;
+        const raw = el.getAttribute('data-json');
+        const data = parseJsonSafe(raw);
+        if (data) {
+            selectEgresado(data, el.id);
+        }
+    }
+
+    // Apertura reactiva y garantizada del modal de edición
+    function openEditarModal(data) {
+        if (!data) {
+            data = window.currentSelectedEgresado;
+        }
+        if (!data) {
+            const row = document.querySelector('.egresado-row.selected-row') || document.querySelector('.egresado-row');
+            if (row) {
+                const raw = row.getAttribute('data-json');
+                data = parseJsonSafe(raw);
+            }
+        }
+        if (data) {
+            window.currentSelectedEgresado = data;
+            if (typeof populateModalEditar === 'function') {
+                populateModalEditar(data);
+            }
+        }
+    }
+
+    // Seleccionar automáticamente el primer egresado al cargar
     document.addEventListener('DOMContentLoaded', function() {
         const firstRow = document.querySelector('.egresado-row');
         if (firstRow) {
-            const rawJson = firstRow.getAttribute('data-json');
-            if (rawJson) {
-                try {
-                    selectEgresado(JSON.parse(rawJson), firstRow.id);
-                } catch(e) {
-                    firstRow.classList.add('selected-row');
-                }
-            } else {
-                firstRow.classList.add('selected-row');
-            }
+            selectEgresadoFromElement(firstRow);
         }
     });
 </script>
@@ -1325,6 +1361,7 @@
 @include('egresados::superadmin.partials._modal_editar')
 @include('egresados::superadmin.partials._modal_importar')
 @include('egresados::superadmin.partials._modal_perfil_egresado')
+@include('egresados::superadmin.partials._modal_confirmar_toggle')
 @include('egresados::superadmin.partials._modal_alertas')
 
 </body>

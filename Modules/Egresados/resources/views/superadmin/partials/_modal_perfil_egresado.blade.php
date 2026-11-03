@@ -39,12 +39,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" 
-                        @click="openModalPerfilEgresado = false; populateModalEditar(window.currentSelectedEgresado); openModalEditar = true;" 
-                        class="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition border border-white/20 cursor-pointer">
-                    <i class="fa-solid fa-pen-to-square text-[#62E31D]"></i>
-                    <span>Editar Datos</span>
-                </button>
                 <button @click="openModalPerfilEgresado = false" type="button" class="text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10 transition cursor-pointer" title="Cerrar ventana">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -174,7 +168,7 @@
 
             <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                 <button type="button" 
-                        @click="openModalPerfilEgresado = false; populateModalEditar(window.currentSelectedEgresado); openModalEditar = true;" 
+                        @click="openModalPerfilEgresado = false; openEditarModal(); openModalEditar = true;" 
                         class="px-5 py-2.5 bg-gradient-to-r from-[#00131E] to-[#001A29] hover:from-[#001A29] hover:to-[#00283d] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer border border-white/10 flex items-center gap-1.5">
                     <i class="fa-solid fa-pen-to-square text-[#62E31D]"></i>
                     <span>Editar Datos</span>
@@ -197,6 +191,12 @@
      */
     function populateModalPerfilEgresado(data) {
         if (!data) return;
+
+        // Mantener sincronizado globalmente
+        window.currentSelectedEgresado = data;
+        if (typeof populateModalEditar === 'function') {
+            populateModalEditar(data);
+        }
 
         const mpInit = document.getElementById('modalEgresadoInitials');
         if (mpInit) mpInit.innerText = data.initials || 'EG';

@@ -98,56 +98,83 @@ class InstructorController extends Controller
      */
     public function directorio(Request $request)
     {
-        $baseQuery = Apprentice::whereNull('apprentices.deleted_at')
+        // Consulta base: Egresados vinculados a SIGE o con estado CERTIFICADO (incluyendo soft-deleted del módulo para permitir activar/desactivar)
+        $query = Apprentice::withTrashed()
+            ->with(['person.users.roles', 'course.program'])
             ->where(function($q) {
-                $q->whereExists(function($sub) {
-                    $sub->select(DB::raw(1))
-                        ->from('people')
-                        ->join('users', 'people.id', '=', 'users.person_id')
-                        ->join('role_user', 'users.id', '=', 'role_user.user_id')
-                        ->join('roles', 'role_user.role_id', '=', 'roles.id')
-                        ->whereColumn('people.id', 'apprentices.person_id')
-                        ->where('roles.slug', 'egresados.egresado');
-                })->orWhere('apprentices.apprentice_status', 'CERTIFICADO');
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
             });
 
-        $totalEgresados = (clone $baseQuery)->count() ?: 6;
-        $totalInactivos = Apprentice::onlyTrashed()->count() ?: 0;
-        $totalActivos = $totalEgresados;
-
-        // Cursos y programas para filtros
-        $courses = Course::with('program')->orderBy('code')->get();
-        $programs = Program::orderBy('name')->get();
-
-        // Consulta de egresados con relaciones
-        $query = (clone $baseQuery)->with(['person', 'course.program']);
-
+        // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = trim(strip_tags($request->input('search')));
             $query->whereHas('person', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('first_last_name', 'like', "%{$search}%")
+                  ->orWhere('second_last_name', 'like', "%{$search}%")
                   ->orWhere('document_number', 'like', "%{$search}%");
             });
+        }
+
+        // Filtro por estado solo si se selecciona uno específico distinto de TODOS
+        if ($request->filled('apprentice_status') && $request->input('apprentice_status') !== 'TODOS') {
+            $stFilter = $request->input('apprentice_status');
+            if ($stFilter === 'ACTIVOS') {
+                $query->whereNull('deleted_at')->whereNotIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO']);
+            } elseif ($stFilter === 'INACTIVOS') {
+                $query->where(function($sub) {
+                    $sub->whereNotNull('deleted_at')->orWhereIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO']);
+                });
+            } else {
+                $query->where('apprentice_status', $stFilter);
+            }
+        } elseif ($request->filled('status')) {
+            $query->where('apprentice_status', $request->input('status'));
         }
 
         if ($request->filled('course_id')) {
             $query->where('course_id', $request->input('course_id'));
         }
 
-        if ($request->filled('status')) {
-            $query->where('apprentice_status', $request->input('status'));
-        }
+        $egresados = $query->orderBy('id', 'desc')->paginate(10);
+        $apprentices = $egresados;
 
-        $apprentices = $query->orderBy('id', 'desc')->paginate(12);
+        // Estadísticas de egresados de este módulo
+        $baseCount = Apprentice::withTrashed()->where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
+
+        $totalEgresados = (clone $baseCount)->count() ?: 6;
+        $totalActivos = (clone $baseCount)->whereNull('deleted_at')->whereNotIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO'])->count() ?: $totalEgresados;
+        $totalInactivos = max(0, $totalEgresados - $totalActivos);
+        $totalEmpleados = (clone $baseCount)->whereNull('deleted_at')->where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedores = (clone $baseCount)->whereNull('deleted_at')->where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalEstudiantes = (clone $baseCount)->whereNull('deleted_at')->where('apprentice_status', 'EN FORMACIÓN')->count();
+        $actualizacionPendiente = 0;
+        $seguimientosRealizados = $totalEgresados;
+        $alertasEnviadas = 0;
+
+        $courses = Course::with('program')->orderBy('code')->get();
+        $programs = Program::orderBy('name')->get();
 
         return view('egresados::instructor.directorio', compact(
+            'egresados',
             'apprentices',
             'courses',
             'programs',
             'totalEgresados',
             'totalInactivos',
-            'totalActivos'
+            'totalActivos',
+            'totalEmpleados',
+            'totalEmprendedores',
+            'totalEstudiantes',
+            'actualizacionPendiente',
+            'seguimientosRealizados',
+            'alertasEnviadas'
         ));
     }
 
@@ -156,92 +183,28 @@ class InstructorController extends Controller
      */
     public function reportes(Request $request)
     {
-        $totalEgresadosCount = Apprentice::count() ?: 5634;
-        $totalEmpleadosCount = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count() ?: 3799;
-        $rateValue = $totalEgresadosCount > 0 ? round(($totalEmpleadosCount / $totalEgresadosCount) * 100) : 67;
+        $totalEgresadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmpleadosCount = $totalEgresadosCount;
+        $totalDesempleadosCount = 0;
+        
+        $rateValue = $totalEgresadosCount > 0 ? 100 : 0;
         $tasaEmpleabilidad = $rateValue . '%';
 
-        $totalGenerados = session('custom_instructor_reports') ? count(session('custom_instructor_reports')) + 4 : 4;
+        $totalGenerados = session('custom_instructor_reports') ? count(session('custom_instructor_reports')) + 5 : 5;
         $totalEgresados = number_format($totalEgresadosCount, 0, ',', '.');
-        $totalEncuestas = 242;
-        $seguimientosMes = 85;
 
         $courses = Course::with('program')->orderBy('code')->get();
         $programs = Program::orderBy('name')->get();
-
-        $defaultReports = [
-            [
-                'id' => 'REP-INS-001',
-                'title' => 'Consolidado Egresados Fichas Asignadas',
-                'full_title' => 'Reporte Integral de Seguimiento y Estado Laboral por Ficha',
-                'date' => '24/10/2026',
-                'type' => 'Seguimiento Fichas',
-                'format' => 'EXCEL',
-                'status' => 'GENERADO',
-                'status_pill' => 'status-green',
-                'program' => 'ADSO / Multimedia',
-                'total_egresados' => 145,
-                'empleados' => 112,
-                'pendientes' => 33,
-                'rate' => '77%',
-                'rate_num' => 77,
-            ],
-            [
-                'id' => 'REP-INS-002',
-                'title' => 'Inserción Laboral Sector Productivo',
-                'full_title' => 'Diagnóstico de Empleabilidad en Empresas de la Región',
-                'date' => '15/10/2026',
-                'type' => 'Empleabilidad',
-                'format' => 'PDF',
-                'status' => 'GENERADO',
-                'status_pill' => 'status-green',
-                'program' => 'ADSO',
-                'total_egresados' => 88,
-                'empleados' => 74,
-                'pendientes' => 14,
-                'rate' => '84%',
-                'rate_num' => 84,
-            ],
-            [
-                'id' => 'REP-INS-003',
-                'title' => 'Respuestas a Encuesta Inserción 2026',
-                'full_title' => 'Informe de Participación y Hallazgos Formativos',
-                'date' => '02/10/2026',
-                'type' => 'Encuestas',
-                'format' => 'EXCEL',
-                'status' => 'GENERADO',
-                'status_pill' => 'status-green',
-                'program' => 'Todos los programas',
-                'total_egresados' => 120,
-                'empleados' => 90,
-                'pendientes' => 30,
-                'rate' => '75%',
-                'rate_num' => 75,
-            ],
-            [
-                'id' => 'REP-INS-004',
-                'title' => 'Egresados con Actualización Pendiente',
-                'full_title' => 'Listado de Contacto para Validación de Datos SENA',
-                'date' => '18/09/2026',
-                'type' => 'Actualización Datos',
-                'format' => 'CSV',
-                'status' => 'GENERADO',
-                'status_pill' => 'status-amber',
-                'program' => 'Agroindustria / ADSO',
-                'total_egresados' => 56,
-                'empleados' => 30,
-                'pendientes' => 26,
-                'rate' => '53%',
-                'rate_num' => 53,
-            ]
-        ];
-
-        $customReports = session('custom_instructor_reports', []);
-        $reports = array_merge($customReports, $defaultReports);
-
-        $reportes = $reports;
         $totalProgramas = $programs->count() ?: 12;
         $totalFormatos = 3;
+
+        // Base de reportes idéntica a SuperAdmin
+        $reportesController = app(\Modules\Egresados\Http\Controllers\ReportesController::class);
+        $baseReports = $reportesController->getBaseReports($totalEgresadosCount, $totalEmpleadosCount, $totalDesempleadosCount, $tasaEmpleabilidad, $rateValue);
+
+        $customReports = session('custom_instructor_reports', []);
+        $reportes = array_merge($customReports, $baseReports);
+        $reports = $reportes;
 
         return view('egresados::instructor.reportes.index', compact(
             'reports',
@@ -252,9 +215,7 @@ class InstructorController extends Controller
             'totalEgresados',
             'totalProgramas',
             'totalFormatos',
-            'tasaEmpleabilidad',
-            'totalEncuestas',
-            'seguimientosMes'
+            'tasaEmpleabilidad'
         ));
     }
 
@@ -264,37 +225,114 @@ class InstructorController extends Controller
     public function storeReporte(Request $request)
     {
         $request->validate([
-            'titulo' => 'required|string|max:255',
-            'tipo' => 'required|string',
-            'formato' => 'required|string',
+            'nombre_reporte' => 'required|string|max:150',
+            'tipo_reporte' => 'required|string',
+            'filtro_programa' => 'nullable|string',
+            'filtro_ficha' => 'nullable|string',
+            'fecha_inicio' => 'nullable|date',
+            'fecha_fin' => 'nullable|date',
+            'formato_exportacion' => 'required|string|in:EXCEL,PDF,CSV',
+            'columnas' => 'nullable|array',
+        ], [
+            'nombre_reporte.required' => 'El nombre del reporte es obligatorio.',
+            'tipo_reporte.required' => 'Debe seleccionar un tipo de reporte u origen de datos.',
+            'formato_exportacion.required' => 'Debe seleccionar el formato de exportación.',
         ]);
 
         $customReports = session('custom_instructor_reports', []);
-        $count = count($customReports) + 5;
-        $newId = 'REP-INS-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        $count = count($customReports) + 6;
+        $newId = 'REP_' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-        $nuevo = [
-            'id' => $newId,
-            'title' => $request->titulo,
-            'full_title' => $request->titulo,
-            'date' => date('d/m/Y'),
-            'type' => $request->tipo,
-            'format' => strtoupper($request->formato),
-            'status' => 'GENERADO',
-            'status_pill' => 'status-green',
-            'program' => $request->programa ?? 'Fichas Seleccionadas',
-            'total_egresados' => rand(40, 150),
-            'empleados' => rand(25, 120),
-            'pendientes' => rand(5, 30),
-            'rate' => rand(65, 95) . '%',
-            'rate_num' => rand(65, 95),
+        $columnLabels = [
+            'datos_personales' => 'Datos Personales',
+            'contacto' => 'Contacto',
+            'academico' => 'Info. Académica',
+            'laboral' => 'Estado Laboral',
+            'seguimientos' => 'Trazabilidad y Seguimientos',
         ];
 
-        array_unshift($customReports, $nuevo);
+        $selectedColumns = [];
+        if ($request->filled('columnas')) {
+            foreach ($request->input('columnas') as $colKey) {
+                $selectedColumns[] = $columnLabels[$colKey] ?? ucfirst($colKey);
+            }
+        } else {
+            $selectedColumns = ['Datos Personales', 'Contacto', 'Info. Académica', 'Estado Laboral'];
+        }
+
+        $programName = $request->input('filtro_programa', 'Todos');
+        if ($programName === 'TODOS' || empty($programName)) {
+            $programName = 'Todos los programas';
+        }
+
+        $pFilter = $request->input('filtro_programa', 'Todos');
+        $fichaName = $request->input('filtro_ficha') ?: 'Todas';
+        $periodo = ($request->filled('fecha_inicio') && $request->filled('fecha_fin'))
+            ? $request->input('fecha_inicio') . ' al ' . $request->input('fecha_fin')
+            : 'Histórico Completo';
+
+        $calcQuery = Apprentice::where(function($q) {
+            $q->whereHas('person.users.roles', function($rq) {
+                $rq->where('slug', 'egresados.egresado');
+            })->orWhere('apprentice_status', 'CERTIFICADO');
+        });
+
+        if (!empty($pFilter) && !in_array(strtoupper($pFilter), ['TODOS', 'TODOS LOS PROGRAMAS', 'GENERAL', 'TODAS LAS ESPECIALIDADES'])) {
+            $calcQuery->whereHas('course.program', function($q) use ($pFilter) {
+                $q->where('name', 'like', "%{$pFilter}%");
+            });
+        }
+        if (!empty($fichaName) && !in_array(strtoupper($fichaName), ['TODAS', 'TODOS', 'TODAS LAS FICHAS'])) {
+            $calcQuery->whereHas('course', function($q) use ($fichaName) {
+                $q->where('code', 'like', "%{$fichaName}%");
+            });
+        }
+
+        $realCount = $calcQuery->count();
+        if ($realCount === 0) {
+            $realCount = Apprentice::where(function($q) {
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
+            })->count() ?: 6;
+        }
+
+        $totalCalculado = $realCount;
+        $empleadosCalculados = $totalCalculado;
+        $desempleadosCalculados = 0;
+        $rateVal = 100;
+
+        $newReport = [
+            'id' => $newId,
+            'title' => $request->input('nombre_reporte'),
+            'full_title' => $request->input('nombre_reporte'),
+            'date' => date('d/m/Y'),
+            'generated_by' => auth()->check() ? (auth()->user()->full_name ?? auth()->user()->name ?? 'Instructor') : 'Instructor',
+            'program' => $programName,
+            'type' => $request->input('tipo_reporte'),
+            'format' => $request->input('formato_exportacion'),
+            'status' => 'GENERADO',
+            'status_pill' => 'status-green',
+            'total_egresados' => $totalCalculado,
+            'empleados' => $empleadosCalculados,
+            'desempleados' => $desempleadosCalculados,
+            'rate' => $rateVal . '%',
+            'rate_num' => $rateVal,
+            'filters' => [
+                'programa' => $programName,
+                'ficha' => $fichaName,
+                'estado' => 'Configurado según origen ' . $request->input('tipo_reporte'),
+                'region' => 'Huila / CEFA',
+                'periodo' => $periodo,
+            ],
+            'columns' => $selectedColumns,
+        ];
+
+        array_unshift($customReports, $newReport);
         session(['custom_instructor_reports' => $customReports]);
 
         return redirect()->route('egresados.instructor.reportes.index')
-            ->with('success', '¡Reporte "' . $request->titulo . '" generado exitosamente!');
+            ->with('success', '¡El reporte "' . $request->input('nombre_reporte') . '" (' . $newId . ') ha sido configurado y generado exitosamente!');
     }
 
     /**

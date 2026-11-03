@@ -53,7 +53,7 @@
 
         <!-- Formulario Básico -->
         <div class="p-6">
-            <form id="form-seguimiento-simple" action="{{ route('egresados.superadmin.seguimiento.store') }}" method="POST" class="space-y-4">
+            <form id="form-seguimiento-simple" action="{{ (request()->is('*instructor*') || (Auth::check() && Auth::user()->hasRole('instructor'))) ? route('egresados.instructor.seguimiento.store') : route('egresados.superadmin.seguimiento.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="egresado_id" id="seguimiento_egresado_id" value="{{ $apprentice->id ?? 1 }}">
 
