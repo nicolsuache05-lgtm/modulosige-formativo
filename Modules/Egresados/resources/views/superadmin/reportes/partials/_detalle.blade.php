@@ -58,13 +58,14 @@
                 Descargar PDF
             </a>
 
-            <!-- 3. Ver Gráficas (Lleva a una vista detallada como la de encuestas) -->
-            <a id="btnActionGraficas" 
-               href="{{ route('egresados.superadmin.reportes.graficas', ['id' => 'REP_002']) }}" 
-               class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Ver Gráficas
-            </a>
+            <!-- 3. Ver Gráficas e Indicadores (Abre modal interactivo) -->
+            <button type="button" 
+                    id="btnActionGraficas" 
+                    @click="openModalGraficas = true; abrirGraficasReporteModal();" 
+                    class="w-full py-2.5 bg-white border border-gray-200 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span>Ver Gráficas e Indicadores</span>
+            </button>
 
             <!-- 4. Enviar por Correo -->
             <button @click="confirmarEnvio = true" type="button" class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">

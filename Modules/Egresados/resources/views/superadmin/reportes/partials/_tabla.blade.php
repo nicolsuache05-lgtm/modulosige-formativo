@@ -139,8 +139,14 @@
                                             title="Ver Detalle">
                                         <i class="fa-solid fa-eye text-xs"></i>
                                     </button>
+                                    <button type="button" 
+                                            onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}'); abrirGraficasReporteModal({{ $jsonData }});" 
+                                            class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition cursor-pointer" 
+                                            title="Ver Gráficas e Indicadores">
+                                        <i class="fa-solid fa-chart-pie text-xs"></i>
+                                    </button>
                                     <a href="{{ route('egresados.superadmin.reportes.export', ['title' => $item['title'], 'format' => $item['format'] ?? 'EXCEL']) }}" 
-                                       class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition cursor-pointer" 
+                                       class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center justify-center transition cursor-pointer" 
                                        title="Descargar">
                                         <i class="fa-solid fa-download text-xs"></i>
                                     </a>
