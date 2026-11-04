@@ -385,11 +385,20 @@ class EgresadosController extends Controller
         $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
         $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
 
+        $todasNoticias = \Modules\Egresados\Http\Controllers\NoticiasController::getAllNoticias();
+        $noticiasPublicadas = array_values(array_filter($todasNoticias, function ($n) {
+            $status = strtoupper($n['status'] ?? 'PUBLICADA');
+            return in_array($status, ['PUBLICADA', 'DESTACADA', 'ACTIVA']);
+        }));
+        $noticiaDestacada = !empty($noticiasPublicadas) ? $noticiasPublicadas[0] : ($todasNoticias[0] ?? null);
+
         return view('egresados::welcome', compact(
             'totalEgresados',
             'totalEmpleados',
             'totalEmprendedores',
-            'totalEstudiantes'
+            'totalEstudiantes',
+            'noticiaDestacada',
+            'noticiasPublicadas'
         ));
     }
 
@@ -1245,6 +1254,12 @@ class EgresadosController extends Controller
         $notificaciones = 3 + count($invitacionesEventos);
         $totalEventosActivos = 2 + count($invitacionesEventos);
 
+        $todasNoticias = \Modules\Egresados\Http\Controllers\NoticiasController::getAllNoticias();
+        $noticiasRecientes = array_slice(array_filter($todasNoticias, function ($n) {
+            $status = strtoupper($n['status'] ?? 'PUBLICADA');
+            return in_array($status, ['PUBLICADA', 'DESTACADA', 'ACTIVA']);
+        }), 0, 3);
+
         return view('egresados::egresados.dashboard', compact(
             'user',
             'person',
@@ -1253,7 +1268,8 @@ class EgresadosController extends Controller
             'oportunidadesLaborales',
             'notificaciones',
             'invitacionesEventos',
-            'totalEventosActivos'
+            'totalEventosActivos',
+            'noticiasRecientes'
         ));
     }
 

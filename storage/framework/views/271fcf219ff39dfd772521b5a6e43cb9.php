@@ -165,7 +165,7 @@
                         </button>
                     </form>
                 <?php else: ?>
-                    <a href="<?php echo e(route('login', ['redirect' => route('egresados.welcome')])); ?>" class="bg-[#002336] hover:bg-[#00324D] border border-white/20 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
+                    <a href="<?php echo e(route('login')); ?>" class="bg-[#002336] hover:bg-[#00324D] border border-white/20 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
                         <i class="fa-regular fa-user text-xs"></i>
                         <span>Iniciar sesión</span>
                     </a>
@@ -214,7 +214,7 @@
                             <span>Ir a mi Panel (<?php echo e(Auth::user()->primary_role); ?>)</span>
                         </a>
                     <?php else: ?>
-                        <a href="<?php echo e(route('login', ['redirect' => route('egresados.welcome')])); ?>" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                        <a href="<?php echo e(route('login')); ?>" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                             <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
                             <span>Iniciar sesión</span>
                         </a>
@@ -308,17 +308,44 @@
                     
                     <!-- SLIDE 0: NOTICIAS DE SIGE -->
                     <div id="sigeSlide-0" onclick="clickSlideSige(0)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
-                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Noticias de SIGE" class="w-full h-full object-cover">
+                        <img src="<?php echo e($noticiaDestacada['image'] ?? 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80'); ?>" alt="<?php echo e($noticiaDestacada['title'] ?? 'Noticias de SIGE'); ?>" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
                             <span class="bg-[#39A900] text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
-                                <i class="fa-regular fa-newspaper mr-1"></i> Noticias de SIGE
+                                <i class="fa-regular fa-newspaper mr-1"></i> Noticias de SIGE</span>
+                            <?php if(!empty($noticiaDestacada['date'])): ?>
+                            <span class="bg-black/50 backdrop-blur-md text-[#62E31D] text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/10 font-mono shadow-sm">
+                                <i class="fa-regular fa-clock mr-1 text-[9px]"></i><?php echo e($noticiaDestacada['date']); ?>
+
+                            </span>
+                            <?php endif; ?>
+                            <span class="hidden">
                             </span>
                         </div>
                         <div class="absolute bottom-5 left-5 right-5 text-left text-white">
-                            <div class="text-xs text-[#62E31D] font-bold font-sans">Actualidad & Novedades</div>
-                            <h3 class="font-poppins text-lg sm:text-xl md:text-2xl font-black leading-tight mt-1">Noticias y Logros de Egresados</h3>
-                            <p class="font-sans text-xs sm:text-sm text-gray-200 mt-1.5 line-clamp-2 font-medium">Historias de éxito de nuestros graduados, convenios del CEFA e innovaciones productivas en el Huila.</p>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs text-[#62E31D] font-bold font-sans tracking-wide uppercase"><?php echo e($noticiaDestacada['category'] ?? 'Actualidad & Novedades'); ?></span>
+                                <?php if(!empty($noticiaDestacada['target'])): ?>
+                                <span class="text-[10px] text-gray-300 bg-white/10 px-2 py-0.5 rounded-full font-mono line-clamp-1">
+                                    <?php echo e($noticiaDestacada['target']); ?>
+
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                            <h3 class="font-poppins text-lg sm:text-xl md:text-2xl font-black leading-tight mt-1 line-clamp-2 drop-shadow-md">
+                                <?php echo e($noticiaDestacada['title'] ?? 'Noticias y Logros de Egresados'); ?>
+
+                            </h3>
+                            <p class="font-sans text-xs sm:text-sm text-gray-200 mt-1.5 line-clamp-2 font-medium">
+                                <?php echo e($noticiaDestacada['summary'] ?? 'Historias de éxito de nuestros graduados, convenios del CEFA e innovaciones productivas en el Huila.'); ?>
+
+                            </p>
+                            <div class="mt-3 flex items-center gap-2">
+                                <button type="button" onclick="event.stopPropagation(); abrirModalNoticia('<?php echo e($noticiaDestacada['id'] ?? 'NOT-001'); ?>')" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#62E31D] hover:text-white bg-[#001A29]/80 hover:bg-[#39A900] px-3.5 py-1.5 rounded-full border border-[#62E31D]/40 transition shadow-sm font-poppins">
+                                    <span>Leer noticia completa</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
                             
                         </div>
                     </div>
@@ -327,7 +354,7 @@
                     <div id="sigeSlide-1" onclick="clickSlideSige(1)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
                         <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80" alt="Eventos Institucionales" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
                             <span class="bg-blue-600 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
                                 <i class="fa-solid fa-calendar-days mr-1"></i> Eventos
                             </span>
@@ -344,7 +371,7 @@
                     <div id="sigeSlide-2" onclick="clickSlideSige(2)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
                         <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Encuestas y Seguimiento" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
                             <span class="bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
                                 <i class="fa-solid fa-chart-pie mr-1"></i> Encuestas
                             </span>
@@ -361,7 +388,7 @@
                     <div id="sigeSlide-3" onclick="clickSlideSige(3)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
                         <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80" alt="Emprendimiento Fondo Emprender" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
                             <span class="bg-amber-600 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
                                 <i class="fa-solid fa-rocket mr-1"></i> Fondo Emprender
                             </span>
@@ -378,7 +405,7 @@
                     <div id="sigeSlide-4" onclick="clickSlideSige(4)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
                         <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Red de Egresados CEFA" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
                             <span class="bg-purple-600 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
                                 <i class="fa-solid fa-users mr-1"></i> Red de Egresados
                             </span>
@@ -537,12 +564,117 @@
 
 
     <!-- ============================================== -->
+        <!-- ============================================== -->
+    <!-- MODAL DETALLE DE NOTICIA INSTITUCIONAL (SENA ERP) -->
+    <!-- ============================================== -->
+    <div id="modalVerNoticiaLanding" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity duration-300" onclick="if(event.target === this) cerrarModalNoticia()">
+        <div class="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-gray-200">
+            
+            <!-- Header Modal con Gradiente SENA ERP -->
+            <div class="bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] px-6 py-4 flex items-center justify-between border-b-2 border-[#39A900] text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#39A900]/20 border border-[#62E31D]/40 flex items-center justify-center text-[#62E31D]">
+                        <i class="fa-solid fa-newspaper text-base"></i>
+                    </div>
+                    <div>
+                        <span id="modalNoticiaCategory" class="text-[11px] font-bold text-[#62E31D] uppercase tracking-wider font-mono">Actualidad</span>
+                        <h4 class="font-poppins font-black text-base sm:text-lg text-white leading-tight">Comunicado Institucional SIGE</h4>
+                    </div>
+                </div>
+                <button type="button" onclick="cerrarModalNoticia()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition" title="Cerrar ventana">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo Modal con Scroll -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-5">
+                
+                <!-- Imagen Destacada de la Noticia -->
+                <div class="relative h-56 sm:h-64 rounded-2xl overflow-hidden bg-slate-900 border border-gray-100 shadow-md">
+                    <img id="modalNoticiaImg" src="" alt="Imagen Noticia" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs">
+                        <span id="modalNoticiaDate" class="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full font-mono text-[11px] text-gray-200 border border-white/20"></span>
+                        <span id="modalNoticiaTarget" class="bg-[#39A900] px-2.5 py-1 rounded-full font-bold text-[11px] text-white shadow-sm font-sans"></span>
+                    </div>
+                </div>
+
+                <!-- Título -->
+                <div>
+                    <h3 id="modalNoticiaTitle" class="font-poppins font-black text-xl sm:text-2xl text-[#00131E] leading-snug"></h3>
+                    <div class="flex items-center gap-2 mt-2 text-xs text-gray-500 font-sans">
+                        <i class="fa-solid fa-user-pen text-[#39A900]"></i>
+                        <span id="modalNoticiaAuthor" class="font-bold"></span>
+                    </div>
+                </div>
+
+                <!-- Resumen Resaltado -->
+                <div class="bg-[#EAF7EE]/70 border-l-4 border-[#39A900] p-4 rounded-r-2xl">
+                    <p id="modalNoticiaSummary" class="text-xs sm:text-sm text-gray-800 font-medium italic leading-relaxed"></p>
+                </div>
+
+                <!-- Contenido Completo -->
+                <div id="modalNoticiaContent" class="text-sm text-gray-700 leading-relaxed space-y-3 font-sans border-t border-gray-100 pt-4">
+                </div>
+
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-gray-50 px-6 py-3.5 border-t border-gray-200 flex items-center justify-between">
+                <span class="text-xs text-gray-500 font-medium">SIGE · CEFA La Angostura</span>
+                <button type="button" onclick="cerrarModalNoticia()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#001A29] to-[#002336] hover:from-[#39A900] hover:to-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins">
+                    Cerrar Comunicado
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <!-- SCRIPT DEL CARRUSEL DE IMÁGENES "¿QUÉ ENCUENTRAS EN SIGE?" -->
     <!-- ============================================== -->
     <script>
         let currentSigeSlide = 0;
         const totalSigeSlides = 5;
         let sigeCoverflowTimer = null;
+
+        const sigeNoticiasPublicadas = <?php echo json_encode($noticiasPublicadas ?? [], 15, 512) ?>;
+        const sigeNoticiaDestacadaId = '<?php echo e($noticiaDestacada['id'] ?? 'NOT-001'); ?>';
+
+        function abrirModalNoticia(id) {
+            let noticia = sigeNoticiasPublicadas.find(n => n.id === id);
+            if (!noticia && sigeNoticiasPublicadas.length > 0) {
+                noticia = sigeNoticiasPublicadas[0];
+            }
+            if (!noticia) return;
+
+            document.getElementById('modalNoticiaImg').src = noticia.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80';
+            document.getElementById('modalNoticiaCategory').textContent = noticia.category || 'Actualidad';
+            document.getElementById('modalNoticiaTitle').textContent = noticia.title || '';
+            document.getElementById('modalNoticiaSummary').textContent = noticia.summary || '';
+            document.getElementById('modalNoticiaAuthor').textContent = (noticia.author || 'CEFA La Angostura') + (noticia.author_role ? ' · ' + noticia.author_role : '');
+            document.getElementById('modalNoticiaDate').textContent = noticia.date || '';
+            document.getElementById('modalNoticiaTarget').textContent = noticia.target || 'Comunidad CEFA';
+            
+            const contentEl = document.getElementById('modalNoticiaContent');
+            const paragraphs = (noticia.content || noticia.summary || '').split('\n').filter(p => p.trim().length > 0);
+            contentEl.innerHTML = paragraphs.map(p => `<p class="mb-3 text-gray-700 leading-relaxed font-sans">${p}</p>`).join('');
+
+            const modal = document.getElementById('modalVerNoticiaLanding');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalNoticia() {
+            const modal = document.getElementById('modalVerNoticiaLanding');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            document.body.style.overflow = '';
+        }
 
         function renderCoverflowSige() {
             const isMobile = window.innerWidth < 640;
@@ -624,6 +756,8 @@
         function clickSlideSige(idx) {
             if (idx !== currentSigeSlide) {
                 irASlideSige(idx);
+            } else if (idx === 0) {
+                abrirModalNoticia(sigeNoticiaDestacadaId);
             }
         }
 

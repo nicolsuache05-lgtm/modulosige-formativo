@@ -56,15 +56,23 @@
         --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
+      @view-transition {
+        navigation: auto;
+      }
+
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
+      }
+
+      body, button, input, select, textarea, .sidebar, .topbar, .font-editorial, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
       }
 
       .app {
@@ -75,6 +83,7 @@
 
       /* ---------------- SIDEBAR ---------------- */
       .sidebar {
+        view-transition-name: sige-sidebar;
         background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
@@ -85,9 +94,15 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
 
       .brand {
+        view-transition-name: sige-brand;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -120,8 +135,8 @@
 
       .brand-name {
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
+        font-weight: 800;
+        font-size: 16px;
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
@@ -138,8 +153,10 @@
       }
       .brand-sub {
         font-size: 10.5px;
-        color: rgba(255, 255, 255, 0.7);
-        margin-top: 2px;
+        color: #62E31D;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
 
       .nav-label {
@@ -156,33 +173,32 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
         font-size: 13.5px;
-        font-weight: 500;
-        margin-bottom: 3px;
-        transition: all 0.15s ease;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      nav a i {
+      nav a i, nav a svg {
+        width: 18px;
         font-size: 15px;
-        width: 20px;
         text-align: center;
-        opacity: 0.85;
+        flex-shrink: 0;
       }
       nav a:hover {
         background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
       }
       nav a.active {
-        background: var(--green);
+        background: linear-gradient(135deg, var(--sena-green, #39A900) 0%, #2e8b00 100%);
         color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.4);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
       }
-      nav a.active i {
-        opacity: 1;
+      nav a.active i, nav a.active svg {
         color: #ffffff;
       }
 
@@ -191,32 +207,48 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      @keyframes sigeFadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
       }
 
       /* ---------------- TOPBAR ---------------- */
       .topbar {
-        background: var(--forest);
+        background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
         color: #ffffff;
-        padding: 0 32px;
+        padding: 0 36px;
         height: 64px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 2px solid var(--green);
+        border-bottom: 2px solid var(--sena-green, #39A900);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 50;
       }
 
       .topbar-left {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
+      }
+
+      .portal-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 999px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+      .portal-link-btn:hover {
+        background: var(--green);
+        border-color: var(--green);
+        color: #ffffff;
       }
 
       .icon-btn {
@@ -551,8 +583,8 @@
       <div>
         <div class="brand-name">
           <span>SIGE</span>
-                  </div>
-        <div class="brand-sub">Gestión de Egresados</div>
+        </div>
+        <div class="brand-sub">GESTIÓN DE EGRESADOS</div>
       </div>
     </a>
 
@@ -578,10 +610,11 @@
         <i class="fa-regular fa-calendar-check"></i>
         <span>Eventos</span>
       </a>
+      <a href="{{ route('egresados.instructor.noticias.index') }}">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Noticias</span>
+      </a>
     </nav>
-
-
-
   </aside>
 
   <!-- MAIN VIEWPORT -->
@@ -589,12 +622,7 @@
     
     <!-- Topbar con Notificaciones y Menú de Usuario Unificado -->
     <div class="topbar">
-      <div class="topbar-left">
-        <span style="font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:6px;">
-          <i class="fa-solid fa-chalkboard-user" style="color:var(--moss);"></i>
-          <span>Panel de Acompañamiento y Seguimiento</span>
-        </span>
-      </div>
+      <div class="topbar-left"></div>
 
       @include('egresados::superadmin.partials._topbar_right')
     </div>

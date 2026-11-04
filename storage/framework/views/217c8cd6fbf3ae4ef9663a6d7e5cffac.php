@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <title>SIGE · Gestión de Encuestas — CEFA La Angostura</title>
 
     <!-- Favicon -->
@@ -71,15 +72,23 @@
         --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
+      @view-transition {
+        navigation: auto;
+      }
+
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
+      }
+
+      body, button, input, select, textarea, .sidebar, .topbar, .font-editorial, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
       }
 
       .app {
@@ -90,6 +99,7 @@
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
+        view-transition-name: sige-sidebar;
         background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
@@ -100,9 +110,15 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
 
       .brand {
+        view-transition-name: sige-brand;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -135,8 +151,8 @@
 
       .brand-name {
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
+        font-weight: 800;
+        font-size: 16px;
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
@@ -153,8 +169,10 @@
       }
       .brand-sub {
         font-size: 10.5px;
-        color: rgba(255, 255, 255, 0.7);
-        margin-top: 2px;
+        color: #62E31D;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
 
       .nav-label {
@@ -189,7 +207,6 @@
       nav a:hover {
         background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(3px);
       }
       nav a.active {
         background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
@@ -222,7 +239,18 @@
 
       .topbar {
         background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
-        border-bottom: 3px solid var(--sena-green);
+        border-bottom: 2px solid var(--sena-green);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        padding: 0 36px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
         box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
@@ -281,17 +309,17 @@
       }
 
       .content {
-        padding: 30px 36px 48px;
+        padding: 32px 36px 48px;
         flex: 1;
       }
 
-      @media (max-width: 1080px) {
+      @media (max-width: 768px) {
         .app { grid-template-columns: 1fr; }
         .sidebar { display: none; }
       }
       @media (max-width: 640px) {
         .content { padding: 20px 16px 36px; }
-        .topbar { padding: 12px 16px; }
+        .topbar { padding: 0 16px; }
       }
       [x-cloak] { display: none !important; }
     </style>
@@ -318,7 +346,7 @@
         <div class="brand-name">
           <span>SIGE</span>
         </div>
-        <div class="brand-sub">Gestión de Egresados</div>
+        <div class="brand-sub">GESTIÓN DE EGRESADOS</div>
       </div>
     </a>
 
@@ -348,9 +376,11 @@
         <i class="fa-regular fa-calendar-check"></i>
         <span>Eventos</span>
       </a>
+      <a href="<?php echo e(route('egresados.noticias')); ?>">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Noticias</span>
+      </a>
     </nav>
-
-
   </aside>
 
   <!-- ============================================== -->

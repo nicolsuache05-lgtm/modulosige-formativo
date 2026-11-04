@@ -72,15 +72,23 @@
         --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
+      @view-transition {
+        navigation: auto;
+      }
+
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
+      }
+
+      body, button, input, select, textarea, .sidebar, .topbar, .font-editorial, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
       }
 
       .app {
@@ -91,6 +99,7 @@
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
+        view-transition-name: sige-sidebar;
         background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
@@ -101,9 +110,15 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
 
       .brand {
+        view-transition-name: sige-brand;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -136,8 +151,8 @@
 
       .brand-name {
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-weight: 700;
-        font-size: 18px;
+        font-weight: 800;
+        font-size: 16px;
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
@@ -154,8 +169,10 @@
       }
       .brand-sub {
         font-size: 10.5px;
-        color: rgba(255, 255, 255, 0.7);
-        margin-top: 2px;
+        color: #62E31D;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
 
       .nav-label {
@@ -190,7 +207,6 @@
       nav a:hover {
         background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(3px);
       }
       nav a.active {
         background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
@@ -219,25 +235,21 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        animation: sigeFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      @keyframes sigeFadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
       }
 
       .topbar {
         background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
-        border-bottom: 3px solid var(--sena-green);
+        border-bottom: 2px solid var(--sena-green);
         box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 36px;
+        padding: 0 36px;
+        height: 64px;
         position: sticky;
         top: 0;
-        z-index: 20;
+        z-index: 50;
       }
 
       .topbar-left {
@@ -294,8 +306,39 @@
       }
 
       .content {
-        padding: 28px 36px;
+        padding: 32px 36px 48px;
         flex: 1;
+      }
+
+      .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .page-title {
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
+        font-weight: 700;
+        font-size: 28px;
+        margin: 0 0 6px;
+        color: var(--forest-deep);
+        letter-spacing: -0.5px;
+      }
+      .page-title span {
+        color: var(--green);
+      }
+      .page-desc {
+        font-size: 14.5px;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+
+      @media (max-width: 768px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        .content { padding: 20px 16px 36px; }
       }
 
       [x-cloak] { display: none !important; }
@@ -322,7 +365,7 @@
         <div class="brand-name">
           <span>SIGE</span>
         </div>
-        <div class="brand-sub">Gestión de Egresados</div>
+        <div class="brand-sub">GESTIÓN DE EGRESADOS</div>
       </div>
     </a>
 
@@ -348,9 +391,11 @@
         <i class="fa-regular fa-calendar-check"></i>
         <span>Eventos</span>
       </a>
+      <a href="{{ route('egresados.instructor.noticias.index') }}">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Noticias</span>
+      </a>
     </nav>
-
-
   </aside>
 
   <!-- ============================================== -->
@@ -383,12 +428,12 @@
       @endif
 
       <!-- Encabezado y botón Crear Reporte -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="page-head">
           <div>
-              <h1 class="text-2xl sm:text-3xl font-bold font-editorial text-gray-900 tracking-tight">
-                  Gestión de <span class="text-[#39A900]">Reportes</span>
+              <h1 class="page-title">
+                  Gestión de <span>Reportes</span>
               </h1>
-              <p class="text-xs sm:text-sm text-gray-500 mt-1">Generación y consulta de reportes institucionales del CEFA.</p>
+              <p class="page-desc">Generación y consulta de reportes institucionales del CEFA.</p>
           </div>
           <div class="flex items-center gap-3">
               <button @click="openModal = true" 

@@ -11,11 +11,14 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     /**
-     * Redirige al login unificado del ERP.
+     * Redirige al login unificado del ERP o directo al panel si ya está autenticado.
      */
     public function showLoginForm(Request $request)
     {
-        $redirect = $request->query('redirect', route('egresados.welcome'));
+        if (Auth::check()) {
+            return $this->redirectByRole(Auth::user());
+        }
+        $redirect = $request->query('redirect', route('egresados.dashboard_egresado'));
         return redirect()->route('login', ['redirect' => $redirect]);
     }
 
@@ -42,8 +45,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
-            if ($request->filled('redirect') && !str_contains($request->input('redirect'), '/login')) {
-                return redirect()->to($request->input('redirect'));
+            $redirectUrl = $request->input('redirect');
+            if (!empty($redirectUrl) && !str_contains($redirectUrl, '/login') && !str_contains($redirectUrl, 'egresados/welcome') && !str_ends_with($redirectUrl, '/egresados')) {
+                return redirect()->to($redirectUrl);
             }
 
             return $this->redirectByRole($user);
@@ -55,8 +59,9 @@ class AuthController extends Controller
             Auth::login($user, $request->filled('remember'));
             $request->session()->regenerate();
 
-            if ($request->filled('redirect') && !str_contains($request->input('redirect'), '/login')) {
-                return redirect()->to($request->input('redirect'));
+            $redirectUrl = $request->input('redirect');
+            if (!empty($redirectUrl) && !str_contains($redirectUrl, '/login') && !str_contains($redirectUrl, 'egresados/welcome') && !str_ends_with($redirectUrl, '/egresados')) {
+                return redirect()->to($redirectUrl);
             }
 
             return $this->redirectByRole($user);

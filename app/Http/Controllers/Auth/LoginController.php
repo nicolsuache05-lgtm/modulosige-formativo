@@ -16,8 +16,26 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
-            $redirect = $request->query('redirect', route('direccion.welcome'));
-            return redirect($redirect)->with('info', 'Ya has iniciado sesión como ' . Auth::user()->full_name);
+            $user = Auth::user();
+            $redirect = $request->query('redirect', '');
+            if (!empty($redirect) && !str_contains($redirect, 'login') && !str_contains($redirect, 'egresados/welcome') && !str_ends_with($redirect, '/egresados')) {
+                return redirect($redirect);
+            }
+
+            // Redirección directa al panel correspondiente según el usuario autenticado
+            if ($user->hasSuperAdmin() || $user->nickname === 'superadmin_egresados' || $user->email === 'superadmin.egresados@sena.edu.co' || $user->nickname === 'superadmin' || ($user->roles && ($user->roles->contains('slug', 'egresados.admin') || $user->roles->contains('slug', 'superadmin')))) {
+                return redirect()->route('egresados.dashboard');
+            }
+
+            if ($user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co' || ($user->roles && ($user->roles->contains('slug', 'egresados.instructor') || $user->roles->contains('slug', 'sigac.instructor')))) {
+                return redirect()->route('egresados.dashboard_instructor');
+            }
+
+            if ($user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.egresado'))) {
+                return redirect()->route('egresados.dashboard_egresado');
+            }
+
+            return redirect()->route('direccion.welcome')->with('info', 'Ya has iniciado sesión como ' . $user->full_name);
         }
 
         $redirect = $request->query('redirect', '');
@@ -55,40 +73,66 @@ class LoginController extends Controller
                             $user->nickname === 'superadmin_egresados' || 
                             $user->email === 'superadmin.egresados@sena.edu.co' || 
                             $user->nickname === 'superadmin' || 
-                            $user->roles->contains('slug', 'egresados.admin') ||
-                            $user->roles->contains('slug', 'superadmin');
+                            $user->nickname === 'admin' || 
+                            ($user->roles && ($user->roles->contains('slug', 'egresados.admin') || $user->roles->contains('slug', 'superadmin')));
 
             $isInstructor = $user->nickname === 'instructor_egresados' || 
                             $user->email === 'instructor.egresados@sena.edu.co' || 
-                            $user->roles->contains('slug', 'egresados.instructor') || 
-                            $user->roles->contains('slug', 'sigac.instructor') || 
-                            $user->roles->contains('slug', 'agrocefa.trainer');
+                            ($user->roles && (
+                                $user->roles->contains('slug', 'egresados.instructor') || 
+                                $user->roles->contains('slug', 'sigac.instructor') || 
+                                $user->roles->contains('slug', 'agrocefa.trainer')
+                            ));
+
+            $isEgresado = $user->nickname === 'egresado_sige' || 
+                          $user->email === 'egresado.sige@sena.edu.co' || 
+                          str_contains(strtolower($user->nickname ?? ''), 'egresad') ||
+                          str_contains(strtolower($user->email ?? ''), 'egresad') ||
+                          ($user->roles && (
+                              $user->roles->contains('slug', 'egresados.egresado') ||
+                              $user->roles->contains('slug', 'senaempresa.apprentice') ||
+                              $user->roles->contains('slug', 'sigac.apprentice') ||
+                              $user->roles->contains(fn($r) => str_contains($r->slug, 'egresad')) ||
+                              $user->roles->contains(fn($r) => str_contains($r->slug, 'apprentice'))
+                          )) ||
+                          (class_exists('\Modules\Egresados\Entities\Apprentice') && \Modules\Egresados\Entities\Apprentice::where('person_id', $user->person_id)->exists());
 
             $redirectUrl = $request->input('redirect');
-            if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
-                // Si el redirect es la landing de egresados, dirigir directo al dashboard correspondiente
-                if (str_contains($redirectUrl, 'egresados/welcome') || str_contains($redirectUrl, 'egresados/home') || str_ends_with($redirectUrl, '/egresados')) {
-                    if ($isSuperAdmin) {
-                        return redirect()->route('egresados.dashboard');
-                    }
-                    if ($isInstructor) {
-                        return redirect()->route('egresados.dashboard_instructor');
-                    }
-                }
-                return redirect($redirectUrl);
-            }
+            $isGenericRedirect = empty($redirectUrl) || 
+                                 str_contains($redirectUrl, 'egresados/welcome') || 
+                                 str_contains($redirectUrl, 'egresados/home') || 
+                                 str_ends_with($redirectUrl, '/egresados') || 
+                                 str_contains($redirectUrl, 'egresados/login') ||
+                                 str_contains($redirectUrl, 'dashboard-egresado') ||
+                                 str_contains($redirectUrl, 'direccion/welcome');
 
-            // Redirección inteligente al panel correspondiente según el usuario/rol
-            if ($user->nickname === 'superadmin_egresados' || $user->email === 'superadmin.egresados@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.admin')) || !empty($isSuperAdmin)) {
+            // 1. SuperAdmin -> Directo a su Dashboard de SuperAdmin
+            if ($isSuperAdmin) {
+                if (!$isGenericRedirect && str_contains($redirectUrl, 'superadmin')) {
+                    return redirect($redirectUrl);
+                }
                 return redirect()->route('egresados.dashboard');
             }
 
-            if ($user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.instructor')) || !empty($isInstructor)) {
+            // 2. Admin / Instructor -> Directo a su Dashboard de Instructor
+            if ($isInstructor) {
+                if (!$isGenericRedirect && str_contains($redirectUrl, 'instructor')) {
+                    return redirect($redirectUrl);
+                }
                 return redirect()->route('egresados.dashboard_instructor');
             }
 
-            if ($user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.egresado'))) {
+            // 3. Egresado -> Directo a su Dashboard de Egresado
+            if ($isEgresado) {
+                if (!$isGenericRedirect && (str_contains($redirectUrl, 'egresados/encuestas') || str_contains($redirectUrl, 'egresados/oportunidades'))) {
+                    return redirect($redirectUrl);
+                }
                 return redirect()->route('egresados.dashboard_egresado');
+            }
+
+            // Fallback por defecto si tiene otra ruta válida
+            if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
+                return redirect($redirectUrl);
             }
 
             return redirect()->intended(route('direccion.welcome'));

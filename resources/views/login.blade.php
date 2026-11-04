@@ -241,7 +241,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('login.post') }}" method="POST">
+                    <form id="loginForm" action="{{ route('login.post') }}" method="POST">
                         @csrf
                         <input type="hidden" name="redirect" value="{{ old('redirect', $redirect ?? request('redirect')) }}">
 
@@ -276,7 +276,7 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-sena w-100 mb-3">
+                        <button type="submit" id="btnSubmitLogin" class="btn btn-sena w-100 mb-3">
                             <i class="fas fa-right-to-bracket btn-icon-navy me-2"></i>
                             <span>Iniciar Sesión en SENA Empresa</span>
                         </button>
@@ -287,13 +287,13 @@
                                 <i class="fas fa-key text-warning me-1"></i> Credenciales de Acceso Rápido (Los 3 Paneles):
                             </span>
                             <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
-                                <button type="button" class="btn btn-sm btn-dark text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('superadmin_egresados', '12345678')" title="Clic para ingresar como SuperAdmin">
-                                    🛡️ <strong>SuperAdmin</strong>
+                                <button type="button" class="btn btn-sm btn-dark text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('superadmin_egresados', '12345678')" title="Clic para autocompletar Super Admin">
+                                    🛡️ <strong>Super Admin</strong>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-primary text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('instructor_egresados', '12345678')" title="Clic para ingresar como Instructor">
-                                    👨‍🏫 <strong>Instructor</strong>
+                                <button type="button" class="btn btn-sm btn-primary text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('instructor_egresados', '12345678')" title="Clic para autocompletar Admin">
+                                    👨‍🏫 <strong>Admin</strong>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-success text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('egresado_sige', '12345678')" title="Clic para ingresar como Egresado">
+                                <button type="button" class="btn btn-sm btn-success text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('egresado_sige', '12345678')" title="Clic para autocompletar Egresado">
                                     🎓 <strong>Egresado</strong>
                                 </button>
                             </div>

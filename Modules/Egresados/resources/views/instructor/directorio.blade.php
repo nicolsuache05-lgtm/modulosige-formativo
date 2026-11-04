@@ -62,15 +62,23 @@
         --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
+      @view-transition {
+        navigation: auto;
+      }
+
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
 
       body {
-        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
         background: var(--bg);
         color: var(--ink);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
+      }
+
+      body, button, input, select, textarea, .sidebar, .topbar, .font-editorial, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
       }
 
       .app {
@@ -81,6 +89,7 @@
 
       /* ---------------- SIDEBAR INSTITUCIONAL ---------------- */
       .sidebar {
+        view-transition-name: sige-sidebar;
         background: linear-gradient(180deg, var(--sena-navy) 0%, var(--sena-dark) 100%);
         color: #ffffff;
         display: flex;
@@ -91,9 +100,15 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
 
       .brand {
+        view-transition-name: sige-brand;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -124,7 +139,7 @@
         border-radius: 7px;
       }
       .brand-name {
-        font-family: 'Poppins', 'Nunito', sans-serif;
+        font-family: 'Poppins', 'Nunito', sans-serif !important;
         font-weight: 800;
         font-size: 16px;
         letter-spacing: 0.5px;
@@ -134,36 +149,37 @@
       }
       .brand-sub {
         font-size: 10.5px;
-        color: var(--moss);
+        color: #62E31D;
         font-weight: 600;
         letter-spacing: 0.3px;
         text-transform: uppercase;
       }
 
       .nav-label {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1.1px;
+        letter-spacing: 0.8px;
         color: rgba(255, 255, 255, 0.45);
-        padding: 10px 12px 6px;
+        padding: 8px 12px 6px;
+        margin-top: 6px;
       }
 
       nav {
         display: flex;
         flex-direction: column;
-        gap: 3px;
       }
       nav a {
         display: flex;
         align-items: center;
-        gap: 11px;
-        padding: 10px 12px;
-        border-radius: 10px;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 12px;
         color: rgba(255, 255, 255, 0.82);
         text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-bottom: 4px;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       nav a i, nav a svg {
@@ -175,10 +191,9 @@
       nav a:hover {
         background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
-        transform: translateX(3px);
       }
       nav a.active {
-        background: linear-gradient(135deg, var(--sena-green) 0%, #2e8b00 100%);
+        background: linear-gradient(135deg, var(--sena-green, #39A900) 0%, #2e8b00 100%);
         color: #ffffff;
         font-weight: 700;
         box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
@@ -208,16 +223,17 @@
 
       .topbar {
         background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
-        border-bottom: 3px solid var(--sena-green);
+        border-bottom: 2px solid var(--sena-green);
         box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 36px;
+        padding: 0 36px;
+        height: 64px;
         position: sticky;
         top: 0;
-        z-index: 20;
+        z-index: 50;
       }
 
       .topbar-left {
@@ -253,18 +269,15 @@
       }
 
       .content {
-        padding: 30px 36px 60px;
-        max-width: 1440px;
-        width: 100%;
-        margin: 0 auto;
+        padding: 32px 36px 48px;
+        flex: 1;
       }
 
-      /* Page head */
       .page-head {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
         flex-wrap: wrap;
         gap: 14px;
       }
@@ -280,12 +293,12 @@
         color: var(--green);
       }
       .page-desc {
-        font-size: 14px;
+        font-size: 14.5px;
         color: var(--ink-soft);
         margin: 0;
       }
 
-      /* Stat cards */
+      /* Stat cards (Idéntico a Inicio en Dashboard) */
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -295,67 +308,79 @@
       .stat-card {
         background: var(--card);
         border-radius: 16px;
-        padding: 22px 22px 20px;
+        padding: 22px 22px 18px;
         border: 1px solid var(--line);
         display: flex;
         flex-direction: column;
         gap: 12px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
         transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       }
       .stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 24px rgba(1, 56, 25, 0.06);
-        border-color: rgba(57, 169, 0, 0.35);
+        box-shadow: 0 10px 24px rgba(0, 19, 30, 0.08);
+        border-color: rgba(57, 169, 0, 0.4);
       }
+
       .stat-top {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 12px;
       }
       .stat-icon {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
+        background: var(--green-soft);
+        color: var(--sena-green);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
       }
-      .stat-icon.amber { background: #FFF8E6; color: #D97706; }
-      .stat-icon.red { background: #FEE2E2; color: #DC2626; }
-      .stat-icon.green { background: var(--green-soft); color: var(--green); }
-      .stat-icon.blue { background: #EEF4FF; color: #2563EB; }
+      .stat-card:hover .stat-icon {
+        transform: scale(1.08);
+      }
+      .stat-icon.green   { background: #EAF7EE; color: var(--sena-green); }
+      .stat-icon.blue    { background: #E0F2FE; color: #0284c7; }
+      .stat-icon.emerald { background: #DCFCE7; color: #166534; }
+      .stat-icon.amber   { background: #FEF3C7; color: #d97706; }
+      .stat-icon.purple  { background: #F3E8FF; color: #9333ea; }
+      .stat-icon.cyan    { background: #E0F7FA; color: #00838f; }
 
-      .stat-label {
-        font-size: 11.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+      .stat-title {
+        font-size: 13.5px;
         color: var(--ink-soft);
+        font-weight: 600;
       }
-      .stat-num {
+      .stat-value {
         font-family: 'Poppins', 'Nunito', sans-serif;
-        font-size: 30px;
         font-weight: 700;
+        font-size: 32px;
         color: var(--forest-deep);
         line-height: 1;
-        margin: 2px 0 6px;
+        letter-spacing: -0.5px;
       }
-      .stat-pill {
-        display: inline-flex;
+      .stat-meta {
+        display: flex;
         align-items: center;
-        gap: 4px;
-        font-size: 11.5px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 999px;
-        width: fit-content;
+        justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
       }
-      .stat-pill.amber { background: #FEF3C7; color: #92400E; }
-      .stat-pill.red { background: #FEE2E2; color: #991B1B; }
-      .stat-pill.green { background: var(--green-soft); color: var(--green-dark); }
-      .stat-pill.blue { background: #DBEAFE; color: #1E40AF; }
+      .stat-trend {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--sena-green);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .stat-trend.down {
+        color: #dc2626;
+      }
 
       /* ---------------- LOWER 2-COLUMN + 1-COLUMN GRID ---------------- */
       .main-grid {
@@ -705,12 +730,10 @@
         background: #FAFCF9;
       }
 
-      @media (max-width: 1024px) {
+      @media (max-width: 768px) {
         .app { grid-template-columns: 1fr; }
         .sidebar { display: none; }
-        .main-grid { grid-template-columns: 1fr; }
-        .stats-grid { grid-template-columns: 1fr; }
-        .content { padding: 20px 16px; }
+        .content { padding: 20px 16px 36px; }
       }
 
       [x-cloak] { display: none !important; }
@@ -753,7 +776,7 @@
         <div class="brand-name">
           <span>SIGE</span>
         </div>
-        <div class="brand-sub">Gestión de Egresados</div>
+        <div class="brand-sub">GESTIÓN DE EGRESADOS</div>
       </div>
     </a>
 
@@ -779,9 +802,11 @@
         <i class="fa-regular fa-calendar-check"></i>
         <span>Eventos</span>
       </a>
+      <a href="{{ route('egresados.instructor.noticias.index') }}">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Noticias</span>
+      </a>
     </nav>
-
-
   </aside>
 
   <!-- ============================================== -->
@@ -800,12 +825,12 @@
     <div class="content space-y-6">
 
       <!-- Header de la Página y Botón Nuevo Egresado -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="page-head">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold font-editorial text-gray-900 tracking-tight">
-            Gestión de <span class="text-[#39A900]">Egresados</span>
+          <h1 class="page-title">
+            Gestión de <span>Egresados</span>
           </h1>
-          <p class="text-xs sm:text-sm text-gray-500 mt-1">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
+          <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -819,68 +844,68 @@
       </div>
 
       <!-- 1. Estadísticas Superiores (4 Cards · Paleta SENA ERP) -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         
         <!-- Metric 1: Total Egresados -->
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Total Egresados</span>
-            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+            <span class="text-xs sm:text-[13px] font-bold text-gray-500 uppercase tracking-wider">Total Egresados</span>
+            <span class="w-10 h-10 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm shadow-xs">
               <i class="fa-solid fa-user-graduate"></i>
             </span>
           </div>
-          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalEgresados) }}</div>
+          <div class="text-3xl sm:text-4xl font-extrabold text-[#00131E] my-1">{{ number_format($totalEgresados ?? 0) }}</div>
           <div class="mt-2 flex items-center gap-1.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
               En base de datos
             </span>
           </div>
         </div>
 
         <!-- Metric 2: Egresados Activos -->
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Egresados Activos</span>
-            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+            <span class="text-xs sm:text-[13px] font-bold text-gray-500 uppercase tracking-wider">Egresados Activos</span>
+            <span class="w-10 h-10 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm shadow-xs">
               <i class="fa-solid fa-user-check"></i>
             </span>
           </div>
-          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
+          <div class="text-3xl sm:text-4xl font-extrabold text-[#00131E] my-1">{{ number_format($totalActivos ?? $totalEgresados) }}</div>
           <div class="mt-2 flex items-center gap-1.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-1 animate-pulse"></span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] mr-1.5 animate-pulse"></span>
               Habilitados en SIGE
             </span>
           </div>
         </div>
 
         <!-- Metric 3: Egresados Inactivos -->
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Egresados Inactivos</span>
-            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+            <span class="text-xs sm:text-[13px] font-bold text-gray-500 uppercase tracking-wider">Egresados Inactivos</span>
+            <span class="w-10 h-10 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm shadow-xs">
               <i class="fa-solid fa-user-xmark"></i>
             </span>
           </div>
-          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ number_format($totalInactivos ?? 0) }}</div>
+          <div class="text-3xl sm:text-4xl font-extrabold text-[#00131E] my-1">{{ number_format($totalInactivos ?? 0) }}</div>
           <div class="mt-2 flex items-center gap-1.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-700 border border-gray-200">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
               Desactivados
             </span>
           </div>
         </div>
 
         <!-- Metric 4: Programas SENA -->
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#39A900]/40 transition-all flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Programas</span>
-            <span class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-2xs">
+            <span class="text-xs sm:text-[13px] font-bold text-gray-500 uppercase tracking-wider">Programas</span>
+            <span class="w-10 h-10 rounded-xl bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm shadow-xs">
               <i class="fa-solid fa-graduation-cap"></i>
             </span>
           </div>
-          <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ $programs->count() ?: 4 }}</div>
+          <div class="text-3xl sm:text-4xl font-extrabold text-[#00131E] my-1">{{ number_format($totalProgramas ?? 4216) }}</div>
           <div class="mt-2 flex items-center gap-1.5">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
               Programas CEFA
             </span>
           </div>
@@ -904,10 +929,10 @@
               <span class="text-[11px] text-gray-400">Filtrado en tiempo real</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Programa</label>
-                <select id="filterPrograma" onchange="filterDirectorioLive()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Programa</label>
+                <select id="filterPrograma" onchange="filterDirectorioLive()" class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
                   <option value="">Todos los programas</option>
                   @foreach($programs as $prog)
                     <option value="{{ mb_strtoupper($prog->name) }}" {{ request('programa') == $prog->name ? 'selected' : '' }}>{{ $prog->name }}</option>
@@ -916,8 +941,8 @@
               </div>
 
               <div>
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Estado</label>
-                <select id="filterEstado" onchange="filterDirectorioLive()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Estado</label>
+                <select id="filterEstado" onchange="filterDirectorioLive()" class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
                   <option value="">Todos los estados</option>
                   <option value="ACTIVO">🟢 Activos en SIGE</option>
                   <option value="INACTIVO">🔴 Inactivos en SIGE</option>
@@ -931,11 +956,11 @@
               </div>
 
               <div>
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Buscar por Documento o Nombre</label>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Buscar por Documento o Nombre</label>
                 <div class="relative">
                   <input type="text" id="filterText" onkeyup="filterDirectorioLive()" value="{{ request('search') }}" placeholder="Buscar egresado..." 
-                         class="w-full pl-8 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] outline-none transition">
-                  <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                         class="w-full pl-9 pr-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] outline-none transition">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs sm:text-sm"></i>
                 </div>
               </div>
             </div>
@@ -958,14 +983,14 @@
 
             <!-- Tabla -->
             <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-xs">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead>
-                  <tr class="bg-[#FAFCF9] border-b border-gray-100 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
-                    <th class="py-3 px-4">Documento</th>
-                    <th class="py-3 px-4">Egresado(a)</th>
-                    <th class="py-3 px-4">Programa & Ficha</th>
-                    <th class="py-3 px-4">Estado</th>
-                    <th class="py-3 px-4 text-center">Acciones</th>
+                  <tr class="bg-[#FAFCF9] border-b border-gray-100 text-gray-500 font-bold uppercase tracking-wider text-xs">
+                    <th class="py-3.5 px-4">Documento</th>
+                    <th class="py-3.5 px-4">Egresado(a)</th>
+                    <th class="py-3.5 px-4">Programa & Ficha</th>
+                    <th class="py-3.5 px-4">Estado</th>
+                    <th class="py-3.5 px-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="egresadosTableBody" class="divide-y divide-gray-100">
@@ -1025,47 +1050,47 @@
                         data-search="{{ mb_strtolower($docRaw . ' ' . $fullName . ' ' . $emailRaw . ' ' . $progRaw) }}"
                         onclick="selectEgresadoFromElement(this)">
                         
-                        <td class="py-3 px-4 font-bold text-[#00131E]">
+                        <td class="py-3.5 px-4 font-bold text-sm text-[#00131E]">
                           {{ $person->document_number ?? 'N/A' }}
                         </td>
 
-                        <td class="py-3 px-4">
-                          <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-[#EAF7EE] text-[#00131E] font-bold text-xs flex items-center justify-center border border-[#BBF7D0] shrink-0">
+                        <td class="py-3.5 px-4">
+                          <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-[#EAF7EE] text-[#00131E] font-bold text-xs flex items-center justify-center border border-[#BBF7D0] shrink-0">
                               {{ $initials ?: 'EG' }}
                             </div>
                             <div class="overflow-hidden">
-                              <div class="font-bold text-gray-900 leading-tight truncate">{{ $fullName }}</div>
-                              <div class="text-[11px] text-gray-400 truncate">{{ $person->misena_email ?? $person->personal_email ?? 'Sin correo' }}</div>
+                              <div class="font-bold text-gray-900 text-sm leading-tight truncate">{{ $fullName }}</div>
+                              <div class="text-xs text-gray-400 truncate mt-0.5">{{ $person->misena_email ?? $person->personal_email ?? 'Sin correo' }}</div>
                             </div>
                           </div>
                         </td>
 
-                        <td class="py-3 px-4">
-                          <div class="font-semibold text-gray-800 leading-tight">{{ $program ? Str::limit($program->name, 28) : 'ADSO' }}</div>
-                          <div class="text-[11px] text-gray-400 font-medium">Ficha: {{ $course->code ?? 'N/A' }}</div>
+                        <td class="py-3.5 px-4">
+                          <div class="font-semibold text-gray-800 text-sm leading-tight">{{ $program ? Str::limit($program->name, 28) : 'ADSO' }}</div>
+                          <div class="text-xs text-gray-400 font-medium mt-0.5">Ficha: {{ $course->code ?? 'N/A' }}</div>
                         </td>
 
-                        <td class="py-3 px-4">
+                        <td class="py-3.5 px-4">
                           <div class="flex flex-col gap-1 items-start">
-                            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wide {{ $pillClass === 'status-green' ? 'bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]' : ($pillClass === 'status-blue' ? 'bg-blue-50 text-blue-700 border border-blue-200' : ($pillClass === 'status-red' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200')) }}">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wide {{ $pillClass === 'status-green' ? 'bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]' : ($pillClass === 'status-blue' ? 'bg-blue-50 text-blue-700 border border-blue-200' : ($pillClass === 'status-red' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200')) }}">
                               {{ $st }}
                             </span>
                             @if($isApprenticeActive)
-                              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[#166534]">
+                              <span class="inline-flex items-center gap-1 text-xs font-bold text-[#166534]">
                                 <span class="w-1.5 h-1.5 rounded-full bg-[#39A900]"></span> Activo
                               </span>
                             @else
-                              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                              <span class="inline-flex items-center gap-1 text-xs font-bold text-red-600">
                                 <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inactivo
                               </span>
                             @endif
                           </div>
                         </td>
 
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3.5 px-4 text-center">
                           <button type="button" 
-                                  class="w-7 h-7 rounded-lg bg-gray-50 text-gray-500 hover:bg-[#39A900] hover:text-white transition inline-flex items-center justify-center text-xs" 
+                                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-[#39A900] hover:text-white transition inline-flex items-center justify-center text-xs" 
                                   title="Ver detalle">
                             <i class="fa-solid fa-eye"></i>
                           </button>
@@ -1096,92 +1121,92 @@
 
         <!-- Columna Derecha: Panel de Detalle Rápido (1/3 - Sticky) -->
         <div class="lg:col-span-1 sticky top-20 space-y-4">
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-4">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
             
             <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-              <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-[#39A900] animate-pulse"></span>
                 Detalle del Egresado
               </span>
               <div class="flex items-center gap-1.5">
-                <span id="detailActivePill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">Activo</span>
-                <span id="detailStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">CERTIFICADO</span>
+                <span id="detailActivePill" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">Activo</span>
+                <span id="detailStatusPill" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">CERTIFICADO</span>
               </div>
             </div>
 
             <!-- Hero del Usuario Seleccionado -->
-            <div class="flex items-center gap-3">
-              <div id="detailAvatarLarge" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#001A29] to-[#39A900] text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+            <div class="flex items-center gap-3.5">
+              <div id="detailAvatarLarge" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#001A29] to-[#39A900] text-white flex items-center justify-center font-bold text-xl shadow-sm shrink-0">
                 EG
               </div>
               <div class="overflow-hidden">
-                <div id="detailName" class="font-bold text-gray-900 text-base leading-tight truncate">Selecciona un egresado</div>
-                <div id="detailDoc" class="text-xs text-gray-500 mt-0.5">Doc: ---</div>
-                <div id="detailEmail" class="text-xs font-semibold text-[#39A900] truncate mt-0.5">correo@sena.edu.co</div>
+                <div id="detailName" class="font-bold text-gray-900 text-base sm:text-lg leading-tight truncate">Selecciona un egresado</div>
+                <div id="detailDoc" class="text-xs sm:text-sm text-gray-500 mt-0.5">Doc: ---</div>
+                <div id="detailEmail" class="text-xs sm:text-sm font-semibold text-[#39A900] truncate mt-0.5">correo@sena.edu.co</div>
               </div>
             </div>
 
             <!-- Bloque Académico -->
-            <div class="bg-gray-50/80 p-3.5 rounded-xl border border-gray-100 space-y-2">
-              <span class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">Información Académica</span>
-              <div class="flex justify-between items-center text-xs">
+            <div class="bg-gray-50/80 p-4 rounded-xl border border-gray-100 space-y-2.5">
+              <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Información Académica</span>
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Programa:</span>
-                <span id="detailProgram" class="font-bold text-gray-800 text-right truncate max-w-[160px]">ADSO</span>
+                <span id="detailProgram" class="font-bold text-gray-800 text-right truncate max-w-[170px]">ADSO</span>
               </div>
-              <div class="flex justify-between items-center text-xs">
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Código Ficha:</span>
                 <span id="detailCode" class="font-bold text-gray-800">3345643</span>
               </div>
-              <div class="flex justify-between items-center text-xs">
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Centro Formación:</span>
                 <span class="font-bold text-gray-800">CEFA La Angostura</span>
               </div>
             </div>
 
             <!-- Bloque Contacto -->
-            <div class="bg-gray-50/80 p-3.5 rounded-xl border border-gray-100 space-y-2">
-              <span class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">Información de Contacto</span>
-              <div class="flex justify-between items-center text-xs">
+            <div class="bg-gray-50/80 p-4 rounded-xl border border-gray-100 space-y-2.5">
+              <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Información de Contacto</span>
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Teléfono:</span>
                 <span id="detailPhone" class="font-bold text-gray-800">300 000 0000</span>
               </div>
-              <div class="flex justify-between items-center text-xs">
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Tipo Documento:</span>
                 <span id="detailDocType" class="font-bold text-gray-800">Cédula</span>
               </div>
-              <div class="flex justify-between items-center text-xs">
+              <div class="flex justify-between items-center text-xs sm:text-sm">
                 <span class="text-gray-500 font-medium">Estado Ocupacional:</span>
                 <span id="detailStatusText" class="font-bold text-[#39A900]">CERTIFICADO</span>
               </div>
             </div>
 
             <!-- Botones de Acción -->
-            <div class="space-y-2 pt-1">
+            <div class="space-y-2.5 pt-1">
               <button type="button" 
                       id="detailFullBtn" 
                       @click="openModalPerfilEgresado = true; if(window.currentSelectedEgresado) populateModalPerfilEgresado(window.currentSelectedEgresado);" 
-                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 cursor-pointer">
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 cursor-pointer">
                 <span>Ver Perfil Completo</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
               </button>
 
               <button type="button" 
                       @click="openEditarModal(); openModalEditar = true;" 
-                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl border border-gray-200 transition cursor-pointer">
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-bold rounded-xl border border-gray-200 transition cursor-pointer">
                 <i class="fa-solid fa-pen-to-square text-[#39A900]"></i>
                 <span>Editar Datos</span>
               </button>
 
               <button type="button" 
                       @click="openModalSeguimiento = true" 
-                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EAF7EE] hover:bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-xl border border-[#BBF7D0] transition cursor-pointer">
+                      class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EAF7EE] hover:bg-[#dcfce7] text-[#166534] text-xs sm:text-sm font-bold rounded-xl border border-[#BBF7D0] transition cursor-pointer">
                 <i class="fa-solid fa-notes-medical"></i>
                 <span>Registrar Seguimiento</span>
               </button>
 
               <form id="detailToggleForm" action="" method="POST" onsubmit="event.preventDefault(); openConfirmToggleModal();">
                 @csrf
-                <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition">
+                <button type="submit" id="detailToggleBtn" class="cursor-pointer w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold border transition">
                   <i id="detailToggleIcon" class="fa-solid fa-toggle-on"></i>
                   <span id="detailToggleText">Desactivar Egresado</span>
                 </button>

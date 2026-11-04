@@ -189,16 +189,18 @@
   /* ================= ESTILOS GLOBALES DE TOPBAR INSTITUCIONAL SENA ERP ================= */
   .topbar {
     background: linear-gradient(135deg, var(--sena-dark, #00131E) 0%, var(--sena-navy, #001A29) 100%) !important;
-    border-bottom: 3px solid var(--sena-green, #39A900) !important;
+    border-bottom: 2px solid var(--sena-green, #39A900) !important;
     box-shadow: 0 4px 14px rgba(0, 19, 30, 0.15) !important;
     color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 12px 36px !important;
+    height: 64px !important;
+    padding: 0 36px !important;
     position: sticky !important;
     top: 0 !important;
-    z-index: 40 !important;
+    z-index: 50 !important;
+    box-sizing: border-box !important;
   }
   .topbar-left {
     display: flex;
@@ -291,51 +293,31 @@
   }
 
   ::view-transition-old(root) {
-    animation: 160ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeOut;
+    animation: 90ms ease-out both sigeFadeOut;
   }
   ::view-transition-new(root) {
-    animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) both sigeFadeIn;
+    animation: 140ms ease-in both sigeFadeIn;
   }
 
   @keyframes sigeFadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-4px); }
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   @keyframes sigeFadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  /* Mantener el sidebar y topbar firmes durante la navegación sin saltos */
-  .sidebar {
+  /* Mantener el sidebar, logo de arribita y topbar firmes durante la navegación sin saltos */
+  .brand {
+    view-transition-name: sige-brand;
+  }
+  .sidebar, aside {
     view-transition-name: sige-sidebar;
   }
   .topbar {
     view-transition-name: sige-topbar;
-  }
-
-  /* Animación de entrada suave del contenido principal */
-  .content, .content-area {
-    animation: sigePageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes sigePageEnter {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Estilo durante la salida suave al hacer clic en un módulo */
-  .sige-page-exit {
-    opacity: 0 !important;
-    transform: translateY(-4px) !important;
-    transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   /* ================= ESTILOS DE TOPBAR RIGHT & MENÚS PLEGABLES ================= */
@@ -906,6 +888,71 @@
     box-shadow: 0 6px 16px rgba(57, 169, 0, 0.4);
     color: #ffffff;
   }
+
+  /* ================= ESTILO OFICIAL SENA ERP: PUNTO BLANCO ACTIVO Y AL PASAR EL CURSOR (SIDEBAR) ================= */
+  aside.sidebar nav a,
+  .sidebar nav a {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 11px 14px !important;
+    border-radius: 12px !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    user-select: none !important;
+  }
+
+  /* Punto blanco cuando el módulo está activo */
+  aside.sidebar nav a.active,
+  .sidebar nav a.active {
+    background: linear-gradient(135deg, var(--sena-green, #39A900) 0%, #2e8b00 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(57, 169, 0, 0.38) !important;
+    position: relative !important;
+  }
+
+  aside.sidebar nav a.active::after,
+  .sidebar nav a.active::after {
+    content: '' !important;
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 6.5px !important;
+    height: 6.5px !important;
+    border-radius: 50% !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 0 7px rgba(255, 255, 255, 0.95), 0 0 2px #ffffff !important;
+    z-index: 5 !important;
+    display: block !important;
+    opacity: 1 !important;
+  }
+
+  /* Punto blanco al pasar el cursor (hover) por los diferentes módulos */
+  aside.sidebar nav a:not(.active):hover,
+  .sidebar nav a:not(.active):hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+  }
+
+  aside.sidebar nav a:not(.active):hover::after,
+  .sidebar nav a:not(.active):hover::after {
+    content: '' !important;
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.85) !important;
+    z-index: 5 !important;
+    display: block !important;
+    opacity: 1 !important;
+    transition: opacity 0.15s ease, transform 0.15s ease !important;
+  }
 </style>
 
 <script>
@@ -1244,28 +1291,5 @@
         sessionStorage.setItem('sige_superadmin_sidebar_scroll', sidebar.scrollTop);
       }, { passive: true });
     }
-
-    // 2. Interceptar clics en los enlaces del menú y cards para salida suave sin parpadeos
-    const moduleLinks = document.querySelectorAll('.sidebar nav a, aside nav a, .user-menu-item, .portal-link-btn, .stat-link, .panel-action, a[href*="directorio"], a[href*="encuestas"], a[href*="reportes"], a[href*="eventos"], a[href*="dashboard"]');
-    moduleLinks.forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        // Ignorar enlaces vacíos, anclas, javascript o enlaces que se abran en nueva pestaña
-        if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
-        // Si ya está activo en esta página, no hacer nada
-        if (this.classList.contains('active')) return;
-        // Respetar combinaciones de teclas para abrir en pestaña nueva
-        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
-
-        const mainContent = document.querySelector('.content') || document.querySelector('.content-area') || document.querySelector('.main') || document.querySelector('main');
-        if (mainContent) {
-          e.preventDefault();
-          mainContent.classList.add('sige-page-exit');
-          setTimeout(function() {
-            window.location.href = href;
-          }, 120);
-        }
-      });
-    });
   });
 </script>

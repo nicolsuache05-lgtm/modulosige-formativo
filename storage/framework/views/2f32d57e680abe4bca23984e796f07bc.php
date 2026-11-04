@@ -1378,6 +1378,237 @@
       .hero-heading { font-size: 24px; }
       .kpi-row-grid { grid-template-columns: 1fr; }
     }
+    /* ========================================================
+       ESTILOS DEL INICIO ENRIQUECIDO (PORTAL EGRESADO)
+       ======================================================== */
+    .egresado-credential-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      transition: var(--transition);
+    }
+    .credential-card-header {
+      background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%);
+      padding: 22px 28px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--sena-green);
+    }
+    .credential-card-body {
+      padding: 24px 28px;
+    }
+    .credential-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .credential-info-item {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .credential-info-item .ci-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .credential-info-item .ci-val {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--sena-dark);
+      word-break: break-word;
+    }
+    .credential-progress-wrap {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .credential-progress-bar {
+      flex: 1;
+      min-width: 200px;
+    }
+    .credential-bar-track {
+      height: 8px;
+      background: #E2E8F0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .credential-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--sena-green), var(--sena-neon));
+      border-radius: 999px;
+      width: 85%;
+      transition: width 0.6s ease;
+    }
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .quick-action-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      padding: 18px;
+      transition: var(--transition);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .quick-action-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--sena-green);
+    }
+    .qa-icon-wrap {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+    .qa-icon-wrap.green { background: #EAF7EE; color: var(--sena-green); }
+    .qa-icon-wrap.blue { background: #EFF6FF; color: #2563EB; }
+    .qa-icon-wrap.purple { background: #FAF5FF; color: #9333EA; }
+    .qa-icon-wrap.orange { background: #FFF7ED; color: #EA580C; }
+    .home-two-col-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+    .home-box-panel {
+      background: #FFFFFF;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--line);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .home-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .home-box-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--sena-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-news-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      gap: 14px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+      cursor: pointer;
+      align-items: center;
+    }
+    .home-news-card:hover {
+      border-color: var(--sena-green);
+      background: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+    .home-news-thumb {
+      width: 82px;
+      height: 68px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--sena-navy);
+      flex-shrink: 0;
+    }
+    .home-event-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      transition: var(--transition);
+    }
+    .home-event-card:hover {
+      border-color: var(--sena-green);
+      background: #FFFFFF;
+    }
+    .home-event-datebox {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #EAF7EE;
+      border: 1px solid #BBF7D0;
+      color: var(--sena-green-hover);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .home-event-datebox span {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--sena-green);
+    }
+    .home-job-item {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      transition: var(--transition);
+    }
+    .home-job-item:hover {
+      border-color: #2563EB;
+      background: #FFFFFF;
+    }
+
+    @media (max-width: 900px) {
+      .home-two-col-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -1525,6 +1756,238 @@
               <i class="fa-regular fa-calendar-days"></i>
             </div>
           </div>
+        </div>
+
+        <!-- ========================================================
+             ACCIONES RÁPIDAS / ATAJOS INSTITUCIONALES
+             ======================================================== -->
+        <div style="margin-bottom:12px; margin-top:8px;">
+          <h3 style="font-size:16px; font-weight:800; color:var(--sena-dark); display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bolt text-[#39A900]"></i> Accesos Rápidos
+          </h3>
+        </div>
+        <div class="quick-actions-grid">
+          <!-- Atajo 1: Encuestas -->
+          <div class="quick-action-card" onclick="showSection('encuestas')">
+            <div class="qa-icon-wrap green">
+              <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Encuestas</h4>
+              <p style="font-size:12px; color:#64748B; margin:2px 0 0;"><?php echo e($encuestasPendientes ?? 2); ?> cuestionarios pendientes</p>
+            </div>
+          </div>
+
+          <!-- Atajo 2: Ofertas Laborales -->
+          <div class="quick-action-card" onclick="showSection('oportunidades')">
+            <div class="qa-icon-wrap blue">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Bolsa de Empleo</h4>
+              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">8 vacantes activas CEFA</p>
+            </div>
+          </div>
+
+          <!-- Atajo 3: Eventos -->
+          <div class="quick-action-card" onclick="showSection('noticias')">
+            <div class="qa-icon-wrap purple">
+              <i class="fa-regular fa-calendar-days"></i>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Eventos & Ferias</h4>
+              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">Talleres de actualización</p>
+            </div>
+          </div>
+
+          <!-- Atajo 4: Certificado -->
+          <div class="quick-action-card" onclick="openCertificadosModal()">
+            <div class="qa-icon-wrap orange">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Certificados SOFIA</h4>
+              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">Descarga tus actas y títulos</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             3. GRID DE 2 COLUMNAS: COMUNICADOS + EVENTOS/VACANTES
+             ======================================================== -->
+        <div class="home-two-col-grid">
+          
+          <!-- Columna Izquierda: Últimos Comunicados de SIGE -->
+          <div class="home-box-panel">
+            <div class="home-box-header">
+              <div class="home-box-title">
+                <i class="fa-regular fa-newspaper text-[#39A900]"></i>
+                <span>Noticias & Convocatorias de SIGE</span>
+              </div>
+              <a href="<?php echo e(route('egresados.welcome')); ?>#noticias" target="_blank" style="font-size:12px; font-weight:700; color:var(--sena-green); text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                <span>Ver en Portal</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </a>
+            </div>
+
+            <?php if(isset($noticiasRecientes) && count($noticiasRecientes) > 0): ?>
+              <?php $__currentLoopData = $noticiasRecientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $noticia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="home-news-card" onclick="abrirModalNoticiaHome('<?php echo e(addslashes($noticia['title'])); ?>', '<?php echo e(addslashes($noticia['category'] ?? 'General')); ?>', '<?php echo e(addslashes($noticia['created_at'] ?? 'Reciente')); ?>', '<?php echo e(addslashes($noticia['author'] ?? 'Coordinación CEFA')); ?>', '<?php echo e(addslashes($noticia['content'] ?? $noticia['lead'] ?? '')); ?>', '<?php echo e($noticia['image_url'] ?? ''); ?>')">
+                  <?php if(!empty($noticia['image_url'])): ?>
+                    <img src="<?php echo e($noticia['image_url']); ?>" class="home-news-thumb" alt="Noticia">
+                  <?php else: ?>
+                    <div class="home-news-thumb" style="display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #001A29, #002336); color:#62E31D;">
+                      <i class="fa-regular fa-newspaper text-xl"></i>
+                    </div>
+                  <?php endif; ?>
+                  <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                      <span style="background:#EAF7EE; color:#166534; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; text-transform:uppercase;">
+                        <?php echo e($noticia['category'] ?? 'Convocatorias'); ?>
+
+                      </span>
+                      <span style="font-size:11px; color:#8B9FA9;">
+                        <i class="fa-regular fa-clock me-1"></i><?php echo e($noticia['created_at'] ?? 'Hoy'); ?>
+
+                      </span>
+                    </div>
+                    <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                      <?php echo e($noticia['title']); ?>
+
+                    </h4>
+                    <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                      <?php echo e($noticia['lead'] ?? Str::limit(strip_tags($noticia['content'] ?? ''), 90)); ?>
+
+                    </p>
+                  </div>
+                </div>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php else: ?>
+              <!-- Noticias estáticas de muestra si la base está vacía -->
+              <div class="home-news-card" onclick="abrirModalNoticiaHome('Apertura Convocatoria Fondo Emprender 2026', 'Convocatorias', 'Noviembre 2026', 'SENA Emprende Rural', 'Se abre la bolsa de 2.000 millones de pesos en capital semilla no reembolsable para ideas de negocio formuladas por aprendices y egresados del CEFA La Angostura.', 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?w=800&q=80')">
+                <img src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?w=300&q=80" class="home-news-thumb" alt="Fondo Emprender">
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <span style="background:#EAF7EE; color:#166534; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;">CONVOCATORIAS</span>
+                    <span style="font-size:11px; color:#8B9FA9;">Reciente</span>
+                  </div>
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25;">
+                    Apertura Convocatoria Fondo Emprender 2026
+                  </h4>
+                  <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3;">
+                    Financiación de hasta $100 millones para proyectos productivos de egresados.
+                  </p>
+                </div>
+              </div>
+
+              <div class="home-news-card" onclick="abrirModalNoticiaHome('Convenio de Empleabilidad con Empresas del Sector TIC', 'Actualidad', 'Noviembre 2026', 'Agencia Pública de Empleo', 'El CEFA La Angostura firma alianza estratégica para vincular tecnólogos ADSO y afines en empresas de desarrollo tecnológico a nivel regional y nacional.', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80')">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=300&q=80" class="home-news-thumb" alt="Convenio">
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <span style="background:#EFF6FF; color:#1D4ED8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;">ACTUALIDAD</span>
+                    <span style="font-size:11px; color:#8B9FA9;">Esta semana</span>
+                  </div>
+                  <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25;">
+                    Convenio de Empleabilidad con Empresas TIC
+                  </h4>
+                  <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3;">
+                    Nuevas vacantes y pasantías remuneradas para graduados de la región.
+                  </p>
+                </div>
+              </div>
+            <?php endif; ?>
+          </div>
+
+          <!-- Columna Derecha: Eventos Próximos & Vacantes Destacadas -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            
+            <!-- Eventos Próximos -->
+            <div class="home-box-panel">
+              <div class="home-box-header">
+                <div class="home-box-title">
+                  <i class="fa-regular fa-calendar-check text-[#39A900]"></i>
+                  <span>Próximos Eventos CEFA</span>
+                </div>
+                <button type="button" onclick="showSection('noticias')" style="background:none; border:none; font-size:12px; font-weight:700; color:var(--sena-green); cursor:pointer;">
+                  Ver todos
+                </button>
+              </div>
+
+              <!-- Evento 1 -->
+              <div class="home-event-card">
+                <div class="home-event-datebox">
+                  NOV
+                  <span>20</span>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Encuentro Anual de Egresados 2026</h5>
+                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Auditorio La Angostura · 8:30 AM</p>
+                </div>
+                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="showToast('¡Te has registrado con éxito al Encuentro Anual!')">
+                  Inscribirme
+                </button>
+              </div>
+
+              <!-- Evento 2 -->
+              <div class="home-event-card">
+                <div class="home-event-datebox">
+                  DIC
+                  <span>05</span>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Feria de Empleo y Emprendimiento</h5>
+                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Modalidad Híbrida · Teams & CEFA</p>
+                </div>
+                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="showToast('¡Te has registrado a la Feria de Empleo!')">
+                  Inscribirme
+                </button>
+              </div>
+            </div>
+
+            <!-- Oportunidades Laborales Destacadas -->
+            <div class="home-box-panel">
+              <div class="home-box-header">
+                <div class="home-box-title">
+                  <i class="fa-solid fa-briefcase text-[#2563EB]"></i>
+                  <span>Ofertas Recomendadas</span>
+                </div>
+                <button type="button" onclick="showSection('oportunidades')" style="background:none; border:none; font-size:12px; font-weight:700; color:#2563EB; cursor:pointer;">
+                  Ver Bolsa (8)
+                </button>
+              </div>
+
+              <!-- Oferta 1 -->
+              <div class="home-job-item">
+                <div style="width:36px; height:36px; border-radius:8px; background:#EFF6FF; color:#2563EB; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
+                  <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Desarrollador Web Junior</h5>
+                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Alianzas TIC Huila · $2.800.000 COP</p>
+                </div>
+                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px; border-color:#2563EB; color:#2563EB;" onclick="showSection('oportunidades')">
+                  Postularme
+                </button>
+              </div>
+
+              <!-- Oferta 2 -->
+              <div class="home-job-item">
+                <div style="width:36px; height:36px; border-radius:8px; background:#EAF7EE; color:var(--sena-green); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
+                  <i class="fa-solid fa-wheat-awn"></i>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Supervisor de Producción CEFA</h5>
+                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Campoalegre · $2.400.000 COP</p>
+                </div>
+                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px; border-color:var(--sena-green); color:var(--sena-green);" onclick="showSection('oportunidades')">
+                  Postularme
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
       </section>
@@ -2478,6 +2941,156 @@
 </div>
 
 <!-- ========================================================
+     MODAL: ACTUALIZAR DATOS DE CONTACTO DEL EGRESADO
+     ======================================================== -->
+<div class="modal-backdrop" id="modalActualizarDatos" onclick="if(event.target===this)closeActualizarDatosModal()">
+  <div class="modal-box-card" style="max-width: 520px; border-radius: var(--radius-xl); overflow: hidden;">
+    <div style="background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%); padding: 20px 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--sena-green);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-user-pen" style="color: var(--sena-neon); font-size: 18px;"></i>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">Actualizar Datos de Contacto</h3>
+          <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Expediente de Egresado CEFA</span>
+        </div>
+      </div>
+      <button type="button" class="modal-close-x" onclick="closeActualizarDatosModal()" style="color:#fff;">&times;</button>
+    </div>
+
+    <form id="formActualizarContacto" onsubmit="guardarDatosContacto(event)" style="padding: 22px 24px;">
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
+          Teléfono / WhatsApp Móvil *
+        </label>
+        <input type="text" id="input-edit-telefono" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="<?php echo e($person->telephone1 ?? '3124567890'); ?>" required>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
+          Correo Electrónico Personal *
+        </label>
+        <input type="email" id="input-edit-email" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="<?php echo e(Auth::user()->email ?? 'egresado.sige@sena.edu.co'); ?>" required>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
+          Municipio de Residencia Actual
+        </label>
+        <input type="text" id="input-edit-municipio" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="Campoalegre / Neiva (Huila)">
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
+          Situación Laboral Actual *
+        </label>
+        <select id="select-edit-laboral" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;">
+          <option value="Empleado en el área de formación" selected>Empleado(a) en el área de formación</option>
+          <option value="Empleado en otra área">Empleado(a) en otra área</option>
+          <option value="Emprendedor con negocio activo">Emprendedor(a) con negocio activo</option>
+          <option value="Búsqueda activa de empleo">En búsqueda activa de empleo</option>
+          <option value="Continuando estudios de pregrado">Continuando formación profesional</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 10px; border-top: 1px solid var(--line);">
+        <button type="button" class="btn-card-outline" onclick="closeActualizarDatosModal()" style="padding: 9px 18px; font-size: 13px; border-radius: 10px;">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-green-submit" style="padding: 9px 20px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; border: none; cursor: pointer;">
+          <i class="fa-solid fa-floppy-disk me-1"></i> Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL: CERTIFICADOS Y ACTAS DIGITALES SENA
+     ======================================================== -->
+<div class="modal-backdrop" id="modalCertificados" onclick="if(event.target===this)closeCertificadosModal()">
+  <div class="modal-box-card" style="max-width: 500px; border-radius: var(--radius-xl); overflow: hidden;">
+    <div style="background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%); padding: 20px 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--sena-green);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-award" style="color: var(--sena-neon); font-size: 20px;"></i>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">Descarga de Certificados Oficiales</h3>
+          <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Plataforma SOFIA Plus / SENA</span>
+        </div>
+      </div>
+      <button type="button" class="modal-close-x" onclick="closeCertificadosModal()" style="color:#fff;">&times;</button>
+    </div>
+
+    <div style="padding: 24px;">
+      <div style="background: #EAF7EE; border: 1px solid #BBF7D0; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px;">
+        <i class="fa-solid fa-shield-halved" style="color: var(--sena-green); font-size: 22px;"></i>
+        <div style="font-size: 12.5px; color: #166534; font-weight: 600;">
+          Tus certificados y actas de grado cuentan con firma digital y código QR de autenticidad institucional.
+        </div>
+      </div>
+
+      <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 16px;">
+        Para consultar y descargar tus constancias oficiales de egresado del CEFA:
+      </p>
+
+      <ol style="font-size: 12.5px; color: #334155; padding-left: 20px; margin-bottom: 22px; line-height: 1.6;">
+        <li>Ingresa al portal oficial de certificados del SENA.</li>
+        <li>Selecciona tu tipo de documento y digita tu número de identificación.</li>
+        <li>Haz clic en <strong>"Consultar Certificados"</strong> y descarga tu PDF oficial.</li>
+      </ol>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-card-outline" onclick="closeCertificadosModal()" style="padding: 9px 18px; font-size: 13px; border-radius: 10px;">
+          Entendido
+        </button>
+        <a href="https://certificados.sena.edu.co" target="_blank" class="btn-green-submit" style="padding: 9px 20px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <span>Ir a Certificados SENA</span>
+          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL: LECTURA COMPLETA DE NOTICIA EN EL HOME
+     ======================================================== -->
+<div class="modal-backdrop" id="modalNoticiaHome" onclick="if(event.target===this)cerrarModalNoticiaHome()">
+  <div class="modal-box-card" style="max-width: 620px; border-radius: var(--radius-xl); overflow: hidden;">
+    <div id="mnh-image-container" style="display: none; height: 180px; overflow: hidden; position: relative;">
+      <img id="mnh-image" src="" style="width: 100%; height: 100%; object-fit: cover;" alt="Noticia">
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0, 19, 30, 0.8) 100%);"></div>
+    </div>
+    
+    <div style="padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <span id="mnh-category" style="background: #EAF7EE; color: #166534; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">
+          Convocatorias
+        </span>
+        <button type="button" class="modal-close-x" onclick="cerrarModalNoticiaHome()" style="font-size: 24px; border: none; background: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <h3 id="mnh-title" style="font-size: 18px; font-weight: 800; color: var(--sena-dark); margin: 0 0 8px; line-height: 1.3;">
+        Título de la Noticia
+      </h3>
+
+      <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; color: #64748B; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
+        <span><i class="fa-regular fa-clock me-1 text-[#39A900]"></i> <span id="mnh-date">Reciente</span></span>
+        <span><i class="fa-regular fa-user me-1 text-[#39A900]"></i> <span id="mnh-author">Coordinación CEFA</span></span>
+      </div>
+
+      <div id="mnh-content" style="font-size: 13.5px; color: #334155; line-height: 1.6; max-height: 320px; overflow-y: auto; margin-bottom: 20px;">
+        Detalle del comunicado...
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" class="btn-green-submit" onclick="cerrarModalNoticiaHome()" style="padding: 9px 22px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; border: none; cursor: pointer;">
+          Cerrar Noticia
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
      ALERTA TOAST FLOTANTE HORIZONTAL EN EL CENTRO
      ======================================================== -->
 <div class="toast-alert" id="toastAlert">
@@ -3398,8 +4011,78 @@
       });
     }
 
-    // Actualizar cuadritos de notificaciones vinculados
-    updateNotifCounters();
+  // Funciones para el Modal de Actualizar Datos de Contacto
+  function openActualizarDatosModal() {
+    const modal = document.getElementById('modalActualizarDatos');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeActualizarDatosModal() {
+    const modal = document.getElementById('modalActualizarDatos');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function guardarDatosContacto(e) {
+    e.preventDefault();
+    const email = document.getElementById('input-edit-email')?.value || '';
+    const laboral = document.getElementById('select-edit-laboral')?.value || 'Empleado en el área de formación';
+    
+    const dispEmail = document.getElementById('disp-correo-personal');
+    if (dispEmail && email) dispEmail.textContent = email;
+
+    const dispLaboral = document.getElementById('disp-estado-laboral');
+    if (dispLaboral) {
+      dispLaboral.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + laboral;
+    }
+
+    const dispPorcentaje = document.getElementById('disp-porcentaje-perfil');
+    if (dispPorcentaje) dispPorcentaje.textContent = '100%';
+    const barFill = document.getElementById('bar-fill-perfil');
+    if (barFill) barFill.style.width = '100%';
+
+    closeActualizarDatosModal();
+    showToast('¡Datos de contacto y expediente actualizados al 100%!');
+  }
+
+  // Funciones para Modal de Certificados
+  function openCertificadosModal() {
+    const modal = document.getElementById('modalCertificados');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeCertificadosModal() {
+    const modal = document.getElementById('modalCertificados');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Funciones para Modal de Lectura de Noticia en Home
+  function abrirModalNoticiaHome(title, cat, date, author, content, imgUrl) {
+    document.getElementById('mnh-title').textContent = title;
+    document.getElementById('mnh-category').textContent = cat || 'Convocatorias';
+    document.getElementById('mnh-date').textContent = date || 'Reciente';
+    document.getElementById('mnh-author').textContent = author || 'Coordinación CEFA';
+    document.getElementById('mnh-content').innerHTML = content.replace(/\n/g, '<br>');
+
+    const imgContainer = document.getElementById('mnh-image-container');
+    const imgEl = document.getElementById('mnh-image');
+    if (imgUrl && imgUrl.trim() !== '') {
+      imgEl.src = imgUrl;
+      imgContainer.style.display = 'block';
+    } else {
+      imgContainer.style.display = 'none';
+    }
+
+    const modal = document.getElementById('modalNoticiaHome');
+    if (modal) modal.classList.add('active');
+  }
+
+  function cerrarModalNoticiaHome() {
+    const modal = document.getElementById('modalNoticiaHome');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Actualizar cuadritos de notificaciones vinculados
+  updateNotifCounters();
 
     // Aplicar filtrado para que en 'Todas' se eliminen las enviadas y solo aparezcan en 'Respondidas'
     filterSurveys(currentSurveyFilter);

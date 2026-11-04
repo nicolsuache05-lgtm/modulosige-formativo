@@ -1,16 +1,16 @@
 @php
-    header("Location: " . route('login', ['redirect' => request('redirect', route('egresados.welcome'))]));
+    header("Location: " . route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]));
     exit();
 @endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url={{ route('login', ['redirect' => request('redirect', route('egresados.welcome'))]) }}">
+    <meta http-equiv="refresh" content="0;url={{ route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]) }}">
     <title>Redirigiendo al Login Central ERP...</title>
 </head>
 <body>
-    <p>Redirigiendo al <a href="{{ route('login', ['redirect' => request('redirect', route('egresados.welcome'))]) }}">Login Central de SENA Empresa ERP</a>...</p>
+    <p>Redirigiendo al <a href="{{ route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]) }}">Login Central de SENA Empresa ERP</a>...</p>
 </body>
 </html>
 

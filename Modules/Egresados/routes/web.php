@@ -8,6 +8,7 @@ use Modules\Egresados\Http\Controllers\ReportesController;
 use Modules\Egresados\Http\Controllers\EventosController;
 use Modules\Egresados\Http\Controllers\InstructorController;
 use Modules\Egresados\Http\Controllers\InstructorEncuestasController;
+use Modules\Egresados\Http\Controllers\NoticiasController;
 use Modules\Egresados\Http\Middleware\CheckEgresadosRole;
 
 /*
@@ -23,8 +24,18 @@ Route::get('egresados/welcome', [EgresadosController::class, 'welcome'])->name('
 
 // 2. Autenticación Institucional Centralizada del ERP
 Route::get('egresados/login', function (\Illuminate\Http\Request $request) {
-    $redirect = $request->query('redirect', route('egresados.welcome'));
-    return redirect()->route('login', ['redirect' => $redirect]);
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.egresado'))) {
+            return redirect()->route('egresados.dashboard_egresado');
+        }
+        if ($user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.instructor'))) {
+            return redirect()->route('egresados.dashboard_instructor');
+        }
+        return redirect()->route('egresados.dashboard');
+    }
+    $redirect = $request->query('redirect', '');
+    return redirect()->route('login', $redirect ? ['redirect' => $redirect] : []);
 })->name('egresados.login');
 
 Route::post('egresados/login', [AuthController::class, 'login'])->name('egresados.login.post');
@@ -116,6 +127,14 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     Route::get('egresados/superadmin/eventos/{id}/exportar', [EventosController::class, 'exportarExcel'])->name('egresados.superadmin.eventos.exportar');
     Route::put('egresados/superadmin/eventos/{id}/cancelar', [EventosController::class, 'cancelar'])->name('egresados.superadmin.eventos.cancelar');
 
+    // Módulo de Noticias y Comunicados (Superadmin)
+    Route::get('egresados/noticias', [NoticiasController::class, 'index'])->name('egresados.noticias');
+    Route::get('egresados/superadmin/noticias', [NoticiasController::class, 'index'])->name('egresados.superadmin.noticias.index');
+    Route::post('egresados/superadmin/noticias/store', [NoticiasController::class, 'store'])->name('egresados.superadmin.noticias.store');
+    Route::put('egresados/superadmin/noticias/{id}', [NoticiasController::class, 'update'])->name('egresados.superadmin.noticias.update');
+    Route::delete('egresados/superadmin/noticias/{id}', [NoticiasController::class, 'destroy'])->name('egresados.superadmin.noticias.destroy');
+    Route::put('egresados/superadmin/noticias/{id}/toggle-status', [NoticiasController::class, 'toggleStatus'])->name('egresados.superadmin.noticias.toggle_status');
+
     // Rutas dinámicas con parámetro ID de egresado (al final y con restricción numérica)
     Route::get('egresados/{id}/perfil', [EgresadosController::class, 'show'])->name('egresados.superadmin.perfil')->whereNumber('id');
     Route::get('egresados/{id}', [EgresadosController::class, 'show'])->name('egresados.show')->whereNumber('id');
@@ -161,6 +180,13 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::put('egresados/instructor/eventos/{id}', [InstructorController::class, 'updateEvento'])->name('egresados.instructor.eventos.update');
     Route::post('egresados/instructor/eventos/{id}/invitar', [InstructorController::class, 'invitarEvento'])->name('egresados.instructor.eventos.invitar');
     Route::put('egresados/instructor/eventos/{id}/cancelar', [InstructorController::class, 'cancelarEvento'])->name('egresados.instructor.eventos.cancelar');
+
+    // Módulo de Noticias y Comunicados (Instructor)
+    Route::get('egresados/instructor/noticias', [NoticiasController::class, 'instructorIndex'])->name('egresados.instructor.noticias.index');
+    Route::post('egresados/instructor/noticias/store', [NoticiasController::class, 'instructorStore'])->name('egresados.instructor.noticias.store');
+    Route::put('egresados/instructor/noticias/{id}', [NoticiasController::class, 'instructorUpdate'])->name('egresados.instructor.noticias.update');
+    Route::delete('egresados/instructor/noticias/{id}', [NoticiasController::class, 'instructorDestroy'])->name('egresados.instructor.noticias.destroy');
+    Route::put('egresados/instructor/noticias/{id}/toggle-status', [NoticiasController::class, 'instructorToggleStatus'])->name('egresados.instructor.noticias.toggle_status');
 
     Route::get('egresados/instructor/{id}/perfil', [EgresadosController::class, 'show'])->name('egresados.instructor.perfil');
 });

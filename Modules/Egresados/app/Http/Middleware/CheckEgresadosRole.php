@@ -20,8 +20,13 @@ class CheckEgresadosRole
         // 1. Validar si el usuario está autenticado
         if (!Auth::check()) {
             if (app()->environment('local')) {
-                $devUser = \App\Models\User::where('nickname', 'superadmin_egresados')
-                    ->orWhere('email', 'superadmin.egresados@sena.edu.co')
+                $targetNick = match ($roleType) {
+                    'instructor' => 'instructor_egresados',
+                    'egresado'   => 'egresado_sige',
+                    default      => 'superadmin_egresados',
+                };
+                $devUser = \App\Models\User::where('nickname', $targetNick)
+                    ->orWhere('email', $targetNick . '@sena.edu.co')
                     ->first();
                 if ($devUser) {
                     Auth::login($devUser);

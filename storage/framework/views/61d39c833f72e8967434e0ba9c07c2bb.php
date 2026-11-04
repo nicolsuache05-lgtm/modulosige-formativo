@@ -2,6 +2,8 @@
 <!-- 5. MODAL DE ANÁLISIS GRÁFICO E INDICADORES (SENA ERP) -->
 <!-- ============================================== -->
 <div x-show="openGraficasModal" 
+     @open-modal-graficas.window="openGraficasModal = true"
+     @close-modal-graficas.window="openGraficasModal = false"
      style="display: none;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
@@ -165,5 +167,4 @@
     </div>
 
 </div>
-
 <?php /**PATH C:\laragon\www\modulosige-formativo\Modules\Egresados\resources\views\superadmin\reportes\partials\_modal_graficas.blade.php ENDPATH**/ ?>

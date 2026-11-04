@@ -13,7 +13,8 @@
         $hasSuccess = false;
     }
     $isInvitacion = str_contains($lowerMsg, 'invitaci');
-    $isInstructor = str_contains($lowerMsg, 'instructor');
+    $isNoticia = str_contains($lowerMsg, 'noticia') || str_contains($lowerMsg, 'comunicado');
+    $isInstructor = str_contains($lowerMsg, 'instructor') && !$isNoticia;
     $isEncuesta = str_contains($lowerMsg, 'encuesta');
     $isReporte = str_contains($lowerMsg, 'reporte');
     $isEvento = str_contains($lowerMsg, 'evento');
@@ -33,6 +34,23 @@
         $badgeText = 'Invitación y enlace de registro enviados a los egresados';
         $tagIcon = 'fa-paper-plane';
         $tagLabel = 'CONVOCATORIA Y EVENTOS · SIGE ERP';
+    } elseif ($isNoticia) {
+        if ($isDeleted) {
+            $successTitle = '¡Noticia Eliminada Exitosamente!';
+            $badgeText = 'La noticia ha sido retirada del portal institucional';
+            $tagIcon = 'fa-trash-can';
+            $tagLabel = 'MÓDULO DE NOTICIAS · SIGE ERP';
+        } elseif ($isUpdated) {
+            $successTitle = '¡Noticia Actualizada!';
+            $badgeText = 'Información y contenido de la noticia guardados con éxito';
+            $tagIcon = 'fa-newspaper';
+            $tagLabel = 'MÓDULO DE NOTICIAS · SIGE ERP';
+        } else {
+            $successTitle = '¡Noticia Publicada!';
+            $badgeText = 'Noticia publicada y disponible en el portal institucional';
+            $tagIcon = 'fa-newspaper';
+            $tagLabel = 'MÓDULO DE NOTICIAS · SIGE ERP';
+        }
     } elseif ($isEncuesta) {
         if ($isCerrada) {
             $successTitle = '¡Encuesta Cerrada Exitosamente!';
