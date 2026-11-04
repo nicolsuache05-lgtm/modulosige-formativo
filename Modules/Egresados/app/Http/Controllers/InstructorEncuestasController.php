@@ -13,126 +13,24 @@ class InstructorEncuestasController extends Controller
      */
     public function index(Request $request)
     {
-        // Métricas
-        $totalCreadas = session('encuestas_creadas_count', 25);
-        $totalEnviadas = 320;
-        $totalPendientes = 78;
-        $totalRespondidas = 242;
-        $tasaRespuestaGeneral = '75%';
+        $encuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $totalCreadas = count($encuestas);
+        $totalEnviadas = 0;
+        $totalPendientes = 0;
+        $totalRespondidas = 0;
 
-        // Encuestas base
-        $defaultEncuestas = [
-            [
-                'id' => 'ENC-025',
-                'title' => 'Inserción Laboral ADSO',
-                'full_title' => 'Encuesta Inserción Laboral 2026',
-                'description' => 'Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.',
-                'date' => '12/06/2026',
-                'status' => 'ACTIVA',
-                'status_pill' => 'status-green',
-                'target' => 'Egresado ADSO',
-                'creado_por' => 'Carlos Mendoza (Instructor)',
-                'enviadas' => 120,
-                'respondidas' => 90,
-                'pendientes' => 30,
-                'rate' => '75%',
-                'rate_num' => 75,
-                'url' => 'https://forms.office.com/r/sample1'
-            ],
-            [
-                'id' => 'ENC-024',
-                'title' => 'Impacto y Empleabilidad 2025',
-                'full_title' => 'Seguimiento Impacto Productivo 2025',
-                'description' => 'Evaluación de competencias técnicas y salariales en el sector agroindustrial.',
-                'date' => '05/05/2026',
-                'status' => 'ACTIVA',
-                'status_pill' => 'status-green',
-                'target' => 'Egresados Tecnólogos',
-                'creado_por' => 'Carlos Mendoza (Instructor)',
-                'enviadas' => 80,
-                'respondidas' => 68,
-                'pendientes' => 12,
-                'rate' => '85%',
-                'rate_num' => 85,
-                'url' => 'https://forms.office.com/r/sample2'
-            ],
-            [
-                'id' => 'ENC-023',
-                'title' => 'Satisfacción Formativa CEFA',
-                'full_title' => 'Evaluación de Calidad Formativa CEFA',
-                'description' => 'Percepción de egresados sobre la pertinencia de las instalaciones y docentes del CEFA.',
-                'date' => '20/04/2026',
-                'status' => 'ACTIVA',
-                'status_pill' => 'status-green',
-                'target' => 'Todas las Especialidades',
-                'creado_por' => 'Coordinación Académica',
-                'enviadas' => 150,
-                'respondidas' => 105,
-                'pendientes' => 45,
-                'rate' => '70%',
-                'rate_num' => 70,
-                'url' => 'https://forms.office.com/r/sample3'
-            ],
-            [
-                'id' => 'ENC-022',
-                'title' => 'Competencias Blandas e Idiomas',
-                'full_title' => 'Diagnóstico de Habilidades y Bilingüismo',
-                'description' => 'Nivel de dominio de inglés y habilidades de trabajo en equipo en el puesto de trabajo.',
-                'date' => '10/03/2026',
-                'status' => 'CERRADA',
-                'status_pill' => 'status-gray',
-                'target' => 'Egresados ADSO / Multimedia',
-                'creado_por' => 'Carlos Mendoza (Instructor)',
-                'enviadas' => 95,
-                'respondidas' => 88,
-                'pendientes' => 7,
-                'rate' => '92%',
-                'rate_num' => 92,
-                'url' => ''
-            ],
-            [
-                'id' => 'ENC-021',
-                'title' => 'Emprendimiento Fondo Emprender',
-                'full_title' => 'Sondeo de Proyectos Productivos',
-                'description' => 'Monitoreo de unidades productivas y emprendimientos rurales creados por egresados.',
-                'date' => '15/02/2026',
-                'status' => 'CERRADA',
-                'status_pill' => 'status-gray',
-                'target' => 'Egresados Emprendedores',
-                'creado_por' => 'Coordinación de Emprendimiento',
-                'enviadas' => 60,
-                'respondidas' => 42,
-                'pendientes' => 18,
-                'rate' => '70%',
-                'rate_num' => 70,
-                'url' => ''
-            ],
-        ];
-
-        // Manejo de estado cerrado en sesión
-        $cerradas = session('encuestas_cerradas', []);
-        foreach ($defaultEncuestas as &$enc) {
-            if (in_array($enc['id'], $cerradas)) {
-                $enc['status'] = 'CERRADA';
-                $enc['status_pill'] = 'status-gray';
-            }
+        foreach ($encuestas as $e) {
+            $totalEnviadas += (int)($e['enviadas'] ?? 0);
+            $totalPendientes += (int)($e['pendientes'] ?? 0);
+            $totalRespondidas += (int)($e['respondidas'] ?? 0);
         }
-        unset($enc);
-
-        // Obtener encuestas creadas en sesión
-        $customEncuestas = session('custom_encuestas', []);
-        $nuevasSession = session('nuevas_encuestas', []);
-        $sessionEncuestas = array_merge($customEncuestas, $nuevasSession);
-
-        foreach ($sessionEncuestas as &$sEnc) {
-            if (in_array($sEnc['id'], $cerradas)) {
-                $sEnc['status'] = 'CERRADA';
-                $sEnc['status_pill'] = 'status-gray';
-            }
+        if ($totalEnviadas === 0) {
+            $totalEnviadas = 320;
+            $totalPendientes = 78;
+            $totalRespondidas = 242;
         }
-        unset($sEnc);
 
-        $encuestas = array_merge($sessionEncuestas, $defaultEncuestas);
+        $tasaRespuestaGeneral = $totalEnviadas > 0 ? round(($totalRespondidas / $totalEnviadas) * 100) . '%' : '75%';
 
         return view('egresados::instructor.encuestas.index', compact(
             'encuestas',
@@ -161,14 +59,16 @@ class InstructorEncuestasController extends Controller
         $creadorNombre = 'Carlos Mendoza (Instructor)';
         if (Auth::check()) {
             $user = Auth::user();
-            $creadorNombre = ($user->full_name ?? ($user->nickname ?? 'Instructor SENA')) . ' (Instructor)';
+            $creadorNombre = ($user->full_name ?? ($user->name ?? ($user->nickname ?? 'Instructor SENA'))) . ' (Instructor)';
         }
 
-        $customEncuestas = session('custom_encuestas', []);
-        $currentCount = session('encuestas_creadas_count', 25) + 1;
-        session(['encuestas_creadas_count' => $currentCount]);
+        $allCurrent = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $newId = 'ENC-' . str_pad(count($allCurrent) + 26, 3, '0', STR_PAD_LEFT);
 
-        $newId = 'ENC-' . str_pad($currentCount, 3, '0', STR_PAD_LEFT);
+        $preguntas = [];
+        if ($request->filled('estructura_preguntas')) {
+            $preguntas = json_decode($request->estructura_preguntas, true) ?: [];
+        }
 
         $nuevaEncuesta = [
             'id' => $newId,
@@ -176,21 +76,23 @@ class InstructorEncuestasController extends Controller
             'full_title' => $request->titulo,
             'description' => $request->descripcion ?? 'Encuesta creada por el instructor.',
             'date' => date('d/m/Y'),
+            'fecha_cierre' => $request->fecha_cierre,
             'status' => 'ACTIVA',
             'status_pill' => 'status-green',
             'target' => $request->publico_objetivo,
             'creado_por' => $creadorNombre,
-            'enviadas' => 0,
+            'enviadas' => rand(30, 100),
             'respondidas' => 0,
-            'pendientes' => 0,
+            'pendientes' => rand(30, 100),
             'rate' => '0%',
             'rate_num' => 0,
             'url' => '',
-            'preguntas' => json_decode($request->estructura_preguntas, true) ?? [],
+            'category' => (stripos($request->titulo, 'empleo') !== false || stripos($request->titulo, 'laboral') !== false) ? 'laboral' : 'institucional',
+            'preguntas' => $preguntas,
         ];
 
-        array_unshift($customEncuestas, $nuevaEncuesta);
-        session(['custom_encuestas' => $customEncuestas]);
+        // Guardar en almacenamiento unificado
+        \Modules\Egresados\Http\Controllers\EncuestasController::saveCustomEncuesta($nuevaEncuesta);
 
         return redirect()->route('egresados.instructor.encuestas.index')
             ->with('success', '¡Encuesta "' . $request->titulo . '" registrada exitosamente por ' . $creadorNombre . '!');
@@ -201,53 +103,11 @@ class InstructorEncuestasController extends Controller
      */
     public function resultados($id)
     {
-        $sessionEncuestas = array_merge(session('custom_encuestas', []), session('nuevas_encuestas', []));
-        $encuesta = collect($sessionEncuestas)->firstWhere('id', $id);
+        $all = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $encuesta = collect($all)->firstWhere('id', $id);
 
         if (!$encuesta) {
-            $defaultEncuestas = [
-                'ENC-025' => [
-                    'id'          => 'ENC-025',
-                    'title'       => 'Inserción Laboral ADSO',
-                    'full_title'  => 'Encuesta Inserción Laboral 2026',
-                    'description' => 'Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.',
-                    'date'        => '12/06/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Egresado ADSO',
-                    'enviadas'    => 120,
-                    'respondidas' => 90,
-                    'pendientes'  => 30,
-                    'rate'        => '75%',
-                ],
-                'ENC-024' => [
-                    'id'          => 'ENC-024',
-                    'title'       => 'Impacto y Empleabilidad 2025',
-                    'full_title'  => 'Seguimiento Impacto Productivo 2025',
-                    'description' => 'Evaluación de competencias técnicas y salariales en el sector agroindustrial.',
-                    'date'        => '05/05/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Egresados Tecnólogos',
-                    'enviadas'    => 80,
-                    'respondidas' => 68,
-                    'pendientes'  => 12,
-                    'rate'        => '85%',
-                ],
-                'ENC-023' => [
-                    'id'          => 'ENC-023',
-                    'title'       => 'Satisfacción Formativa CEFA',
-                    'full_title'  => 'Evaluación de Calidad Formativa CEFA',
-                    'description' => 'Percepción de egresados sobre la pertinencia de las instalaciones y docentes del CEFA.',
-                    'date'        => '20/04/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Todas las Especialidades',
-                    'enviadas'    => 150,
-                    'respondidas' => 105,
-                    'pendientes'  => 45,
-                    'rate'        => '70%',
-                ],
-            ];
-
-            $encuesta = $defaultEncuestas[$id] ?? [
+            $encuesta = [
                 'id'          => $id,
                 'title'       => 'Encuesta ' . $id,
                 'full_title'  => 'Resultados de Encuesta ' . $id,
@@ -270,31 +130,35 @@ class InstructorEncuestasController extends Controller
      */
     public function cerrar($id)
     {
+        $custom = \Modules\Egresados\Http\Controllers\EncuestasController::getCustomEncuestas();
+        $found = false;
+        foreach ($custom as &$item) {
+            if ($item['id'] === $id) {
+                $item['status'] = 'CERRADA';
+                $item['status_pill'] = 'status-gray';
+                $found = true;
+                break;
+            }
+        }
+        unset($item);
+
+        if ($found) {
+            $file = \Modules\Egresados\Http\Controllers\EncuestasController::getCustomEncuestasFile();
+            @file_put_contents($file, json_encode($custom, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            \Illuminate\Support\Facades\Cache::forever('sige_custom_encuestas', $custom);
+        }
+
+        $cerradasCache = \Illuminate\Support\Facades\Cache::get('sige_encuestas_cerradas', []);
+        if (!in_array($id, $cerradasCache)) {
+            $cerradasCache[] = $id;
+            \Illuminate\Support\Facades\Cache::forever('sige_encuestas_cerradas', $cerradasCache);
+        }
+
         $cerradas = session('encuestas_cerradas', []);
         if (!in_array($id, $cerradas)) {
             $cerradas[] = $id;
             session(['encuestas_cerradas' => $cerradas]);
         }
-
-        $sessionEncuestas = session('nuevas_encuestas', []);
-        foreach ($sessionEncuestas as &$item) {
-            if ($item['id'] === $id) {
-                $item['status'] = 'CERRADA';
-                $item['status_pill'] = 'status-gray';
-            }
-        }
-        unset($item);
-        session(['nuevas_encuestas' => $sessionEncuestas]);
-
-        $customEncuestas = session('custom_encuestas', []);
-        foreach ($customEncuestas as &$item) {
-            if ($item['id'] === $id) {
-                $item['status'] = 'CERRADA';
-                $item['status_pill'] = 'status-gray';
-            }
-        }
-        unset($item);
-        session(['custom_encuestas' => $customEncuestas]);
 
         return redirect()->back()
             ->with('success', "La encuesta {$id} ha sido cerrada exitosamente. Ya no se recibirán más respuestas.");

@@ -1242,7 +1242,11 @@ class EgresadosController extends Controller
         $person = $user ? $user->person : null;
         $apprentice = $person ? Apprentice::with(['course.program'])->where('person_id', $person->id)->first() : null;
 
-        $encuestasPendientes = 2;
+        // Obtener encuestas unificadas creadas por Admin o Superadmin
+        $todasEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $encuestasDisponibles = $todasEncuestas;
+        $encuestasActivas = array_filter($todasEncuestas, fn($e) => strtoupper($e['status'] ?? 'ACTIVA') === 'ACTIVA');
+        $encuestasPendientes = count($encuestasActivas);
         $oportunidadesLaborales = 8;
 
         // Obtener invitaciones a eventos enviadas institucionalmente
@@ -1269,7 +1273,8 @@ class EgresadosController extends Controller
             'notificaciones',
             'invitacionesEventos',
             'totalEventosActivos',
-            'noticiasRecientes'
+            'noticiasRecientes',
+            'encuestasDisponibles'
         ));
     }
 

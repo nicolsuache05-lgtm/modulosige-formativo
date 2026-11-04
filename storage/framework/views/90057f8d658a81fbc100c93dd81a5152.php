@@ -1181,10 +1181,11 @@
       background: #FFFFFF;
       border-radius: var(--radius-xl);
       padding: 30px;
-      max-width: 540px;
+      max-width: 560px;
       width: 100%;
       position: relative;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 20px 45px rgba(0, 19, 30, 0.22);
+      border-top: 4px solid #39A900;
       transform: scale(0.95) translateY(10px);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       max-height: 90vh;
@@ -1215,120 +1216,213 @@
       color: var(--ink);
     }
 
-    /* Modal Encuesta Preguntas */
+    /* Modal Encuesta Preguntas con Colores Oficiales ERP SENA Empresa */
     .modal-header-banner {
-      background: var(--green-soft);
-      border: 1px solid var(--green-soft-border);
+      background: linear-gradient(135deg, #00131E 0%, #002336 100%);
+      border-left: 4px solid #39A900;
       border-radius: var(--radius-md);
-      padding: 16px;
+      padding: 18px 20px;
       margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0, 19, 30, 0.08);
     }
     .modal-header-banner h3 {
       font-family: 'Poppins', 'Nunito', sans-serif;
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 700;
-      color: var(--forest);
-      margin-bottom: 4px;
+      color: #FFFFFF;
+      margin: 0 0 4px;
     }
     .modal-header-banner p {
       font-size: 12.5px;
-      color: var(--forest);
+      color: rgba(255, 255, 255, 0.85);
       margin: 0;
+      line-height: 1.4;
     }
     .question-block {
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 18px;
-      margin-bottom: 18px;
-    }
-    .question-block:last-of-type {
-      border-bottom: none;
-      padding-bottom: 0;
+      background: #FAFDF7;
+      border: 1px solid #E8F5E9;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 14px;
     }
     .question-title {
       font-size: 13.5px;
       font-weight: 700;
-      color: var(--ink);
+      color: #001A29;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .question-title span { color: #dc2626; }
+    .question-title .q-num-badge {
+      background: #39A900;
+      color: #FFFFFF;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .question-title span.required-star { color: #dc2626; }
     .option-radio-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      padding: 6px 10px;
+      border-radius: 8px;
       font-size: 13px;
-      color: var(--ink);
+      color: #001A29;
       cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .option-radio-row:hover {
+      background: #F0FDF4;
+      border-color: #BBF7D0;
     }
     .option-radio-row input[type="radio"] {
-      accent-color: var(--forest);
-      width: 16px;
-      height: 16px;
+      accent-color: #39A900;
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
     }
 
-    /* MODAL DE CONFIRMACIÓN CENTRADA CON EL "CHULO" (Requerimiento exacto del usuario) */
+    /* ========================================================
+       MODALES DE CONFIRMACIÓN Y ALERTA (DISEÑO OFICIAL SUPERADMIN SENA ERP)
+       ======================================================== */
     .success-modal-card {
       background: #FFFFFF;
-      border-radius: var(--radius-xl);
-      padding: 40px 32px 36px;
-      max-width: 420px;
+      border-radius: 28px;
+      padding: 36px 30px;
+      max-width: 440px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 25px 60px -10px rgba(0, 19, 30, 0.45);
+      border: 1.5px solid rgba(57, 169, 0, 0.25);
       position: relative;
+      overflow: hidden;
       transform: scale(0.92);
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .modal-backdrop.active .success-modal-card {
       transform: scale(1);
     }
-    .chulo-circle-badge {
-      width: 76px;
-      height: 76px;
-      border-radius: 50%;
-      background: #EAF7EE;
-      color: var(--sena-green);
+
+    /* Contenedor del Chulito Animado SENA ERP */
+    .sena-chulito-container {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 24px rgba(57, 169, 0, 0.25);
-      border: 3px solid #BBF7D0;
+      margin: 0 auto 16px auto;
+      width: 86px;
+      height: 86px;
     }
-    .success-modal-card h3 {
-      font-family: 'Poppins', 'Nunito', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--sena-dark);
-      margin-bottom: 10px;
-      letter-spacing: -0.01em;
+
+    /* Halo pulsante de fondo */
+    .sena-chulito-glow {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(57, 169, 0, 0.28) 0%, rgba(57, 169, 0, 0) 70%);
+      animation: sena-pulse-halo 2s ease-in-out infinite;
     }
-    .success-modal-card p {
-      font-size: 13.5px;
-      color: var(--ink-soft);
-      line-height: 1.5;
-      margin-bottom: 26px;
+
+    /* Círculo base con elevación */
+    .sena-chulito-badge {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 28px -6px rgba(57, 169, 0, 0.45), 
+                  inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      animation: sena-chulito-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+      z-index: 2;
     }
+
+    /* SVG del Chulito SENA */
+    .sena-chulito-svg {
+      width: 44px;
+      height: 44px;
+      stroke: #ffffff;
+      stroke-width: 4.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Trazo animado del chulito */
+    .sena-chulito-path {
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+      animation: sena-draw-check 0.45s cubic-bezier(0.65, 0, 0.45, 1) 0.35s forwards;
+    }
+
+    /* Barra de progreso de autocierre */
+    .sena-alert-progress {
+      height: 5px;
+      background: linear-gradient(to right, #39A900, #62E31D);
+      width: 100%;
+      border-radius: 0 0 24px 24px;
+      transform-origin: left;
+      animation: sena-progress-drain 7.5s linear forwards;
+    }
+
+    .success-modal-card:hover .sena-alert-progress {
+      animation-play-state: paused;
+    }
+
+    @keyframes sena-chulito-pop {
+      0% { transform: scale(0.3); opacity: 0; }
+      70% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes sena-pulse-halo {
+      0%, 100% { transform: scale(0.95); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    @keyframes sena-draw-check {
+      from { stroke-dashoffset: 60; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes sena-progress-drain {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+
     .btn-modal-accept {
-      background: var(--sena-green);
-      color: #FFFFFF;
+      background: linear-gradient(135deg, #001A29 0%, #39A900 100%);
+      color: #FFFFFF !important;
       border: none;
-      padding: 13px 36px;
-      border-radius: 12px;
+      padding: 14px 24px;
+      border-radius: 16px;
       font-size: 14px;
       font-weight: 800;
       cursor: pointer;
       font-family: inherit;
       width: 100%;
-      max-width: 240px;
-      transition: var(--transition);
-      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 24px -4px rgba(57, 169, 0, 0.45), 0 4px 10px rgba(0, 26, 41, 0.25);
     }
     .btn-modal-accept:hover {
-      background: var(--sena-green-hover);
+      background: linear-gradient(135deg, #00131E 0%, #2e8b00 100%);
       transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(57, 169, 0, 0.45);
+      box-shadow: 0 12px 28px -4px rgba(57, 169, 0, 0.55), 0 6px 12px rgba(0, 26, 41, 0.3);
     }
 
     /* Centered Toast Alert */
@@ -1701,8 +1795,14 @@
         </div>
 
         <?php if(isset($invitacionesEventos) && count($invitacionesEventos) > 0): ?>
-          <?php $primeraInv = reset($invitacionesEventos); ?>
-          <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); border-left: 5px solid #39A900; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 16px rgba(0,19,30,0.12);">
+          <?php 
+            $primeraInv = reset($invitacionesEventos);
+            $invKeys = array_keys($invitacionesEventos);
+            $primeraInvKey = reset($invKeys);
+            $invEventId = 'event-inv-' . ($primeraInv['id'] ?? $primeraInvKey);
+            $invEventTitle = $primeraInv['title'] ?? 'Evento Institucional CEFA';
+          ?>
+          <div id="banner-invitacion-evento" data-event-id="<?php echo e($invEventId); ?>" data-event-title="<?php echo e($invEventTitle); ?>" style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); border-left: 5px solid #39A900; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 16px rgba(0,19,30,0.12); transition: all 0.3s ease;">
             <div style="display: flex; align-items: center; gap: 14px;">
               <div style="width: 42px; height: 42px; border-radius: 12px; background: #39A900; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0;">
                 <i class="fa-solid fa-paper-plane"></i>
@@ -1713,10 +1813,35 @@
                 <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin: 2px 0 0;"><?php echo e($primeraInv['date'] ?? 'Próximamente'); ?> | <?php echo e($primeraInv['location'] ?? 'CEFA'); ?> · Dirigido a: <?php echo e($primeraInv['program'] ?? 'Egresados'); ?></p>
               </div>
             </div>
-            <button type="button" class="btn-green-submit" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 10px; white-space: nowrap; cursor: pointer;" onclick="showSection('noticias');">
-              Ver e Inscribirme
-            </button>
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <button type="button" class="btn-green-submit" style="padding: 8px 18px; font-size: 12px; font-weight: 700; border-radius: 10px; white-space: nowrap; cursor: pointer;" onclick="openInscripcionModal('<?php echo e(addslashes($invEventTitle)); ?>', document.getElementById('btn-inscribir-<?php echo e($invEventId); ?>'), '<?php echo e($invEventId); ?>');">
+                Ver e Inscribirme
+              </button>
+              <button type="button" onclick="descartarBannerInvitacion('<?php echo e($invEventId); ?>', '<?php echo e(addslashes($invEventTitle)); ?>')" title="Ocultar invitación" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
           </div>
+          <script>
+            (function(){
+              try {
+                var eid = '<?php echo e($invEventId); ?>';
+                var etitle = '<?php echo e(addslashes(mb_strtolower(trim($invEventTitle)))); ?>';
+                var storedEvents = JSON.parse(localStorage.getItem('SIGE_EVENTOS_INSCRITOS_IDS') || '[]');
+                var storedDismissed = JSON.parse(localStorage.getItem('SIGE_INVITACIONES_DESCARTADAS') || '[]');
+                var allCheck = [].concat(storedEvents, storedDismissed);
+                var isDone = allCheck.some(function(item){
+                  if (!item) return false;
+                  var s = String(item).toLowerCase();
+                  return s === eid.toLowerCase() || s === etitle || s.indexOf(etitle) !== -1 || etitle.indexOf(s.replace('title:', '')) !== -1;
+                });
+                if (isDone) {
+                  var b = document.getElementById('banner-invitacion-evento');
+                  if (b) b.style.display = 'none';
+                }
+              } catch(e){}
+            })();
+          </script>
         <?php endif; ?>
 
         <!-- Solo las 3 Tarjetas KPI solicitadas explícitamente -->
@@ -1756,238 +1881,6 @@
               <i class="fa-regular fa-calendar-days"></i>
             </div>
           </div>
-        </div>
-
-        <!-- ========================================================
-             ACCIONES RÁPIDAS / ATAJOS INSTITUCIONALES
-             ======================================================== -->
-        <div style="margin-bottom:12px; margin-top:8px;">
-          <h3 style="font-size:16px; font-weight:800; color:var(--sena-dark); display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-bolt text-[#39A900]"></i> Accesos Rápidos
-          </h3>
-        </div>
-        <div class="quick-actions-grid">
-          <!-- Atajo 1: Encuestas -->
-          <div class="quick-action-card" onclick="showSection('encuestas')">
-            <div class="qa-icon-wrap green">
-              <i class="fa-solid fa-clipboard-question"></i>
-            </div>
-            <div>
-              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Encuestas</h4>
-              <p style="font-size:12px; color:#64748B; margin:2px 0 0;"><?php echo e($encuestasPendientes ?? 2); ?> cuestionarios pendientes</p>
-            </div>
-          </div>
-
-          <!-- Atajo 2: Ofertas Laborales -->
-          <div class="quick-action-card" onclick="showSection('oportunidades')">
-            <div class="qa-icon-wrap blue">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div>
-              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Bolsa de Empleo</h4>
-              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">8 vacantes activas CEFA</p>
-            </div>
-          </div>
-
-          <!-- Atajo 3: Eventos -->
-          <div class="quick-action-card" onclick="showSection('noticias')">
-            <div class="qa-icon-wrap purple">
-              <i class="fa-regular fa-calendar-days"></i>
-            </div>
-            <div>
-              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Eventos & Ferias</h4>
-              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">Talleres de actualización</p>
-            </div>
-          </div>
-
-          <!-- Atajo 4: Certificado -->
-          <div class="quick-action-card" onclick="openCertificadosModal()">
-            <div class="qa-icon-wrap orange">
-              <i class="fa-solid fa-award"></i>
-            </div>
-            <div>
-              <h4 style="font-size:14px; font-weight:800; color:var(--sena-dark); margin:0;">Certificados SOFIA</h4>
-              <p style="font-size:12px; color:#64748B; margin:2px 0 0;">Descarga tus actas y títulos</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ========================================================
-             3. GRID DE 2 COLUMNAS: COMUNICADOS + EVENTOS/VACANTES
-             ======================================================== -->
-        <div class="home-two-col-grid">
-          
-          <!-- Columna Izquierda: Últimos Comunicados de SIGE -->
-          <div class="home-box-panel">
-            <div class="home-box-header">
-              <div class="home-box-title">
-                <i class="fa-regular fa-newspaper text-[#39A900]"></i>
-                <span>Noticias & Convocatorias de SIGE</span>
-              </div>
-              <a href="<?php echo e(route('egresados.welcome')); ?>#noticias" target="_blank" style="font-size:12px; font-weight:700; color:var(--sena-green); text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                <span>Ver en Portal</span>
-                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-              </a>
-            </div>
-
-            <?php if(isset($noticiasRecientes) && count($noticiasRecientes) > 0): ?>
-              <?php $__currentLoopData = $noticiasRecientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $noticia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="home-news-card" onclick="abrirModalNoticiaHome('<?php echo e(addslashes($noticia['title'])); ?>', '<?php echo e(addslashes($noticia['category'] ?? 'General')); ?>', '<?php echo e(addslashes($noticia['created_at'] ?? 'Reciente')); ?>', '<?php echo e(addslashes($noticia['author'] ?? 'Coordinación CEFA')); ?>', '<?php echo e(addslashes($noticia['content'] ?? $noticia['lead'] ?? '')); ?>', '<?php echo e($noticia['image_url'] ?? ''); ?>')">
-                  <?php if(!empty($noticia['image_url'])): ?>
-                    <img src="<?php echo e($noticia['image_url']); ?>" class="home-news-thumb" alt="Noticia">
-                  <?php else: ?>
-                    <div class="home-news-thumb" style="display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #001A29, #002336); color:#62E31D;">
-                      <i class="fa-regular fa-newspaper text-xl"></i>
-                    </div>
-                  <?php endif; ?>
-                  <div style="flex:1; min-width:0;">
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                      <span style="background:#EAF7EE; color:#166534; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; text-transform:uppercase;">
-                        <?php echo e($noticia['category'] ?? 'Convocatorias'); ?>
-
-                      </span>
-                      <span style="font-size:11px; color:#8B9FA9;">
-                        <i class="fa-regular fa-clock me-1"></i><?php echo e($noticia['created_at'] ?? 'Hoy'); ?>
-
-                      </span>
-                    </div>
-                    <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                      <?php echo e($noticia['title']); ?>
-
-                    </h4>
-                    <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                      <?php echo e($noticia['lead'] ?? Str::limit(strip_tags($noticia['content'] ?? ''), 90)); ?>
-
-                    </p>
-                  </div>
-                </div>
-              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            <?php else: ?>
-              <!-- Noticias estáticas de muestra si la base está vacía -->
-              <div class="home-news-card" onclick="abrirModalNoticiaHome('Apertura Convocatoria Fondo Emprender 2026', 'Convocatorias', 'Noviembre 2026', 'SENA Emprende Rural', 'Se abre la bolsa de 2.000 millones de pesos en capital semilla no reembolsable para ideas de negocio formuladas por aprendices y egresados del CEFA La Angostura.', 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?w=800&q=80')">
-                <img src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?w=300&q=80" class="home-news-thumb" alt="Fondo Emprender">
-                <div style="flex:1; min-width:0;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <span style="background:#EAF7EE; color:#166534; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;">CONVOCATORIAS</span>
-                    <span style="font-size:11px; color:#8B9FA9;">Reciente</span>
-                  </div>
-                  <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25;">
-                    Apertura Convocatoria Fondo Emprender 2026
-                  </h4>
-                  <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3;">
-                    Financiación de hasta $100 millones para proyectos productivos de egresados.
-                  </p>
-                </div>
-              </div>
-
-              <div class="home-news-card" onclick="abrirModalNoticiaHome('Convenio de Empleabilidad con Empresas del Sector TIC', 'Actualidad', 'Noviembre 2026', 'Agencia Pública de Empleo', 'El CEFA La Angostura firma alianza estratégica para vincular tecnólogos ADSO y afines en empresas de desarrollo tecnológico a nivel regional y nacional.', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80')">
-                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=300&q=80" class="home-news-thumb" alt="Convenio">
-                <div style="flex:1; min-width:0;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <span style="background:#EFF6FF; color:#1D4ED8; font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px;">ACTUALIDAD</span>
-                    <span style="font-size:11px; color:#8B9FA9;">Esta semana</span>
-                  </div>
-                  <h4 style="font-size:13.5px; font-weight:800; color:var(--sena-dark); margin:0 0 4px; line-height:1.25;">
-                    Convenio de Empleabilidad con Empresas TIC
-                  </h4>
-                  <p style="font-size:12px; color:#5A6E7D; margin:0; line-height:1.3;">
-                    Nuevas vacantes y pasantías remuneradas para graduados de la región.
-                  </p>
-                </div>
-              </div>
-            <?php endif; ?>
-          </div>
-
-          <!-- Columna Derecha: Eventos Próximos & Vacantes Destacadas -->
-          <div style="display:flex; flex-direction:column; gap:20px;">
-            
-            <!-- Eventos Próximos -->
-            <div class="home-box-panel">
-              <div class="home-box-header">
-                <div class="home-box-title">
-                  <i class="fa-regular fa-calendar-check text-[#39A900]"></i>
-                  <span>Próximos Eventos CEFA</span>
-                </div>
-                <button type="button" onclick="showSection('noticias')" style="background:none; border:none; font-size:12px; font-weight:700; color:var(--sena-green); cursor:pointer;">
-                  Ver todos
-                </button>
-              </div>
-
-              <!-- Evento 1 -->
-              <div class="home-event-card">
-                <div class="home-event-datebox">
-                  NOV
-                  <span>20</span>
-                </div>
-                <div style="flex:1; min-width:0;">
-                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Encuentro Anual de Egresados 2026</h5>
-                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Auditorio La Angostura · 8:30 AM</p>
-                </div>
-                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="showToast('¡Te has registrado con éxito al Encuentro Anual!')">
-                  Inscribirme
-                </button>
-              </div>
-
-              <!-- Evento 2 -->
-              <div class="home-event-card">
-                <div class="home-event-datebox">
-                  DIC
-                  <span>05</span>
-                </div>
-                <div style="flex:1; min-width:0;">
-                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Feria de Empleo y Emprendimiento</h5>
-                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Modalidad Híbrida · Teams & CEFA</p>
-                </div>
-                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px;" onclick="showToast('¡Te has registrado a la Feria de Empleo!')">
-                  Inscribirme
-                </button>
-              </div>
-            </div>
-
-            <!-- Oportunidades Laborales Destacadas -->
-            <div class="home-box-panel">
-              <div class="home-box-header">
-                <div class="home-box-title">
-                  <i class="fa-solid fa-briefcase text-[#2563EB]"></i>
-                  <span>Ofertas Recomendadas</span>
-                </div>
-                <button type="button" onclick="showSection('oportunidades')" style="background:none; border:none; font-size:12px; font-weight:700; color:#2563EB; cursor:pointer;">
-                  Ver Bolsa (8)
-                </button>
-              </div>
-
-              <!-- Oferta 1 -->
-              <div class="home-job-item">
-                <div style="width:36px; height:36px; border-radius:8px; background:#EFF6FF; color:#2563EB; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
-                  <i class="fa-solid fa-laptop-code"></i>
-                </div>
-                <div style="flex:1; min-width:0;">
-                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Desarrollador Web Junior</h5>
-                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Alianzas TIC Huila · $2.800.000 COP</p>
-                </div>
-                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px; border-color:#2563EB; color:#2563EB;" onclick="showSection('oportunidades')">
-                  Postularme
-                </button>
-              </div>
-
-              <!-- Oferta 2 -->
-              <div class="home-job-item">
-                <div style="width:36px; height:36px; border-radius:8px; background:#EAF7EE; color:var(--sena-green); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
-                  <i class="fa-solid fa-wheat-awn"></i>
-                </div>
-                <div style="flex:1; min-width:0;">
-                  <h5 style="font-size:13px; font-weight:800; color:var(--sena-dark); margin:0;">Supervisor de Producción CEFA</h5>
-                  <p style="font-size:11.5px; color:#64748B; margin:2px 0 0;">Campoalegre · $2.400.000 COP</p>
-                </div>
-                <button type="button" class="btn-card-outline" style="padding:5px 10px; font-size:11px; border-radius:8px; border-color:var(--sena-green); color:var(--sena-green);" onclick="showSection('oportunidades')">
-                  Postularme
-                </button>
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
 
       </section>
@@ -2057,9 +1950,9 @@
         <!-- Filtros y Búsqueda -->
         <div class="filter-toolbar-box">
           <div class="filter-tabs-group">
-            <button class="filter-pill-btn active" id="tab-filter-todas" onclick="filterSurveys('todas', this)">Todas (<span id="count-filter-todas"><?php echo e($encuestasPendientes ?? 2); ?></span>)</button>
-            <button class="filter-pill-btn" id="tab-filter-pendientes" onclick="filterSurveys('pendientes', this)">Pendientes (<span id="count-filter-pendientes"><?php echo e($encuestasPendientes ?? 2); ?></span>)</button>
-            <button class="filter-pill-btn" id="tab-filter-completadas" onclick="filterSurveys('completadas', this)">Respondidas (<span id="count-filter-completadas">5</span>)</button>
+            <button class="filter-pill-btn active" id="tab-filter-pendientes" onclick="filterSurveys('pendientes', this)">Pendientes (<span id="count-filter-pendientes"><?php echo e($encuestasPendientes ?? 0); ?></span>)</button>
+            <button class="filter-pill-btn" id="tab-filter-todas" onclick="filterSurveys('todas', this)">Todas (<span id="count-filter-todas"><?php echo e(isset($encuestasDisponibles) ? count($encuestasDisponibles) : 0); ?></span>)</button>
+            <button class="filter-pill-btn" id="tab-filter-completadas" onclick="filterSurveys('completadas', this)">Respondidas (<span id="count-filter-completadas">0</span>)</button>
           </div>
           <div class="search-inputs-group">
             <div class="input-search-field">
@@ -2078,121 +1971,62 @@
         <div class="two-column-layout">
           <div id="survey-list-container">
 
-            <!-- Encuesta 1 -->
-            <div class="portal-item-card survey-card-item" id="survey-card-1" data-id="1" data-type="pendientes" data-cat="institucional">
-              <div class="card-icon-pill green" id="survey-icon-1">
-                <i class="fa-regular fa-clipboard"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Satisfacción con los servicios institucionales 2026</h3>
-                    <span class="card-tag-badge" id="survey-badge-1">Institucional · CEFA</span>
+            <?php if(isset($encuestasDisponibles) && count($encuestasDisponibles) > 0): ?>
+              <?php $__currentLoopData = $encuestasDisponibles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $enc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                  $encId = $enc['id'];
+                  $isClosed = strtoupper($enc['status'] ?? 'ACTIVA') === 'CERRADA';
+                  $cat = $enc['category'] ?? ((stripos($enc['title'] ?? '', 'laboral') !== false || stripos($enc['title'] ?? '', 'empleo') !== false) ? 'laboral' : 'institucional');
+                  $creador = $enc['creado_por'] ?? 'Super Admin / Instructor';
+                  $target = $enc['target'] ?? 'Comunidad de Egresados';
+                  $fechaLimite = $enc['fecha_cierre'] ?? $enc['date'] ?? 'Próximamente';
+                  $titulo = $enc['title'] ?? ($enc['full_title'] ?? 'Encuesta Institucional');
+                ?>
+                <div class="portal-item-card survey-card-item" id="survey-card-<?php echo e($encId); ?>" data-id="<?php echo e($encId); ?>" data-type="<?php echo e($isClosed ? 'completadas' : 'pendientes'); ?>" data-cat="<?php echo e($cat); ?>">
+                  <div class="card-icon-pill <?php echo e($cat === 'laboral' ? 'purple' : 'green'); ?>" id="survey-icon-<?php echo e($encId); ?>">
+                    <i class="fa-solid <?php echo e($cat === 'laboral' ? 'fa-briefcase' : 'fa-clipboard-list'); ?>"></i>
                   </div>
-                  <div id="survey-btn-wrap-1">
-                    <button type="button" class="btn-green-submit" onclick="openSurveyModal('Satisfacción con los servicios institucionales 2026', 1)">
-                      <i class="fa-solid fa-pen-to-square"></i>
-                      <span>Responder</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="card-meta-list" id="survey-meta-1">
-                  <span><i class="fa-regular fa-calendar"></i> Límite: 31 de mayo, 2026</span>
-                  <span><i class="fa-regular fa-clock"></i> Tiempo estimado: 10 min</span>
-                  <span><i class="fa-solid fa-shield-halved"></i> 100% Confidencial</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Ayúdanos a evaluar los procesos de formación, laboratorios agroindustriales y acompañamiento recibido durante tu permanencia en el centro formativo.
-                </p>
-                <div class="card-action-bar">
-                  <div class="card-progress-col" id="survey-progress-1">
-                    <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 0%;"></div></div>
-                    <span class="progress-label-text">0% completado</span>
-                  </div>
-                  <button type="button" class="btn-card-outline" id="survey-detail-btn-1" onclick="openSurveyModal('Satisfacción con los servicios institucionales 2026', 1)">
-                    <span>Ver detalles</span>
-                    <i class="fa-solid fa-arrow-right" style="font-size:11px; margin-left:4px;"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+                  <div class="card-body-content">
+                    <div class="card-top-header">
+                      <div>
+                        <h3 class="card-title-text"><?php echo e($titulo); ?></h3>
+                        <span class="card-tag-badge <?php echo e($cat === 'laboral' ? 'purple' : ''); ?>" id="survey-badge-<?php echo e($encId); ?>">
+                          <?php echo e($target); ?> · <strong style="font-weight:700;"><?php echo e($creador); ?></strong>
+                        </span>
+                      </div>
+                      <div id="survey-btn-wrap-<?php echo e($encId); ?>">
+                        <?php if($isClosed): ?>
+                          <button type="button" class="btn-card-outline" style="border-color:#94a3b8; color:#64748b; background:#f1f5f9; cursor:default;">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>Cerrada</span>
+                          </button>
+                        <?php else: ?>
+                          <button type="button" class="btn-green-submit" onclick="openSurveyModal('<?php echo e(addslashes($titulo)); ?>', '<?php echo e($encId); ?>')">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Responder</span>
+                          </button>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                    <div class="card-meta-list" id="survey-meta-<?php echo e($encId); ?>">
+                      <span><i class="fa-regular fa-calendar"></i> Límite: <?php echo e($fechaLimite); ?></span>
+                      <span><i class="fa-solid fa-user-tie"></i> Creado por: <?php echo e($creador); ?></span>
+                      <span><i class="fa-solid fa-shield-halved"></i> 100% Confidencial</span>
+                    </div>
+                    <p class="card-desc-paragraph">
+                      <?php echo e($enc['description'] ?? 'Instrumento institucional para evaluación y seguimiento a egresados del CEFA.'); ?>
 
-            <!-- Encuesta 2 -->
-            <div class="portal-item-card survey-card-item" id="survey-card-2" data-id="2" data-type="pendientes" data-cat="laboral">
-              <div class="card-icon-pill purple" id="survey-icon-2">
-                <i class="fa-solid fa-briefcase"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Seguimiento e Inserción Laboral ADSO / TIC 2026</h3>
-                    <span class="card-tag-badge purple" id="survey-badge-2">Empleabilidad</span>
-                  </div>
-                  <div id="survey-btn-wrap-2">
-                    <button type="button" class="btn-green-submit" onclick="openSurveyModal('Seguimiento e Inserción Laboral ADSO / TIC 2026', 2)">
-                      <i class="fa-solid fa-pen-to-square"></i>
-                      <span>Responder</span>
-                    </button>
+                    </p>
+                    <div class="card-action-bar">
+                      <div class="card-progress-col" id="survey-progress-<?php echo e($encId); ?>">
+                        <div class="progress-bar-track"><div class="progress-bar-fill" style="width: <?php echo e($isClosed ? '100%' : '0%'); ?>;"></div></div>
+                        <span class="progress-label-text"><?php echo e($isClosed ? 'Concluida' : '0% completado'); ?></span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="card-meta-list" id="survey-meta-2">
-                  <span><i class="fa-regular fa-calendar"></i> Límite: 15 de junio, 2026</span>
-                  <span><i class="fa-regular fa-clock"></i> Tiempo estimado: 15 min</span>
-                  <span><i class="fa-solid fa-users"></i> Egresados Tecnólogos</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Información clave para monitorear tu estatus de vinculación en empresas de desarrollo tecnológico, rango salarial y pertinencia de las competencias adquiridas.
-                </p>
-                <div class="card-action-bar">
-                  <div class="card-progress-col" id="survey-progress-2">
-                    <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 0%;"></div></div>
-                    <span class="progress-label-text">0% completado</span>
-                  </div>
-                  <button type="button" class="btn-card-outline" id="survey-detail-btn-2" onclick="openSurveyModal('Seguimiento e Inserción Laboral ADSO / TIC 2026', 2)">
-                    <span>Ver detalles</span>
-                    <i class="fa-solid fa-arrow-right" style="font-size:11px; margin-left:4px;"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Encuesta 3: Completada -->
-            <div class="portal-item-card survey-card-item" id="survey-card-3" data-id="3" data-type="completadas" data-cat="institucional">
-              <div class="card-icon-pill green" id="survey-icon-3">
-                <i class="fa-solid fa-circle-check"></i>
-              </div>
-              <div class="card-body-content">
-                <div class="card-top-header">
-                  <div>
-                    <h3 class="card-title-text">Impacto y Empleabilidad 2025</h3>
-                    <span class="card-tag-badge completed" id="survey-badge-3">Completada · Registrada</span>
-                  </div>
-                  <div id="survey-btn-wrap-3">
-                    <button type="button" class="btn-card-outline" style="border-color:#16a34a; color:#16a34a; background:#f0fdf4; cursor:default;" onclick="showToast('Ya has respondido esta encuesta con éxito')">
-                      <i class="fa-solid fa-check"></i>
-                      <span>Enviada</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="card-meta-list" id="survey-meta-3">
-                  <span><i class="fa-regular fa-calendar-check"></i> Finalizada el 2025-11-20</span>
-                  <span><i class="fa-solid fa-check-double"></i> Respuestas guardadas</span>
-                </div>
-                <p class="card-desc-paragraph">
-                  Encuesta anual finalizada con éxito. Agradecemos tus aportes que permitieron la renovación del plan curricular de tecnologías informáticas.
-                </p>
-                <div class="card-action-bar">
-                  <div class="card-progress-col" id="survey-progress-3">
-                    <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 100%;"></div></div>
-                    <span class="progress-label-text" style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> 100% completada</span>
-                  </div>
-                  <button type="button" class="btn-card-outline" id="survey-detail-btn-3" onclick="showToast('Visualizando histórico de respuestas...')">
-                    <span>Ver respuestas</span>
-                    <i class="fa-solid fa-arrow-right" style="font-size:11px; margin-left:4px;"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php endif; ?>
 
             <!-- Estado vacío cuando no hay encuestas en el filtro actual -->
             <div id="survey-empty-state" class="portal-item-card" style="display:none; text-align:center; padding:36px 20px; align-items:center; justify-content:center; flex-direction:column; background:#F8FAFC; border:1px dashed #CBD5E1; border-radius:var(--radius-lg); width:100%;">
@@ -2236,18 +2070,6 @@
                     <h4>Oportunidades Futuras</h4>
                     <p>Permite priorizar convenios de vinculación y bolsas de empleo para tu área.</p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="side-widget-card" style="background:#F0FDF4; border-color:#BBF7D0;">
-              <div style="display:flex; gap:10px; align-items:flex-start;">
-                <i class="fa-solid fa-circle-info" style="color:#16a34a; font-size:18px; margin-top:2px;"></i>
-                <div>
-                  <h4 style="font-size:13.5px; font-weight:700; color:#166534; margin-bottom:4px;">Recordatorio Importante</h4>
-                  <p style="font-size:12px; color:#14532d; line-height:1.45; margin:0;">
-                    Recibirás una notificación y correo de confirmación tan pronto envíes tus respuestas.
-                  </p>
                 </div>
               </div>
             </div>
@@ -2743,20 +2565,27 @@
 </div>
 
 <!-- ========================================================
-     MODAL DE PREGUNTAS DE ENCUESTA
+     MODAL DE PREGUNTAS DE ENCUESTA CON ESTILO OFICIAL SENA ERP
      ======================================================== -->
 <div class="modal-backdrop" id="modalEncuesta" onclick="if(event.target===this)closeSurveyModal()">
   <div class="modal-box-card">
-    <button type="button" class="modal-close-x" onclick="closeSurveyModal()"><i class="fa-solid fa-xmark"></i></button>
+    <button type="button" class="modal-close-x" onclick="closeSurveyModal()" title="Cerrar ventana"><i class="fa-solid fa-xmark"></i></button>
 
     <div class="modal-header-banner">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">
+        <i class="fa-solid fa-square-poll-vertical"></i> Instrumento Oficial SENA
+      </div>
       <h3 id="modal-survey-title">Encuesta de Seguimiento e Inserción Laboral</h3>
-      <p>Tus respuestas permiten mejorar los procesos pedagógicos y de empleabilidad del SENA CEFA.</p>
+      <p>Tus respuestas son confidenciales y permiten modernizar los procesos pedagógicos y de empleabilidad del SENA CEFA.</p>
     </div>
 
     <form id="form-responder-encuesta" onsubmit="event.preventDefault(); submitSurvey();">
       <div class="question-block">
-        <h4 class="question-title">1. ¿Qué tan satisfecho está con la formación técnica/tecnológica recibida en el CEFA? <span>*</span></h4>
+        <h4 class="question-title">
+          <span class="q-num-badge">1</span>
+          <span>¿Qué tan satisfecho está con la formación técnica/tecnológica recibida en el CEFA?</span>
+          <span class="required-star">*</span>
+        </h4>
         <label class="option-radio-row"><input type="radio" name="q1" value="Excelente" checked required> Excelente</label>
         <label class="option-radio-row"><input type="radio" name="q1" value="Buena"> Buena</label>
         <label class="option-radio-row"><input type="radio" name="q1" value="Regular"> Regular</label>
@@ -2764,14 +2593,22 @@
       </div>
 
       <div class="question-block">
-        <h4 class="question-title">2. ¿Se encuentra vinculado laboralmente o desarrollando un emprendimiento actualmente? <span>*</span></h4>
+        <h4 class="question-title">
+          <span class="q-num-badge">2</span>
+          <span>¿Se encuentra vinculado laboralmente o desarrollando un emprendimiento actualmente?</span>
+          <span class="required-star">*</span>
+        </h4>
         <label class="option-radio-row"><input type="radio" name="q2" value="Si" checked required> Sí, con contrato laboral</label>
         <label class="option-radio-row"><input type="radio" name="q2" value="Independiente"> Sí, como independiente o emprendedor</label>
         <label class="option-radio-row"><input type="radio" name="q2" value="No"> No actualmente, en búsqueda activa</label>
       </div>
 
       <div class="question-block">
-        <h4 class="question-title">3. ¿Su empleo actual se relaciona con el programa cursado en el SENA? <span>*</span></h4>
+        <h4 class="question-title">
+          <span class="q-num-badge">3</span>
+          <span>¿Su empleo actual se relaciona con el programa cursado en el SENA?</span>
+          <span class="required-star">*</span>
+        </h4>
         <label class="option-radio-row"><input type="radio" name="q3" value="Totalmente" checked required> Totalmente relacionado</label>
         <label class="option-radio-row"><input type="radio" name="q3" value="Parcialmente"> Parcialmente relacionado</label>
         <label class="option-radio-row"><input type="radio" name="q3" value="No"> No relacionado</label>
@@ -2789,21 +2626,66 @@
 </div>
 
 <!-- ========================================================
-     MODAL DE CONFIRMACIÓN: ENVIADA CORRECTAMENTE CON CHULO EN LA MITAD
-     (Requerimiento explícito: "esto pongamelo el aceptar como asi en la mitad q salga envaida correctamente y un chulo")
+     MODAL DE CONFIRMACIÓN: ENVIADA CORRECTAMENTE (DISEÑO OFICIAL SUPERADMIN SENA ERP)
      ======================================================== -->
 <div class="modal-backdrop" id="encuestaEnviadaModal" onclick="if(event.target===this)closeEncuestaEnviadaModal()">
   <div class="success-modal-card">
-    <div class="chulo-circle-badge">
-      <i class="fa-solid fa-check"></i>
+    <!-- Botón cerrar (X) en esquina superior derecha -->
+    <button type="button" 
+            onclick="closeEncuestaEnviadaModal()" 
+            style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+            onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+            onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+            title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- CHULITO ANIMADO SENA (IDÉNTICO AL DASHBOARD DE SUPERADMIN) -->
+    <div class="sena-chulito-container">
+      <div class="sena-chulito-glow"></div>
+      <div class="sena-chulito-badge">
+        <svg class="sena-chulito-svg" viewBox="0 0 36 36">
+          <path class="sena-chulito-path" d="M8 18.5L14.5 25L28 11.5"/>
+        </svg>
+      </div>
     </div>
-    <h3>¡Enviada correctamente!</h3>
-    <p>
+
+    <!-- Encabezado / Tag Oficial -->
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #EAF7EE; border: 1px solid #BBF7D0; color: #166534; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+      <i class="fa-solid fa-clipboard-check" style="font-size: 11px; color: #39A900;"></i>
+      <span>MÓDULO DE ENCUESTAS · SIGE ERP</span>
+    </div>
+
+    <!-- Título Principal -->
+    <h3 style="font-family: 'Poppins', 'Nunito', sans-serif; font-size: 22px; font-weight: 800; color: #00131E; margin: 0 0 8px 0; letter-spacing: -0.3px; line-height: 1.25;">
+      ¡Enviada correctamente!
+    </h3>
+
+    <!-- Mensaje Detallado -->
+    <p style="font-size: 14px; font-weight: 500; color: #5A6E7D; line-height: 1.5; margin: 0 0 16px 0;">
       Tu encuesta ha sido registrada satisfactoriamente en el sistema. Tus respuestas han sido recibidas y procesadas de forma confidencial.
     </p>
-    <button type="button" class="btn-modal-accept" onclick="closeEncuestaEnviadaModal()">
-      Aceptar
-    </button>
+
+    <!-- Badge de Confirmación y Verificación Institucional -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 16px; color: #166534; font-size: 12.5px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
+      <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 14px;"></i>
+      <span>Instrumento guardado y verificado en la base de datos institucional</span>
+    </div>
+
+    <!-- Botón de Acción Principal SENA ERP -->
+    <div style="margin-top: 6px;">
+      <button type="button" 
+              class="btn-modal-accept"
+              onclick="closeEncuestaEnviadaModal()">
+        <i class="fa-solid fa-check" style="font-size: 14px;"></i>
+        <span>Aceptar y Continuar</span>
+      </button>
+    </div>
+
+    <!-- Barra temporizada de autocierre con degradado SENA -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; overflow: hidden;">
+      <div class="sena-alert-progress"></div>
+    </div>
   </div>
 </div>
 
@@ -2852,20 +2734,64 @@
 </div>
 
 <!-- ========================================================
-     MODAL DE CONFIRMACIÓN: INSCRIPCIÓN EXITOSA A EVENTO
+     MODAL DE CONFIRMACIÓN: INSCRIPCIÓN EXITOSA A EVENTO (DISEÑO OFICIAL SUPERADMIN SENA ERP)
      ======================================================== -->
 <div class="modal-backdrop" id="modalInscripcionExitosa" onclick="if(event.target===this)closeInscripcionExitosaModal()">
-  <div class="success-modal-card" style="border-top: 4px solid var(--sena-green);">
-    <div class="chulo-circle-badge">
-      <i class="fa-solid fa-check"></i>
+  <div class="success-modal-card">
+    <!-- Botón cerrar (X) en esquina superior derecha -->
+    <button type="button" 
+            onclick="closeInscripcionExitosaModal()" 
+            style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+            onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+            onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+            title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- CHULITO ANIMADO SENA (IDÉNTICO AL DASHBOARD DE SUPERADMIN) -->
+    <div class="sena-chulito-container">
+      <div class="sena-chulito-glow"></div>
+      <div class="sena-chulito-badge">
+        <svg class="sena-chulito-svg" viewBox="0 0 36 36">
+          <path class="sena-chulito-path" d="M8 18.5L14.5 25L28 11.5"/>
+        </svg>
+      </div>
     </div>
-    <h3 style="font-family:'Poppins', 'Nunito', sans-serif; font-size:24px; font-weight:700; color:var(--sena-dark); margin-bottom:10px;">¡Inscripción Confirmada con Éxito!</h3>
-    <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin-bottom:26px;">
+
+    <!-- Encabezado / Tag Oficial -->
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #EAF7EE; border: 1px solid #BBF7D0; color: #166534; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+      <i class="fa-solid fa-calendar-check" style="font-size: 11px; color: #39A900;"></i>
+      <span>GESTIÓN DE EVENTOS · SIGE ERP</span>
+    </div>
+
+    <!-- Título Principal -->
+    <h3 style="font-family:'Poppins', 'Nunito', sans-serif; font-size:22px; font-weight:800; color:#00131E; margin:0 0 8px 0; letter-spacing:-0.3px; line-height:1.25;">
+      ¡Inscripción Confirmada con Éxito!
+    </h3>
+
+    <!-- Mensaje Detallado -->
+    <p style="font-size:14px; font-weight:500; color:#5A6E7D; line-height:1.5; margin:0 0 16px 0;">
       Te has inscrito exitosamente a <strong id="modal-success-event-title" style="color:var(--sena-dark);">este evento</strong> en el CEFA La Angostura. Recibirás los recordatorios y detalles de acceso en tu correo electrónico.
     </p>
-    <button type="button" class="btn-modal-accept" onclick="closeInscripcionExitosaModal()">
-      Aceptar
-    </button>
+
+    <!-- Badge de Confirmación y Verificación Institucional -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 16px; color: #166534; font-size: 12.5px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
+      <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 14px;"></i>
+      <span>Cupo reservado y verificado en la base de datos institucional</span>
+    </div>
+
+    <!-- Botón de Acción Principal SENA ERP -->
+    <div style="margin-top: 6px;">
+      <button type="button" class="btn-modal-accept" onclick="closeInscripcionExitosaModal()">
+        <i class="fa-solid fa-check" style="font-size: 14px;"></i>
+        <span>Aceptar y Continuar</span>
+      </button>
+    </div>
+
+    <!-- Barra temporizada de autocierre con degradado SENA -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; overflow: hidden;">
+      <div class="sena-alert-progress"></div>
+    </div>
   </div>
 </div>
 
@@ -2923,169 +2849,63 @@
 </div>
 
 <!-- ========================================================
-     MODAL DE CONFIRMACIÓN: POSTULACIÓN EXITOSA CON BOTÓN ACEPTAR
+     MODAL DE CONFIRMACIÓN: POSTULACIÓN EXITOSA (DISEÑO OFICIAL SUPERADMIN SENA ERP)
      ======================================================== -->
 <div class="modal-backdrop" id="modalPostulacionExitosa" onclick="if(event.target===this)cerrarModalPostulacionExitosa()">
-  <div class="success-modal-card" style="border-top: 4px solid var(--sena-green);">
-    <div class="chulo-circle-badge">
-      <i class="fa-solid fa-check"></i>
+  <div class="success-modal-card">
+    <!-- Botón cerrar (X) en esquina superior derecha -->
+    <button type="button" 
+            onclick="cerrarModalPostulacionExitosa()" 
+            style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+            onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+            onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+            title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- CHULITO ANIMADO SENA (IDÉNTICO AL DASHBOARD DE SUPERADMIN) -->
+    <div class="sena-chulito-container">
+      <div class="sena-chulito-glow"></div>
+      <div class="sena-chulito-badge">
+        <svg class="sena-chulito-svg" viewBox="0 0 36 36">
+          <path class="sena-chulito-path" d="M8 18.5L14.5 25L28 11.5"/>
+        </svg>
+      </div>
     </div>
-    <h3>¡Postulación Enviada con Éxito!</h3>
-    <p>
+
+    <!-- Encabezado / Tag Oficial -->
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #EAF7EE; border: 1px solid #BBF7D0; color: #166534; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+      <i class="fa-solid fa-briefcase" style="font-size: 11px; color: #39A900;"></i>
+      <span>BOLSA DE EMPLEO APE · SIGE ERP</span>
+    </div>
+
+    <!-- Título Principal -->
+    <h3 style="font-family:'Poppins', 'Nunito', sans-serif; font-size:22px; font-weight:800; color:#00131E; margin:0 0 8px 0; letter-spacing:-0.3px; line-height:1.25;">
+      ¡Postulación Enviada con Éxito!
+    </h3>
+
+    <!-- Mensaje Detallado -->
+    <p style="font-size:14px; font-weight:500; color:#5A6E7D; line-height:1.5; margin:0 0 16px 0;">
       Tu perfil de egresado(a) y hoja de vida han sido remitidos formalmente para la vacante de <strong id="modal-success-cargo" style="color:var(--sena-dark);">este cargo</strong>. La empresa revisará tus competencias y te contactará a través de tus datos registrados.
     </p>
-    <button type="button" class="btn-modal-accept" onclick="cerrarModalPostulacionExitosa()">
-      Aceptar
-    </button>
-  </div>
-</div>
 
-<!-- ========================================================
-     MODAL: ACTUALIZAR DATOS DE CONTACTO DEL EGRESADO
-     ======================================================== -->
-<div class="modal-backdrop" id="modalActualizarDatos" onclick="if(event.target===this)closeActualizarDatosModal()">
-  <div class="modal-box-card" style="max-width: 520px; border-radius: var(--radius-xl); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%); padding: 20px 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--sena-green);">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fa-solid fa-user-pen" style="color: var(--sena-neon); font-size: 18px;"></i>
-        <div>
-          <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">Actualizar Datos de Contacto</h3>
-          <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Expediente de Egresado CEFA</span>
-        </div>
-      </div>
-      <button type="button" class="modal-close-x" onclick="closeActualizarDatosModal()" style="color:#fff;">&times;</button>
+    <!-- Badge de Confirmación y Verificación Institucional -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 16px; color: #166534; font-size: 12.5px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
+      <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 14px;"></i>
+      <span>Postulación remitida y registrada en la plataforma institucional</span>
     </div>
 
-    <form id="formActualizarContacto" onsubmit="guardarDatosContacto(event)" style="padding: 22px 24px;">
-      <div style="margin-bottom: 14px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
-          Teléfono / WhatsApp Móvil *
-        </label>
-        <input type="text" id="input-edit-telefono" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="<?php echo e($person->telephone1 ?? '3124567890'); ?>" required>
-      </div>
-
-      <div style="margin-bottom: 14px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
-          Correo Electrónico Personal *
-        </label>
-        <input type="email" id="input-edit-email" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="<?php echo e(Auth::user()->email ?? 'egresado.sige@sena.edu.co'); ?>" required>
-      </div>
-
-      <div style="margin-bottom: 14px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
-          Municipio de Residencia Actual
-        </label>
-        <input type="text" id="input-edit-municipio" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;" value="Campoalegre / Neiva (Huila)">
-      </div>
-
-      <div style="margin-bottom: 18px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--sena-dark); display: block; margin-bottom: 4px;">
-          Situación Laboral Actual *
-        </label>
-        <select id="select-edit-laboral" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;">
-          <option value="Empleado en el área de formación" selected>Empleado(a) en el área de formación</option>
-          <option value="Empleado en otra área">Empleado(a) en otra área</option>
-          <option value="Emprendedor con negocio activo">Emprendedor(a) con negocio activo</option>
-          <option value="Búsqueda activa de empleo">En búsqueda activa de empleo</option>
-          <option value="Continuando estudios de pregrado">Continuando formación profesional</option>
-        </select>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 10px; border-top: 1px solid var(--line);">
-        <button type="button" class="btn-card-outline" onclick="closeActualizarDatosModal()" style="padding: 9px 18px; font-size: 13px; border-radius: 10px;">
-          Cancelar
-        </button>
-        <button type="submit" class="btn-green-submit" style="padding: 9px 20px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; border: none; cursor: pointer;">
-          <i class="fa-solid fa-floppy-disk me-1"></i> Guardar Cambios
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ========================================================
-     MODAL: CERTIFICADOS Y ACTAS DIGITALES SENA
-     ======================================================== -->
-<div class="modal-backdrop" id="modalCertificados" onclick="if(event.target===this)closeCertificadosModal()">
-  <div class="modal-box-card" style="max-width: 500px; border-radius: var(--radius-xl); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, var(--sena-dark) 0%, var(--sena-navy) 100%); padding: 20px 24px; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--sena-green);">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fa-solid fa-award" style="color: var(--sena-neon); font-size: 20px;"></i>
-        <div>
-          <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">Descarga de Certificados Oficiales</h3>
-          <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Plataforma SOFIA Plus / SENA</span>
-        </div>
-      </div>
-      <button type="button" class="modal-close-x" onclick="closeCertificadosModal()" style="color:#fff;">&times;</button>
+    <!-- Botón de Acción Principal SENA ERP -->
+    <div style="margin-top: 6px;">
+      <button type="button" class="btn-modal-accept" onclick="cerrarModalPostulacionExitosa()">
+        <i class="fa-solid fa-check" style="font-size: 14px;"></i>
+        <span>Aceptar y Continuar</span>
+      </button>
     </div>
 
-    <div style="padding: 24px;">
-      <div style="background: #EAF7EE; border: 1px solid #BBF7D0; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px;">
-        <i class="fa-solid fa-shield-halved" style="color: var(--sena-green); font-size: 22px;"></i>
-        <div style="font-size: 12.5px; color: #166534; font-weight: 600;">
-          Tus certificados y actas de grado cuentan con firma digital y código QR de autenticidad institucional.
-        </div>
-      </div>
-
-      <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 16px;">
-        Para consultar y descargar tus constancias oficiales de egresado del CEFA:
-      </p>
-
-      <ol style="font-size: 12.5px; color: #334155; padding-left: 20px; margin-bottom: 22px; line-height: 1.6;">
-        <li>Ingresa al portal oficial de certificados del SENA.</li>
-        <li>Selecciona tu tipo de documento y digita tu número de identificación.</li>
-        <li>Haz clic en <strong>"Consultar Certificados"</strong> y descarga tu PDF oficial.</li>
-      </ol>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" class="btn-card-outline" onclick="closeCertificadosModal()" style="padding: 9px 18px; font-size: 13px; border-radius: 10px;">
-          Entendido
-        </button>
-        <a href="https://certificados.sena.edu.co" target="_blank" class="btn-green-submit" style="padding: 9px 20px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          <span>Ir a Certificados SENA</span>
-          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================================
-     MODAL: LECTURA COMPLETA DE NOTICIA EN EL HOME
-     ======================================================== -->
-<div class="modal-backdrop" id="modalNoticiaHome" onclick="if(event.target===this)cerrarModalNoticiaHome()">
-  <div class="modal-box-card" style="max-width: 620px; border-radius: var(--radius-xl); overflow: hidden;">
-    <div id="mnh-image-container" style="display: none; height: 180px; overflow: hidden; position: relative;">
-      <img id="mnh-image" src="" style="width: 100%; height: 100%; object-fit: cover;" alt="Noticia">
-      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0, 19, 30, 0.8) 100%);"></div>
-    </div>
-    
-    <div style="padding: 24px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <span id="mnh-category" style="background: #EAF7EE; color: #166534; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">
-          Convocatorias
-        </span>
-        <button type="button" class="modal-close-x" onclick="cerrarModalNoticiaHome()" style="font-size: 24px; border: none; background: none; cursor: pointer;">&times;</button>
-      </div>
-
-      <h3 id="mnh-title" style="font-size: 18px; font-weight: 800; color: var(--sena-dark); margin: 0 0 8px; line-height: 1.3;">
-        Título de la Noticia
-      </h3>
-
-      <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; color: #64748B; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
-        <span><i class="fa-regular fa-clock me-1 text-[#39A900]"></i> <span id="mnh-date">Reciente</span></span>
-        <span><i class="fa-regular fa-user me-1 text-[#39A900]"></i> <span id="mnh-author">Coordinación CEFA</span></span>
-      </div>
-
-      <div id="mnh-content" style="font-size: 13.5px; color: #334155; line-height: 1.6; max-height: 320px; overflow-y: auto; margin-bottom: 20px;">
-        Detalle del comunicado...
-      </div>
-
-      <div style="display: flex; justify-content: flex-end;">
-        <button type="button" class="btn-green-submit" onclick="cerrarModalNoticiaHome()" style="padding: 9px 22px; font-size: 13px; font-weight: 700; border-radius: 10px; background: var(--sena-green); color: #fff; border: none; cursor: pointer;">
-          Cerrar Noticia
-        </button>
-      </div>
+    <!-- Barra temporizada de autocierre con degradado SENA -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; overflow: hidden;">
+      <div class="sena-alert-progress"></div>
     </div>
   </div>
 </div>
@@ -3167,7 +2987,7 @@
       const data = localStorage.getItem(SURVEY_STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data);
-        return new Set(Array.isArray(parsed) ? parsed.map(Number) : []);
+        return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
       }
     } catch (e) {
       console.warn('Error leyendo localStorage', e);
@@ -3183,12 +3003,12 @@
     }
   }
 
-  let activeSurveyId = 1;
+  let activeSurveyId = '';
   const answeredSurveys = getStoredSurveys();
 
   function openSurveyModal(title, id) {
     if (id !== undefined) {
-      activeSurveyId = Number(id);
+      activeSurveyId = String(id);
     }
     if (answeredSurveys.has(activeSurveyId)) {
       showToast('Esta encuesta ya fue respondida y registrada con éxito.');
@@ -3238,37 +3058,37 @@
 
   function markSurveyAsCompleted(id, saveToStorage = true) {
     if (!id) return;
-    const numId = Number(id);
-    answeredSurveys.add(numId);
+    const strId = String(id);
+    answeredSurveys.add(strId);
 
     if (saveToStorage) {
       saveStoredSurveys(answeredSurveys);
     }
 
     // Actualizar la tarjeta visualmente a "Enviada"
-    const card = document.getElementById('survey-card-' + numId);
+    const card = document.getElementById('survey-card-' + strId);
     if (card) {
       card.setAttribute('data-type', 'completadas');
 
       // Cambiar ícono a check verde
-      const icon = document.getElementById('survey-icon-' + numId);
+      const icon = document.getElementById('survey-icon-' + strId);
       if (icon) {
         icon.className = 'card-icon-pill green';
         icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
       }
 
       // Cambiar etiqueta superior
-      const badge = document.getElementById('survey-badge-' + numId);
+      const badge = document.getElementById('survey-badge-' + strId);
       if (badge) {
         badge.className = 'card-tag-badge completed';
         badge.innerHTML = '<i class="fa-solid fa-check"></i> Completada · Registrada';
       }
 
       // Cambiar botón a "Enviada"
-      const btnWrap = document.getElementById('survey-btn-wrap-' + numId);
+      const btnWrap = document.getElementById('survey-btn-wrap-' + strId);
       if (btnWrap) {
         btnWrap.innerHTML = `
-          <button type="button" class="btn-card-outline" style="border-color:#16a34a; color:#16a34a; background:#f0fdf4; cursor:default;" title="Doble clic para reiniciar prueba" ondblclick="resetSurveyForTesting(${numId})" onclick="showToast('Ya has respondido esta encuesta con éxito')">
+          <button type="button" class="btn-card-outline" style="border-color:#16a34a; color:#16a34a; background:#f0fdf4; cursor:default;" title="Doble clic para reiniciar prueba" ondblclick="resetSurveyForTesting('${strId}')" onclick="showToast('Ya has respondido esta encuesta con éxito')">
             <i class="fa-solid fa-check"></i>
             <span>Enviada</span>
           </button>
@@ -3276,7 +3096,7 @@
       }
 
       // Actualizar detalles y fecha
-      const meta = document.getElementById('survey-meta-' + numId);
+      const meta = document.getElementById('survey-meta-' + strId);
       if (meta) {
         const today = new Date().toISOString().slice(0, 10);
         meta.innerHTML = `
@@ -3286,7 +3106,7 @@
       }
 
       // Barra de progreso a 100%
-      const prog = document.getElementById('survey-progress-' + numId);
+      const prog = document.getElementById('survey-progress-' + strId);
       if (prog) {
         prog.innerHTML = `
           <div class="progress-bar-track"><div class="progress-bar-fill" style="width: 100%;"></div></div>
@@ -3295,7 +3115,7 @@
       }
 
       // Botón de detalles
-      const detailBtn = document.getElementById('survey-detail-btn-' + numId);
+      const detailBtn = document.getElementById('survey-detail-btn-' + strId);
       if (detailBtn) {
         detailBtn.innerHTML = `<span>Ver respuestas</span> <i class="fa-solid fa-arrow-right" style="font-size:11px; margin-left:4px;"></i>`;
         detailBtn.onclick = function() { showToast('Visualizando histórico de respuestas...'); };
@@ -3307,18 +3127,28 @@
   }
 
   function updateSurveyCounters() {
-    const total = 7;
-    const answeredCount = answeredSurveys.size;
-    const pendientes = Math.max(0, 2 - answeredCount);
-    const completadas = 5 + answeredCount;
-    const tasa = Math.round((completadas / total) * 100);
+    const allCards = document.querySelectorAll('#survey-list-container .survey-card-item');
+    const total = allCards.length;
+    let completadas = 0;
+    let pendientes = 0;
+
+    allCards.forEach(card => {
+      const type = card.getAttribute('data-type');
+      if (type === 'completadas') {
+        completadas++;
+      } else {
+        pendientes++;
+      }
+    });
+
+    const tasa = total > 0 ? Math.round((completadas / total) * 100) : 100;
 
     // Cuadrito Inicio: Encuestas Pendientes
     const elInicioPend = document.getElementById('kpi-inicio-encuestas-pendientes');
     if (elInicioPend) elInicioPend.textContent = pendientes;
     const elInicioSub = document.getElementById('kpi-inicio-subtext-encuestas');
     if (elInicioSub) {
-      elInicioSub.textContent = pendientes === 0 ? '¡Al día! Sin encuestas pendientes' : 'Por responder actualmente';
+      elInicioSub.textContent = pendientes === 0 ? '¡Al día! Sin encuestas pendientes' : (pendientes === 1 ? '1 encuesta pendiente' : pendientes + ' encuestas pendientes');
     }
 
     // Badge lateral del menú
@@ -3347,17 +3177,119 @@
 
     // Pestañas / Filtros superiores
     const elFilterTodas = document.getElementById('count-filter-todas');
-    if (elFilterTodas) elFilterTodas.textContent = pendientes;
+    if (elFilterTodas) elFilterTodas.textContent = total;
 
     const elFilterPend = document.getElementById('count-filter-pendientes');
     if (elFilterPend) elFilterPend.textContent = pendientes;
 
     const elFilterComp = document.getElementById('count-filter-completadas');
     if (elFilterComp) elFilterComp.textContent = completadas;
+
+    // Actualizar notificaciones del topbar al pie del nombre
+    renderEgresadoTopbarNotifications();
+  }
+
+  function renderEgresadoTopbarNotifications() {
+    const listEl = document.getElementById('notifItemsList');
+    const badgeCount = document.getElementById('notifCountBadge');
+    const badgeDot = document.getElementById('notifBadgeDot');
+    if (!listEl) return;
+
+    // 1. Obtener encuestas pendientes
+    const pendingSurveyCards = document.querySelectorAll('#survey-list-container .survey-card-item[data-type="pendientes"]');
+    
+    // 2. Obtener banner institucional si está visible y pendiente
+    const banner = document.getElementById('banner-invitacion-evento');
+    const hasPendingBanner = banner && banner.style.display !== 'none' && !banner.hidden;
+
+    const notifItems = [];
+
+    // Agregar encuestas pendientes a las notificaciones de la campana
+    pendingSurveyCards.forEach(card => {
+      const id = card.getAttribute('data-id') || '';
+      const titleEl = card.querySelector('.card-title-text');
+      const title = titleEl ? titleEl.textContent.trim() : 'Encuesta Institucional';
+      const metaDateEl = card.querySelector('.card-meta-list span');
+      const dateText = metaDateEl ? metaDateEl.textContent.trim() : 'Pendiente';
+
+      notifItems.push({
+        type: 'encuesta',
+        id: id,
+        title: title,
+        meta: dateText,
+        icon: 'fa-clipboard-list',
+        color: '#b45309',
+        bg: '#FEF3C7',
+        action: `showSection('encuestas'); openSurveyModal('${title.replace(/'/g, "\\'")}', '${id}');`
+      });
+    });
+
+    // Agregar invitación a evento si está pendiente
+    if (hasPendingBanner) {
+      const invTitle = banner.getAttribute('data-event-title') || 'Invitación Institucional';
+      const invId = banner.getAttribute('data-event-id') || '';
+      notifItems.push({
+        type: 'evento',
+        id: invId,
+        title: '¡Nueva Invitación Oficial: ' + invTitle + '!',
+        meta: 'Requiere confirmar inscripción',
+        icon: 'fa-paper-plane',
+        color: '#0d6928',
+        bg: '#DCFCE7',
+        action: `showSection('inicio');`
+      });
+    }
+
+    // Renderizar en el menú desplegable al pie del nombre
+    if (notifItems.length > 0) {
+      let html = '';
+      notifItems.forEach(item => {
+        html += `
+          <div class="notif-item unread" style="cursor:pointer;" onclick="${item.action}">
+            <div class="notif-icon" style="background:${item.bg};">
+              <i class="fa-solid ${item.icon}" style="color:${item.color};"></i>
+            </div>
+            <div class="notif-content">
+              <div class="notif-text">
+                <strong>${item.type === 'encuesta' ? 'Encuesta Pendiente:' : 'Evento:'}</strong> ${item.title}
+              </div>
+              <div class="notif-meta">
+                <span class="notif-time" style="color:${item.color}; font-weight:700;"><i class="fa-regular fa-clock"></i> ${item.meta}</span>
+                <span class="unread-dot"></span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+
+      if (badgeDot) badgeDot.style.display = 'flex';
+      if (badgeCount) {
+        badgeCount.textContent = `${notifItems.length} pendientes`;
+        badgeCount.style.background = '#FEF2F2';
+        badgeCount.style.color = '#DC2626';
+      }
+    } else {
+      listEl.innerHTML = `
+        <div style="padding:28px 18px; text-align:center; color:#64748b;">
+          <div style="width:42px; height:42px; border-radius:50%; background:#DCFCE7; color:#16a34a; display:inline-flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:8px;">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <p style="font-size:13.5px; font-weight:700; color:#0f172a; margin:0 0 4px;">¡Estás al día!</p>
+          <p style="font-size:12px; margin:0; line-height:1.4;">No tienes encuestas ni actividades pendientes por completar.</p>
+        </div>
+      `;
+      if (badgeDot) badgeDot.style.display = 'none';
+      if (badgeCount) {
+        badgeCount.textContent = 'Al día';
+        badgeCount.style.background = '#DCFCE7';
+        badgeCount.style.color = '#166534';
+      }
+    }
   }
 
   function resetSurveyForTesting(id) {
-    answeredSurveys.delete(Number(id));
+    answeredSurveys.delete(String(id));
     saveStoredSurveys(answeredSurveys);
     showToast('Encuesta reiniciada para realizar pruebas.');
     setTimeout(() => location.reload(), 400);
@@ -3400,6 +3332,77 @@
   let activeEventTitle = '';
   let activeEventId = '';
 
+  const STORAGE_DISMISSED_INV_KEY = 'SIGE_INVITACIONES_DESCARTADAS';
+
+  function getDismissedInvitations() {
+    try {
+      const data = localStorage.getItem(STORAGE_DISMISSED_INV_KEY);
+      return data ? new Set(JSON.parse(data)) : new Set();
+    } catch(e) {
+      return new Set();
+    }
+  }
+
+  function saveDismissedInvitations(set) {
+    try {
+      localStorage.setItem(STORAGE_DISMISSED_INV_KEY, JSON.stringify(Array.from(set)));
+    } catch(e) {}
+  }
+
+  function checkHideBannerInvitacion() {
+    const banner = document.getElementById('banner-invitacion-evento');
+    if (!banner) return;
+
+    const eventId = banner.getAttribute('data-event-id');
+    const eventTitle = (banner.getAttribute('data-event-title') || '').trim().toLowerCase();
+    const dismissed = getDismissedInvitations();
+
+    let shouldHide = false;
+
+    if (eventId && dismissed.has(eventId)) shouldHide = true;
+    if (eventTitle && dismissed.has(eventTitle)) shouldHide = true;
+
+    if (inscribedEvents && inscribedEvents.size > 0) {
+      if (eventId && inscribedEvents.has(eventId)) shouldHide = true;
+      if (eventTitle && inscribedEvents.has('title:' + eventTitle)) shouldHide = true;
+
+      inscribedEvents.forEach(item => {
+        if (typeof item === 'string') {
+          const itemLower = item.toLowerCase();
+          if (eventId && itemLower.includes(eventId.toLowerCase())) shouldHide = true;
+          if (eventTitle && (itemLower.includes(eventTitle) || eventTitle.includes(itemLower.replace('title:', '')))) {
+            shouldHide = true;
+          }
+        }
+      });
+    }
+
+    if (shouldHide) {
+      banner.style.display = 'none';
+    }
+    if (typeof renderEgresadoTopbarNotifications === 'function') {
+      renderEgresadoTopbarNotifications();
+    }
+  }
+
+  function descartarBannerInvitacion(eventId, eventTitle) {
+    const banner = document.getElementById('banner-invitacion-evento');
+    if (banner) {
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        banner.style.display = 'none';
+        if (typeof renderEgresadoTopbarNotifications === 'function') {
+          renderEgresadoTopbarNotifications();
+        }
+      }, 250);
+    }
+    const dismissed = getDismissedInvitations();
+    if (eventId) dismissed.add(eventId);
+    if (eventTitle) dismissed.add(eventTitle.trim().toLowerCase());
+    saveDismissedInvitations(dismissed);
+  }
+
   function updateEventCounters() {
     const totalEvents = document.querySelectorAll('#section-noticias .event-card-item').length || 2;
 
@@ -3440,8 +3443,14 @@
 
     if (activeEventId) {
       inscribedEvents.add(activeEventId);
-      saveStoredEventSet(inscribedEvents);
     }
+    if (activeEventTitle) {
+      inscribedEvents.add('title:' + activeEventTitle.trim().toLowerCase());
+    }
+    saveStoredEventSet(inscribedEvents);
+
+    // Ocultar banner si ya se inscribió en este evento
+    checkHideBannerInvitacion();
 
     // Actualizar visualmente el botón sobre el que se hizo clic
     if (activeEventBtn) {
@@ -3752,13 +3761,13 @@
     showToast('Filtros restablecidos');
   }
 
-  // Filtros de Encuestas (En 'Todas' se eliminan las enviadas, que solo aparecen en 'Respondidas')
-  let currentSurveyFilter = 'todas';
+  // Filtros de Encuestas (Pendientes por defecto, Todas para ver histórico completo, Respondidas para ver enviadas)
+  let currentSurveyFilter = 'pendientes';
 
   function filterSurveys(filter, btn) {
     if (filter) currentSurveyFilter = filter;
 
-    document.querySelectorAll('.filter-pill-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-tabs-group .filter-pill-btn').forEach(b => b.classList.remove('active'));
     const targetBtn = btn || document.getElementById('tab-filter-' + currentSurveyFilter);
     if (targetBtn) targetBtn.classList.add('active');
 
@@ -3770,13 +3779,10 @@
       let shouldShow = false;
 
       if (currentSurveyFilter === 'todas') {
-        // En 'Todas', se eliminan/ocultan las que ya han sido enviadas; solo aparecen las pendientes
-        shouldShow = (type !== 'completadas');
+        shouldShow = true;
       } else if (currentSurveyFilter === 'pendientes') {
-        // En 'Pendientes', solo las no respondidas
         shouldShow = (type === 'pendientes');
       } else if (currentSurveyFilter === 'completadas') {
-        // En 'Respondidas', solo las enviadas / completadas
         shouldShow = (type === 'completadas');
       }
 
@@ -3798,9 +3804,12 @@
         if (currentSurveyFilter === 'completadas') {
           if (titleEl) titleEl.textContent = 'Aún no tienes encuestas respondidas';
           if (descEl) descEl.textContent = 'Cuando diligencies y envíes una encuesta, la encontrarás registrada en este apartado.';
-        } else {
+        } else if (currentSurveyFilter === 'pendientes') {
           if (titleEl) titleEl.textContent = '¡Estás al día con tus encuestas!';
-          if (descEl) descEl.textContent = 'No tienes instrumentos pendientes por diligenciar. Puedes revisar tus respuestas guardadas en la pestaña Respondidas.';
+          if (descEl) descEl.textContent = 'No tienes instrumentos pendientes por diligenciar. Puedes revisar tus respuestas guardadas en la pestaña Respondidas o Todas.';
+        } else {
+          if (titleEl) titleEl.textContent = 'No hay encuestas disponibles';
+          if (descEl) descEl.textContent = 'Actualmente no se encuentran encuestas registradas en el sistema.';
         }
       } else {
         emptyState.style.display = 'none';
@@ -3818,7 +3827,7 @@
       let isCategoryAllowed = false;
 
       if (currentSurveyFilter === 'todas') {
-        isCategoryAllowed = (type !== 'completadas');
+        isCategoryAllowed = true;
       } else if (currentSurveyFilter === 'pendientes') {
         isCategoryAllowed = (type === 'pendientes');
       } else if (currentSurveyFilter === 'completadas') {
@@ -3855,7 +3864,7 @@
       let isCategoryAllowed = false;
 
       if (currentSurveyFilter === 'todas') {
-        isCategoryAllowed = (type !== 'completadas');
+        isCategoryAllowed = true;
       } else if (currentSurveyFilter === 'pendientes') {
         isCategoryAllowed = (type === 'pendientes');
       } else if (currentSurveyFilter === 'completadas') {
@@ -3987,6 +3996,9 @@
     // Actualizar cuadritos de eventos vinculados
     updateEventCounters();
 
+    // Ocultar banner de invitación institucional si ya está inscrito o fue descartado
+    checkHideBannerInvitacion();
+
     // Restaurar notificaciones importantes y leídas
     if (notifImportantes && notifImportantes.size > 0) {
       notifImportantes.forEach(id => {
@@ -4011,81 +4023,16 @@
       });
     }
 
-  // Funciones para el Modal de Actualizar Datos de Contacto
-  function openActualizarDatosModal() {
-    const modal = document.getElementById('modalActualizarDatos');
-    if (modal) modal.classList.add('active');
-  }
-
-  function closeActualizarDatosModal() {
-    const modal = document.getElementById('modalActualizarDatos');
-    if (modal) modal.classList.remove('active');
-  }
-
-  function guardarDatosContacto(e) {
-    e.preventDefault();
-    const email = document.getElementById('input-edit-email')?.value || '';
-    const laboral = document.getElementById('select-edit-laboral')?.value || 'Empleado en el área de formación';
-    
-    const dispEmail = document.getElementById('disp-correo-personal');
-    if (dispEmail && email) dispEmail.textContent = email;
-
-    const dispLaboral = document.getElementById('disp-estado-laboral');
-    if (dispLaboral) {
-      dispLaboral.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + laboral;
-    }
-
-    const dispPorcentaje = document.getElementById('disp-porcentaje-perfil');
-    if (dispPorcentaje) dispPorcentaje.textContent = '100%';
-    const barFill = document.getElementById('bar-fill-perfil');
-    if (barFill) barFill.style.width = '100%';
-
-    closeActualizarDatosModal();
-    showToast('¡Datos de contacto y expediente actualizados al 100%!');
-  }
-
-  // Funciones para Modal de Certificados
-  function openCertificadosModal() {
-    const modal = document.getElementById('modalCertificados');
-    if (modal) modal.classList.add('active');
-  }
-
-  function closeCertificadosModal() {
-    const modal = document.getElementById('modalCertificados');
-    if (modal) modal.classList.remove('active');
-  }
-
-  // Funciones para Modal de Lectura de Noticia en Home
-  function abrirModalNoticiaHome(title, cat, date, author, content, imgUrl) {
-    document.getElementById('mnh-title').textContent = title;
-    document.getElementById('mnh-category').textContent = cat || 'Convocatorias';
-    document.getElementById('mnh-date').textContent = date || 'Reciente';
-    document.getElementById('mnh-author').textContent = author || 'Coordinación CEFA';
-    document.getElementById('mnh-content').innerHTML = content.replace(/\n/g, '<br>');
-
-    const imgContainer = document.getElementById('mnh-image-container');
-    const imgEl = document.getElementById('mnh-image');
-    if (imgUrl && imgUrl.trim() !== '') {
-      imgEl.src = imgUrl;
-      imgContainer.style.display = 'block';
-    } else {
-      imgContainer.style.display = 'none';
-    }
-
-    const modal = document.getElementById('modalNoticiaHome');
-    if (modal) modal.classList.add('active');
-  }
-
-  function cerrarModalNoticiaHome() {
-    const modal = document.getElementById('modalNoticiaHome');
-    if (modal) modal.classList.remove('active');
-  }
-
-  // Actualizar cuadritos de notificaciones vinculados
-  updateNotifCounters();
+    // Actualizar cuadritos de notificaciones vinculados
+    updateNotifCounters();
 
     // Aplicar filtrado para que en 'Todas' se eliminen las enviadas y solo aparezcan en 'Respondidas'
     filterSurveys(currentSurveyFilter);
+
+    // Sincronizar notificaciones en la campana al pie del nombre
+    if (typeof renderEgresadoTopbarNotifications === 'function') {
+      renderEgresadoTopbarNotifications();
+    }
 
     const hash = window.location.hash.replace('#', '');
     if (hash && sectionsList.includes(hash)) {

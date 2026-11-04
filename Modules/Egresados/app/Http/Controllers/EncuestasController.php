@@ -8,25 +8,26 @@ use Illuminate\Http\Request;
 class EncuestasController extends Controller
 {
     /**
-     * Muestra la vista principal de Gestión de Encuestas para el Superadmin.
+     * Ruta al archivo persistente de encuestas creadas por Admin o Superadmin.
      */
-    public function index(Request $request)
+    public static function getCustomEncuestasFile(): string
     {
-        // 5 Métricas Superiores
-        $totalCreadas = session('encuestas_creadas_count', 25);
-        $totalEnviadas = 320;
-        $totalPendientes = 78;
-        $totalRespondidas = 242;
-        $tasaRespuestaGeneral = '75%';
+        return storage_path('app/sige_custom_encuestas.json');
+    }
 
-        // Encuestas base por defecto
-        $defaultEncuestas = [
+    /**
+     * Listado base predeterminado de encuestas institucionales del sistema.
+     */
+    public static function getDefaultEncuestas(): array
+    {
+        return [
             [
                 'id' => 'ENC-025',
                 'title' => 'Inserción Laboral ADSO',
                 'full_title' => 'Encuesta Inserción Laboral 2026',
                 'description' => 'Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.',
                 'date' => '12/06/2026',
+                'fecha_cierre' => '12/06/2026',
                 'status' => 'ACTIVA',
                 'status_pill' => 'status-green',
                 'target' => 'Egresado ADSO',
@@ -36,7 +37,8 @@ class EncuestasController extends Controller
                 'pendientes' => 30,
                 'rate' => '75%',
                 'rate_num' => 75,
-                'url' => 'https://forms.office.com/r/sample1'
+                'url' => 'https://forms.office.com/r/sample1',
+                'category' => 'laboral',
             ],
             [
                 'id' => 'ENC-024',
@@ -44,6 +46,7 @@ class EncuestasController extends Controller
                 'full_title' => 'Seguimiento Impacto Productivo 2025',
                 'description' => 'Evaluación de competencias técnicas y salariales en el sector agroindustrial.',
                 'date' => '05/05/2026',
+                'fecha_cierre' => '05/05/2026',
                 'status' => 'ACTIVA',
                 'status_pill' => 'status-green',
                 'target' => 'Egresados Tecnólogos',
@@ -53,7 +56,8 @@ class EncuestasController extends Controller
                 'pendientes' => 12,
                 'rate' => '85%',
                 'rate_num' => 85,
-                'url' => 'https://forms.office.com/r/sample2'
+                'url' => 'https://forms.office.com/r/sample2',
+                'category' => 'laboral',
             ],
             [
                 'id' => 'ENC-023',
@@ -61,16 +65,18 @@ class EncuestasController extends Controller
                 'full_title' => 'Evaluación de Calidad Formativa CEFA',
                 'description' => 'Percepción de egresados sobre la pertinencia de las instalaciones y docentes del CEFA.',
                 'date' => '20/04/2026',
+                'fecha_cierre' => '20/04/2026',
                 'status' => 'ACTIVA',
                 'status_pill' => 'status-green',
                 'target' => 'Todas las Especialidades',
-                'creado_por' => 'Coordinación Académica',
+                'creado_por' => 'Coordinación Académica (Super Admin)',
                 'enviadas' => 150,
                 'respondidas' => 105,
                 'pendientes' => 45,
                 'rate' => '70%',
                 'rate_num' => 70,
-                'url' => 'https://forms.office.com/r/sample3'
+                'url' => 'https://forms.office.com/r/sample3',
+                'category' => 'institucional',
             ],
             [
                 'id' => 'ENC-022',
@@ -78,6 +84,7 @@ class EncuestasController extends Controller
                 'full_title' => 'Diagnóstico de Habilidades y Bilingüismo',
                 'description' => 'Nivel de dominio de inglés y habilidades de trabajo en equipo en el puesto de trabajo.',
                 'date' => '10/03/2026',
+                'fecha_cierre' => '10/03/2026',
                 'status' => 'CERRADA',
                 'status_pill' => 'status-gray',
                 'target' => 'Egresados ADSO / Multimedia',
@@ -87,7 +94,8 @@ class EncuestasController extends Controller
                 'pendientes' => 7,
                 'rate' => '92%',
                 'rate_num' => 92,
-                'url' => ''
+                'url' => '',
+                'category' => 'institucional',
             ],
             [
                 'id' => 'ENC-021',
@@ -95,42 +103,152 @@ class EncuestasController extends Controller
                 'full_title' => 'Sondeo de Proyectos Productivos',
                 'description' => 'Monitoreo de unidades productivas y emprendimientos rurales creados por egresados.',
                 'date' => '15/02/2026',
+                'fecha_cierre' => '15/02/2026',
                 'status' => 'CERRADA',
                 'status_pill' => 'status-gray',
                 'target' => 'Egresados Emprendedores',
-                'creado_por' => 'Coordinación de Emprendimiento',
+                'creado_por' => 'Coordinación de Emprendimiento (Super Admin)',
                 'enviadas' => 60,
                 'respondidas' => 42,
                 'pendientes' => 18,
                 'rate' => '70%',
                 'rate_num' => 70,
-                'url' => ''
+                'url' => '',
+                'category' => 'laboral',
             ],
         ];
+    }
 
-        // Manejo de estado cerrado en sesión
-        $cerradas = session('encuestas_cerradas', []);
-        foreach ($defaultEncuestas as &$enc) {
-            if (in_array($enc['id'], $cerradas)) {
+    /**
+     * Obtiene las encuestas creadas dinámicamente por Administradores o Superadministradores.
+     */
+    public static function getCustomEncuestas(): array
+    {
+        $file = self::getCustomEncuestasFile();
+        $fileList = [];
+        if (file_exists($file)) {
+            $content = @file_get_contents($file);
+            $fileList = json_decode($content, true) ?: [];
+        }
+
+        $cacheList = [];
+        try {
+            $cacheList = \Illuminate\Support\Facades\Cache::get('sige_custom_encuestas', []);
+        } catch (\Throwable $e) {}
+
+        $sessionCustom = [];
+        try {
+            $sessionCustom = session('custom_encuestas', []);
+        } catch (\Throwable $e) {}
+
+        $sessionNuevas = [];
+        try {
+            $sessionNuevas = session('nuevas_encuestas', []);
+        } catch (\Throwable $e) {}
+
+        $combined = [];
+        foreach (array_merge($fileList, (array)$cacheList, (array)$sessionCustom, (array)$sessionNuevas) as $enc) {
+            if (!empty($enc['id']) && !isset($combined[$enc['id']])) {
+                $combined[$enc['id']] = $enc;
+            }
+        }
+
+        return array_values($combined);
+    }
+
+    /**
+     * Guarda o actualiza una encuesta creada por Admin o Superadmin en almacenamiento compartido.
+     */
+    public static function saveCustomEncuesta(array $encuesta): void
+    {
+        $custom = self::getCustomEncuestas();
+        $found = false;
+        foreach ($custom as &$c) {
+            if ($c['id'] === $encuesta['id']) {
+                $c = $encuesta;
+                $found = true;
+                break;
+            }
+        }
+        unset($c);
+
+        if (!$found) {
+            array_unshift($custom, $encuesta);
+        }
+
+        $file = self::getCustomEncuestasFile();
+        @file_put_contents($file, json_encode($custom, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        
+        try {
+            \Illuminate\Support\Facades\Cache::forever('sige_custom_encuestas', $custom);
+        } catch (\Throwable $e) {}
+
+        try {
+            session(['custom_encuestas' => $custom]);
+            session(['nuevas_encuestas' => $custom]);
+            session(['encuestas_creadas_count' => count($custom) + 25]);
+        } catch (\Throwable $e) {}
+    }
+
+    /**
+     * Obtiene todas las encuestas combinadas (creadas + predeterminadas) con su estado actualizado.
+     */
+    public static function getAllEncuestas(): array
+    {
+        $custom = self::getCustomEncuestas();
+        $defaults = self::getDefaultEncuestas();
+
+        $cerradas = [];
+        try {
+            $cerradas = session('encuestas_cerradas', []);
+        } catch (\Throwable $e) {}
+
+        $cerradasCache = [];
+        try {
+            $cerradasCache = \Illuminate\Support\Facades\Cache::get('sige_encuestas_cerradas', []);
+        } catch (\Throwable $e) {}
+
+        $todasCerradas = array_unique(array_merge((array)$cerradas, (array)$cerradasCache));
+
+        $customIds = array_column($custom, 'id');
+        $filteredDefaults = array_filter($defaults, fn($d) => !in_array($d['id'], $customIds));
+
+        $all = array_values(array_merge($custom, $filteredDefaults));
+
+        foreach ($all as &$enc) {
+            if (in_array($enc['id'], $todasCerradas)) {
                 $enc['status'] = 'CERRADA';
                 $enc['status_pill'] = 'status-gray';
             }
         }
         unset($enc);
 
-        $customSession = session('custom_encuestas', []);
-        $nuevasSession = session('nuevas_encuestas', []);
-        $sessionEncuestas = array_merge($customSession, $nuevasSession);
+        return $all;
+    }
 
-        foreach ($sessionEncuestas as &$sEnc) {
-            if (in_array($sEnc['id'], $cerradas)) {
-                $sEnc['status'] = 'CERRADA';
-                $sEnc['status_pill'] = 'status-gray';
-            }
+    /**
+     * Muestra la vista principal de Gestión de Encuestas para el Superadmin.
+     */
+    public function index(Request $request)
+    {
+        $encuestas = self::getAllEncuestas();
+        $totalCreadas = count($encuestas);
+        $totalEnviadas = 0;
+        $totalPendientes = 0;
+        $totalRespondidas = 0;
+
+        foreach ($encuestas as $e) {
+            $totalEnviadas += (int)($e['enviadas'] ?? 0);
+            $totalPendientes += (int)($e['pendientes'] ?? 0);
+            $totalRespondidas += (int)($e['respondidas'] ?? 0);
         }
-        unset($sEnc);
+        if ($totalEnviadas === 0) {
+            $totalEnviadas = 320;
+            $totalPendientes = 78;
+            $totalRespondidas = 242;
+        }
 
-        $encuestas = array_merge($sessionEncuestas, $defaultEncuestas);
+        $tasaRespuestaGeneral = $totalEnviadas > 0 ? round(($totalRespondidas / $totalEnviadas) * 100) . '%' : '75%';
 
         return view('egresados::superadmin.encuestas.index', compact(
             'encuestas',
@@ -170,7 +288,8 @@ class EncuestasController extends Controller
         ];
 
         $targetLabel = $publicoLabels[$request->publico_objetivo] ?? $request->publico_objetivo;
-        $newId = 'ENC-' . str_pad(rand(26, 99), 3, '0', STR_PAD_LEFT);
+        $allCurrent = self::getAllEncuestas();
+        $newId = 'ENC-' . str_pad(count($allCurrent) + 26, 3, '0', STR_PAD_LEFT);
 
         // Decodificar la estructura dinámica de preguntas creada con Alpine.js
         $preguntas = [];
@@ -180,29 +299,35 @@ class EncuestasController extends Controller
 
         $totalPreguntas = count($preguntas);
 
+        $creadorNombre = 'Super Admin (Coordinación)';
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $u = \Illuminate\Support\Facades\Auth::user();
+            $creadorNombre = ($u->full_name ?? ($u->name ?? 'Super Admin')) . ' (Super Admin)';
+        }
+
         $nuevaEncuesta = [
             'id'          => $newId,
             'title'       => $request->titulo,
             'full_title'  => $request->titulo,
             'description' => $request->descripcion ?? 'Encuesta enviada a ' . $targetLabel . ($totalPreguntas > 0 ? " ({$totalPreguntas} preguntas nativas)" : ''),
             'date'        => date('d/m/Y'),
+            'fecha_cierre'=> $request->fecha_cierre,
             'status'      => 'ACTIVA',
             'status_pill' => 'status-green',
             'target'      => $targetLabel,
+            'creado_por'  => $creadorNombre,
             'enviadas'    => rand(40, 150),
             'respondidas' => 0,
             'pendientes'  => rand(40, 150),
             'rate'        => '0%',
             'rate_num'    => 0,
             'url'         => $request->url_formulario ?? '',
+            'category'    => (stripos($request->titulo, 'empleo') !== false || stripos($request->titulo, 'laboral') !== false) ? 'laboral' : 'institucional',
             'preguntas'   => $preguntas,
         ];
 
-        // Guardar en sesión de forma desacoplada
-        $sessionEncuestas = session('nuevas_encuestas', []);
-        array_unshift($sessionEncuestas, $nuevaEncuesta);
-        session(['nuevas_encuestas' => $sessionEncuestas]);
-        session(['encuestas_creadas_count' => count($sessionEncuestas) + 25]);
+        // Guardar en almacenamiento compartido (archivo JSON + Cache + Sesión)
+        self::saveCustomEncuesta($nuevaEncuesta);
 
         $msg = '¡Encuesta "' . $request->titulo . '" creada exitosamente' . ($totalPreguntas > 0 ? " con {$totalPreguntas} preguntas nativas." : '!');
 
@@ -215,54 +340,11 @@ class EncuestasController extends Controller
      */
     public function resultados($id)
     {
-        // Buscar la encuesta por ID en sesión o en las encuestas por defecto
-        $sessionEncuestas = session('nuevas_encuestas', []);
-        $encuesta = collect($sessionEncuestas)->firstWhere('id', $id);
+        $all = self::getAllEncuestas();
+        $encuesta = collect($all)->firstWhere('id', $id);
 
         if (!$encuesta) {
-            $defaultEncuestas = [
-                'ENC-025' => [
-                    'id'          => 'ENC-025',
-                    'title'       => 'Inserción Laboral ADSO',
-                    'full_title'  => 'Encuesta Inserción Laboral 2026',
-                    'description' => 'Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.',
-                    'date'        => '12/06/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Egresado ADSO',
-                    'enviadas'    => 120,
-                    'respondidas' => 90,
-                    'pendientes'  => 30,
-                    'rate'        => '75%',
-                ],
-                'ENC-024' => [
-                    'id'          => 'ENC-024',
-                    'title'       => 'Impacto y Empleabilidad 2025',
-                    'full_title'  => 'Seguimiento Impacto Productivo 2025',
-                    'description' => 'Evaluación de competencias técnicas y salariales en el sector agroindustrial.',
-                    'date'        => '05/05/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Egresados Tecnólogos',
-                    'enviadas'    => 80,
-                    'respondidas' => 68,
-                    'pendientes'  => 12,
-                    'rate'        => '85%',
-                ],
-                'ENC-023' => [
-                    'id'          => 'ENC-023',
-                    'title'       => 'Satisfacción Formativa CEFA',
-                    'full_title'  => 'Evaluación de Calidad Formativa CEFA',
-                    'description' => 'Percepción de egresados sobre la pertinencia de las instalaciones y docentes del CEFA.',
-                    'date'        => '20/04/2026',
-                    'status'      => 'ACTIVA',
-                    'target'      => 'Todas las Especialidades',
-                    'enviadas'    => 150,
-                    'respondidas' => 105,
-                    'pendientes'  => 45,
-                    'rate'        => '70%',
-                ],
-            ];
-
-            $encuesta = $defaultEncuestas[$id] ?? [
+            $encuesta = [
                 'id'          => $id,
                 'title'       => 'Encuesta ' . $id,
                 'full_title'  => 'Resultados de Encuesta ' . $id,
@@ -285,28 +367,35 @@ class EncuestasController extends Controller
      */
     public function cerrar($id)
     {
-        // 1. Integración con base de datos (descomentar al conectar el modelo Eloquent):
-        // $encuesta = Encuesta::findOrFail($id);
-        // $encuesta->estado = 'CERRADA';
-        // $encuesta->save();
+        $custom = self::getCustomEncuestas();
+        $found = false;
+        foreach ($custom as &$item) {
+            if ($item['id'] === $id) {
+                $item['status'] = 'CERRADA';
+                $item['status_pill'] = 'status-gray';
+                $found = true;
+                break;
+            }
+        }
+        unset($item);
 
-        // 2. Persistir el estado cerrado en sesión
+        if ($found) {
+            $file = self::getCustomEncuestasFile();
+            @file_put_contents($file, json_encode($custom, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            \Illuminate\Support\Facades\Cache::forever('sige_custom_encuestas', $custom);
+        }
+
+        $cerradasCache = \Illuminate\Support\Facades\Cache::get('sige_encuestas_cerradas', []);
+        if (!in_array($id, $cerradasCache)) {
+            $cerradasCache[] = $id;
+            \Illuminate\Support\Facades\Cache::forever('sige_encuestas_cerradas', $cerradasCache);
+        }
+
         $cerradas = session('encuestas_cerradas', []);
         if (!in_array($id, $cerradas)) {
             $cerradas[] = $id;
             session(['encuestas_cerradas' => $cerradas]);
         }
-
-        // Si la encuesta proviene de las creadas en sesión, actualizar su estado
-        $sessionEncuestas = session('nuevas_encuestas', []);
-        foreach ($sessionEncuestas as &$item) {
-            if ($item['id'] === $id) {
-                $item['status'] = 'CERRADA';
-                $item['status_pill'] = 'status-gray';
-            }
-        }
-        unset($item);
-        session(['nuevas_encuestas' => $sessionEncuestas]);
 
         return redirect()->back()
             ->with('success', "La encuesta {$id} ha sido cerrada exitosamente. Ya no se recibirán más respuestas.");
