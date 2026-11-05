@@ -1261,6 +1261,23 @@ class EgresadosController extends Controller
 
         $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');
 
+        // Determinar si el egresado debe actualizar su contraseña inicial (primer ingreso con cédula)
+        $debeActualizarPassword = false;
+        if ($user && !$user->hasSuperAdmin()) {
+            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
+            $docStr = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
+
+            $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
+            if (!$alreadyUpdated) {
+                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password)) {
+                    $debeActualizarPassword = true;
+                } elseif (session('sige_needs_password_change')) {
+                    $debeActualizarPassword = true;
+                }
+            }
+        }
+
         // Obtener encuestas unificadas creadas por Admin o Superadmin
         $todasEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
         $encuestasDisponibles = $todasEncuestas;
@@ -1350,7 +1367,8 @@ class EgresadosController extends Controller
             'noticiasPublicadas',
             'encuestasDisponibles',
             'misEncuestasRespondidas',
-            'misEventosRespondidos'
+            'misEventosRespondidos',
+            'debeActualizarPassword'
         ));
     }
 

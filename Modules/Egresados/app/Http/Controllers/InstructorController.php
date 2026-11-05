@@ -76,6 +76,24 @@ class InstructorController extends Controller
             ->take(4)
             ->get();
 
+        $user = auth()->user();
+        $person = $user ? $user->person : null;
+        $debeActualizarPassword = false;
+        if ($user && !$user->hasSuperAdmin()) {
+            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
+            $docStr = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
+
+            $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
+            if (!$alreadyUpdated) {
+                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password)) {
+                    $debeActualizarPassword = true;
+                } elseif (session('sige_needs_password_change')) {
+                    $debeActualizarPassword = true;
+                }
+            }
+        }
+
         return view('egresados::instructor.dashboard', compact(
             'courses',
             'totalEgresados',
@@ -89,7 +107,8 @@ class InstructorController extends Controller
             'totalEventos',
             'totalReportes',
             'recentEgresados',
-            'programStats'
+            'programStats',
+            'debeActualizarPassword'
         ));
     }
 

@@ -96,9 +96,30 @@ class AuthController extends Controller
                         $user->email = $uniqueEmail;
                     }
 
-                    $user->password = Hash::make($cleanDoc);
+                    // Solo asignar el documento como clave si es un usuario recién creado
+                    // o si su contraseña actual todavía no está configurada.
+                    if (!$user->exists || empty($user->password)) {
+                        $user->password = Hash::make($cleanDoc);
+                    } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
+                        $user->password = Hash::make($cleanDoc);
+                    }
                     $user->person_id = $person->id;
                     $user->save();
+
+                    // Detectar si requiere actualizar la contraseña inicial (por ser primer acceso con cédula)
+                    $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                    $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                        ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                        : [];
+                    
+                    $hasExplicitlyChanged = isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]);
+                    $isUsingDocAsPassword = Hash::check($cleanDoc, $user->password) || $isDocPassword;
+                    
+                    if ($isUsingDocAsPassword && !$hasExplicitlyChanged) {
+                        session(['sige_needs_password_change' => true]);
+                    } else {
+                        session()->forget('sige_needs_password_change');
+                    }
 
                     try {
                         $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
@@ -141,12 +162,37 @@ class AuthController extends Controller
         if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
             $user->password = Hash::make($password);
             $user->save();
+
+            $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                : [];
+            if (!isset($passwordsActualizados[$user->id]) && !isset($passwordsActualizados[(string)$user->person->document_number])) {
+                session(['sige_needs_password_change' => true]);
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
             return $this->redirectByRole($user);
         }
 
         if ($user && Hash::check($password, $user->password)) {
+            $isInstructorOrEgresado = ($user->roles->contains('slug', 'egresados.egresado') || 
+                                       $user->roles->contains('slug', 'egresados.instructor') ||
+                                       $user->nickname === 'egresado_sige' ||
+                                       $user->nickname === 'instructor_egresados');
+
+            if ($isInstructorOrEgresado && $user->person && !$user->hasSuperAdmin()) {
+                $docNum = (string)$user->person->document_number;
+                $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                    ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                    : [];
+                if (!isset($passwordsActualizados[$user->id]) && !isset($passwordsActualizados[$docNum]) && Hash::check($docNum, $user->password)) {
+                    session(['sige_needs_password_change' => true]);
+                }
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
 
@@ -216,5 +262,98 @@ class AuthController extends Controller
 
         $redirect = $request->input('redirect', $request->query('redirect', route('egresados.welcome')));
         return redirect()->to($redirect)->with('info', 'Has cerrado sesión correctamente.');
+    }
+
+    /**
+     * Procesa la actualización de la contraseña inicial (documento de identidad) a una nueva clave.
+     */
+    public function cambiarPassword(Request $request)
+    {
+        if (!Auth::check()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'No autorizado. Debes iniciar sesión primero.'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        $person = $user->person;
+        if (!$person && $user->person_id) {
+            $person = \Modules\SICA\Entities\Person::find($user->person_id);
+        }
+        $cleanDoc = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
+
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6',
+            'new_password_confirmation' => 'required|string|same:new_password',
+        ], [
+            'current_password.required' => 'Debes ingresar tu contraseña inicial (tu documento de identidad).',
+            'new_password.required' => 'Debes ingresar una nueva contraseña personal.',
+            'new_password.min' => 'La nueva contraseña debe tener como mínimo 6 caracteres.',
+            'new_password_confirmation.required' => 'Debes confirmar tu nueva contraseña.',
+            'new_password_confirmation.same' => 'La confirmación de la contraseña no coincide.',
+        ]);
+
+        $currentPass = trim($request->input('current_password'));
+        $newPass = trim($request->input('new_password'));
+
+        // Validar si la contraseña inicial es correcta
+        $isCurrentValid = Hash::check($currentPass, $user->password) ||
+                          (!empty($cleanDoc) && $currentPass === $cleanDoc) ||
+                          ($person && $currentPass === (string)$person->document_number);
+
+        if (!$isCurrentValid) {
+            $msg = 'La contraseña inicial ingresada es incorrecta. Recuerda que corresponde a tu número de documento de identidad.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->withErrors(['current_password' => $msg]);
+        }
+
+        // Validar que la nueva contraseña no sea idéntica al documento
+        if ((!empty($cleanDoc) && $newPass === $cleanDoc) || ($person && $newPass === (string)$person->document_number)) {
+            $msg = 'Por motivos de seguridad, la nueva contraseña no puede ser igual a tu número de documento.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->withErrors(['new_password' => $msg]);
+        }
+
+        // Actualizar la contraseña del usuario
+        $user->password = Hash::make($newPass);
+        $user->save();
+
+        // Registrar en el archivo persistente de contraseñas actualizadas
+        $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
+        $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
+
+        $record = [
+            'user_id' => $user->id,
+            'nickname' => $user->nickname,
+            'documento' => $cleanDoc,
+            'nombre' => $person ? ($person->first_name . ' ' . $person->first_last_name) : $user->name,
+            'updated_at' => now()->toDateTimeString(),
+            'ip' => $request->ip(),
+        ];
+        $passwords[$user->id] = $record;
+        if (!empty($cleanDoc)) {
+            $passwords[$cleanDoc] = $record;
+        }
+        @file_put_contents($passwordsFile, json_encode($passwords, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        // Quitar la bandera de la sesión
+        session()->forget('sige_needs_password_change');
+
+        $successMsg = '¡Tu contraseña ha sido actualizada con éxito! A partir de tu próximo ingreso, usa tu nueva clave personal.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMsg
+            ]);
+        }
+
+        return redirect()->back()->with('success', $successMsg);
     }
 }

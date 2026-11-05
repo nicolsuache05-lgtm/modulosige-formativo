@@ -756,15 +756,285 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(57, 169, 0, 0.45);
     }
-    .hero-image-decor {
+    /* ========================================================
+       ANIMACIÓN Y ESTILO DEL LOGO EN LA ESQUINITA (HERO BANNER)
+       ======================================================== */
+    .hero-corner-decor-wrapper {
       position: absolute;
-      right: 20px;
-      bottom: -15px;
-      height: 190px;
-      opacity: 0.85;
+      right: 18px;
+      bottom: -4px;
+      z-index: 2;
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      animation: cornerEmergence 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hero-corner-glow {
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(98, 227, 29, 0.32) 0%, rgba(57, 169, 0, 0.16) 45%, transparent 70%);
       pointer-events: none;
       z-index: 1;
+      animation: pulseCornerGlow 4s ease-in-out infinite alternate;
+    }
+
+    .hero-image-decor {
+      position: relative;
+      height: 215px;
+      max-width: 330px;
       object-fit: contain;
+      z-index: 2;
+      filter: drop-shadow(0 14px 26px rgba(0, 19, 30, 0.6)) drop-shadow(0 0 18px rgba(57, 169, 0, 0.35));
+      transform-origin: bottom right;
+      animation: gentleCornerFloat 4.2s ease-in-out infinite 1.2s;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .hero-banner-card:hover .hero-image-decor,
+    .hero-image-decor:hover {
+      transform: translateY(-10px) scale(1.05) rotate(-2.5deg);
+      filter: drop-shadow(0 20px 36px rgba(0, 19, 30, 0.7)) drop-shadow(0 0 26px rgba(98, 227, 29, 0.55));
+    }
+
+    @keyframes cornerEmergence {
+      0% {
+        opacity: 0;
+        transform: translate(80px, 80px) scale(0.6) rotate(10deg);
+      }
+      60% {
+        opacity: 1;
+        transform: translate(-8px, -10px) scale(1.06) rotate(-3deg);
+      }
+      82% {
+        transform: translate(3px, 3px) scale(0.98) rotate(1deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes gentleCornerFloat {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-8px) rotate(-1.5deg);
+      }
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+    }
+
+    @keyframes pulseCornerGlow {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.55;
+      }
+      100% {
+        transform: scale(1.18);
+        opacity: 1;
+      }
+    }
+
+    /* ========================================================
+       BANNER Y MODAL ACTUALIZACIÓN DE CONTRASEÑA INICIAL (ERP SENA)
+       ======================================================== */
+    .banner-password-erp-card {
+      background: linear-gradient(135deg, #00131E 0%, #002336 100%);
+      border-left: 5px solid #39A900;
+      border: 1px solid rgba(98, 227, 29, 0.35);
+      border-radius: 18px;
+      padding: 20px 26px;
+      margin-bottom: 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 8px 24px rgba(0, 19, 30, 0.22);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .banner-password-erp-card::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: 40px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(98, 227, 29, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .banner-password-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
+    }
+    .banner-password-icon-box .pulse-indicator-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 12px;
+      height: 12px;
+      background: #62E31D;
+      border: 2px solid #00131E;
+      border-radius: 50%;
+      animation: pulseGlow 2s infinite;
+    }
+    .banner-password-content {
+      flex: 1;
+    }
+    .banner-password-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .tag-alerta-erp {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #62E31D;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tag-alerta-sub {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .banner-password-title {
+      font-family: 'Poppins', 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      color: #FFFFFF;
+    }
+    .banner-password-desc {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.82);
+      margin: 0;
+      line-height: 1.45;
+    }
+    .banner-password-action {
+      flex-shrink: 0;
+    }
+    .btn-actualizar-pwd-erp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #39A900 0%, #2d8500 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+    .btn-actualizar-pwd-erp:hover {
+      background: linear-gradient(135deg, #43be04 0%, #329600 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(57, 169, 0, 0.5);
+    }
+    .input-password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-password-wrapper input {
+      padding-right: 42px !important;
+    }
+    .btn-toggle-eye {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #8B9FA9;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+    .btn-toggle-eye:hover {
+      color: #39A900;
+    }
+    .pwd-match-status {
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .pwd-match-status.ok {
+      color: #16a34a;
+    }
+    .pwd-match-status.err {
+      color: #dc2626;
+    }
+    .erp-security-tips {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .erp-security-tips ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+    }
+    .erp-security-tips li {
+      margin-bottom: 3px;
+    }
+    @media (max-width: 768px) {
+      .banner-password-erp-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 20px;
+      }
+      .banner-password-action {
+        width: 100%;
+      }
+      .btn-actualizar-pwd-erp {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
   
@@ -1150,6 +1420,222 @@
     }
 
     /* ========================================================
+       TARJETAS Y ELEMENTOS DE NOTICIAS INSTITUCIONALES
+       ======================================================== */
+    .news-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .news-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0, 19, 30, 0.09);
+      border-color: rgba(57, 169, 0, 0.45);
+    }
+    .news-card-img-wrap {
+      width: 100%;
+      height: 170px;
+      position: relative;
+      overflow: hidden;
+      background: #001A29;
+    }
+    .news-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .news-card:hover .news-card-img-wrap img {
+      transform: scale(1.05);
+    }
+    .news-card-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.70) 0%, transparent 60%);
+    }
+    .badge-pill-over-img {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .news-card-no-img {
+      padding: 16px 20px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #F8FAFC;
+      border-bottom: 1px solid #EDF2F7;
+    }
+    .news-card-body {
+      padding: 18px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .news-card-meta-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 11.5px;
+      color: #64748B;
+    }
+    .news-date-pill {
+      font-size: 11.5px;
+      color: #64748B;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+    .news-status-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .news-status-pill.destacada {
+      background: #EEF4FF;
+      color: #1D4ED8;
+      border: 1px solid rgba(29, 78, 216, 0.25);
+    }
+    .news-status-pill.publicada {
+      background: #EAF7EE;
+      color: #166534;
+      border: 1px solid rgba(22, 101, 52, 0.25);
+    }
+    .news-card-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #0F172A;
+      line-height: 1.35;
+      margin: 4px 0 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .news-target-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      background: #F1F5F9;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+    .news-target-badge i {
+      color: var(--sena-green);
+      font-size: 10px;
+    }
+    .news-card-summary {
+      font-size: 12.5px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .news-card-footer {
+      padding-top: 14px;
+      border-top: 1px solid #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      gap: 10px;
+    }
+    .news-author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+    .news-author-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #EAF7EE;
+      color: var(--sena-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      border: 1px solid #BBF7D0;
+      flex-shrink: 0;
+    }
+    .news-author-texts {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .news-author-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1E293B;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+    }
+    .news-author-views {
+      font-size: 10px;
+      color: #94A3B8;
+    }
+    .btn-leer-noticia {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #EAF7EE;
+      color: #166534;
+      border: 1px solid #BBF7D0;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .btn-leer-noticia:hover {
+      background: var(--sena-green);
+      color: #ffffff;
+      border-color: var(--sena-green);
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .badge-pill.status-green { background: #EAF7EE; color: #1E7E34; border: 1px solid rgba(40,167,69,0.25); }
+    .badge-pill.status-blue { background: #EEF4FF; color: #1D4ED8; border: 1px solid rgba(29,78,216,0.25); }
+    .badge-pill.status-amber { background: #FFF8E6; color: #B45309; border: 1px solid rgba(217,119,6,0.25); }
+
+    /* ========================================================
        MODALES Y CONFIRMACIÓN CENTRADA (Requerimiento especial)
        ======================================================== */
     .modal-backdrop {
@@ -1456,7 +1942,12 @@
       .app-layout { grid-template-columns: 1fr; }
       .sidebar { display: none; }
       .two-column-layout { grid-template-columns: 1fr; }
-      .hero-image-decor { display: none; }
+      .hero-corner-decor-wrapper { right: 10px; bottom: -6px; }
+      .hero-image-decor { height: 160px; max-width: 240px; }
+    }
+    @media (max-width: 768px) {
+      .hero-corner-decor-wrapper { opacity: 0.35; right: -15px; bottom: -15px; pointer-events: none; }
+      .hero-image-decor { height: 130px; }
     }
     @media (max-width: 640px) {
       .topbar { padding: 12px 18px; }
@@ -1825,6 +2316,7 @@
       <a id="nav-eventos" class="nav-item" onclick="showSection('eventos')">
         <i class="fa-regular fa-calendar-check"></i>
         <span>Eventos</span>
+        <span class="nav-badge" id="nav-badge-eventos" style="display:none;">0</span>
       </a>
     </nav>
 
@@ -1852,6 +2344,32 @@
            ======================================================== -->
       <section id="section-inicio" class="section-tab active">
 
+        @if(!empty($debeActualizarPassword))
+        <!-- Letrerito Bonito con Colores del ERP: Alerta de Actualización de Contraseña Inicial -->
+        <div id="banner-alerta-password-inicial" class="banner-password-erp-card">
+          <div class="banner-password-icon-box">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span class="pulse-indicator-badge"></span>
+          </div>
+          <div class="banner-password-content">
+            <div class="banner-password-tags">
+              <span class="tag-alerta-erp"><i class="fa-solid fa-lock"></i> SEGURIDAD INSTITUCIONAL · CEFA SENA</span>
+              <span class="tag-alerta-sub">Primer Ingreso al Sistema</span>
+            </div>
+            <h3 class="banner-password-title">¡Actualización de Contraseña Inicial Requerida!</h3>
+            <p class="banner-password-desc">
+              Detectamos que estás ingresando con tu contraseña inicial (tu documento de identidad). Para proteger tu privacidad y salvaguardar tus datos en el CEFA, debes asignar una nueva contraseña personal.
+            </p>
+          </div>
+          <div class="banner-password-action">
+            <button type="button" class="btn-actualizar-pwd-erp" onclick="openModalActualizarPasswordInicial()">
+              <i class="fa-solid fa-key"></i>
+              <span>Actualizar Contraseña Ahora</span>
+            </button>
+          </div>
+        </div>
+        @endif
+
         <!-- Banner Hero con estética Forest Green -->
         <div class="hero-banner-card">
           <div class="hero-content">
@@ -1872,7 +2390,10 @@
               </button>
             </div>
           </div>
-          <img src="{{ route('egresados.assets.image', 'egresados-banner-transparent.png') }}" class="hero-image-decor" alt="Egresados SENA">
+          <div class="hero-corner-decor-wrapper">
+            <div class="hero-corner-glow"></div>
+            <img src="{{ route('egresados.assets.image', 'egresados-banner-transparent.png') }}" class="hero-image-decor" alt="Egresados SENA CEFA" title="¡Egresados CEFA SENA, Contigo Siempre!">
+          </div>
         </div>
 
         @if(isset($invitacionesEventos) && count($invitacionesEventos) > 0)
@@ -1941,20 +2462,20 @@
             </div>
           </div>
 
-          <!-- KPI 2: Oportunidades Laborales -->
-          <div class="kpi-metric-card" onclick="showSection('oportunidades')">
+          <!-- KPI 2: Noticias Institucionales -->
+          <div class="kpi-metric-card" onclick="showSection('noticias')">
             <div class="kpi-data-col">
-              <span class="kpi-tag-label">OFERTAS LABORALES</span>
-              <span class="kpi-big-number" id="kpi-inicio-ofertas-count">3</span>
-              <span class="kpi-sub-text">Vacantes disponibles hoy</span>
+              <span class="kpi-tag-label">NOTICIAS INSTITUCIONALES</span>
+              <span class="kpi-big-number" id="kpi-inicio-noticias-count">{{ count($noticiasPublicadas ?? []) }}</span>
+              <span class="kpi-sub-text">Comunicados y convocatorias</span>
             </div>
             <div class="kpi-icon-badge blue">
-              <i class="fa-solid fa-briefcase"></i>
+              <i class="fa-solid fa-newspaper"></i>
             </div>
           </div>
 
           <!-- KPI 3: Eventos Activos -->
-          <div class="kpi-metric-card" onclick="showSection('noticias')">
+          <div class="kpi-metric-card" onclick="showSection('eventos')">
             <div class="kpi-data-col">
               <span class="kpi-tag-label">EVENTOS ACTIVOS</span>
               <span class="kpi-big-number" id="kpi-inicio-eventos-count">{{ $totalEventosActivos ?? 2 }}</span>
@@ -2342,15 +2863,179 @@
       </section>
 
       <!-- ========================================================
-           SECCIÓN 4: NOTICIAS Y EVENTOS
+           SECCIÓN: NOTICIAS & COMUNICADOS INSTITUCIONALES
            ======================================================== -->
       <section id="section-noticias" class="section-tab">
 
         <div class="hero-banner-card">
           <div class="hero-content">
-            <h1 class="hero-heading">Eventos</h1>
+            <h1 class="hero-heading">Noticias & Convocatorias</h1>
             <p class="hero-description">
-              Participa en los eventos de CEFA La Angostura.
+              Mantente al día con las convocatorias, jornadas de empleo, alianzas de formación y comunicados oficiales publicados por el Centro Agroindustrial La Angostura.
+            </p>
+          </div>
+        </div>
+
+        <!-- KPIs Noticias -->
+        <div class="kpi-row-grid">
+          <div class="kpi-metric-card">
+            <div class="kpi-data-col">
+              <span class="kpi-tag-label">NOTICIAS PUBLICADAS</span>
+              <span class="kpi-big-number">{{ count($noticiasPublicadas ?? []) }}</span>
+              <span class="kpi-sub-text">Comunicados vigentes</span>
+            </div>
+            <div class="kpi-icon-badge green"><i class="fa-solid fa-newspaper"></i></div>
+          </div>
+          <div class="kpi-metric-card">
+            <div class="kpi-data-col">
+              <span class="kpi-tag-label">CONVOCATORIAS & EMPLEO</span>
+              <span class="kpi-big-number">
+                {{ count(array_filter($noticiasPublicadas ?? [], fn($n) => in_array($n['category'] ?? '', ['Convocatorias', 'Empleabilidad']))) }}
+              </span>
+              <span class="kpi-sub-text">Oportunidades activas</span>
+            </div>
+            <div class="kpi-icon-badge blue"><i class="fa-solid fa-bullhorn"></i></div>
+          </div>
+          <div class="kpi-metric-card">
+            <div class="kpi-data-col">
+              <span class="kpi-tag-label">DESTACADAS</span>
+              <span class="kpi-big-number">
+                {{ count(array_filter($noticiasPublicadas ?? [], fn($n) => ($n['status'] ?? '') === 'DESTACADA')) }}
+              </span>
+              <span class="kpi-sub-text">De alta prioridad</span>
+            </div>
+            <div class="kpi-icon-badge amber"><i class="fa-solid fa-star"></i></div>
+          </div>
+        </div>
+
+        <!-- Filtros y Búsqueda de Noticias -->
+        <div class="filter-toolbar-box">
+          <div class="search-inputs-group" style="width:100%; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div class="input-search-field" style="flex:1; max-width:380px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="input-buscar-noticias" placeholder="Buscar por título, contenido o autor..." style="width:100%;" oninput="filtrarNoticiasEgresado()">
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <select class="select-filter-dropdown" id="select-filtro-categoria-noticia" onchange="filtrarNoticiasEgresado()">
+                <option value="todas">🏷 Todas las categorías</option>
+                <option value="convocatorias">Convocatorias</option>
+                <option value="empleabilidad">Empleabilidad</option>
+                <option value="capacitación">Capacitación</option>
+                <option value="institucional">Institucional</option>
+                <option value="comunidad">Comunidad</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grilla de Noticias -->
+        <div id="grid-noticias-egresados" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; margin-top: 10px;">
+          @forelse($noticiasPublicadas ?? [] as $n)
+            @php
+              $img = $n['image'] ?? null;
+              if ($img && str_contains($img, '127.0.0.1:8000/storage/')) {
+                  $img = asset(explode('127.0.0.1:8000/', $img)[1] ?? '');
+              }
+              $catPill = $n['category_pill'] ?? 'status-green';
+              $cat = $n['category'] ?? 'Institucional';
+            @endphp
+            <div class="news-card noticia-card-item"
+                 data-id="{{ $n['id'] }}"
+                 data-category="{{ strtolower($cat) }}"
+                 data-title="{{ strtolower($n['title'] ?? '') }}"
+                 data-summary="{{ strtolower($n['summary'] ?? '') }}"
+                 data-author="{{ strtolower($n['author'] ?? '') }}"
+                 data-target="{{ strtolower($n['target'] ?? '') }}">
+              
+              @if(!empty($img))
+                <div class="news-card-img-wrap">
+                  <img src="{{ $img }}" alt="{{ $n['title'] ?? 'Noticia' }}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';">
+                  <div class="news-card-img-overlay"></div>
+                  <span class="badge-pill {{ $catPill }} badge-pill-over-img">
+                    <i class="{{ $n['icon'] ?? 'fa-solid fa-tag' }}"></i>
+                    {{ $cat }}
+                  </span>
+                </div>
+              @else
+                <div class="news-card-no-img">
+                  <span class="badge-pill {{ $catPill }}">
+                    <i class="{{ $n['icon'] ?? 'fa-solid fa-tag' }}"></i>
+                    {{ $cat }}
+                  </span>
+                  <span class="news-date-pill">
+                    <i class="fa-regular fa-calendar"></i> {{ $n['date'] ?? 'Reciente' }}
+                  </span>
+                </div>
+              @endif
+
+              <div class="news-card-body">
+                @if(!empty($img))
+                  <div class="news-card-meta-top">
+                    <span class="news-date-pill">
+                      <i class="fa-regular fa-calendar"></i> {{ $n['date'] ?? 'Reciente' }}
+                    </span>
+                    <span class="news-status-pill {{ ($n['status'] ?? '') === 'DESTACADA' ? 'destacada' : 'publicada' }}">
+                      {{ $n['status'] ?? 'PUBLICADA' }}
+                    </span>
+                  </div>
+                @endif
+
+                <h3 class="news-card-title">{{ $n['title'] ?? '' }}</h3>
+
+                @if(!empty($n['target']))
+                  <div class="news-target-badge">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <span>{{ $n['target'] }}</span>
+                  </div>
+                @endif
+
+                <p class="news-card-summary">{{ $n['summary'] ?? '' }}</p>
+
+                <div class="news-card-footer">
+                  <div class="news-author-info">
+                    <div class="news-author-avatar">
+                      <i class="fa-solid fa-user-pen"></i>
+                    </div>
+                    <div class="news-author-texts">
+                      <span class="news-author-name">{{ $n['author'] ?? 'CEFA SENA' }}</span>
+                      <span class="news-author-views"><i class="fa-regular fa-eye"></i> {{ $n['views_count'] ?? 1 }} lecturas</span>
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn-leer-noticia" onclick="openModalDetalleNoticia('{{ $n['id'] }}')">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Leer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          @empty
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border-radius: 16px; border: 1px dashed #CBD5E1;">
+              <i class="fa-solid fa-newspaper" style="font-size: 38px; color: #94A3B8; margin-bottom: 12px;"></i>
+              <h3 style="font-size: 16px; font-weight: 700; color: #334155;">No hay noticias publicadas en este momento</h3>
+              <p style="font-size: 13px; color: #64748B;">Próximamente se publicarán nuevas convocatorias y noticias institucionales.</p>
+            </div>
+          @endforelse
+        </div>
+
+        <div id="noticias-no-results" style="display:none; text-align:center; padding: 40px 20px; background: #fff; border-radius: 16px; border: 1px dashed #CBD5E1; margin-top: 20px;">
+          <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; color: #94A3B8; margin-bottom: 10px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700; color: #334155;">No se encontraron noticias</h3>
+          <p style="font-size: 12.5px; color: #64748B;">No hay comunicados que coincidan con los criterios de búsqueda.</p>
+        </div>
+
+      </section>
+
+      <!-- ========================================================
+           SECCIÓN: EVENTOS INSTITUCIONALES
+           ======================================================== -->
+      <section id="section-eventos" class="section-tab">
+
+        <div class="hero-banner-card">
+          <div class="hero-content">
+            <h1 class="hero-heading">Eventos Institucionales</h1>
+            <p class="hero-description">
+              Participa activamente en talleres, jornadas laborales, foros y actividades organizadas por el CEFA La Angostura para la comunidad de egresados.
             </p>
           </div>
         </div>
@@ -2414,66 +3099,77 @@
             @endforeach
           @endif
 
-          <!-- Evento 1 -->
-          <div class="portal-item-card event-card-item" data-event-id="event-1">
-            <div class="card-icon-pill green">
-              <i class="fa-solid fa-microphone"></i>
-            </div>
-            <div class="card-body-content">
-              <div class="card-top-header">
-                <div>
-                  <h3 class="card-title-text">Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral</h3>
-                  <span class="card-tag-badge">Académico · Virtual</span>
+          <!-- Eventos dinámicos registrados en el sistema por Admin/Superadmin -->
+          @if(isset($eventosDisponibles) && count($eventosDisponibles) > 0)
+            @foreach($eventosDisponibles as $ev)
+              @php
+                $evIdClean = 'event-' . preg_replace('/[^a-zA-Z0-9_\-]/', '', $ev['id'] ?? uniqid());
+              @endphp
+              <div class="portal-item-card event-card-item" data-event-id="{{ $evIdClean }}">
+                <div class="card-icon-pill {{ ($ev['status'] ?? '') === 'PROGRAMADO' ? 'green' : 'blue' }}">
+                  <i class="fa-solid fa-calendar-check"></i>
                 </div>
-                <button type="button" class="btn-green-submit" id="btn-inscribir-event-1" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', this, 'event-1')">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span>Inscribirme</span>
-                </button>
-              </div>
-              <div class="card-meta-list">
-                <span><i class="fa-regular fa-calendar"></i> 10 de junio, 2026</span>
-                <span><i class="fa-regular fa-clock"></i> 9:00 a.m. – 12:00 m.</span>
-                <span><i class="fa-solid fa-chalkboard-user"></i> Facilitador: Lic. Andrés Palacios</span>
-              </div>
-              <p class="card-desc-paragraph">
-                Sesión práctica sobre comunicación asertiva, resolución de conflictos y preparación para entrevistas en paneles corporativos.
-              </p>
-              <div class="card-action-bar">
-                <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupos Disponibles</span>
-                <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', document.getElementById('btn-inscribir-event-1'), 'event-1')">Ver temario</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Evento 2 -->
-          <div class="portal-item-card event-card-item" data-event-id="event-2">
-            <div class="card-icon-pill blue">
-              <i class="fa-solid fa-handshake-angle"></i>
-            </div>
-            <div class="card-body-content">
-              <div class="card-top-header">
-                <div>
-                  <h3 class="card-title-text">Feria Regional de Empleo y Emprendimiento CEFA 2026</h3>
-                  <span class="card-tag-badge blue">Empleabilidad &bull; Presencial</span>
+                <div class="card-body-content">
+                  <div class="card-top-header">
+                    <div>
+                      <h3 class="card-title-text">{{ $ev['title'] ?? 'Evento Institucional' }}</h3>
+                      <span class="card-tag-badge {{ ($ev['status'] ?? '') === 'PROGRAMADO' ? '' : 'blue' }}">
+                        {{ $ev['type'] ?? 'Institucional' }} · {{ $ev['status'] ?? 'PROGRAMADO' }}
+                      </span>
+                    </div>
+                    <button type="button" class="btn-green-submit" id="btn-inscribir-{{ $evIdClean }}" onclick="openInscripcionModal('{{ addslashes($ev['title'] ?? 'Evento') }}', this, '{{ $evIdClean }}')">
+                      <i class="fa-solid fa-ticket"></i>
+                      <span>Inscribirme</span>
+                    </button>
+                  </div>
+                  <div class="card-meta-list">
+                    <span><i class="fa-regular fa-calendar"></i> {{ $ev['date'] ?? 'Próximamente' }}</span>
+                    @if(!empty($ev['time']))<span><i class="fa-regular fa-clock"></i> {{ $ev['time'] }}</span>@endif
+                    <span><i class="fa-solid fa-location-dot"></i> {{ $ev['location'] ?? 'Auditorio Principal CEFA' }}</span>
+                    @if(!empty($ev['program']))<span><i class="fa-solid fa-graduation-cap"></i> {{ $ev['program'] }}</span>@endif
+                  </div>
+                  <p class="card-desc-paragraph">
+                    {{ $ev['description'] ?? 'Participa en esta actividad de seguimiento y fortalecimiento para egresados del CEFA.' }}
+                  </p>
+                  <div class="card-action-bar">
+                    <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupos Disponibles</span>
+                    <button type="button" class="btn-card-outline" onclick="openInscripcionModal('{{ addslashes($ev['title'] ?? 'Evento') }}', document.getElementById('btn-inscribir-{{ $evIdClean }}'), '{{ $evIdClean }}')">Ver temario y detalles</button>
+                  </div>
                 </div>
-                <button type="button" class="btn-green-submit" id="btn-inscribir-event-2" onclick="openInscripcionModal('Feria Regional de Empleo y Emprendimiento CEFA 2026', this, 'event-2')">
-                  <i class="fa-solid fa-ticket"></i>
-                  <span>Inscribirme</span>
-                </button>
               </div>
-              <div class="card-meta-list">
-                <span><i class="fa-regular fa-calendar"></i> 20 de junio, 2026</span>
-                <span><i class="fa-solid fa-location-dot"></i> Auditorio Principal La Angostura</span>
+            @endforeach
+          @else
+            <!-- Evento de respaldo si no hay eventos registrados -->
+            <div class="portal-item-card event-card-item" data-event-id="event-1">
+              <div class="card-icon-pill green">
+                <i class="fa-solid fa-microphone"></i>
               </div>
-              <p class="card-desc-paragraph">
-                Espacio de articulación con más de 25 empresas de la región interesadas en perfiles de egresados SENA.
-              </p>
-              <div class="card-action-bar">
-                <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Entrada Libre para Egresados</span>
-                <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Feria Regional de Empleo y Emprendimiento CEFA 2026', document.getElementById('btn-inscribir-event-2'), 'event-2')">Ver empresas</button>
+              <div class="card-body-content">
+                <div class="card-top-header">
+                  <div>
+                    <h3 class="card-title-text">Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral</h3>
+                    <span class="card-tag-badge">Académico · Virtual</span>
+                  </div>
+                  <button type="button" class="btn-green-submit" id="btn-inscribir-event-1" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', this, 'event-1')">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Inscribirme</span>
+                  </button>
+                </div>
+                <div class="card-meta-list">
+                  <span><i class="fa-regular fa-calendar"></i> 10 de junio, 2026</span>
+                  <span><i class="fa-regular fa-clock"></i> 9:00 a.m. – 12:00 m.</span>
+                  <span><i class="fa-solid fa-chalkboard-user"></i> Facilitador: Lic. Andrés Palacios</span>
+                </div>
+                <p class="card-desc-paragraph">
+                  Sesión práctica sobre comunicación asertiva, resolución de conflictos y preparación para entrevistas en paneles corporativos.
+                </p>
+                <div class="card-action-bar">
+                  <span style="font-size:12px; color:var(--sena-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Cupos Disponibles</span>
+                  <button type="button" class="btn-card-outline" onclick="openInscripcionModal('Taller: Habilidades Blandas y Liderazgo para el Éxito Laboral', document.getElementById('btn-inscribir-event-1'), 'event-1')">Ver temario</button>
+                </div>
               </div>
             </div>
-          </div>
+          @endif
 
         </div>
 
@@ -2770,46 +3466,253 @@
 </div>
 
 <!-- ========================================================
-     MODAL DE INSCRIPCIÓN A EVENTOS
+     MODAL DE INSCRIPCIÓN A EVENTOS (COLORES INSTITUCIONALES SENA ERP & MÁS INFORMACIÓN)
      ======================================================== -->
 <div class="modal-backdrop" id="inscripcionModal" onclick="if(event.target===this)closeInscripcionModal()">
-  <div class="modal-box-card" style="max-width:480px; border-top: 4px solid var(--sena-green); padding: 32px 28px;">
-    <button type="button" class="modal-close-x" onclick="closeInscripcionModal()"><i class="fa-solid fa-xmark"></i></button>
+  <div class="modal-box-card" style="max-width: 660px; max-height: 90vh; overflow-y: auto; border-top: 4px solid var(--sena-green); padding: 0; position: relative;">
+    
+    <!-- Botón de Cerrar (X) -->
+    <button type="button" class="modal-close-x" onclick="closeInscripcionModal()" style="z-index: 10; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2);" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-      <div style="width: 60px; height: 60px; border-radius: 50%; background: #EAF7EE; color: var(--sena-green); display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; border: 2px solid #BBF7D0;">
-        <i class="fa-regular fa-calendar-check"></i>
+    <!-- Banner Encabezado Oficial SIGE (Colores ERP: Deep Forest & Sena Neon) -->
+    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 24px 28px; color: #fff; position: relative;">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        <i class="fa-solid fa-calendar-check"></i> PORTAL EGRESADOS · CONFIRMACIÓN DE ASISTENCIA
       </div>
-      <h3 style="font-family: 'Poppins', 'Nunito', sans-serif; font-size: 20px; font-weight: 700; color: var(--sena-dark); margin-bottom: 4px;" id="modal-event-title">
-        Inscripción a Actividad
-      </h3>
-      <p style="font-size: 13px; color: var(--ink-soft); margin: 0;">
-        Confirma tus datos para apartar tu cupo en este evento del CEFA.
+      <h2 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0; letter-spacing:-0.4px;" id="modal-event-title">
+        Inscripción al Evento
+      </h2>
+      <p style="font-size:13px; color:#A0AEC0; margin:0; line-height:1.5;">
+        Aparta tu cupo y confirma tus datos para participar en las actividades y encuentros oficiales del CEFA La Angostura.
       </p>
     </div>
 
-    <form onsubmit="event.preventDefault(); confirmInscripcion();">
-      <div style="margin-bottom:14px;">
-        <label style="display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:5px;">Nombre Completo</label>
-        <input type="text" value="@auth {{ Auth::user()->full_name }} @else Nicol Suache @endauth" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
-      </div>
-      <div style="margin-bottom:14px;">
-        <label style="display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:5px;">Correo Electrónico</label>
-        <input type="email" value="@auth {{ Auth::user()->email }} @else egresada.cefa@sena.edu.co @endauth" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
-      </div>
-      <div style="margin-bottom:20px;">
-        <label style="display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:5px;">Teléfono de Contacto</label>
-        <input type="tel" value="310 123 4567" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; font-family:inherit;" required>
+    <!-- Contenido Principal del Modal -->
+    <div style="padding: 24px 28px;">
+
+      <!-- FICHA TÉCNICA E INFORMACIÓN DETALLADA DEL EVENTO -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 18px 20px; margin-bottom: 22px;">
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge-pill status-green" id="modal-event-type-badge">
+              <i class="fa-solid fa-ticket"></i> <span id="modal-event-type-text">Convocatoria Oficial</span>
+            </span>
+            <span class="badge-pill status-blue" id="modal-event-status-badge">
+              <i class="fa-solid fa-circle-check"></i> <span id="modal-event-status-text">Cupos Disponibles</span>
+            </span>
+          </div>
+          <span style="font-size: 11.5px; font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 10px; border-radius: 20px;" id="modal-event-cupo-badge">
+            <i class="fa-solid fa-users"></i> <span id="modal-event-cupo-text">Cupo: 200 asistentes</span>
+          </span>
+        </div>
+
+        <!-- Grilla de Detalles Técnicos -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #EAF7EE; color: var(--sena-green); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; border: 1px solid #BBF7D0;">
+              <i class="fa-regular fa-calendar"></i>
+            </div>
+            <div>
+              <span style="display: block; font-size: 10.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">Fecha del Evento</span>
+              <span style="font-size: 13px; font-weight: 700; color: #0F172A;" id="modal-event-date-text">Próximamente</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #EEF4FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; border: 1px solid #BFDBFE;">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+            <div>
+              <span style="display: block; font-size: 10.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">Horario</span>
+              <span style="font-size: 13px; font-weight: 700; color: #0F172A;" id="modal-event-time-text">09:00 AM - 12:00 PM</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; border: 1px solid #FDE68A;">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <span style="display: block; font-size: 10.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">Lugar / Ubicación</span>
+              <span style="font-size: 13px; font-weight: 700; color: #0F172A;" id="modal-event-location-text">Centro CEFA La Angostura</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #F3E8FF; color: #9333EA; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; border: 1px solid #E9D5FF;">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <span style="display: block; font-size: 10.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">Público / Programa</span>
+              <span style="font-size: 13px; font-weight: 700; color: #0F172A;" id="modal-event-program-text">Todos los Egresados CEFA</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Descripción y Temario -->
+        <div style="background: #FFFFFF; border-left: 4px solid var(--sena-green); border-radius: 0 10px 10px 0; padding: 12px 14px; border: 1px solid #E2E8F0; border-left-width: 4px; border-left-color: var(--sena-green);">
+          <span style="display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--sena-green); margin-bottom: 4px;">
+            <i class="fa-solid fa-circle-info"></i> Temario & Descripción de la Actividad:
+          </span>
+          <p style="font-size: 12.5px; color: #334155; line-height: 1.55; margin: 0;" id="modal-event-desc-text">
+            Invitación oficial dirigida a la comunidad de egresados SENA.
+          </p>
+        </div>
+
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button type="button" class="btn-card-outline" onclick="closeInscripcionModal()" style="padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">Cancelar</button>
-        <button type="submit" class="btn-green-submit" style="padding:10px 22px; border-radius:10px; font-weight:700; background:var(--sena-green); cursor:pointer;">
-          <i class="fa-solid fa-check"></i>
-          <span>Confirmar Registro</span>
-        </button>
+      <!-- FORMULARIO DE CONFIRMACIÓN DE DATOS DEL EGRESADO (ERP SENA) -->
+      <form id="formInscripcionEvento" onsubmit="event.preventDefault(); confirmInscripcion();">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+          <div style="width: 24px; height: 24px; border-radius: 6px; background: #EAF7EE; color: var(--sena-green); display: flex; align-items: center; justify-content: center; font-size: 11px;">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+          <span style="font-size: 12px; font-weight: 800; color: #00131E; text-transform: uppercase; letter-spacing: 0.4px;">
+            Confirma tus datos personales para la reserva
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          
+          <!-- Documento de Identidad -->
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:5px;">
+              Documento (Cédula) <span style="color:#39A900; font-size:10px; font-weight:800;">✓ Verificado</span>
+            </label>
+            <input type="text" id="modal-event-input-doc" readonly
+                   value="{{ $person->document_number ?? (Auth::user()->document_number ?? '1085244588') }}" 
+                   style="width:100%; border:1px solid #E2E8F0; background:#F8FAFC; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:600; color:#475569; font-family:inherit;">
+          </div>
+
+          <!-- Nombre Completo -->
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:5px;">
+              Nombre Completo <span style="color:#EF4444;">*</span>
+            </label>
+            <input type="text" id="modal-event-input-name" required
+                   value="@auth {{ $person ? ($person->first_name . ' ' . $person->first_lastname . ' ' . ($person->second_lastname ?? '')) : (Auth::user()->full_name ?? Auth::user()->name) }} @else Emily Zaray Perdomo Izquierdo @endauth" 
+                   style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:600; color:#0F172A; font-family:inherit;">
+          </div>
+
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          
+          <!-- Correo Electrónico -->
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:5px;">
+              Correo Electrónico <span style="color:#EF4444;">*</span>
+            </label>
+            <input type="email" id="modal-event-input-email" required
+                   value="@auth {{ $person->personal_email ?? ($person->misena_email ?? (Auth::user()->email ?? '')) }} @else egresada.cefa@sena.edu.co @endauth" 
+                   style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:600; color:#0F172A; font-family:inherit;">
+          </div>
+
+          <!-- Teléfono / WhatsApp -->
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:5px;">
+              Celular / WhatsApp <span style="color:#EF4444;">*</span>
+            </label>
+            <input type="tel" id="modal-event-input-phone" required
+                   value="{{ $person->telephone1 ?? '310 123 4567' }}" 
+                   style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:600; color:#0F172A; font-family:inherit;">
+          </div>
+
+        </div>
+
+        <!-- Modalidad de Asistencia -->
+        <div style="margin-bottom: 22px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:5px;">
+            Modalidad de Participación
+          </label>
+          <select id="modal-event-select-modalidad" style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:600; color:#0F172A; background:#fff; font-family:inherit;">
+            <option value="Presencial">🏢 Asistencia Presencial (Auditorio Principal / Instalaciones CEFA)</option>
+            <option value="Virtual">💻 Asistencia Virtual (Transmisión en Vivo / Enlace Meet)</option>
+          </select>
+        </div>
+
+        <!-- Botones de Acción SENA ERP -->
+        <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; padding-top:16px; border-top:1px solid #E2E8F0;">
+          <button type="button" class="btn-card-outline" onclick="closeInscripcionModal()" style="padding:10px 20px; border-radius:11px; font-weight:700; cursor:pointer; font-size:13px;">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit-confirm-inscripcion" class="btn-green-submit" style="padding:11px 26px; border-radius:11px; font-weight:800; font-size:13.5px; background:linear-gradient(135deg, #39A900 0%, #2d8500 100%); cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(57,169,0,0.25);">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Confirmar mi Cupo</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL: DETALLE COMPLETO DE NOTICIA INSTITUCIONAL
+     ======================================================== -->
+<div class="modal-backdrop" id="modalDetalleNoticia" onclick="if(event.target===this)closeModalDetalleNoticia()">
+  <div class="modal-box-card" style="max-width: 680px; max-height: 88vh; overflow-y: auto; padding: 0; border-top: 4px solid var(--sena-green); position: relative;">
+    <!-- Botón Cerrar (X) -->
+    <button type="button" class="modal-close-x" onclick="closeModalDetalleNoticia()" style="z-index: 10; background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15);" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Header con Imagen (si tiene) -->
+    <div id="modal-noticia-img-wrap" style="display:none; width:100%; height:230px; position:relative; overflow:hidden; background:#00131E;">
+      <img id="modal-noticia-img" src="" alt="Portada Noticia" style="width:100%; height:100%; object-fit:cover;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);"></div>
+      <div style="position:absolute; bottom:16px; left:22px; right:22px;">
+        <span id="modal-noticia-cat-badge" class="badge-pill status-green" style="margin-bottom:8px;"></span>
+        <h2 id="modal-noticia-title-img" style="color:#fff; font-size:19px; font-weight:800; line-height:1.3; margin:0; text-shadow: 0 2px 4px rgba(0,0,0,0.6);"></h2>
       </div>
-    </form>
+    </div>
+
+    <!-- Header sin Imagen (si no tiene) -->
+    <div id="modal-noticia-header-no-img" style="display:none; background:linear-gradient(135deg, #00131E 0%, #002336 100%); padding:24px 26px; color:#fff;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span id="modal-noticia-cat-badge-no-img" class="badge-pill status-green"></span>
+        <span id="modal-noticia-date-header" style="font-size:12px; opacity:0.85;"></span>
+      </div>
+      <h2 id="modal-noticia-title-no-img" style="color:#fff; font-size:19px; font-weight:800; line-height:1.3; margin:0;"></h2>
+    </div>
+
+    <!-- Cuerpo del Modal -->
+    <div style="padding: 24px 26px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; padding:10px 14px; border-radius:12px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#0F766E; font-weight:700;">
+          <i class="fa-solid fa-bullseye" style="color:#39A900;"></i>
+          <span>Dirigido a: <strong id="modal-noticia-target" style="color:#001A29;"></strong></span>
+        </div>
+        <div style="font-size:11.5px; color:#64748B;">
+          <i class="fa-regular fa-eye"></i> <span id="modal-noticia-views"></span> lecturas
+        </div>
+      </div>
+
+      <!-- Resumen / Lead -->
+      <div id="modal-noticia-summary-box" style="border-left:4px solid #39A900; background:#F0FDF4; padding:12px 16px; border-radius:0 10px 10px 0; margin-bottom:18px; font-size:13.5px; font-weight:600; color:#166534; line-height:1.5;">
+      </div>
+
+      <!-- Contenido Completo -->
+      <div id="modal-noticia-content" style="font-size:13.5px; color:#334155; line-height:1.7; white-space:pre-line; max-height:42vh; overflow-y:auto; padding-right:8px; margin-bottom:20px;">
+      </div>
+
+      <!-- Pie del Modal -->
+      <div style="padding-top:16px; border-top:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#64748B;">
+          <i class="fa-solid fa-shield-halved" style="color:#39A900;"></i>
+          <span>Publicado por: <strong id="modal-noticia-author" style="color:#0F172A;"></strong></span>
+        </div>
+        <button type="button" class="btn-card-outline" onclick="closeModalDetalleNoticia()" style="padding:7px 18px; font-size:12px; font-weight:700; cursor:pointer;">Cerrar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2964,6 +3867,126 @@
         <button type="submit" id="btn-submit-perfil" class="btn-green-submit" style="padding:11px 24px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-floppy-disk"></i>
           <span>Guardar Cambios</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL ACTUALIZACIÓN DE CONTRASEÑA INICIAL (ERP SENA)
+     ======================================================== -->
+<div class="modal-backdrop" id="modalActualizarPasswordInicial" onclick="if(event.target===this)closeModalActualizarPasswordInicial()">
+  <div class="modal-box-card" style="max-width: 540px; border-top: 4px solid #39A900; padding: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px rgba(0, 19, 30, 0.35);">
+    <!-- Botón de Cerrar (X) -->
+    <button type="button" class="modal-close-x" onclick="closeModalActualizarPasswordInicial()" style="z-index: 10; background: rgba(255,255,255,0.95);" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Banner Encabezado Oficial SIGE -->
+    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 24px 28px; color: #fff; position: relative;">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:800; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        <i class="fa-solid fa-shield-halved"></i> SEGURIDAD DE ACCESO · CEFA SENA
+      </div>
+      <h3 style="font-family:'Poppins','Nunito',sans-serif; font-size:19px; font-weight:800; color:#fff; margin:0 0 6px 0; line-height:1.3;">
+        Actualizar Contraseña Inicial
+      </h3>
+      <p style="font-size:12px; color:rgba(255,255,255,0.85); margin:0; line-height:1.45;">
+        Por ser tu primer ingreso al sistema con tu número de documento, es necesario que configures tu nueva contraseña personal e intransferible.
+      </p>
+    </div>
+
+    <!-- Formulario de Actualización de Contraseña -->
+    <form id="formActualizarPasswordInicial" onsubmit="submitActualizarPasswordInicial(event)" style="padding: 22px 26px;">
+      @csrf
+
+      <!-- Mensaje de Alerta en caso de errores de validación -->
+      <div id="alert-password-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
+      
+      <!-- Mensaje de Éxito -->
+      <div id="alert-password-success" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
+
+      <!-- Tarjeta informativa del documento registrado -->
+      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; align-items:center; gap:12px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:rgba(57, 169, 0, 0.12); color:#39A900; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+        <div>
+          <span style="font-size:11px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.4px;">Usuario Oficial y Clave Inicial:</span>
+          <div style="font-size:13.5px; font-weight:700; color:#00131E;">
+            Cédula / Documento: <span style="color:#39A900;">{{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: 'Documento Registrado') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. Primera Contraseña (Documento) -->
+      <div style="margin-bottom:16px;">
+        <label for="pwd_current_password" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
+          <i class="fa-solid fa-lock" style="color:#39A900; margin-right:4px;"></i> 1. Primera Contraseña (Tu Cédula o Documento Actual) <span style="color:#EF4444;">*</span>
+        </label>
+        <div class="input-password-wrapper">
+          <input type="password" id="pwd_current_password" name="current_password" class="input-modern"
+                 value="{{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: '') }}"
+                 placeholder="Ingresa tu documento (clave inicial)" required style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
+          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_current_password', this)" title="Ver u ocultar contraseña">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
+        <span style="display:block; font-size:11px; color:#64748B; margin-top:4px;">
+          Corresponde a la contraseña con la que iniciaste sesión por primera vez.
+        </span>
+      </div>
+
+      <!-- 2. Nueva Contraseña -->
+      <div style="margin-bottom:16px;">
+        <label for="pwd_new_password" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
+          <i class="fa-solid fa-key" style="color:#39A900; margin-right:4px;"></i> 2. Nueva Contraseña Privada <span style="color:#EF4444;">*</span>
+        </label>
+        <div class="input-password-wrapper">
+          <input type="password" id="pwd_new_password" name="new_password" class="input-modern"
+                 placeholder="Mínimo 6 caracteres (ej. MiClave2026*)" required minlength="6" oninput="checkPasswordMatch()"
+                 style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
+          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password', this)" title="Ver u ocultar contraseña">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Confirmar Nueva Contraseña -->
+      <div style="margin-bottom:18px;">
+        <label for="pwd_new_password_confirmation" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
+          <i class="fa-solid fa-circle-check" style="color:#39A900; margin-right:4px;"></i> 3. Confirmar Nueva Contraseña <span style="color:#EF4444;">*</span>
+        </label>
+        <div class="input-password-wrapper">
+          <input type="password" id="pwd_new_password_confirmation" name="new_password_confirmation" class="input-modern"
+                 placeholder="Vuelve a escribir la nueva contraseña" required minlength="6" oninput="checkPasswordMatch()"
+                 style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
+          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password_confirmation', this)" title="Ver u ocultar contraseña">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
+        <div id="pwdMatchStatus" class="pwd-match-status" style="display:none;"></div>
+      </div>
+
+      <!-- Tips de Seguridad -->
+      <div class="erp-security-tips">
+        <strong style="color:#00131E; font-size:11.5px; display:inline-flex; align-items:center; gap:5px;">
+          <i class="fa-solid fa-circle-info" style="color:#39A900;"></i> Recomendaciones de Seguridad CEFA:
+        </strong>
+        <ul style="margin:4px 0 0 16px; padding:0; font-size:11.5px; color:#64748B;">
+          <li>Tu usuario seguirá siendo tu número de cédula.</li>
+          <li>La nueva clave debe tener al menos 6 caracteres y ser distinta a tu documento.</li>
+        </ul>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; margin-top:20px;">
+        <button type="button" class="btn-card-outline" onclick="closeModalActualizarPasswordInicial()" style="padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer; font-size:12.5px;">
+          Recordármelo más tarde
+        </button>
+        <button type="submit" id="btn-submit-password-inicial" class="btn-green-submit" style="padding:11px 22px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:13px; background:linear-gradient(135deg, #39A900 0%, #2a7c00 100%); color:#fff; border:none; box-shadow:0 4px 14px rgba(57,169,0,0.35);">
+          <i class="fa-solid fa-shield-check"></i>
+          <span>Guardar Nueva Contraseña</span>
         </button>
       </div>
     </form>
@@ -3179,7 +4202,13 @@
       icon: 'fa-briefcase'
     },
     'noticias': {
-      title: 'Noticias & Eventos · Comunidad CEFA',
+      title: 'Noticias & Comunicados · Comunidad CEFA',
+      tag: 'Comunicados Oficiales',
+      subtitle: 'Convocatorias, Fondo Emprender, empleo y novedades institucionales',
+      icon: 'fa-newspaper'
+    },
+    'eventos': {
+      title: 'Eventos Institucionales · CEFA La Angostura',
       tag: 'Agenda Activa',
       subtitle: 'Talleres, ferias de empleo, cursos y actividades institucionales',
       icon: 'fa-calendar-days'
@@ -3192,7 +4221,7 @@
     }
   };
 
-  const sectionsList = ['inicio', 'encuestas', 'oportunidades', 'noticias', 'notificaciones'];
+  const sectionsList = ['inicio', 'encuestas', 'noticias', 'eventos', 'oportunidades', 'notificaciones'];
 
   function showSection(name) {
     if (!sectionsList.includes(name)) name = 'inicio';
@@ -3223,6 +4252,7 @@
   const CURRENT_USER_KEY = 'usr_' + CURRENT_USER_ID + '_' + CURRENT_USER_DOC;
   const BACKEND_ANSWERED_SURVEYS = @json($misEncuestasRespondidas ?? []);
   const BACKEND_RESPONDED_EVENTS = @json($misEventosRespondidos ?? []);
+  const NOTICIAS_DATA = @json($noticiasPublicadas ?? []);
 
   // Limpieza preventiva de claves globales residuales no aisladas
   try {
@@ -3504,19 +4534,94 @@
       });
     });
 
-    // Agregar invitación a evento si está pendiente
+    // 2. Obtener eventos institucionales pendientes de inscripción
+    const addedEventIds = new Set();
+    let pendingEventsCount = 0;
+
     if (hasPendingBanner) {
       const invTitle = banner.getAttribute('data-event-title') || 'Invitación Institucional';
       const invId = banner.getAttribute('data-event-id') || '';
+      addedEventIds.add(invId);
+      addedEventIds.add(invTitle.trim().toLowerCase());
+      pendingEventsCount++;
+
       notifItems.push({
         type: 'evento',
         id: invId,
         title: '¡Nueva Invitación Oficial: ' + invTitle + '!',
-        meta: 'Requiere confirmar inscripción',
-        icon: 'fa-paper-plane',
+        meta: 'Requiere confirmar inscripción · Aparta tu cupo',
+        icon: 'fa-calendar-check',
         color: '#0d6928',
         bg: '#DCFCE7',
-        action: `showSection('inicio');`
+        action: `showSection('inicio'); openInscripcionModal('${invTitle.replace(/'/g, "\\'")}', document.getElementById('btn-inscribir-${invId}'), '${invId}');`
+      });
+    }
+
+    // Agregar todos los eventos disponibles a los que el egresado aún no se ha inscrito
+    const eventCards = document.querySelectorAll('#section-eventos .event-card-item');
+    eventCards.forEach(card => {
+      const evId = card.getAttribute('data-event-id') || '';
+      const titleEl = card.querySelector('.card-title-text');
+      const title = titleEl ? titleEl.textContent.trim() : 'Evento Institucional';
+      const cleanId = evId.replace(/^event-inv-/, '').replace(/^event-/, '');
+
+      const isAlreadyInscribed = (
+        (inscribedEvents && (
+          inscribedEvents.has(evId) ||
+          inscribedEvents.has(cleanId) ||
+          inscribedEvents.has('event-' + cleanId) ||
+          inscribedEvents.has('title:' + title.toLowerCase())
+        ))
+      );
+
+      const isAlreadyAdded = addedEventIds.has(evId) || addedEventIds.has(title.toLowerCase());
+
+      if (!isAlreadyInscribed && !isAlreadyAdded) {
+        pendingEventsCount++;
+        addedEventIds.add(evId);
+        addedEventIds.add(title.toLowerCase());
+
+        const metaDateEl = card.querySelector('.card-meta-list span');
+        const dateText = metaDateEl ? metaDateEl.textContent.trim() : 'Próximamente';
+
+        notifItems.push({
+          type: 'evento',
+          id: evId,
+          title: 'Nuevo Evento: ' + title,
+          meta: dateText + ' · Inscríbete aquí',
+          icon: 'fa-calendar-days',
+          color: '#15803d',
+          bg: '#EAF7EE',
+          action: `showSection('eventos'); openInscripcionModal('${title.replace(/'/g, "\\'")}', document.getElementById('btn-inscribir-${cleanId}') || document.getElementById('btn-inscribir-${evId}'), '${evId}');`
+        });
+      }
+    });
+
+    // Actualizar badge de eventos en el menú lateral si existe
+    const navBadgeEventos = document.getElementById('nav-badge-eventos');
+    if (navBadgeEventos) {
+      if (pendingEventsCount > 0) {
+        navBadgeEventos.textContent = pendingEventsCount;
+        navBadgeEventos.style.display = 'inline-flex';
+      } else {
+        navBadgeEventos.style.display = 'none';
+      }
+    }
+
+    // Agregar noticias publicadas recientemente por Admin / Superadmin
+    if (typeof NOTICIAS_DATA !== 'undefined' && Array.isArray(NOTICIAS_DATA) && NOTICIAS_DATA.length > 0) {
+      const topNews = NOTICIAS_DATA.slice(0, 2);
+      topNews.forEach(news => {
+        notifItems.push({
+          type: 'noticia',
+          id: news.id,
+          title: news.title || 'Nueva Noticia Institucional',
+          meta: news.date || 'Reciente',
+          icon: 'fa-newspaper',
+          color: '#1D4ED8',
+          bg: '#EEF4FF',
+          action: `showSection('noticias'); openModalDetalleNoticia('${news.id}');`
+        });
       });
     }
 
@@ -3531,7 +4636,7 @@
             </div>
             <div class="notif-content">
               <div class="notif-text">
-                <strong>${item.type === 'encuesta' ? 'Encuesta Pendiente:' : 'Evento:'}</strong> ${item.title}
+                <strong>${item.type === 'encuesta' ? 'Encuesta Pendiente:' : (item.type === 'noticia' ? 'Noticia:' : 'Evento:')}</strong> ${item.title}
               </div>
               <div class="notif-meta">
                 <span class="notif-time" style="color:${item.color}; font-weight:700;"><i class="fa-regular fa-clock"></i> ${item.meta}</span>
@@ -3694,7 +4799,7 @@
   }
 
   function updateEventCounters() {
-    const totalEvents = document.querySelectorAll('#section-noticias .event-card-item').length || 2;
+    const totalEvents = document.querySelectorAll('#section-eventos .event-card-item').length || 2;
 
     const kpiEventosActivos = document.getElementById('kpi-eventos-activos-count');
     if (kpiEventosActivos) kpiEventosActivos.textContent = totalEvents;
@@ -3706,13 +4811,109 @@
     if (kpiInscripciones) kpiInscripciones.textContent = inscribedEvents.size;
   }
 
+  const EVENTOS_LIST_DATA = @json($eventosDisponibles ?? []);
+  const INVITACIONES_LIST_DATA = @json($invitacionesEventos ?? []);
+
   function openInscripcionModal(title, btn, eventId) {
     activeEventTitle = title || 'Actividad Especial';
     activeEventBtn = btn || null;
     activeEventId = eventId || '';
 
+    let card = null;
+    if (btn) {
+      card = btn.closest('.event-card-item') || btn.closest('#banner-invitacion-evento');
+    }
+    if (!card && eventId) {
+      card = document.querySelector('[data-event-id="' + eventId + '"]');
+    }
+
+    let eventData = {
+      title: activeEventTitle,
+      type: 'Evento Institucional · CEFA',
+      date: 'Fecha por confirmar',
+      time: '09:00 AM - 12:00 PM',
+      location: 'Auditorio Principal CEFA La Angostura',
+      program: 'Comunidad de Egresados SENA',
+      responsible: 'Coordinación Académica & Egresados',
+      description: 'Participa en esta actividad oficial diseñada para el fortalecimiento profesional, inserción laboral y networking de la comunidad de egresados del CEFA.',
+      cupo: 'Cupo: 200 asistentes'
+    };
+
+    // 1. Buscar en arreglo backend de eventos
+    const cleanId = String(eventId || '').replace(/^event-inv-/, '').replace(/^event-/, '');
+    const foundEvt = EVENTOS_LIST_DATA.find(e => String(e.id) === cleanId || String(e.title || '').trim().toLowerCase() === activeEventTitle.trim().toLowerCase());
+    
+    if (foundEvt) {
+      if (foundEvt.title) eventData.title = foundEvt.title;
+      if (foundEvt.type) eventData.type = foundEvt.type;
+      if (foundEvt.date) eventData.date = foundEvt.date;
+      if (foundEvt.time) eventData.time = foundEvt.time;
+      if (foundEvt.location) eventData.location = foundEvt.location;
+      if (foundEvt.program) eventData.program = foundEvt.program;
+      if (foundEvt.responsible) eventData.responsible = foundEvt.responsible;
+      if (foundEvt.description) eventData.description = foundEvt.description;
+      if (foundEvt.cupo) eventData.cupo = 'Cupo Máximo: ' + foundEvt.cupo + ' asistentes';
+    }
+
+    // 2. Extraer del DOM de la tarjeta (si está en pantalla)
+    if (card) {
+      const titleEl = card.querySelector('.card-title-text');
+      if (titleEl && titleEl.textContent.trim()) {
+        eventData.title = titleEl.textContent.trim();
+      }
+      const tagEl = card.querySelector('.card-tag-badge');
+      if (tagEl && tagEl.textContent.trim()) {
+        eventData.type = tagEl.textContent.replace(/\s+/g, ' ').trim();
+      }
+      const metaSpans = card.querySelectorAll('.card-meta-list span');
+      metaSpans.forEach(span => {
+        const text = span.textContent.trim();
+        if (span.querySelector('.fa-calendar')) {
+          eventData.date = text;
+        } else if (span.querySelector('.fa-clock')) {
+          eventData.time = text;
+        } else if (span.querySelector('.fa-location-dot')) {
+          eventData.location = text;
+        } else if (span.querySelector('.fa-graduation-cap')) {
+          eventData.program = text;
+        } else if (span.querySelector('.fa-chalkboard-user')) {
+          eventData.responsible = text;
+        }
+      });
+      const descEl = card.querySelector('.card-desc-paragraph');
+      if (descEl && descEl.textContent.trim()) {
+        eventData.description = descEl.textContent.trim();
+      }
+      const cupoEl = card.querySelector('.card-action-bar span');
+      if (cupoEl && cupoEl.textContent.trim()) {
+        eventData.cupo = cupoEl.textContent.trim();
+      }
+    }
+
+    // 3. Poblar modal
     const titleEl = document.getElementById('modal-event-title');
-    if (titleEl) titleEl.textContent = 'Inscripción: ' + activeEventTitle;
+    if (titleEl) titleEl.textContent = 'Inscripción: ' + eventData.title;
+
+    const typeEl = document.getElementById('modal-event-type-text');
+    if (typeEl) typeEl.textContent = eventData.type;
+
+    const dateEl = document.getElementById('modal-event-date-text');
+    if (dateEl) dateEl.textContent = eventData.date;
+
+    const timeEl = document.getElementById('modal-event-time-text');
+    if (timeEl) timeEl.textContent = eventData.time;
+
+    const locEl = document.getElementById('modal-event-location-text');
+    if (locEl) locEl.textContent = eventData.location;
+
+    const progEl = document.getElementById('modal-event-program-text');
+    if (progEl) progEl.textContent = eventData.program;
+
+    const descEl = document.getElementById('modal-event-desc-text');
+    if (descEl) descEl.textContent = eventData.description;
+
+    const cupoEl = document.getElementById('modal-event-cupo-text');
+    if (cupoEl) cupoEl.textContent = eventData.cupo;
 
     const modal = document.getElementById('inscripcionModal');
     if (modal) modal.classList.add('active');
@@ -3729,7 +4930,46 @@
   }
 
   function confirmInscripcion() {
+    const btnSubmit = document.getElementById('btn-submit-confirm-inscripcion');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Confirmando...';
+    }
+
+    const modalidadVal = document.getElementById('modal-event-select-modalidad')?.value || 'Presencial';
+    const emailVal = document.getElementById('modal-event-input-email')?.value || '';
+    const phoneVal = document.getElementById('modal-event-input-phone')?.value || '';
+    const nameVal = document.getElementById('modal-event-input-name')?.value || '';
+    const docVal = document.getElementById('modal-event-input-doc')?.value || '';
+
+    // Enviar RSVP al backend para persistencia completa
+    try {
+      fetch('{{ route("egresados.eventos.responder") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          evento_id: activeEventId.replace('event-', '').replace('inv-', ''),
+          title: activeEventTitle,
+          asistencia: 'si',
+          modalidad: modalidadVal,
+          documento: docVal,
+          nombre: nameVal,
+          email: emailVal,
+          telefono: phoneVal
+        })
+      }).catch(() => {});
+    } catch(e) {}
+
     closeInscripcionModal();
+
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-calendar-check"></i> <span>Confirmar mi Cupo</span>';
+    }
 
     if (activeEventId) {
       inscribedEvents.add(activeEventId);
@@ -3755,6 +4995,11 @@
 
     // Actualizar los cuadritos vinculados
     updateEventCounters();
+
+    // Actualizar notificaciones en la campana arribita
+    if (typeof renderEgresadoTopbarNotifications === 'function') {
+      renderEgresadoTopbarNotifications();
+    }
 
     // Mostrar ventana modal de confirmación con botón Aceptar
     const titleSuccess = document.getElementById('modal-success-event-title');
@@ -4229,6 +5474,105 @@
     if (errBox) errBox.style.display = 'none';
   }
 
+  // ========================================================
+  // CONTROL DE NOTICIAS & MODAL DE DETALLE
+  // ========================================================
+
+  function openModalDetalleNoticia(id) {
+    const noticia = NOTICIAS_DATA.find(n => String(n.id) === String(id));
+    if (!noticia) return;
+
+    const modal = document.getElementById('modalDetalleNoticia');
+    if (!modal) return;
+
+    let imgUrl = noticia.image || '';
+    if (imgUrl && imgUrl.includes('127.0.0.1:8000/storage/')) {
+      imgUrl = '{{ asset("") }}' + imgUrl.split('127.0.0.1:8000/')[1];
+    }
+
+    const imgWrap = document.getElementById('modal-noticia-img-wrap');
+    const imgEl = document.getElementById('modal-noticia-img');
+    const headerNoImg = document.getElementById('modal-noticia-header-no-img');
+
+    if (imgUrl) {
+      if (imgWrap) imgWrap.style.display = 'block';
+      if (headerNoImg) headerNoImg.style.display = 'none';
+      if (imgEl) imgEl.src = imgUrl;
+      const catBadge = document.getElementById('modal-noticia-cat-badge');
+      if (catBadge) {
+        catBadge.textContent = noticia.category || 'Institucional';
+        catBadge.className = 'badge-pill ' + (noticia.category_pill || 'status-green');
+      }
+      const titleImg = document.getElementById('modal-noticia-title-img');
+      if (titleImg) titleImg.textContent = noticia.title || '';
+    } else {
+      if (imgWrap) imgWrap.style.display = 'none';
+      if (headerNoImg) headerNoImg.style.display = 'block';
+      const catBadgeNoImg = document.getElementById('modal-noticia-cat-badge-no-img');
+      if (catBadgeNoImg) {
+        catBadgeNoImg.textContent = noticia.category || 'Institucional';
+        catBadgeNoImg.className = 'badge-pill ' + (noticia.category_pill || 'status-green');
+      }
+      const dateHeader = document.getElementById('modal-noticia-date-header');
+      if (dateHeader) dateHeader.textContent = noticia.date || 'Reciente';
+      const titleNoImg = document.getElementById('modal-noticia-title-no-img');
+      if (titleNoImg) titleNoImg.textContent = noticia.title || '';
+    }
+
+    const targetEl = document.getElementById('modal-noticia-target');
+    if (targetEl) targetEl.textContent = noticia.target || 'Toda la comunidad de Egresados CEFA';
+
+    const viewsEl = document.getElementById('modal-noticia-views');
+    if (viewsEl) viewsEl.textContent = noticia.views_count || 1;
+
+    const summaryEl = document.getElementById('modal-noticia-summary-box');
+    if (summaryEl) summaryEl.textContent = noticia.summary || '';
+
+    const contentEl = document.getElementById('modal-noticia-content');
+    if (contentEl) contentEl.textContent = noticia.content || noticia.summary || '';
+
+    const authorEl = document.getElementById('modal-noticia-author');
+    if (authorEl) authorEl.textContent = noticia.author || 'Administración CEFA';
+
+    modal.classList.add('active');
+  }
+
+  function closeModalDetalleNoticia() {
+    const modal = document.getElementById('modalDetalleNoticia');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function filtrarNoticiasEgresado() {
+    const query = (document.getElementById('input-buscar-noticias')?.value || '').toLowerCase().trim();
+    const cat = (document.getElementById('select-filtro-categoria-noticia')?.value || 'todas').toLowerCase();
+
+    const cards = document.querySelectorAll('.noticia-card-item');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
+      const cardTitle = (card.getAttribute('data-title') || '').toLowerCase();
+      const cardSummary = (card.getAttribute('data-summary') || '').toLowerCase();
+      const cardAuthor = (card.getAttribute('data-author') || '').toLowerCase();
+      const cardTarget = (card.getAttribute('data-target') || '').toLowerCase();
+
+      const matchesQuery = !query || cardTitle.includes(query) || cardSummary.includes(query) || cardAuthor.includes(query) || cardTarget.includes(query);
+      const matchesCat = (cat === 'todas') || (cardCat === cat) || cardCat.includes(cat);
+
+      if (matchesQuery && matchesCat) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const noRes = document.getElementById('noticias-no-results');
+    if (noRes) {
+      noRes.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
   // Manejador de teclado Escape para cerrar modales y menús
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
@@ -4240,7 +5584,7 @@
       cerrarModalPostulacion();
       closeModalActualizarPerfilEgresado();
       cerrarModalPostulacionExitosa();
-      closeModalActualizarPerfilEgresado();
+      closeModalDetalleNoticia();
     }
   });
 
@@ -4444,7 +5788,159 @@
     } else {
       showSection('inicio');
     }
+
+    @if(!empty($debeActualizarPassword))
+      setTimeout(() => {
+        openModalActualizarPasswordInicial();
+      }, 600);
+    @endif
   });
+
+  /* ========================================================
+     FUNCIONES PARA ACTUALIZACIÓN DE CONTRASEÑA INICIAL (ERP SENA)
+     ======================================================== */
+  function openModalActualizarPasswordInicial() {
+    const modal = document.getElementById('modalActualizarPasswordInicial');
+    if (modal) {
+      modal.classList.add('active');
+      const errBox = document.getElementById('alert-password-error');
+      const sucBox = document.getElementById('alert-password-success');
+      if (errBox) errBox.style.display = 'none';
+      if (sucBox) sucBox.style.display = 'none';
+      setTimeout(() => {
+        const newPwdInput = document.getElementById('pwd_new_password');
+        if (newPwdInput) newPwdInput.focus();
+      }, 250);
+    }
+  }
+
+  function closeModalActualizarPasswordInicial() {
+    const modal = document.getElementById('modalActualizarPasswordInicial');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    } else {
+      input.type = 'password';
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  }
+
+  function checkPasswordMatch() {
+    const p1 = document.getElementById('pwd_new_password');
+    const p2 = document.getElementById('pwd_new_password_confirmation');
+    const status = document.getElementById('pwdMatchStatus');
+    if (!p1 || !p2 || !status) return;
+
+    if (!p2.value) {
+      status.style.display = 'none';
+      return;
+    }
+
+    status.style.display = 'flex';
+    if (p1.value === p2.value) {
+      status.className = 'pwd-match-status ok';
+      status.innerHTML = '<i class="fa-solid fa-check-circle"></i> Las contraseñas coinciden';
+    } else {
+      status.className = 'pwd-match-status err';
+      status.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Las contraseñas no coinciden aún';
+    }
+  }
+
+  function submitActualizarPasswordInicial(e) {
+    e.preventDefault();
+    const form = document.getElementById('formActualizarPasswordInicial');
+    const btn = document.getElementById('btn-submit-password-inicial');
+    const errBox = document.getElementById('alert-password-error');
+    const sucBox = document.getElementById('alert-password-success');
+    const banner = document.getElementById('banner-alerta-password-inicial');
+
+    const curVal = document.getElementById('pwd_current_password').value.trim();
+    const newVal = document.getElementById('pwd_new_password').value.trim();
+    const confVal = document.getElementById('pwd_new_password_confirmation').value.trim();
+
+    if (!curVal) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Por favor ingresa tu contraseña inicial (tu documento de identidad).';
+      errBox.style.display = 'block';
+      return;
+    }
+    if (newVal.length < 6) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La nueva contraseña debe tener al menos 6 caracteres.';
+      errBox.style.display = 'block';
+      return;
+    }
+    if (newVal !== confVal) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La confirmación de contraseña no coincide con la nueva contraseña.';
+      errBox.style.display = 'block';
+      return;
+    }
+    if (newVal === curVal) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La nueva contraseña no puede ser igual a tu documento o clave inicial.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    errBox.style.display = 'none';
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+
+    const formData = new FormData(form);
+
+    fetch("{{ route('egresados.cambiar_password') }}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      }
+    })
+    .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
+    .then(({ status, ok, data }) => {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+
+      if (ok && data.success) {
+        sucBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.message || '¡Contraseña actualizada con éxito!');
+        sucBox.style.display = 'block';
+        errBox.style.display = 'none';
+
+        if (banner) {
+          banner.style.transition = 'all 0.5s ease';
+          banner.style.opacity = '0';
+          banner.style.transform = 'translateY(-20px)';
+          setTimeout(() => { banner.remove(); }, 500);
+        }
+
+        showToast('¡Tu contraseña ha sido actualizada con éxito!');
+
+        setTimeout(() => {
+          closeModalActualizarPasswordInicial();
+        }, 1600);
+      } else {
+        errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.message || 'Error al actualizar contraseña.');
+        errBox.style.display = 'block';
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Ocurrió un error inesperado de conexión.';
+      errBox.style.display = 'block';
+    });
+  }
 </script>
 
 </body>

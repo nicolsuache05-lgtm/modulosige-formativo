@@ -45,6 +45,9 @@ Route::match(['get', 'post'], 'egresados/logout', function (\Illuminate\Http\Req
     return redirect()->route('logout', ['redirect' => $redirect]);
 })->name('egresados.logout');
 
+// Actualización de contraseña inicial obligatoria para primer ingreso
+Route::post('egresados/cambiar-password', [AuthController::class, 'cambiarPassword'])->name('egresados.cambiar_password');
+
 // Redirección inteligente al autenticarse en SIGE
 Route::get('egresados/home', [AuthController::class, 'showLoginForm'])->name('egresados.home');
 
