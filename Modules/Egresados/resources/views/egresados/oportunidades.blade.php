@@ -94,10 +94,11 @@
       }
       .brand-sub {
         font-size: 10.5px;
-        color: var(--moss, #62E31D);
-        font-weight: 600;
-        letter-spacing: 0.3px;
+        color: #62E31D !important;
+        font-weight: 700;
+        letter-spacing: 0.4px;
         text-transform: uppercase;
+        margin-top: 2px;
       }
       nav { margin-top: 20px; }
       nav a {
@@ -383,7 +384,7 @@
       </div>
       <div>
         <div class="brand-name">SIGE</div>
-        <div class="brand-sub">Gestión de Egresados</div>
+        <div class="brand-sub">GESTIÓN DE EGRESADOS</div>
       </div>
     </a>
     <nav>
@@ -396,11 +397,8 @@
       <a href="{{ route('egresados.oportunidades_egresado') }}" class="active">
         <i class="fa-solid fa-briefcase"></i><span>Oportunidades Laborales</span>
       </a>
-      <a href="#">
-        <i class="fa-regular fa-calendar-days"></i><span>Noticias y Eventos</span>
-      </a>
-      <a href="#">
-        <i class="fa-regular fa-bell"></i><span>Notificaciones</span>
+      <a href="{{ route('egresados.dashboard_egresado') }}#eventos">
+        <i class="fa-regular fa-calendar-check"></i><span>Eventos</span>
       </a>
     </nav>
     <div class="sidebar-foot">

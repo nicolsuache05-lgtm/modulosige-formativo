@@ -490,11 +490,7 @@ class InstructorController extends Controller
             ],
         ];
 
-        $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
-        $customIds = array_column($customEventos, 'id');
-        $filteredDefaults = array_filter($defaultEventos, fn($d) => !in_array($d['id'], $customIds));
-
-        $eventos = array_merge($customEventos, $filteredDefaults);
+        $eventos = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
 
         $totalProgramados = count(array_filter($eventos, fn($e) => ($e['status'] ?? '') === 'PROGRAMADO'));
         $totalRealizados = count(array_filter($eventos, fn($e) => in_array(($e['status'] ?? ''), ['REALIZADO', 'FINALIZADO'])));
@@ -617,6 +613,7 @@ class InstructorController extends Controller
         array_unshift($customEventos, $nuevo);
         session(['custom_instructor_eventos' => $customEventos]);
         session(['custom_eventos' => $customEventos]);
+        \Modules\Egresados\Http\Controllers\EventosController::saveCustomEvento($nuevo);
 
         return redirect()->route('egresados.instructor.eventos.index')
             ->with('success', '¡Evento "' . $nombre . '" programado exitosamente!');
@@ -629,6 +626,7 @@ class InstructorController extends Controller
     {
         $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
         $found = false;
+        $eventoGuardar = null;
 
         foreach ($customEventos as &$evt) {
             if ($evt['id'] === $id) {
@@ -643,6 +641,7 @@ class InstructorController extends Controller
                     $evt['status'] = strtoupper($request->status);
                 }
                 $found = true;
+                $eventoGuardar = $evt;
                 break;
             }
         }
@@ -668,10 +667,14 @@ class InstructorController extends Controller
                 'responsible' => 'Instructor CEFA'
             ];
             array_unshift($customEventos, $nuevoModificado);
+            $eventoGuardar = $nuevoModificado;
         }
 
         session(['custom_instructor_eventos' => $customEventos]);
         session(['custom_eventos' => $customEventos]);
+        if ($eventoGuardar) {
+            \Modules\Egresados\Http\Controllers\EventosController::saveCustomEvento($eventoGuardar);
+        }
 
         return redirect()->route('egresados.instructor.eventos.index')
             ->with('success', '¡El evento ' . $id . ' fue actualizado exitosamente!');
@@ -684,19 +687,21 @@ class InstructorController extends Controller
     {
         $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
         $found = false;
+        $eventoGuardar = null;
 
         foreach ($customEventos as &$evt) {
             if ($evt['id'] === $id) {
                 $evt['status'] = 'CANCELADO';
                 $evt['status_pill'] = 'status-red';
                 $found = true;
+                $eventoGuardar = $evt;
                 break;
             }
         }
         unset($evt);
 
         if (!$found) {
-            $customEventos[] = [
+            $eventoGuardar = [
                 'id' => $id,
                 'title' => 'Evento ' . $id,
                 'type' => 'Evento Institucional',
@@ -714,10 +719,14 @@ class InstructorController extends Controller
                 'program' => 'Todos',
                 'responsible' => 'Instructor CEFA'
             ];
+            $customEventos[] = $eventoGuardar;
         }
 
         session(['custom_instructor_eventos' => $customEventos]);
         session(['custom_eventos' => $customEventos]);
+        if ($eventoGuardar) {
+            \Modules\Egresados\Http\Controllers\EventosController::saveCustomEvento($eventoGuardar);
+        }
 
         return redirect()->route('egresados.instructor.eventos.index')
             ->with('success', 'El evento ' . $id . ' ha sido cancelado exitosamente.');

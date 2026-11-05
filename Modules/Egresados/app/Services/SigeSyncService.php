@@ -431,7 +431,7 @@ class SigeSyncService
                     $userId = DB::table('users')->insertGetId([
                         'email'      => $cleanEmail,
                         'nickname'   => "egresado.{$docNum}",
-                        'password'   => \Illuminate\Support\Facades\Hash::make("Sena{$docNum}*"),
+                        'password'   => \Illuminate\Support\Facades\Hash::make((string)$docNum),
                         'person_id'  => $pId,
                         'created_at' => $now,
                         'updated_at' => $now,

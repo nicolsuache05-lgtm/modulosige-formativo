@@ -247,22 +247,22 @@
 
                         <!-- User / Email Input -->
                         <div class="mb-3 position-relative form-group-custom">
-                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico / Usuario</label>
+                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico, Usuario o Cédula</label>
                             <div class="position-relative">
-                                <i class="fas fa-envelope input-group-text-icon"></i>
-                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="ejemplo@sena.edu.co o usuario" required autofocus>
+                                <i class="fas fa-id-card input-group-text-icon"></i>
+                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="ejemplo@sena.edu.co, usuario o número de cédula" required autofocus>
                             </div>
                         </div>
 
                         <!-- Password Input -->
                         <div class="mb-3 position-relative form-group-custom">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label for="password" class="form-label fw-semibold text-secondary fs-7 mb-0">Contraseña</label>
+                                <label for="password" class="form-label fw-semibold text-secondary fs-7 mb-0">Contraseña (o Cédula)</label>
                                 <a href="javascript:void(0)" onclick="alert('Por favor contacte al Administrador del Sistema ERP o Soporte TIC.');" class="fs-7 text-decoration-none fw-semibold" style="color: var(--sena-green);">¿Olvidaste tu contraseña?</a>
                             </div>
                             <div class="position-relative">
                                 <i class="fas fa-lock input-group-text-icon"></i>
-                                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
+                                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Contraseña o número de cédula" required>
                                 <i class="far fa-eye toggle-password" id="togglePassword"></i>
                             </div>
                         </div>
@@ -298,7 +298,10 @@
                                 </button>
                             </div>
                             <div class="small text-muted" style="font-size: 0.75rem;">
-                                Contraseña para todos: <strong class="text-dark">12345678</strong> • <em>Haz clic en cualquiera para autocompletar</em>
+                                Contraseña para roles de prueba: <strong class="text-dark">12345678</strong><br>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle mt-1 py-1 px-2 fw-semibold">
+                                    <i class="fas fa-check-circle me-1"></i> Egresados registrados: ingresan con su número de cédula en usuario y contraseña
+                                </span>
                             </div>
                         </div>
                     </form>

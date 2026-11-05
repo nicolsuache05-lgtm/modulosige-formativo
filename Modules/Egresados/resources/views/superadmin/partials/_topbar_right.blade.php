@@ -156,6 +156,16 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
+        <button type="button" class="user-menu-item" onclick="if(typeof openModalActualizarPerfilEgresado === 'function'){ openModalActualizarPerfilEgresado(); } else { window.location.href='{{ route('egresados.dashboard_egresado') }}'; }" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit;">
+          <div class="menu-item-icon bg-green-icon">
+            <i class="fa-solid fa-user-pen"></i>
+          </div>
+          <div class="menu-item-content">
+            <div class="menu-item-title">Actualizar mi Información</div>
+            <div class="menu-item-desc">Contacto, residencia y contraseña</div>
+          </div>
+        </button>
+
         <a href="{{ route('home') }}" class="user-menu-item">
           <div class="menu-item-icon bg-blue-icon">
             <i class="fa-solid fa-layer-group"></i>

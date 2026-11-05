@@ -199,4 +199,7 @@ Route::middleware([CheckEgresadosRole::class . ':egresado'])->group(function () 
     Route::get('egresados/dashboard-egresado', [EgresadosController::class, 'dashboardEgresado'])->name('egresados.dashboard_egresado');
     Route::get('egresados/encuestas-egresado', [EgresadosController::class, 'encuestasEgresado'])->name('egresados.encuestas_egresado');
     Route::get('egresados/oportunidades-egresado', [EgresadosController::class, 'oportunidadesEgresado'])->name('egresados.oportunidades_egresado');
+    Route::post('egresados/eventos/{id?}/responder', [EgresadosController::class, 'responderEvento'])->name('egresados.eventos.responder');
+    Route::post('egresados/encuestas/{id?}/responder', [EgresadosController::class, 'responderEncuesta'])->name('egresados.encuestas.responder');
+    Route::post('egresados/perfil/actualizar', [EgresadosController::class, 'actualizarPerfilEgresado'])->name('egresados.perfil.actualizar');
 });

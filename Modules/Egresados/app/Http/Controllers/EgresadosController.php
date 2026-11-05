@@ -1240,14 +1240,73 @@ class EgresadosController extends Controller
     {
         $user = auth()->user();
         $person = $user ? $user->person : null;
+        if (!$person && $user && $user->person_id) {
+            $person = Person::find($user->person_id);
+        }
+        if (!$person && $user) {
+            $cleanDocFromNick = preg_replace('/\D/', '', $user->nickname ?? '');
+            if (!empty($cleanDocFromNick) && strlen($cleanDocFromNick) >= 5) {
+                $person = Person::where('document_number', $cleanDocFromNick)->first();
+            }
+        }
         $apprentice = $person ? Apprentice::with(['course.program'])->where('person_id', $person->id)->first() : null;
+        if (!$apprentice && $user) {
+            $apprentice = Apprentice::with(['course.program'])->whereHas('person', function($q) use ($user) {
+                $q->where('personal_email', $user->email)->orWhere('misena_email', $user->email);
+            })->first();
+            if ($apprentice && !$person) {
+                $person = $apprentice->person;
+            }
+        }
+
+        $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');
 
         // Obtener encuestas unificadas creadas por Admin o Superadmin
         $todasEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
         $encuestasDisponibles = $todasEncuestas;
+
+        // 1. Obtener encuestas respondidas exclusivamente por ESTE egresado autenticado
+        $respuestasEncuestasFile = storage_path('app/sige_respuestas_encuestas.json');
+        $misEncuestasRespondidas = [];
+        if (file_exists($respuestasEncuestasFile)) {
+            try {
+                $allResp = json_decode(@file_get_contents($respuestasEncuestasFile), true) ?: [];
+                foreach ($allResp as $r) {
+                    $matchDoc = ($doc && isset($r['documento']) && (string)$r['documento'] === (string)$doc);
+                    $matchUser = ($user && isset($r['user_id']) && (int)$r['user_id'] === (int)$user->id);
+                    if ($matchDoc || $matchUser) {
+                        if (!empty($r['encuesta_id'])) {
+                            $misEncuestasRespondidas[] = (string)$r['encuesta_id'];
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+        $misEncuestasRespondidas = array_values(array_unique($misEncuestasRespondidas));
+
+        // Total de encuestas pendientes exclusivas para este usuario
         $encuestasActivas = array_filter($todasEncuestas, fn($e) => strtoupper($e['status'] ?? 'ACTIVA') === 'ACTIVA');
-        $encuestasPendientes = count($encuestasActivas);
+        $encuestasPendientes = max(0, count($encuestasActivas) - count($misEncuestasRespondidas));
         $oportunidadesLaborales = 8;
+
+        // 2. Obtener eventos respondidos exclusivamente por ESTE egresado
+        $rsvpFile = storage_path('app/sige_eventos_rsvp.json');
+        $misEventosRespondidos = [];
+        if (file_exists($rsvpFile)) {
+            try {
+                $allRsvps = json_decode(@file_get_contents($rsvpFile), true) ?: [];
+                foreach ($allRsvps as $rsvp) {
+                    $matchDoc = ($doc && isset($rsvp['documento']) && (string)$rsvp['documento'] === (string)$doc);
+                    $matchEmail = ($user && isset($rsvp['email']) && (string)$rsvp['email'] === (string)$user->email);
+                    if ($matchDoc || $matchEmail) {
+                        if (!empty($rsvp['evento_id'])) {
+                            $misEventosRespondidos[] = (string)$rsvp['evento_id'];
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+        $misEventosRespondidos = array_values(array_unique($misEventosRespondidos));
 
         // Obtener invitaciones a eventos enviadas institucionalmente
         $invitacionesEventos = \Illuminate\Support\Facades\Cache::get('sige_invitaciones_eventos', []);
@@ -1258,11 +1317,23 @@ class EgresadosController extends Controller
         $notificaciones = 3 + count($invitacionesEventos);
         $totalEventosActivos = 2 + count($invitacionesEventos);
 
+        // Obtener eventos unificados creados por Admin (Instructor) o Superadmin
+        $eventosDisponibles = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
+        $eventosActivos = array_values(array_filter($eventosDisponibles, function($e) {
+            $st = strtoupper($e['status'] ?? 'PROGRAMADO');
+            return $st === 'PROGRAMADO' || $st === 'EN CURSO';
+        }));
+        $totalEventosActivos = count($eventosActivos);
+
         $todasNoticias = \Modules\Egresados\Http\Controllers\NoticiasController::getAllNoticias();
-        $noticiasRecientes = array_slice(array_filter($todasNoticias, function ($n) {
+        $noticiasPublicadas = array_values(array_filter($todasNoticias, function ($n) {
             $status = strtoupper($n['status'] ?? 'PUBLICADA');
             return in_array($status, ['PUBLICADA', 'DESTACADA', 'ACTIVA']);
-        }), 0, 3);
+        }));
+        if (empty($noticiasPublicadas)) {
+            $noticiasPublicadas = $todasNoticias;
+        }
+        $noticiasRecientes = array_slice($noticiasPublicadas, 0, 3);
 
         return view('egresados::egresados.dashboard', compact(
             'user',
@@ -1273,9 +1344,150 @@ class EgresadosController extends Controller
             'notificaciones',
             'invitacionesEventos',
             'totalEventosActivos',
+            'eventosDisponibles',
+            'eventosActivos',
             'noticiasRecientes',
-            'encuestasDisponibles'
+            'noticiasPublicadas',
+            'encuestasDisponibles',
+            'misEncuestasRespondidas',
+            'misEventosRespondidos'
         ));
+    }
+
+    /**
+     * Registra la respuesta / confirmación de asistencia (RSVP) de un egresado a un evento.
+     */
+    public function responderEvento(Request $request, ?string $id = null)
+    {
+        $id = $id ?: $request->input('evento_id');
+        $asistencia = $request->input('asistencia', 'si'); // si, virtual, no
+        $modalidad = $request->input('modalidad', 'Presencial');
+        $comentario = $request->input('comentario', '');
+        
+        $user = auth()->user();
+        $person = $user ? $user->person : null;
+        $doc = $person ? $person->document_number : ($request->input('documento') ?? '10000003');
+        $nombre = $person ? ($person->first_name . ' ' . $person->first_last_name) : ($user ? $user->nickname : 'Egresado');
+        $email = $person ? ($person->misena_email ?: $person->personal_email) : ($user ? $user->email : 'egresado.sige@sena.edu.co');
+
+        // Cargar eventos y encontrar el solicitado
+        $eventos = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
+        $targetEvento = null;
+        foreach ($eventos as $evt) {
+            if ($evt['id'] === $id) {
+                $targetEvento = $evt;
+                break;
+            }
+        }
+
+        if (!$targetEvento) {
+            $targetEvento = [
+                'id' => $id ?: 'EVT-012',
+                'title' => $request->input('title', 'Evento Institucional CEFA'),
+                'type' => 'Evento Institucional',
+                'date' => date('d/m/Y'),
+                'time' => '08:00 AM',
+                'location' => 'Centro CEFA',
+                'status' => 'PROGRAMADO',
+                'cupo' => 100,
+                'registrados' => 0,
+            ];
+        }
+
+        // Si la respuesta es afirmativa (asistiré o virtual), incrementar registrados
+        $cupo = max(1, (int)($targetEvento['cupo'] ?? 100));
+        $registrados = (int)($targetEvento['registrados'] ?? 0);
+
+        if ($asistencia === 'si' || $asistencia === 'virtual' || $asistencia === 'confirmado') {
+            $registrados++;
+        }
+
+        $targetEvento['registrados'] = min($cupo, $registrados);
+        $rateNum = round(($targetEvento['registrados'] / $cupo) * 100);
+        $targetEvento['rate_num'] = $rateNum;
+        $targetEvento['rate'] = $rateNum . '%';
+
+        // Guardar actualización del evento
+        \Modules\Egresados\Http\Controllers\EventosController::saveCustomEvento($targetEvento);
+
+        // Guardar RSVP en persistencia local / sesión
+        $rsvpData = [
+            'evento_id' => $id,
+            'documento' => $doc,
+            'nombre' => $nombre,
+            'email' => $email,
+            'asistencia' => $asistencia,
+            'modalidad' => $modalidad,
+            'comentario' => $comentario,
+            'created_at' => now()->toDateTimeString()
+        ];
+
+        try {
+            $rsvpFile = storage_path('app/sige_eventos_rsvp.json');
+            $allRsvps = [];
+            if (file_exists($rsvpFile)) {
+                $allRsvps = json_decode(@file_get_contents($rsvpFile), true) ?: [];
+            }
+            $allRsvps[] = $rsvpData;
+            @file_put_contents($rsvpFile, json_encode($allRsvps, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        } catch (\Throwable $e) {}
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '¡Tu confirmación de asistencia al evento ha sido registrada exitosamente!',
+                'evento' => $targetEvento,
+                'rsvp' => $rsvpData
+            ]);
+        }
+
+        return redirect()->back()->with('success', '¡Has confirmado tu asistencia al evento "' . ($targetEvento['title'] ?? $id) . '" correctamente!');
+    }
+
+    /**
+     * Registra las respuestas de una encuesta enviada por un egresado específico.
+     */
+    public function responderEncuesta(Request $request, ?string $id = null)
+    {
+        $id = $id ?: $request->input('encuesta_id', 'ENC-025');
+        $user = auth()->user();
+        $person = $user ? $user->person : null;
+        $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');
+        $nombre = $person ? $person->full_name : ($user ? ($user->full_name ?: $user->nickname) : 'Egresado');
+        $email = $person ? ($person->personal_email ?: $person->misena_email) : ($user ? $user->email : 'egresado@sena.edu.co');
+
+        $respuestasFile = storage_path('app/sige_respuestas_encuestas.json');
+        $allRespuestas = [];
+        try {
+            if (file_exists($respuestasFile)) {
+                $allRespuestas = json_decode(@file_get_contents($respuestasFile), true) ?: [];
+            }
+        } catch (\Throwable $e) {}
+
+        $respKey = $id . '_' . $doc;
+        $allRespuestas[$respKey] = [
+            'encuesta_id' => $id,
+            'user_id'     => $user ? $user->id : null,
+            'documento'   => $doc,
+            'nombre'      => $nombre,
+            'email'       => $email,
+            'respuestas'  => $request->except(['_token', 'encuesta_id']),
+            'created_at'  => now()->toDateTimeString(),
+        ];
+
+        try {
+            @file_put_contents($respuestasFile, json_encode($allRespuestas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        } catch (\Throwable $e) {}
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '¡Tu encuesta ha sido registrada satisfactoriamente!',
+                'encuesta_id' => $id
+            ]);
+        }
+
+        return redirect()->back()->with('success', '¡Tu encuesta ha sido enviada con éxito!');
     }
 
     /**
@@ -1296,6 +1508,134 @@ class EgresadosController extends Controller
         $user = auth()->user();
         $person = $user ? $user->person : null;
         return view('egresados::egresados.oportunidades', compact('user', 'person'));
+    }
+
+    /**
+     * Permite que el egresado actualice su propia información de contacto, residencia, laboral y contraseña.
+     */
+    public function actualizarPerfilEgresado(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para actualizar tu información.');
+        }
+
+        $request->validate([
+            'nombres'          => 'required|string|max:100',
+            'apellidos'        => 'required|string|max:100',
+            'personal_email'   => 'required|email|max:255',
+            'misena_email'     => 'nullable|email|max:255',
+            'telefono'         => 'required|string|min:7|max:20',
+            'telefono2'        => 'nullable|string|max:20',
+            'direccion'        => 'nullable|string|max:255',
+            'situacion_laboral'=> 'nullable|string|max:100',
+            'empresa_labora'   => 'nullable|string|max:200',
+            'cargo_labora'     => 'nullable|string|max:200',
+            'password'         => 'nullable|string|min:6|confirmed',
+        ], [
+            'nombres.required'        => 'Los nombres son requeridos.',
+            'apellidos.required'      => 'Los apellidos son requeridos.',
+            'personal_email.required' => 'El correo electrónico personal es requerido.',
+            'personal_email.email'    => 'Ingresa un formato de correo válido.',
+            'telefono.required'       => 'El número de teléfono o celular es obligatorio para contacto.',
+            'password.confirmed'      => 'La confirmación de la contraseña no coincide.',
+            'password.min'            => 'La nueva contraseña debe tener al menos 6 caracteres.',
+        ]);
+
+        $person = $user->person;
+        if (!$person && $user->person_id) {
+            $person = Person::find($user->person_id);
+        }
+
+        \DB::beginTransaction();
+        try {
+            if (!$person) {
+                $docNumber = preg_replace('/\D/', '', $user->nickname ?? '') ?: (time() % 100000000);
+                $person = Person::where('document_number', $docNumber)->first();
+                if (!$person) {
+                    $person = new Person(['document_number' => $docNumber]);
+                }
+            }
+
+            $person->first_name = trim($request->nombres);
+            $apellidosPartes = preg_split('/\s+/', trim($request->apellidos), 2);
+            $person->first_last_name = $apellidosPartes[0] ?? 'SENA';
+            $person->second_last_name = $apellidosPartes[1] ?? null;
+
+            $cleanEmail = strtolower(trim($request->personal_email));
+            $person->personal_email = $cleanEmail;
+
+            if ($request->filled('misena_email')) {
+                $person->misena_email = strtolower(trim($request->misena_email));
+            }
+
+            $cleanTel = preg_replace('/\D/', '', (string)$request->telefono);
+            $person->telephone1 = !empty($cleanTel) ? (int)$cleanTel : null;
+
+            if ($request->filled('telefono2')) {
+                $cleanTel2 = preg_replace('/\D/', '', (string)$request->telefono2);
+                $person->telephone2 = !empty($cleanTel2) ? (int)$cleanTel2 : null;
+            }
+
+            if ($request->filled('direccion')) {
+                $person->address = trim($request->direccion);
+            }
+
+            self::ensurePersonDefaults($person);
+            $person->save();
+
+            // Asociar persona al usuario si no lo estaba
+            $user->person_id = $person->id;
+
+            // Actualizar correo del usuario si no está duplicado en otro usuario
+            if ($cleanEmail !== $user->email && !User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
+                $user->email = $cleanEmail;
+            }
+
+            // Si envió contraseña para cambiarla
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            // Actualizar estado del aprendiz si existe
+            $apprentice = Apprentice::where('person_id', $person->id)->first();
+            if ($apprentice && $request->filled('situacion_laboral')) {
+                $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->situacion_laboral);
+                $apprentice->save();
+            }
+
+            \DB::commit();
+
+            $updatedData = [
+                'full_name' => $person->full_name,
+                'first_name' => $person->first_name,
+                'email' => $person->personal_email,
+                'telephone' => $person->telephone1,
+                'address' => $person->address,
+                'status' => $apprentice ? $apprentice->apprentice_status : ($request->situacion_laboral ?? 'CERTIFICADO'),
+            ];
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => '¡Tu información personal ha sido actualizada con éxito!',
+                    'data' => $updatedData,
+                ]);
+            }
+
+            return redirect()->back()->with('success', '¡Tu información de perfil ha sido actualizada exitosamente!');
+        } catch (\Throwable $e) {
+            \DB::rollBack();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al actualizar información: ' . $e->getMessage()
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'Ocurrió un error al actualizar los datos: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -1886,7 +2226,7 @@ class EgresadosController extends Controller
                         $nickname = $baseNickname . $count++;
                     }
                     $user->nickname = $nickname;
-                    $user->password = Hash::make('Sena' . $person->document_number . '*');
+                    $user->password = Hash::make((string)$person->document_number);
                     $user->save();
                 } else {
                     $user->person_id = $person->id;

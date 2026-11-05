@@ -31,32 +31,123 @@ class AuthController extends Controller
             'email'    => 'required|string',
             'password' => 'required|string',
         ], [
-            'email.required'    => 'El correo o usuario es obligatorio.',
+            'email.required'    => 'El correo, usuario o documento es obligatorio.',
             'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        $field = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'nickname';
-        $credentials = [
-            $field => $request->email,
-            'password' => $request->password,
-        ];
+        $loginInput = trim($request->input('email'));
+        $password = trim($request->input('password'));
+        $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-            $user = Auth::user();
+        // =========================================================================
+        // A. ACCESO DIRECTO PARA EGRESADOS CON NÚMERO DE CÉDULA
+        // Permite que cualquier egresado registrado en el sistema ingrese usando
+        // su cédula como usuario y también como contraseña.
+        // =========================================================================
+        $cleanDoc = preg_replace('/\D/', '', $loginInput);
+        if (!empty($cleanDoc) && strlen($cleanDoc) >= 5) {
+            $person = \Modules\SICA\Entities\Person::where('document_number', $cleanDoc)
+                ->orWhere('document_number', (int)$cleanDoc)
+                ->first();
 
-            $redirectUrl = $request->input('redirect');
-            if (!empty($redirectUrl) && !str_contains($redirectUrl, '/login') && !str_contains($redirectUrl, 'egresados/welcome') && !str_ends_with($redirectUrl, '/egresados')) {
-                return redirect()->to($redirectUrl);
+            if (!$person && class_exists('\Modules\SICA\Entities\Apprentice')) {
+                $apprentice = \Modules\SICA\Entities\Apprentice::whereHas('person', function($q) use ($cleanDoc) {
+                    $q->where('document_number', $cleanDoc)->orWhere('document_number', (int)$cleanDoc);
+                })->with('person')->first();
+                if ($apprentice && $apprentice->person) {
+                    $person = $apprentice->person;
+                }
             }
 
+            if ($person) {
+                $isDocPassword = ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput);
+
+                $user = User::where('person_id', $person->id)->first();
+                if (!$user && !empty($person->misena_email)) {
+                    $user = User::where('email', $person->misena_email)->first();
+                }
+                if (!$user && !empty($person->personal_email)) {
+                    $user = User::where('email', $person->personal_email)->first();
+                }
+                if (!$user) {
+                    $user = User::where('nickname', 'egresado_' . $cleanDoc)->first();
+                }
+
+                $canAuthenticate = false;
+                if ($isDocPassword) {
+                    $canAuthenticate = true;
+                } elseif ($user && Hash::check($password, $user->password)) {
+                    $canAuthenticate = true;
+                }
+
+                if ($canAuthenticate) {
+                    if (!$user) {
+                        $uniqueEmail = !empty($person->misena_email) 
+                            ? $person->misena_email 
+                            : (!empty($person->personal_email) ? $person->personal_email : 'egresado.' . $cleanDoc . '@sena.edu.co');
+
+                        if (User::where('email', $uniqueEmail)->exists()) {
+                            $uniqueEmail = 'egresado.' . $cleanDoc . '.' . time() . '@sena.edu.co';
+                        }
+
+                        $user = new User();
+                        $user->nickname = 'egresado_' . $cleanDoc;
+                        $user->person_id = $person->id;
+                        $user->email = $uniqueEmail;
+                    }
+
+                    $user->password = Hash::make($cleanDoc);
+                    $user->person_id = $person->id;
+                    $user->save();
+
+                    try {
+                        $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                        if (!$roleEgresado) {
+                            $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                            $appId = $appEgresados ? $appEgresados->id : 30;
+                            $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
+                                ['slug' => 'egresados.egresado'],
+                                [
+                                    'name' => 'Egresado',
+                                    'description' => 'Graduado / Egresado de formación profesional del CEFA',
+                                    'description_english' => 'Graduate / Alumni of vocational training at CEFA',
+                                    'full_access' => 'No',
+                                    'app_id' => $appId,
+                                ]
+                            );
+                        }
+                        if ($roleEgresado && method_exists($user, 'roles')) {
+                            $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                        }
+                    } catch (\Throwable $e) {
+                    }
+
+                    Auth::login($user, $remember);
+                    $request->session()->regenerate();
+
+                    return redirect()->route('egresados.dashboard_egresado')
+                        ->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . ($user->full_name ?: $person->full_name) . '!');
+                }
+            }
+        }
+
+        // =========================================================================
+        // B. AUTENTICACIÓN INSTITUCIONAL POR USUARIO O CORREO
+        // =========================================================================
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'nickname';
+        $user = User::where($field, $loginInput)->first();
+
+        // Si la contraseña coincide con el documento de la persona vinculada
+        if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
+            $user->password = Hash::make($password);
+            $user->save();
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
             return $this->redirectByRole($user);
         }
 
-        // Intento alternativo buscando persona por correo o documento
-        $user = User::where($field, $request->email)->first();
-        if ($user && Hash::check($request->password, $user->password)) {
-            Auth::login($user, $request->filled('remember'));
+        if ($user && Hash::check($password, $user->password)) {
+            Auth::login($user, $remember);
             $request->session()->regenerate();
 
             $redirectUrl = $request->input('redirect');

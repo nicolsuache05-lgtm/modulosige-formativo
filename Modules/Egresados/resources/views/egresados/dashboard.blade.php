@@ -100,23 +100,23 @@
       color: #fff;
     }
     .brand-badge, .brand-icon-wrap {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       background: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      padding: 2px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      border: 2px solid rgba(98, 227, 29, 0.6);
+      padding: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      border: 2px solid var(--sena-neon, #62E31D);
     }
     .brand-badge img, .brand-icon-wrap img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      border-radius: 7px;
+      object-fit: contain;
+      border-radius: 8px;
     }
     .brand-titles {
       display: flex;
@@ -153,12 +153,6 @@
       padding: 2px 7px;
       border-radius: 20px;
       line-height: 1.2;
-    }
-    .brand-sub {
-      font-size: 11.5px;
-      color: rgba(255, 255, 255, 0.65);
-      margin-top: 3px;
-      font-weight: 500;
     }
 
     .nav-label {
@@ -1700,6 +1694,91 @@
       background: #FFFFFF;
     }
 
+    /* Estilos para el Perfil del Egresado y Modal de Actualización */
+    .btn-actualizar-perfil-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #62E31D 0%, #39A900 100%);
+      color: #001A29 !important;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(98, 227, 29, 0.35);
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-actualizar-perfil-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(98, 227, 29, 0.5);
+      background: linear-gradient(135deg, #74ea37 0%, #40ba02 100%);
+    }
+
+    .profile-form-section {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .profile-form-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #001A29;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .profile-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .profile-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .profile-input-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+    .profile-input-group input,
+    .profile-input-group select,
+    .profile-input-group textarea {
+      width: 100%;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #0F172A;
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .profile-input-group input:focus,
+    .profile-input-group select:focus,
+    .profile-input-group textarea:focus {
+      border-color: #39A900;
+      box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.15);
+      background: #FFFFFF;
+    }
+    .profile-input-readonly {
+      background: #F1F5F9 !important;
+      color: #64748B !important;
+      cursor: not-allowed;
+      border-color: #E2E8F0 !important;
+    }
+
     @media (max-width: 900px) {
       .home-two-col-grid { grid-template-columns: 1fr; }
     }
@@ -1739,17 +1818,13 @@
         <span>Encuestas</span>
         <span class="nav-badge" id="nav-badge-encuestas">{{ $encuestasPendientes ?? 2 }}</span>
       </a>
-      <a id="nav-oportunidades" class="nav-item" onclick="showSection('oportunidades')">
-        <i class="fa-solid fa-briefcase"></i>
-        <span>Oportunidades Laborales</span>
-      </a>
       <a id="nav-noticias" class="nav-item" onclick="showSection('noticias')">
-        <i class="fa-regular fa-calendar-days"></i>
-        <span>Eventos</span>
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Noticias</span>
       </a>
-      <a id="nav-notificaciones" class="nav-item" onclick="showSection('notificaciones')">
-        <i class="fa-regular fa-bell"></i>
-        <span>Notificaciones</span>
+      <a id="nav-eventos" class="nav-item" onclick="showSection('eventos')">
+        <i class="fa-regular fa-calendar-check"></i>
+        <span>Eventos</span>
       </a>
     </nav>
 
@@ -1790,6 +1865,12 @@
             <p class="hero-description">
               Mantén actualizado tu perfil, participa activamente en los sondeos de seguimiento y aprovecha las oportunidades laborales y convocatorias vigentes.
             </p>
+            <div style="margin-top: 14px;">
+              <button type="button" class="btn-actualizar-perfil-hero" onclick="openModalActualizarPerfilEgresado()">
+                <i class="fa-solid fa-user-pen"></i>
+                <span>Actualizar mi Información</span>
+              </button>
+            </div>
           </div>
           <img src="{{ route('egresados.assets.image', 'egresados-banner-transparent.png') }}" class="hero-image-decor" alt="Egresados SENA">
         </div>
@@ -1827,9 +1908,11 @@
               try {
                 var eid = '{{ $invEventId }}';
                 var etitle = '{{ addslashes(mb_strtolower(trim($invEventTitle))) }}';
-                var storedEvents = JSON.parse(localStorage.getItem('SIGE_EVENTOS_INSCRITOS_IDS') || '[]');
-                var storedDismissed = JSON.parse(localStorage.getItem('SIGE_INVITACIONES_DESCARTADAS') || '[]');
-                var allCheck = [].concat(storedEvents, storedDismissed);
+                var userKey = 'usr_{{ Auth::id() ?? 0 }}_{{ $person->document_number ?? (Auth::user()->nickname ?? "anon") }}';
+                var backendEvents = @json($misEventosRespondidos ?? []);
+                var storedEvents = JSON.parse(localStorage.getItem('sige_events_' + userKey) || '[]');
+                var storedDismissed = JSON.parse(localStorage.getItem('sige_dismissed_inv_' + userKey) || '[]');
+                var allCheck = [].concat(backendEvents, storedEvents, storedDismissed);
                 var isDone = allCheck.some(function(item){
                   if (!item) return false;
                   var s = String(item).toLowerCase();
@@ -2731,6 +2814,163 @@
 </div>
 
 <!-- ========================================================
+     MODAL ACTUALIZAR INFORMACIÓN DEL EGRESADO
+     ======================================================== -->
+<div class="modal-backdrop" id="modalActualizarPerfilEgresado" onclick="if(event.target===this)closeModalActualizarPerfilEgresado()">
+  <div class="modal-box-card" style="max-width: 720px; max-height: 90vh; overflow-y: auto; border-top: 4px solid var(--sena-green); padding: 0;">
+    <!-- Botón de Cerrar (X) -->
+    <button type="button" class="modal-close-x" onclick="closeModalActualizarPerfilEgresado()" style="z-index: 10; background: rgba(255,255,255,0.95);" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Banner Encabezado Oficial SIGE -->
+    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 24px 28px; color: #fff; position: relative;">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:800; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        <i class="fa-solid fa-user-pen"></i> PORTAL EGRESADOS · ACTUALIZACIÓN DE DATOS
+      </div>
+      <h3 style="font-family:'Poppins','Nunito',sans-serif; font-size:19px; font-weight:800; color:#fff; margin:0 0 6px 0; line-height:1.3;">
+        Actualizar mi Información de Perfil
+      </h3>
+      <p style="font-size:12px; color:rgba(255,255,255,0.85); margin:0; line-height:1.4;">
+        Mantén tus datos de contacto y residencia al día para recibir invitaciones a eventos, ofertas laborales y encuestas institucionales del CEFA.
+      </p>
+    </div>
+
+    <!-- Formulario de Actualización -->
+    <form id="formActualizarPerfilEgresado" action="{{ route('egresados.perfil.actualizar') }}" method="POST" style="padding: 22px 26px;">
+      @csrf
+
+      <!-- Mensaje de Alerta en caso de errores de validación -->
+      <div id="alert-profile-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
+
+      <!-- Sección 1: Identificación y Nombres -->
+      <div class="profile-form-section">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-id-card" style="color:var(--sena-green);"></i>
+          <span>1. Datos de Identificación y Nombres</span>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Número de Documento (Cédula) <span style="font-size:10px; color:#16a34a; font-weight:700;">✓ Verificado</span></label>
+            <div style="position:relative;">
+              <input type="text" value="{{ $person->document_number ?? (Auth::user()->nickname ?? 'Cédula') }}" class="profile-input-readonly" readonly title="Documento registrado en el sistema ERP">
+              <i class="fa-solid fa-lock" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+            </div>
+          </div>
+          <div class="profile-input-group">
+            <label>Tipo de Documento</label>
+            <input type="text" value="{{ $person->document_type ?? 'Cédula de ciudadanía' }}" class="profile-input-readonly" readonly>
+          </div>
+          <div class="profile-input-group">
+            <label>Nombres <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="nombres" id="prof_nombres" required value="{{ old('nombres', $person->first_name ?? (Auth::user()->first_name ?? Auth::user()->name ?? '')) }}" placeholder="Ej. Valentina">
+          </div>
+          <div class="profile-input-group">
+            <label>Apellidos <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="apellidos" id="prof_apellidos" required value="{{ old('apellidos', trim(($person->first_last_name ?? '') . ' ' . ($person->second_last_name ?? '')) ?: 'SENA') }}" placeholder="Ej. Ríos Gómez">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 2: Contacto y Residencia -->
+      <div class="profile-form-section">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-address-book" style="color:var(--sena-green);"></i>
+          <span>2. Información de Contacto y Ubicación</span>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Correo Electrónico Personal <span style="color:#ef4444;">*</span></label>
+            <input type="email" name="personal_email" id="prof_personal_email" required value="{{ old('personal_email', $person->personal_email ?? (Auth::user()->email ?? '')) }}" placeholder="tucorreo@gmail.com">
+          </div>
+          <div class="profile-input-group">
+            <label>Correo MiSENA / Institucional (Opcional)</label>
+            <input type="email" name="misena_email" id="prof_misena_email" value="{{ old('misena_email', $person->misena_email ?? '') }}" placeholder="usuario@misena.edu.co">
+          </div>
+          <div class="profile-input-group">
+            <label>Celular / WhatsApp Principal <span style="color:#ef4444;">*</span></label>
+            <input type="tel" name="telefono" id="prof_telefono" required value="{{ old('telefono', $person->telephone1 ?? '') }}" placeholder="Ej. 3123456789">
+          </div>
+          <div class="profile-input-group">
+            <label>Teléfono Alternativo / Fijo (Opcional)</label>
+            <input type="tel" name="telefono2" id="prof_telefono2" value="{{ old('telefono2', $person->telephone2 ?? '') }}" placeholder="Ej. 3001234567">
+          </div>
+          <div class="profile-input-group" style="grid-column: 1 / -1;">
+            <label>Dirección de Residencia Actual</label>
+            <input type="text" name="direccion" id="prof_direccion" value="{{ old('direccion', $person->address ?? '') }}" placeholder="Ej. Calle 10 # 5-20, Neiva - Huila">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3: Situación Laboral y Formación -->
+      <div class="profile-form-section">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-briefcase" style="color:var(--sena-green);"></i>
+          <span>3. Formación y Situación Laboral</span>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Programa Egresado / Formación</label>
+            <input type="text" value="{{ $apprentice->course->program->name ?? 'Tecnología en Análisis y Desarrollo de Software (ADSO)' }}" class="profile-input-readonly" readonly>
+          </div>
+          <div class="profile-input-group">
+            <label>Situación Laboral Actual <span style="color:#ef4444;">*</span></label>
+            @php $currentStatus = strtoupper($apprentice->apprentice_status ?? 'CERTIFICADO'); @endphp
+            <select name="situacion_laboral" id="prof_situacion_laboral">
+              <option value="CERTIFICADO" {{ in_array($currentStatus, ['CERTIFICADO', 'GRADUADO']) ? 'selected' : '' }}>Certificado / Graduado</option>
+              <option value="EMPLEADO" {{ str_contains($currentStatus, 'EMPLE') ? 'selected' : '' }}>Empleado(a) / Trabajando</option>
+              <option value="EMPRENDEDOR" {{ str_contains($currentStatus, 'EMPREND') ? 'selected' : '' }}>Emprendedor(a) / Negocio Propio</option>
+              <option value="EN FORMACIÓN" {{ str_contains($currentStatus, 'FORMAC') ? 'selected' : '' }}>Continuando Estudios Superiores</option>
+              <option value="BUSCANDO EMPLEO">En Búsqueda Activa de Empleo</option>
+            </select>
+          </div>
+          <div class="profile-input-group">
+            <label>Empresa u Organización donde laboras (Opcional)</label>
+            <input type="text" name="empresa_labora" id="prof_empresa_labora" placeholder="Ej. Empresa Privada, Entidad, Emprendimiento...">
+          </div>
+          <div class="profile-input-group">
+            <label>Cargo o Actividad Principal (Opcional)</label>
+            <input type="text" name="cargo_labora" id="prof_cargo_labora" placeholder="Ej. Desarrollador Junior, Asistente, etc.">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 4: Seguridad y Contraseña (Opcional) -->
+      <div class="profile-form-section" style="border-left: 3px solid #39A900;">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-shield-halved" style="color:var(--sena-green);"></i>
+          <span>4. Seguridad y Contraseña (Opcional)</span>
+        </div>
+        <p style="font-size:11.5px; color:#64748B; margin:0 0 10px 0;">
+          Puedes cambiar tu contraseña si deseas personalizarla. Si la dejas vacía, se conservará tu contraseña actual.
+        </p>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Nueva Contraseña</label>
+            <input type="password" name="password" id="prof_password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          </div>
+          <div class="profile-input-group">
+            <label>Confirmar Nueva Contraseña</label>
+            <input type="password" name="password_confirmation" id="prof_password_confirmation" placeholder="Repite la nueva contraseña" autocomplete="new-password">
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; margin-top:20px;">
+        <button type="button" class="btn-card-outline" onclick="closeModalActualizarPerfilEgresado()" style="padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">
+          Cancelar
+        </button>
+        <button type="submit" id="btn-submit-perfil" class="btn-green-submit" style="padding:11px 24px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Guardar Cambios</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================================
      MODAL DE CONFIRMACIÓN: INSCRIPCIÓN EXITOSA A EVENTO (DISEÑO OFICIAL SUPERADMIN SENA ERP)
      ======================================================== -->
 <div class="modal-backdrop" id="modalInscripcionExitosa" onclick="if(event.target===this)closeInscripcionExitosaModal()">
@@ -2977,19 +3217,46 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const SURVEY_STORAGE_KEY = 'sige_egresado_answered_surveys';
+  // Identificación única del usuario autenticado para aislamiento total de datos
+  const CURRENT_USER_ID = '{{ Auth::id() ?? 0 }}';
+  const CURRENT_USER_DOC = '{{ $person->document_number ?? (Auth::user()->nickname ?? 'anon') }}';
+  const CURRENT_USER_KEY = 'usr_' + CURRENT_USER_ID + '_' + CURRENT_USER_DOC;
+  const BACKEND_ANSWERED_SURVEYS = @json($misEncuestasRespondidas ?? []);
+  const BACKEND_RESPONDED_EVENTS = @json($misEventosRespondidos ?? []);
+
+  // Limpieza preventiva de claves globales residuales no aisladas
+  try {
+    localStorage.removeItem('sige_egresado_answered_surveys');
+    localStorage.removeItem('SIGE_ANSWERED_SURVEYS');
+    localStorage.removeItem('SIGE_EVENTOS_INSCRITOS_IDS');
+    localStorage.removeItem('SIGE_INVITACIONES_DESCARTADAS');
+    localStorage.removeItem('SIGE_NOTIF_LEIDAS_IDS');
+    localStorage.removeItem('SIGE_NOTIF_IMPORTANTES_IDS');
+    localStorage.removeItem('SIGE_POSTULACIONES_IDS');
+    localStorage.removeItem('SIGE_GUARDADAS_IDS');
+  } catch(e) {}
+
+  const SURVEY_STORAGE_KEY = 'sige_surveys_' + CURRENT_USER_KEY;
 
   function getStoredSurveys() {
+    const set = new Set();
+    // 1. Cargar las encuestas registradas en backend para este usuario específico
+    if (Array.isArray(BACKEND_ANSWERED_SURVEYS)) {
+      BACKEND_ANSWERED_SURVEYS.forEach(id => set.add(String(id)));
+    }
+    // 2. Cargar las guardadas en localStorage exclusivamente para este usuario
     try {
       const data = localStorage.getItem(SURVEY_STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data);
-        return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(id => set.add(String(id)));
+        }
       }
     } catch (e) {
       console.warn('Error leyendo localStorage', e);
     }
-    return new Set();
+    return set;
   }
 
   function saveStoredSurveys(set) {
@@ -3031,6 +3298,22 @@
 
   function submitSurvey() {
     closeSurveyModal();
+
+    // Enviar al backend para persistencia exclusiva de este usuario
+    try {
+      const form = document.getElementById('form-responder-encuesta');
+      const formData = form ? new FormData(form) : new FormData();
+      formData.append('encuesta_id', activeSurveyId);
+      formData.append('_token', '{{ csrf_token() }}');
+
+      fetch('{{ route('egresados.encuestas.responder') }}', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      });
+    } catch(e) {}
 
     // Restaurar textos originales de confirmación de encuesta
     const sentModal = document.getElementById('encuestaEnviadaModal');
@@ -3306,16 +3589,26 @@
     filterSurveys(currentSurveyFilter);
   }
 
-  // Modales y Control de Inscripción a Eventos
-  const STORAGE_EVENTOS_KEY = 'SIGE_EVENTOS_INSCRITOS_IDS';
+  // Modales y Control de Inscripción a Eventos (Aislado por Usuario)
+  const STORAGE_EVENTOS_KEY = 'sige_events_' + CURRENT_USER_KEY;
 
   function getStoredEventSet() {
+    const set = new Set();
+    // 1. Respuestas de eventos del backend para este usuario específico
+    if (Array.isArray(BACKEND_RESPONDED_EVENTS)) {
+      BACKEND_RESPONDED_EVENTS.forEach(id => set.add(String(id)));
+    }
+    // 2. Guardadas en localStorage exclusivamente para este usuario
     try {
       const data = localStorage.getItem(STORAGE_EVENTOS_KEY);
-      return data ? new Set(JSON.parse(data)) : new Set();
-    } catch(e) {
-      return new Set();
-    }
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(id => set.add(String(id)));
+        }
+      }
+    } catch(e) {}
+    return set;
   }
 
   function saveStoredEventSet(set) {
@@ -3329,7 +3622,7 @@
   let activeEventTitle = '';
   let activeEventId = '';
 
-  const STORAGE_DISMISSED_INV_KEY = 'SIGE_INVITACIONES_DESCARTADAS';
+  const STORAGE_DISMISSED_INV_KEY = 'sige_dismissed_inv_' + CURRENT_USER_KEY;
 
   function getDismissedInvitations() {
     try {
@@ -3473,9 +3766,9 @@
     }, 150);
   }
 
-  // Control de Notificaciones (Importantes con Estrella y Leídas)
-  const STORAGE_NOTIF_IMPORTANTES_KEY = 'SIGE_NOTIF_IMPORTANTES_IDS';
-  const STORAGE_NOTIF_LEIDAS_KEY = 'SIGE_NOTIF_LEIDAS_IDS';
+  // Control de Notificaciones (Importantes con Estrella y Leídas - Aislado por Usuario)
+  const STORAGE_NOTIF_IMPORTANTES_KEY = 'sige_notif_star_' + CURRENT_USER_KEY;
+  const STORAGE_NOTIF_LEIDAS_KEY = 'sige_notif_read_' + CURRENT_USER_KEY;
 
   function getStoredNotifSet(key) {
     try {
@@ -3574,9 +3867,9 @@
     }, 3500);
   }
 
-  // Modal y Control de Postulación y Guardadas de Ofertas Laborales
-  const STORAGE_POSTULACIONES_KEY = 'SIGE_POSTULACIONES_IDS';
-  const STORAGE_GUARDADAS_KEY = 'SIGE_GUARDADAS_IDS';
+  // Modal y Control de Postulación y Guardadas de Ofertas Laborales (Aislado por Usuario)
+  const STORAGE_POSTULACIONES_KEY = 'sige_postulaciones_' + CURRENT_USER_KEY;
+  const STORAGE_GUARDADAS_KEY = 'sige_guardadas_' + CURRENT_USER_KEY;
 
   function getStoredJobSet(key) {
     try {
@@ -3914,6 +4207,28 @@
     }
   });
 
+  // ========================================================
+  // CONTROL DEL MODAL DE ACTUALIZACIÓN DE PERFIL DEL EGRESADO
+  // ========================================================
+  function openModalActualizarPerfilEgresado() {
+    const modal = document.getElementById('modalActualizarPerfilEgresado');
+    if (modal) {
+      modal.classList.add('active');
+      // Cerrar dropdown del usuario si estuviera desplegado
+      const userMenu = document.getElementById('userDropdownMenu');
+      if (userMenu) userMenu.style.display = 'none';
+      const chevron = document.getElementById('userChevronIcon');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  function closeModalActualizarPerfilEgresado() {
+    const modal = document.getElementById('modalActualizarPerfilEgresado');
+    if (modal) modal.classList.remove('active');
+    const errBox = document.getElementById('alert-profile-error');
+    if (errBox) errBox.style.display = 'none';
+  }
+
   // Manejador de teclado Escape para cerrar modales y menús
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
@@ -3923,7 +4238,9 @@
       closeInscripcionModal();
       closeInscripcionExitosaModal();
       cerrarModalPostulacion();
+      closeModalActualizarPerfilEgresado();
       cerrarModalPostulacionExitosa();
+      closeModalActualizarPerfilEgresado();
     }
   });
 
@@ -4029,6 +4346,96 @@
     // Sincronizar notificaciones en la campana al pie del nombre
     if (typeof renderEgresadoTopbarNotifications === 'function') {
       renderEgresadoTopbarNotifications();
+    }
+
+    // Manejador del Formulario de Actualización de Perfil con AJAX
+    const formPerfil = document.getElementById('formActualizarPerfilEgresado');
+    if (formPerfil) {
+      formPerfil.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btnSubmit = document.getElementById('btn-submit-perfil');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Guardando...';
+
+        const errBox = document.getElementById('alert-profile-error');
+        if (errBox) errBox.style.display = 'none';
+
+        const formData = new FormData(formPerfil);
+
+        fetch(formPerfil.action, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          body: formData
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalText;
+
+          if (status === 200 && body.success) {
+            closeModalActualizarPerfilEgresado();
+
+            // Actualizar el nombre e información visible en topbar y hero banner
+            if (body.data) {
+              const heroName = document.querySelector('.hero-heading');
+              if (heroName && body.data.first_name) {
+                heroName.innerHTML = `¡Bienvenido(a), ${body.data.first_name}!`;
+              }
+              const userChipName = document.querySelector('#userChipBtn span');
+              if (userChipName && body.data.full_name) {
+                userChipName.textContent = body.data.full_name;
+              }
+              const menuName = document.querySelector('.user-menu-name');
+              if (menuName && body.data.full_name) {
+                menuName.textContent = body.data.full_name;
+              }
+              const menuEmail = document.querySelector('.user-menu-email');
+              if (menuEmail && body.data.email) {
+                menuEmail.textContent = body.data.email;
+              }
+            }
+
+            // Mostrar el modal oficial SENA de confirmación
+            const successModal = document.getElementById('modalInscripcionExitosa');
+            if (successModal) {
+              const successH3 = successModal.querySelector('h3');
+              const successP = successModal.querySelector('p');
+              const tagSpan = successModal.querySelector('div span');
+              if (tagSpan) tagSpan.textContent = 'ACTUALIZACIÓN EXITOSA · SIGE ERP';
+              if (successH3) successH3.textContent = '¡Información Actualizada!';
+              if (successP) successP.textContent = 'Tus datos personales, de contacto y perfil han sido guardados satisfactoriamente en el sistema.';
+              successModal.classList.add('active');
+            } else if (typeof showToast === 'function') {
+              showToast('¡Tus datos han sido actualizados con éxito!');
+            } else {
+              alert('¡Tus datos han sido actualizados exitosamente!');
+            }
+          } else {
+            // Mostrar mensaje de error o validación
+            let errorMsg = body.message || 'No se pudo actualizar la información. Por favor revisa los campos.';
+            if (body.errors) {
+              const errList = Object.values(body.errors).flat();
+              errorMsg = errList.join('<br>• ');
+            }
+            if (errBox) {
+              errBox.innerHTML = '<strong><i class="fa-solid fa-triangle-exclamation"></i> Por favor revisa los siguientes campos:</strong><br>• ' + errorMsg;
+              errBox.style.display = 'block';
+              errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+              alert(errorMsg);
+            }
+          }
+        })
+        .catch(err => {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalText;
+          formPerfil.submit();
+        });
+      });
     }
 
     const hash = window.location.hash.replace('#', '');

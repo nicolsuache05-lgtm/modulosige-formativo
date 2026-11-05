@@ -792,4 +792,4 @@
 
 </body>
 </html>
-<?php /**PATH C:\laragon\www\modulosige-formativo\Modules\Egresados\resources\views\welcome.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\laragon\www\modulosige-formativo\Modules/Egresados\resources/views/welcome.blade.php ENDPATH**/ ?>

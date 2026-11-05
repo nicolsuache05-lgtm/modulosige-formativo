@@ -113,26 +113,197 @@ class EventosController extends Controller
     }
 
     /**
-     * Obtiene todos los eventos combinando sesión y predeterminados.
+     * Retorna la lista estática de eventos por defecto.
      */
-    private function getAllEventos(): array
+    public static function getDefaultEventosList(): array
     {
-        $custom = session('custom_eventos', []);
-        $defaults = $this->getDefaultEventos();
+        return [
+            [
+                'id' => 'EVT-012',
+                'title' => 'Feria laboral 2026',
+                'type' => 'Feria laboral',
+                'date' => '20/06/2026',
+                'time' => '09:00 AM - 04:00 PM',
+                'location' => 'Auditorio Principal',
+                'program' => 'ADSO - GAE',
+                'responsible' => 'Coordinación Académica',
+                'status' => 'PROGRAMADO',
+                'status_pill' => 'status-blue',
+                'description' => 'Feria laboral dirigida a Egresados para conectar con empresas aliadas y conocer oportunidades de empleo y prácticas profesionales.',
+                'cupo' => 200,
+                'registrados' => 156,
+                'pendientes' => 12,
+                'rate' => '78%',
+                'rate_num' => 78
+            ],
+            [
+                'id' => 'EVT-011',
+                'title' => 'Taller Hoja de Vida & LinkedIn',
+                'type' => 'Taller práctico',
+                'date' => '15/06/2026',
+                'time' => '02:00 PM - 06:00 PM',
+                'location' => 'Sala TIC 3',
+                'program' => 'Todos los programas',
+                'responsible' => 'Agencia Pública de Empleo (APE)',
+                'status' => 'PROGRAMADO',
+                'status_pill' => 'status-blue',
+                'description' => 'Taller intensivo sobre optimización de CV, perfil profesional en LinkedIn y preparación para entrevistas de trabajo en sector TIC y agropecuario.',
+                'cupo' => 50,
+                'registrados' => 45,
+                'pendientes' => 5,
+                'rate' => '90%',
+                'rate_num' => 90
+            ],
+            [
+                'id' => 'EVT-010',
+                'title' => 'Encuentro Egresados Agropecuarios',
+                'type' => 'Encuentro institucional',
+                'date' => '28/05/2026',
+                'time' => '08:30 AM - 01:00 PM',
+                'location' => 'Plaza Central CEFA',
+                'program' => 'Gestión Agroempresarial',
+                'responsible' => 'Coordinación Agropecuaria',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Espacio de integración y relacionamiento para egresados del área agropecuaria con socialización de proyectos de Fondo Emprender.',
+                'cupo' => 180,
+                'registrados' => 180,
+                'pendientes' => 0,
+                'rate' => '100%',
+                'rate_num' => 100
+            ],
+            [
+                'id' => 'EVT-009',
+                'title' => 'Hackathon TIC & Desarrollo Software',
+                'type' => 'Concurso / Hackathon',
+                'date' => '10/05/2026',
+                'time' => '08:00 AM - 08:00 PM',
+                'location' => 'Laboratorio TIC 1 & 2',
+                'program' => 'ADSO',
+                'responsible' => 'Instructores TIC',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Maratón de desarrollo de soluciones tecnológicas aplicadas al campo con premiación para los mejores prototipos funcionales.',
+                'cupo' => 100,
+                'registrados' => 85,
+                'pendientes' => 0,
+                'rate' => '85%',
+                'rate_num' => 85
+            ],
+            [
+                'id' => 'EVT-008',
+                'title' => 'Conferencia: Innovación y Sostenibilidad',
+                'type' => 'Conferencia / Charla',
+                'date' => '22/04/2026',
+                'time' => '10:00 AM - 12:30 PM',
+                'location' => 'Aula Magna CEFA',
+                'program' => 'Producción Agrícola',
+                'responsible' => 'Líder de Sennova',
+                'status' => 'REALIZADO',
+                'status_pill' => 'status-green',
+                'description' => 'Conferencia internacional sobre tecnologías de agricultura de precisión y sostenibilidad ambiental en la región del Huila.',
+                'cupo' => 150,
+                'registrados' => 120,
+                'pendientes' => 0,
+                'rate' => '80%',
+                'rate_num' => 80
+            ],
+        ];
+    }
 
-        // Si algún default fue sobreescrito en sesión por ID, respetarlo
+    /**
+     * Ruta al archivo de almacenamiento persistente de eventos personalizados.
+     */
+    public static function getCustomEventosFile(): string
+    {
+        return storage_path('app/sige_custom_eventos.json');
+    }
+
+    /**
+     * Obtiene los eventos creados o modificados por Admin o Superadmin.
+     */
+    public static function getCustomEventos(): array
+    {
+        $file = self::getCustomEventosFile();
+        $fileList = [];
+        if (file_exists($file)) {
+            $content = @file_get_contents($file);
+            $fileList = json_decode($content, true) ?: [];
+        }
+
+        $cacheList = [];
+        try {
+            $cacheList = Cache::get('sige_custom_eventos', []);
+        } catch (\Throwable $e) {}
+
+        $sessionCustom = [];
+        try {
+            $sessionCustom = session('custom_eventos', session('custom_instructor_eventos', []));
+        } catch (\Throwable $e) {}
+
+        $merged = [];
+        foreach (array_merge($sessionCustom, $cacheList, $fileList) as $e) {
+            if (!empty($e['id']) && !isset($merged[$e['id']])) {
+                $merged[$e['id']] = $e;
+            }
+        }
+
+        return array_values($merged);
+    }
+
+    /**
+     * Guarda o actualiza un evento en almacenamiento unificado.
+     */
+    public static function saveCustomEvento(array $evento): void
+    {
+        $custom = self::getCustomEventos();
+        $found = false;
+        foreach ($custom as &$c) {
+            if ($c['id'] === $evento['id']) {
+                $c = array_merge($c, $evento);
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            array_unshift($custom, $evento);
+        }
+
+        try {
+            $file = self::getCustomEventosFile();
+            @file_put_contents($file, json_encode($custom, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        } catch (\Throwable $e) {}
+
+        try {
+            Cache::forever('sige_custom_eventos', $custom);
+        } catch (\Throwable $e) {}
+
+        try {
+            session(['custom_eventos' => $custom]);
+            session(['custom_instructor_eventos' => $custom]);
+        } catch (\Throwable $e) {}
+    }
+
+    /**
+     * Obtiene todos los eventos combinando personalizados y predeterminados.
+     */
+    public static function getAllEventos(): array
+    {
+        $custom = self::getCustomEventos();
+        $defaults = self::getDefaultEventosList();
+
         $customIds = array_column($custom, 'id');
         $filteredDefaults = array_filter($defaults, fn($d) => !in_array($d['id'], $customIds));
 
-        return array_merge($custom, $filteredDefaults);
+        return array_values(array_merge($custom, $filteredDefaults));
     }
 
     /**
      * Busca un evento por su identificador.
      */
-    private function findEvento(string $id): ?array
+    public static function findEvento(string $id): ?array
     {
-        $eventos = $this->getAllEventos();
+        $eventos = self::getAllEventos();
         foreach ($eventos as $e) {
             if ($e['id'] === $id) {
                 return $e;
@@ -142,26 +313,11 @@ class EventosController extends Controller
     }
 
     /**
-     * Guarda o actualiza un evento en sesión.
+     * Guarda o actualiza un evento en sesión (mantiene compatibilidad).
      */
     private function saveEventoInSession(array $evento): void
     {
-        $custom = session('custom_eventos', []);
-        $found = false;
-
-        foreach ($custom as &$c) {
-            if ($c['id'] === $evento['id']) {
-                $c = $evento;
-                $found = true;
-                break;
-            }
-        }
-
-        if (!$found) {
-            array_unshift($custom, $evento);
-        }
-
-        session(['custom_eventos' => $custom]);
+        self::saveCustomEvento($evento);
     }
 
     /**
