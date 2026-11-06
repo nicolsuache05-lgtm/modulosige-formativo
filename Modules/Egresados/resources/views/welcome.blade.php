@@ -504,10 +504,11 @@
                 <div>
                     <h4 class="font-poppins text-xs uppercase tracking-widest text-[#62E31D] font-black mb-4">Plataforma SIGE</h4>
                     <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 font-sans font-medium">
-                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Noticias de SIGE</a></li>
-                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Eventos y talleres</a></li>
-                        <li><a href="{{ route('egresados.index') }}" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Encuestas y seguimiento</a></li>
-                        <li><a href="{{ route('egresados.index') }}" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Directorio de egresados</a></li>
+                        <li><a href="#inicio" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Inicio</a></li>
+                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Oportunidades</a></li>
+                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Encuestas</a></li>
+                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Eventos & Noticias</a></li>
+                        <li><a href="#contacto" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Contacto</a></li>
                     </ul>
                 </div>
 
@@ -544,9 +545,9 @@
             </div>
 
             <!-- Bottom Copyright -->
-            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4 font-sans font-medium">
-                <p>© {{ date('Y') }} <strong class="text-white font-poppins">SIGE — Sistema de Gestión de Egresados CEFA</strong> • SENA Empresa. Todos los derechos reservados.</p>
-                <p class="text-[#62E31D] font-bold font-poppins">Centro de Formación Agroindustrial "La Angostura"</p>
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4 font-sans font-medium text-center sm:text-left">
+                <p>© {{ date('Y') }} <strong class="text-white font-poppins">SIGE — Sistema de Gestión de Egresados</strong> • SENA Empresa. Derechos de autor: <span class="text-white font-bold">Hasbleidy Perdomo, Juan D. Lizcano y Nicolle Suache</span>. Todos los derechos reservados.</p>
+                <p class="text-[#62E31D] font-bold font-poppins shrink-0">Centro de Formación Agroindustrial "La Angostura"</p>
             </div>
 
         </div>
