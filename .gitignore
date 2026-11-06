@@ -22,12 +22,12 @@ yarn-error.log
 /.vscode
 /.zed
 
-# Logs y bases de datos locales
+
 *.log
 Thumbs.db
 .DS_Store
 
-# Archivos temporales y cache del framework (storage)
+
 /storage/app/*
 !/storage/app/.gitignore
 /storage/app/public/*
