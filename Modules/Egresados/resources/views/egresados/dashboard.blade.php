@@ -1037,6 +1037,121 @@
       }
     }
 
+    /* Modal Bloqueante Tipo SOFIA PLUS con Colores ERP */
+    .modal-sofia-blocking {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: radial-gradient(circle at center, rgba(0, 35, 54, 0.96) 0%, rgba(0, 19, 30, 0.98) 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      z-index: 999999 !important;
+      display: none;
+      align-items: flex-start !important;
+      justify-content: center !important;
+      padding: 20px 14px !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    .modal-sofia-blocking.active {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    .sofia-card-container {
+      max-width: 580px !important;
+      width: 100% !important;
+      background: #FFFFFF !important;
+      border-radius: 18px !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(98, 227, 29, 0.35) !important;
+      border-top: 5px solid #39A900 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      max-height: calc(100vh - 40px) !important;
+      overflow: hidden !important;
+      transform: scale(1) !important;
+      transition: transform 0.2s ease !important;
+      margin: auto 0 !important;
+    }
+    .sofia-card-scrollable {
+      overflow-y: auto !important;
+      max-height: calc(100vh - 140px) !important;
+      padding: 18px 24px 22px !important;
+    }
+    .sofia-card-scrollable::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sofia-card-scrollable::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    @keyframes sofiaShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .sofia-shake {
+      animation: sofiaShake 0.45s ease-in-out !important;
+    }
+    .sofia-user-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 600px) {
+      .sofia-user-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sofia-user-item {
+      font-size: 11.5px;
+    }
+    .sofia-user-item .label {
+      color: #64748B;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .sofia-user-item .val {
+      color: #00131E;
+      font-weight: 800;
+      font-size: 12.5px;
+    }
+    .btn-sofia-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 800;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(57, 169, 0, 0.4);
+      transition: all 0.25s ease;
+    }
+    .btn-sofia-submit:hover {
+      background: linear-gradient(135deg, #43be04 0%, #319400 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(57, 169, 0, 0.55);
+    }
+
   
     .kpi-row-grid {
       display: grid;
@@ -3874,120 +3989,144 @@
 </div>
 
 <!-- ========================================================
-     MODAL ACTUALIZACIÓN DE CONTRASEÑA INICIAL (ERP SENA)
+     MODAL BLOQUEANTE TIPO SOFIA PLUS: CAMBIO OBLIGATORIO DE CONTRASEÑA (COLORES ERP)
      ======================================================== -->
-<div class="modal-backdrop" id="modalActualizarPasswordInicial" onclick="if(event.target===this)closeModalActualizarPasswordInicial()">
-  <div class="modal-box-card" style="max-width: 540px; border-top: 4px solid #39A900; padding: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px rgba(0, 19, 30, 0.35);">
-    <!-- Botón de Cerrar (X) -->
-    <button type="button" class="modal-close-x" onclick="closeModalActualizarPasswordInicial()" style="z-index: 10; background: rgba(255,255,255,0.95);" title="Cerrar ventana">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-
-    <!-- Banner Encabezado Oficial SIGE -->
-    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 24px 28px; color: #fff; position: relative;">
-      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:800; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-        <i class="fa-solid fa-shield-halved"></i> SEGURIDAD DE ACCESO · CEFA SENA
-      </div>
-      <h3 style="font-family:'Poppins','Nunito',sans-serif; font-size:19px; font-weight:800; color:#fff; margin:0 0 6px 0; line-height:1.3;">
-        Actualizar Contraseña Inicial
-      </h3>
-      <p style="font-size:12px; color:rgba(255,255,255,0.85); margin:0; line-height:1.45;">
-        Por ser tu primer ingreso al sistema con tu número de documento, es necesario que configures tu nueva contraseña personal e intransferible.
-      </p>
-    </div>
-
-    <!-- Formulario de Actualización de Contraseña -->
-    <form id="formActualizarPasswordInicial" onsubmit="submitActualizarPasswordInicial(event)" style="padding: 22px 26px;">
-      @csrf
-
-      <!-- Mensaje de Alerta en caso de errores de validación -->
-      <div id="alert-password-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
-      
-      <!-- Mensaje de Éxito -->
-      <div id="alert-password-success" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
-
-      <!-- Tarjeta informativa del documento registrado -->
-      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; align-items:center; gap:12px;">
-        <div style="width:38px; height:38px; border-radius:10px; background:rgba(57, 169, 0, 0.12); color:#39A900; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
-          <i class="fa-solid fa-id-card"></i>
-        </div>
-        <div>
-          <span style="font-size:11px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.4px;">Usuario Oficial y Clave Inicial:</span>
-          <div style="font-size:13.5px; font-weight:700; color:#00131E;">
-            Cédula / Documento: <span style="color:#39A900;">{{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: 'Documento Registrado') }}</span>
+<div class="modal-backdrop @if(!empty($debeActualizarPassword)) active @endif modal-sofia-blocking" id="modalActualizarPasswordInicial" onclick="shakeSofiaModal(event)">
+  <div class="modal-box-card sofia-card-container" id="sofiaPasswordCard" onclick="event.stopPropagation()">
+    
+    <!-- Encabezado Institucional estilo SOFIA PLUS con Colores ERP (Fijo) -->
+    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 18px 24px; color: #fff; position: relative; border-bottom: 3px solid #39A900; flex-shrink: 0;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px;">
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(57,169,0,0.2); border: 1px solid #62E31D; display: flex; align-items: center; justify-content: center; color: #62E31D; font-size: 13px;">
+            <i class="fa-solid fa-shield-halved"></i>
           </div>
+          <span style="font-size: 10.5px; font-weight: 800; color: #62E31D; letter-spacing: 0.6px; text-transform: uppercase;">
+            SISTEMA SIGE ERP · CEFA LA ANGOSTURA
+          </span>
         </div>
-      </div>
-
-      <!-- 1. Primera Contraseña (Documento) -->
-      <div style="margin-bottom:16px;">
-        <label for="pwd_current_password" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
-          <i class="fa-solid fa-lock" style="color:#39A900; margin-right:4px;"></i> 1. Primera Contraseña (Tu Cédula o Documento Actual) <span style="color:#EF4444;">*</span>
-        </label>
-        <div class="input-password-wrapper">
-          <input type="password" id="pwd_current_password" name="current_password" class="input-modern"
-                 value="{{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: '') }}"
-                 placeholder="Ingresa tu documento (clave inicial)" required style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
-          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_current_password', this)" title="Ver u ocultar contraseña">
-            <i class="fa-regular fa-eye"></i>
-          </button>
-        </div>
-        <span style="display:block; font-size:11px; color:#64748B; margin-top:4px;">
-          Corresponde a la contraseña con la que iniciaste sesión por primera vez.
+        <span style="background: rgba(220, 38, 38, 0.25); border: 1px solid #EF4444; color: #FCA5A5; font-size: 9.5px; font-weight: 800; padding: 2.5px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-lock"></i> OBLIGATORIO
         </span>
       </div>
 
-      <!-- 2. Nueva Contraseña -->
-      <div style="margin-bottom:16px;">
-        <label for="pwd_new_password" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
-          <i class="fa-solid fa-key" style="color:#39A900; margin-right:4px;"></i> 2. Nueva Contraseña Privada <span style="color:#EF4444;">*</span>
-        </label>
-        <div class="input-password-wrapper">
-          <input type="password" id="pwd_new_password" name="new_password" class="input-modern"
-                 placeholder="Mínimo 6 caracteres (ej. MiClave2026*)" required minlength="6" oninput="checkPasswordMatch()"
-                 style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
-          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password', this)" title="Ver u ocultar contraseña">
-            <i class="fa-regular fa-eye"></i>
+      <h2 style="font-family: 'Poppins', 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #FFFFFF; margin: 0 0 2px 0; letter-spacing: -0.3px;">
+        CAMBIO OBLIGATORIO DE CONTRASEÑA
+      </h2>
+      <p style="font-size: 11.5px; color: rgba(255, 255, 255, 0.85); margin: 0; line-height: 1.35;">
+        Requerimiento de seguridad institucional de primer ingreso al sistema (estilo SOFIA Plus).
+      </p>
+    </div>
+
+    <!-- Formulario de Actualización de Contraseña con Scroll Ergonómico -->
+    <form id="formActualizarPasswordInicial" action="{{ route('egresados.cambiar_password') }}" method="POST" onsubmit="submitActualizarPasswordInicial(event)" style="display:flex; flex-direction:column; overflow:hidden; margin:0;">
+      @csrf
+
+      <div class="sofia-card-scrollable">
+        <!-- Banner de Advertencia Sofia Plus -->
+        <div style="background: linear-gradient(135deg, #F0FDF4 0%, #EAF7EE 100%); border: 1px solid #BBF7D0; border-left: 4px solid #39A900; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; color: #166534; font-size: 11.5px; line-height: 1.4; display: flex; gap: 10px; align-items: flex-start;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size: 15px; color: #39A900; margin-top: 2px; flex-shrink: 0;"></i>
+          <div>
+            <strong style="color: #00131E; font-size: 12px; display: block; margin-bottom: 2px;">
+              Aviso de Seguridad de Primer Ingreso:
+            </strong>
+            Por políticas institucionales del SENA, al ingresar con tu documento como clave inicial, debes actualizar tu contraseña personal. <strong>No podrás avanzar hasta completar este paso.</strong>
+          </div>
+        </div>
+
+        <!-- Ficha de Identificación del Usuario (Tipo SOFIA Plus) -->
+        <div class="sofia-user-grid">
+          <div class="sofia-user-item">
+            <span class="label"><i class="fa-solid fa-hashtag" style="color: #39A900;"></i> Documento de Identificación:</span>
+            <span class="val" style="color: #39A900; font-size: 13px;">
+              {{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: 'Documento Registrado') }}
+            </span>
+          </div>
+          <div class="sofia-user-item">
+            <span class="label"><i class="fa-solid fa-user-check" style="color: #39A900;"></i> Titular de la Cuenta:</span>
+            <span class="val" style="font-size: 12px;">
+              {{ isset($person) ? ($person->first_name . ' ' . $person->first_last_name) : (Auth::user()->name ?? 'Egresado CEFA') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Mensaje de Alerta en caso de errores de validación -->
+        <div id="alert-password-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:10px 14px; border-radius:10px; font-size:12px; margin-bottom:12px; font-weight:600;"></div>
+        
+        <!-- Mensaje de Éxito -->
+        <div id="alert-password-success" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:10px 14px; border-radius:10px; font-size:12px; margin-bottom:12px; font-weight:700;"></div>
+
+        <!-- 1. Contraseña Anterior / Inicial (Documento) -->
+        <div style="margin-bottom:12px;">
+          <label for="pwd_current_password" style="display:block; font-size:11.5px; font-weight:700; color:#00131E; margin-bottom:5px;">
+            <i class="fa-solid fa-lock" style="color:#39A900; margin-right:4px;"></i> Contraseña Anterior / Inicial (Tu Cédula o Documento Actual) <span style="color:#EF4444;">*</span>
+          </label>
+          <div class="input-password-wrapper">
+            <input type="password" id="pwd_current_password" name="current_password" class="input-modern"
+                   value="{{ isset($person) && $person->document_number ? $person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: '') }}"
+                   placeholder="Ingresa tu documento (clave inicial)" required style="width:100%; border:1px solid #CBD5E1; border-radius:9px; padding:9px 40px 9px 12px; font-size:13px; font-family:inherit;">
+            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_current_password', this)" title="Ver u ocultar contraseña">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Nueva Contraseña -->
+        <div style="margin-bottom:12px;">
+          <label for="pwd_new_password" style="display:block; font-size:11.5px; font-weight:700; color:#00131E; margin-bottom:5px;">
+            <i class="fa-solid fa-key" style="color:#39A900; margin-right:4px;"></i> Nueva Contraseña Personal <span style="color:#EF4444;">*</span>
+          </label>
+          <div class="input-password-wrapper">
+            <input type="password" id="pwd_new_password" name="new_password" class="input-modern"
+                   placeholder="Escribe tu nueva contraseña (mínimo 6 caracteres)" required minlength="6" oninput="checkPasswordMatch()"
+                   style="width:100%; border:1px solid #CBD5E1; border-radius:9px; padding:9px 40px 9px 12px; font-size:13px; font-family:inherit;">
+            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password', this)" title="Ver u ocultar contraseña">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Confirmar Nueva Contraseña -->
+        <div style="margin-bottom:12px;">
+          <label for="pwd_new_password_confirmation" style="display:block; font-size:11.5px; font-weight:700; color:#00131E; margin-bottom:5px;">
+            <i class="fa-solid fa-circle-check" style="color:#39A900; margin-right:4px;"></i> Confirmar Nueva Contraseña <span style="color:#EF4444;">*</span>
+          </label>
+          <div class="input-password-wrapper">
+            <input type="password" id="pwd_new_password_confirmation" name="new_password_confirmation" class="input-modern"
+                   placeholder="Vuelve a escribir exactamente tu nueva contraseña" required minlength="6" oninput="checkPasswordMatch()"
+                   style="width:100%; border:1px solid #CBD5E1; border-radius:9px; padding:9px 40px 9px 12px; font-size:13px; font-family:inherit;">
+            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password_confirmation', this)" title="Ver u ocultar contraseña">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <div id="pwdMatchStatus" class="pwd-match-status" style="display:none; font-size:11px; margin-top:4px;"></div>
+        </div>
+
+        <!-- Reglas de Contraseña estilo SOFIA PLUS -->
+        <div class="erp-security-tips" style="margin-bottom: 16px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:8px 12px;">
+          <strong style="color:#00131E; font-size:11px; display:inline-flex; align-items:center; gap:5px;">
+            <i class="fa-solid fa-list-check" style="color:#39A900;"></i> Requisitos mínimos:
+          </strong>
+          <span style="font-size:11px; color:#475569; margin-left:6px;">
+            Mínimo 6 caracteres · Distinta a tu documento · Deben coincidir.
+          </span>
+        </div>
+
+        <!-- Botón Principal Sofia Plus (Ancho Completo, SIEMPRE VISIBLE) -->
+        <div style="margin-bottom: 12px;">
+          <button type="submit" id="btn-submit-password-inicial" class="btn-sofia-submit">
+            <i class="fa-solid fa-key"></i>
+            <span>CAMBIAR CONTRASEÑA Y CONTINUAR</span>
           </button>
         </div>
-      </div>
 
-      <!-- 3. Confirmar Nueva Contraseña -->
-      <div style="margin-bottom:18px;">
-        <label for="pwd_new_password_confirmation" style="display:block; font-size:12px; font-weight:700; color:#00131E; margin-bottom:6px;">
-          <i class="fa-solid fa-circle-check" style="color:#39A900; margin-right:4px;"></i> 3. Confirmar Nueva Contraseña <span style="color:#EF4444;">*</span>
-        </label>
-        <div class="input-password-wrapper">
-          <input type="password" id="pwd_new_password_confirmation" name="new_password_confirmation" class="input-modern"
-                 placeholder="Vuelve a escribir la nueva contraseña" required minlength="6" oninput="checkPasswordMatch()"
-                 style="width:100%; border:1px solid #CBD5E1; border-radius:10px; padding:10px 42px 10px 14px; font-size:13px; font-family:inherit;">
-          <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pwd_new_password_confirmation', this)" title="Ver u ocultar contraseña">
-            <i class="fa-regular fa-eye"></i>
-          </button>
+        <!-- Enlace para salir si no desea continuar en este momento -->
+        <div style="text-align: center; margin-top: 4px;">
+          <span style="font-size: 11px; color: #64748B;">¿No deseas cambiar tu clave ahora?</span>
+          <a href="{{ route('egresados.logout') }}" style="font-size: 11px; color: #DC2626; font-weight: 700; text-decoration: none; margin-left: 6px;">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión
+          </a>
         </div>
-        <div id="pwdMatchStatus" class="pwd-match-status" style="display:none;"></div>
-      </div>
-
-      <!-- Tips de Seguridad -->
-      <div class="erp-security-tips">
-        <strong style="color:#00131E; font-size:11.5px; display:inline-flex; align-items:center; gap:5px;">
-          <i class="fa-solid fa-circle-info" style="color:#39A900;"></i> Recomendaciones de Seguridad CEFA:
-        </strong>
-        <ul style="margin:4px 0 0 16px; padding:0; font-size:11.5px; color:#64748B;">
-          <li>Tu usuario seguirá siendo tu número de cédula.</li>
-          <li>La nueva clave debe tener al menos 6 caracteres y ser distinta a tu documento.</li>
-        </ul>
-      </div>
-
-      <!-- Botones de Acción -->
-      <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; margin-top:20px;">
-        <button type="button" class="btn-card-outline" onclick="closeModalActualizarPasswordInicial()" style="padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer; font-size:12.5px;">
-          Recordármelo más tarde
-        </button>
-        <button type="submit" id="btn-submit-password-inicial" class="btn-green-submit" style="padding:11px 22px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:13px; background:linear-gradient(135deg, #39A900 0%, #2a7c00 100%); color:#fff; border:none; box-shadow:0 4px 14px rgba(57,169,0,0.35);">
-          <i class="fa-solid fa-shield-check"></i>
-          <span>Guardar Nueva Contraseña</span>
-        </button>
       </div>
     </form>
   </div>
@@ -5790,19 +5929,48 @@
     }
 
     @if(!empty($debeActualizarPassword))
-      setTimeout(() => {
-        openModalActualizarPasswordInicial();
-      }, 600);
+      document.body.style.overflow = 'hidden';
+      openModalActualizarPasswordInicial();
     @endif
   });
 
   /* ========================================================
-     FUNCIONES PARA ACTUALIZACIÓN DE CONTRASEÑA INICIAL (ERP SENA)
+     FUNCIONES PARA ACTUALIZACIÓN DE CONTRASEÑA TIPO SOFIA PLUS (ERP SENA)
      ======================================================== */
+  function shakeSofiaModal(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const card = document.getElementById('sofiaPasswordCard');
+    if (card) {
+      card.classList.remove('sofia-shake');
+      void card.offsetWidth; // retrigger animation
+      card.classList.add('sofia-shake');
+    }
+    const errBox = document.getElementById('alert-password-error');
+    if (errBox) {
+      errBox.innerHTML = '<i class="fa-solid fa-lock"></i> Por seguridad institucional (tipo SOFIA Plus), el cambio de contraseña es obligatorio para continuar.';
+      errBox.style.display = 'block';
+    }
+  }
+
+  // Prevenir que presione ESC para cerrar el modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('modalActualizarPasswordInicial');
+      if (modal && modal.classList.contains('active')) {
+        e.preventDefault();
+        shakeSofiaModal();
+      }
+    }
+  });
+
   function openModalActualizarPasswordInicial() {
     const modal = document.getElementById('modalActualizarPasswordInicial');
     if (modal) {
       modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
       const errBox = document.getElementById('alert-password-error');
       const sucBox = document.getElementById('alert-password-success');
       if (errBox) errBox.style.display = 'none';
@@ -5810,13 +5978,14 @@
       setTimeout(() => {
         const newPwdInput = document.getElementById('pwd_new_password');
         if (newPwdInput) newPwdInput.focus();
-      }, 250);
+      }, 200);
     }
   }
 
   function closeModalActualizarPasswordInicial() {
     const modal = document.getElementById('modalActualizarPasswordInicial');
     if (modal) modal.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
   function togglePasswordVisibility(inputId, btn) {
@@ -5874,28 +6043,32 @@
     if (!curVal) {
       errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Por favor ingresa tu contraseña inicial (tu documento de identidad).';
       errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
     if (newVal.length < 6) {
       errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La nueva contraseña debe tener al menos 6 caracteres.';
       errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
     if (newVal !== confVal) {
       errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La confirmación de contraseña no coincide con la nueva contraseña.';
       errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
     if (newVal === curVal) {
       errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La nueva contraseña no puede ser igual a tu documento o clave inicial.';
       errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
 
     errBox.style.display = 'none';
     const originalText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando y continuando...';
 
     const formData = new FormData(form);
 
@@ -5909,13 +6082,12 @@
     })
     .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
     .then(({ status, ok, data }) => {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-
       if (ok && data.success) {
-        sucBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.message || '¡Contraseña actualizada con éxito!');
+        sucBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.message || '¡Contraseña actualizada con éxito! Entrando al sistema...');
         sucBox.style.display = 'block';
         errBox.style.display = 'none';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Listo! Entrando al sistema...';
+        btn.style.background = '#16a34a';
 
         if (banner) {
           banner.style.transition = 'all 0.5s ease';
@@ -5924,21 +6096,20 @@
           setTimeout(() => { banner.remove(); }, 500);
         }
 
-        showToast('¡Tu contraseña ha sido actualizada con éxito!');
-
         setTimeout(() => {
-          closeModalActualizarPasswordInicial();
-        }, 1600);
+          window.location.href = "{{ route('egresados.dashboard_egresado') }}";
+        }, 700);
       } else {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
         errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.message || 'Error al actualizar contraseña.');
         errBox.style.display = 'block';
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     })
     .catch(err => {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Ocurrió un error inesperado de conexión.';
-      errBox.style.display = 'block';
+      // Si el fetch falla por problemas de red o respuesta no-JSON, enviar formulario nativamente
+      form.submit();
     });
   }
 </script>

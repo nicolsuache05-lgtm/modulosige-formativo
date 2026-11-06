@@ -67,6 +67,28 @@
             animation: float-hero 4.5s ease-in-out infinite;
         }
 
+        /* Logo Ilustrado Flotante con Sombreado Oficial SENA ERP */
+        .hero-logo-emblem {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            user-select: none;
+            filter: drop-shadow(0 18px 30px rgba(0, 19, 30, 0.45)) 
+                    drop-shadow(0 0 22px rgba(57, 169, 0, 0.55)) 
+                    drop-shadow(0 0 45px rgba(98, 227, 29, 0.3));
+            animation: float-hero 4.5s ease-in-out infinite;
+            transition: filter 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .hero-logo-emblem:hover {
+            filter: drop-shadow(0 24px 40px rgba(0, 19, 30, 0.55)) 
+                    drop-shadow(0 0 32px rgba(57, 169, 0, 0.75)) 
+                    drop-shadow(0 0 60px rgba(98, 227, 29, 0.5));
+            transform: scale(1.05) translateY(-16px);
+        }
+
         /* Ambient glowing pulse behind artwork */
         @keyframes glow-pulse {
             0% { transform: scale(0.92); opacity: 0.55; }
@@ -117,31 +139,28 @@
                     <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl font-black tracking-wider leading-none text-white font-poppins">SIGE</span>
-                        <span class="bg-[#39A900] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider font-poppins">CEFA</span>
-                    </div>
-                    <p class="text-[11px] text-[#62E31D] font-bold font-sans">Sistema de Gestión de Egresados</p>
+                    <span class="text-2xl font-black tracking-wider leading-none text-white font-poppins">SIGE</span>
+                    <p class="text-[11px] text-[#62E31D] font-bold font-sans mt-0.5">Centro de Formación Agroindustrial</p>
                 </div>
             </a>
 
-            <!-- Nav Links -->
-            <nav class="hidden lg:flex items-center space-x-1 text-xs sm:text-[13px] font-bold font-poppins">
-                <a href="{{ route('egresados.welcome') }}" class="flex items-center space-x-1.5 bg-[#002336] text-[#62E31D] px-4 py-2 rounded-full border border-[#62E31D]/30 shadow-inner">
+            <!-- Nav Links relacionados a las secciones de la página -->
+            <nav class="hidden lg:flex items-center space-x-1.5 text-xs sm:text-[13px] font-bold font-poppins">
+                <a href="#inicio" class="flex items-center space-x-1.5 bg-[#002336] text-[#62E31D] px-4 py-2 rounded-full border border-[#62E31D]/30 shadow-inner">
                     <i class="fa-solid fa-house text-xs"></i>
                     <span>Inicio</span>
                 </a>
                 <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
-                    <i class="fa-regular fa-newspaper text-xs"></i>
-                    <span>Noticias de SIGE</span>
+                    <i class="fa-solid fa-briefcase text-xs"></i>
+                    <span>Oportunidades</span>
                 </a>
                 <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
-                    <i class="fa-regular fa-calendar-days text-xs"></i>
-                    <span>Eventos</span>
-                </a>
-                <a href="{{ route('egresados.index') }}" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
-                    <i class="fa-solid fa-clipboard-list text-xs"></i>
+                    <i class="fa-solid fa-clipboard-check text-xs"></i>
                     <span>Encuestas</span>
+                </a>
+                <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
+                    <i class="fa-solid fa-calendar-days text-xs"></i>
+                    <span>Eventos & Noticias</span>
                 </a>
                 <a href="#contacto" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
                     <i class="fa-solid fa-phone text-xs"></i>
@@ -164,15 +183,6 @@
                             <span class="hidden sm:inline">Salir</span>
                         </button>
                     </form>
-                @else
-                    <a href="{{ route('login') }}" class="bg-[#002336] hover:bg-[#00324D] border border-white/20 hover:border-[#62E31D] text-white px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-2">
-                        <i class="fa-regular fa-user text-xs"></i>
-                        <span>Iniciar sesión</span>
-                    </a>
-                    <a href="{{ route('egresados.registro') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-[#39A900]/30 hover:shadow-lg transition flex items-center space-x-2">
-                        <i class="fa-solid fa-user-plus text-xs"></i>
-                        <span>Registrarse</span>
-                    </a>
                 @endauth
             </div>
 
@@ -182,7 +192,7 @@
             <!-- ============================================== -->
     <!-- 2. HERO PRINCIPAL DE ALTO IMPACTO (SENA ERP) -->
     <!-- ============================================== -->
-    <section class="relative bg-gradient-to-b from-[#EAF7EE]/50 via-[#F4F7F6] to-[#ffffff] py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-gray-200/70">
+    <section id="inicio" class="relative bg-gradient-to-b from-[#EAF7EE]/50 via-[#F4F7F6] to-[#ffffff] py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-gray-200/70">
         
         <!-- Subtle background curves con colores del ERP -->
         <div class="absolute -top-24 -left-24 w-96 h-96 bg-[#39A900]/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -193,17 +203,12 @@
             <!-- Columna Izquierda: Texto Principal & Acciones -->
             <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
                 
-                <div class="inline-flex items-center space-x-2 bg-white text-[#00131E] text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full shadow-sm border border-[#39A900]/30 font-poppins">
-                    <span class="text-base">👋</span>
-                    <span>Comunidad de Egresados CEFA</span>
-                </div>
-
-                <h1 class="font-poppins text-4xl sm:text-5xl lg:text-[54px] font-black text-[#00131E] leading-[1.12] tracking-tight">
-                    De la formación a la <span class="text-[#39A900] underline decoration-[#62E31D] decoration-[5px] underline-offset-8">cosecha</span> profesional.
+                <h1 class="font-poppins text-4xl sm:text-5xl lg:text-[52px] font-black text-[#00131E] leading-[1.14] tracking-tight">
+                    Impulsa tu crecimiento profesional con el <span class="text-[#39A900] underline decoration-[#62E31D] decoration-[5px] underline-offset-8">Sistema SIGE</span>.
                 </h1>
 
                 <p class="font-sans text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
-                    Conecta con las noticias de la comunidad, eventos de actualización y los egresados del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong>. Tu camino formativo sigue dando frutos.
+                    Conecta con vacantes de empleo, eventos de actualización institucional, noticias y seguimiento del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong> a través del ecosistema SIGE ERP.
                 </p>
 
                 <!-- Botones CTA con Mayor Presencia -->
@@ -225,25 +230,25 @@
                     </a>
                 </div>
 
-                <!-- Badges de confianza -->
+                <!-- Módulos principales del sistema SIGE -->
                 <div class="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs sm:text-sm text-[#00131E] font-bold border-t border-gray-200/60 max-w-lg mx-auto lg:mx-0 font-poppins">
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs">
-                            <i class="fa-solid fa-circle-check"></i>
+                    <div class="flex items-center gap-2 hover:text-[#39A900] transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-sm">
+                            <i class="fa-solid fa-briefcase"></i>
                         </span>
-                        <span>Noticias & Logros</span>
+                        <span>Oportunidades Laborales</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs">
-                            <i class="fa-solid fa-circle-check"></i>
+                    <div class="flex items-center gap-2 hover:text-[#39A900] transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-sm">
+                            <i class="fa-solid fa-clipboard-check"></i>
                         </span>
-                        <span>Fondo Emprender</span>
+                        <span>Encuestas de Seguimiento</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs">
-                            <i class="fa-solid fa-circle-check"></i>
+                    <div class="flex items-center gap-2 hover:text-[#39A900] transition-colors">
+                        <span class="w-6 h-6 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-sm">
+                            <i class="fa-solid fa-calendar-check"></i>
                         </span>
-                        <span>Red de Contactos</span>
+                        <span>Eventos & Convocatorias</span>
                     </div>
                 </div>
 
@@ -256,19 +261,8 @@
                     <!-- Aura y Pulso de Fondo en Verde y Dorado Esmeralda -->
                     <div class="absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] rounded-full bg-gradient-to-tr from-[#39A900]/25 via-[#62E31D]/20 to-[#001A29]/20 blur-3xl animate-glow-pulse pointer-events-none"></div>
 
-                    <!-- Badge Flotante 1: Comunidad Activa -->
-                    <div class="absolute -top-4 -left-2 sm:top-2 sm:left-4 z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-[#EAF7EE] flex items-center gap-2.5 animate-bounce font-poppins" style="animation-duration: 4s;">
-                        <span class="w-8 h-8 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-sm font-bold">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </span>
-                        <div>
-                            <div class="text-[11.5px] font-bold text-[#00131E] leading-tight">+1.240 Egresados</div>
-                            <div class="text-[9.5px] text-[#166534] font-bold font-sans">Comunidad Activa</div>
-                        </div>
-                    </div>
-
-                    <!-- Imagen Central Ilustrada con Gran Escala y Fondo Integrado -->
-                    <img src="{{ route('egresados.assets.image', 'egresados-banner.png') }}" alt="Egresados CEFA ¡Contigo Siempre!" class="relative z-10 w-full h-auto object-contain drop-shadow-2xl animate-float-hero select-none pointer-events-none mix-blend-multiply scale-105 sm:scale-110">
+                    <!-- Imagen Central Ilustrada sin Fondo (Transparente) con Sombreado Oficial ERP y Movimiento -->
+                    <img src="{{ route('egresados.assets.image', 'egresados-banner-transparent.png') }}" alt="Egresados CEFA ¡Contigo Siempre!" class="hero-logo-emblem scale-105 sm:scale-110">
                 </div>
             </div>
 

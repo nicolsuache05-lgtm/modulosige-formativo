@@ -360,12 +360,30 @@ class EgresadosController extends Controller
 
             DB::commit();
 
-            // 6. Iniciar sesión automáticamente en el ERP y redirigir al portal del egresado
-            Auth::login($user);
-            $request->session()->regenerate();
+            // 6. Registrar contraseña elegida en el archivo de contraseñas actualizadas
+            try {
+                $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                    ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                    : [];
+                $passwordsActualizados[$user->id] = date('Y-m-d H:i:s');
+                $passwordsActualizados[(string)$docNumber] = date('Y-m-d H:i:s');
+                if (!is_dir(dirname($passwordsActualizadosFile))) {
+                    @mkdir(dirname($passwordsActualizadosFile), 0777, true);
+                }
+                @file_put_contents($passwordsActualizadosFile, json_encode($passwordsActualizados, JSON_PRETTY_PRINT));
+            } catch (\Exception $ex) {
+                \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
+            }
 
-            return redirect()->route('egresados.dashboard_egresado')
-                ->with('success', '¡Bienvenido(a) a tu Portal de Egresado, ' . $user->full_name . '! Tu registro se ha completado exitosamente.');
+            // 7. NO iniciar sesión automáticamente: Retornar a pantalla con tarjeta de registro exitoso
+            $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
+
+            return redirect()->route('egresados.registro')
+                ->with('registro_exitoso', true)
+                ->with('registrado_nombre', $nombreCompleto)
+                ->with('registrado_doc', (string)$person->document_number)
+                ->with('registrado_email', $cleanEmail);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error en processRegistro egresado: ' . $e->getMessage());
