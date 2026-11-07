@@ -548,10 +548,10 @@
             <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4 font-sans font-medium text-center sm:text-left">
                 <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                     <p>© {{ date('Y') }} <strong class="text-white font-poppins">SIGE — Sistema de Gestión de Egresados</strong> • SENA Empresa. Todos los derechos reservados.</p>
-                    <a href="{{ route('egresados.autores') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#43be04] hover:to-[#39A900] text-white font-poppins font-bold text-xs shadow-md transition-all duration-200 hover:scale-105 border border-[#62E31D]/40 group" title="Ver equipo de autores y desarrolladores de SIGE">
+                    <a href="{{ route('egresados.autores') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#43be04] hover:to-[#39A900] text-white font-poppins font-bold text-xs shadow-md transition-all duration-200 hover:scale-105 border border-[#62E31D]/40 group" title="Ver equipo de autores y desarrolladores de SIGE">
                         <i class="fa-solid fa-users text-[#62E31D] group-hover:text-white transition"></i>
                         <span>Autores</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-80"></i>
+                        <i class="fa-solid fa-arrow-right text-[10px] opacity-80"></i>
                     </a>
                 </div>
                 <p class="text-[#62E31D] font-bold font-poppins shrink-0">Centro de Formación Agroindustrial "La Angostura"</p>
