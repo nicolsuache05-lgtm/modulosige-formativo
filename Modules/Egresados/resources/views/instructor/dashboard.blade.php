@@ -899,6 +899,161 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(57, 169, 0, 0.55);
       }
+
+      /* ========================================================
+         MODAL ACTUALIZACIÓN DE INFORMACIÓN DEL INSTRUCTOR (ESTILO ERP BONITO)
+         ======================================================== */
+      .modal-backdrop-custom {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 19, 30, 0.75);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 14px;
+        overflow-y: auto;
+      }
+      .modal-backdrop-custom.active {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-profile-card {
+        background: #FFFFFF;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 680px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(98, 227, 29, 0.25);
+        border-top: 5px solid #39A900;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        animation: profileModalZoom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes profileModalZoom {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .modal-profile-card::-webkit-scrollbar {
+        width: 6px;
+      }
+      .modal-profile-card::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+      }
+      .profile-form-section {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 16px;
+      }
+      .profile-form-section-title {
+        font-size: 12.5px;
+        font-weight: 800;
+        color: #001A29;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .profile-form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      .profile-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .profile-input-group label {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #334155;
+      }
+      .profile-input-group input,
+      .profile-input-group select {
+        width: 100%;
+        border: 1px solid #CBD5E1;
+        border-radius: 10px;
+        padding: 10px 13px;
+        font-size: 13px;
+        font-family: inherit;
+        color: #00131E;
+        background: #FFFFFF;
+        transition: all 0.2s ease;
+      }
+      .profile-input-group input:focus,
+      .profile-input-group select:focus {
+        outline: none;
+        border-color: #39A900;
+        box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.15);
+      }
+      .profile-input-readonly {
+        background: #F1F5F9 !important;
+        color: #64748B !important;
+        cursor: not-allowed;
+        border-color: #E2E8F0 !important;
+      }
+      .btn-actualizar-perfil-bonito {
+        background: linear-gradient(135deg, #39A900 0%, #2a7c00 100%);
+        color: #FFFFFF;
+        border: none;
+        padding: 13px 26px;
+        border-radius: 12px;
+        font-size: 13.5px;
+        font-weight: 800;
+        font-family: inherit;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 16px rgba(57, 169, 0, 0.4);
+        transition: all 0.25s ease;
+      }
+      .btn-actualizar-perfil-bonito:hover {
+        background: linear-gradient(135deg, #43be04 0%, #319400 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(57, 169, 0, 0.55);
+      }
+      .btn-actualizar-perfil-bonito:active {
+        transform: translateY(0);
+      }
+      .modal-close-btn-custom {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+      }
+      .modal-close-btn-custom:hover {
+        background: #EF4444;
+        border-color: #EF4444;
+        color: #fff;
+        transform: rotate(90deg);
+      }
     </style>
 </head>
 <body>
@@ -1375,6 +1530,151 @@
   </div>
 </div>
 
+<!-- ========================================================
+     MODAL ACTUALIZACIÓN DE INFORMACIÓN DEL INSTRUCTOR (ESTILO ERP BONITO)
+     ======================================================== -->
+<div class="modal-backdrop-custom" id="modalActualizarPerfilInstructor" onclick="if(event.target===this)closeModalActualizarPerfilInstructor()">
+  <div class="modal-profile-card" onclick="event.stopPropagation()">
+    
+    <!-- Botón de Cerrar (X) -->
+    <button type="button" class="modal-close-btn-custom" onclick="closeModalActualizarPerfilInstructor()" title="Cerrar ventana">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Banner Encabezado Oficial SIGE ERP -->
+    <div style="background: linear-gradient(135deg, #00131E 0%, #002336 100%); padding: 22px 26px; color: #fff; position: relative; border-bottom: 3px solid #39A900;">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(98, 227, 29, 0.15); border:1px solid #62E31D; color:#62E31D; font-size:10.5px; font-weight:800; padding:2.5px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        <i class="fa-solid fa-user-pen"></i> PANEL DE ADMINISTRACIÓN · INSTRUCTOR CEFA
+      </div>
+      <h3 style="font-family:'Poppins','Nunito',sans-serif; font-size:19px; font-weight:800; color:#fff; margin:0 0 5px 0; line-height:1.3;">
+        Actualizar mi Información de Instructor
+      </h3>
+      <p style="font-size:12px; color:rgba(255,255,255,0.85); margin:0; line-height:1.4;">
+        Mantén tus datos personales, de contacto y credenciales de acceso al día en el sistema SIGE ERP.
+      </p>
+    </div>
+
+    <!-- Formulario de Actualización -->
+    <form id="formActualizarPerfilInstructor" action="{{ route('egresados.perfil.actualizar') }}" method="POST" onsubmit="submitActualizarPerfilInstructor(event)" style="padding: 22px 26px; display:flex; flex-direction:column; gap:0; margin:0;">
+      @csrf
+
+      <!-- Mensajes de Alerta -->
+      <div id="alert-instructor-profile-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px; font-weight:600;"></div>
+      <div id="alert-instructor-profile-success" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px; font-weight:700;"></div>
+
+      <!-- Sección 1: Identificación y Rol Institucional -->
+      <div class="profile-form-section">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-id-card" style="color:var(--sena-green);"></i>
+          <span>1. Datos de Identificación y Rol Institucional</span>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Número de Documento (Cédula) <span style="font-size:10px; color:#16a34a; font-weight:700;">✓ Verificado</span></label>
+            <div style="position:relative;">
+              <input type="text" value="{{ $person->document_number ?? (Auth::check() && Auth::user()->person ? Auth::user()->person->document_number : (preg_replace('/\D/', '', Auth::user()->nickname ?? '') ?: '10000002')) }}" class="profile-input-readonly" readonly title="Documento registrado en el sistema ERP">
+              <i class="fa-solid fa-lock" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+            </div>
+          </div>
+          <div class="profile-input-group">
+            <label>Tipo de Documento</label>
+            <input type="text" value="{{ $person->document_type ?? (Auth::check() && Auth::user()->person ? Auth::user()->person->document_type : 'Cédula de Ciudadanía (CC)') }}" class="profile-input-readonly" readonly>
+          </div>
+          <div class="profile-input-group">
+            <label>Nombres <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="nombres" id="inst_nombres" required value="{{ old('nombres', $person->first_name ?? (Auth::check() && Auth::user()->person ? Auth::user()->person->first_name : (Auth::user()->name ?? 'Carlos'))) }}" placeholder="Ej. Carlos">
+          </div>
+          <div class="profile-input-group">
+            <label>Apellidos <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="apellidos" id="inst_apellidos" required value="{{ old('apellidos', trim(($person->first_last_name ?? '') . ' ' . ($person->second_last_name ?? '')) ?: (Auth::check() && Auth::user()->person ? trim(Auth::user()->person->first_last_name . ' ' . (Auth::user()->person->second_last_name ?? '')) : 'Mendoza')) }}" placeholder="Ej. Mendoza">
+          </div>
+          <div class="profile-input-group" style="grid-column: 1 / -1;">
+            <label>Rol / Asignación en el Sistema</label>
+            <div style="background:#EAF7EE; border:1px solid #BBF7D0; color:#166534; padding:9px 14px; border-radius:10px; font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-shield-halved" style="color:#39A900;"></i>
+              <span>Instructor de Seguimiento a Egresados · Centro de Formación Agroindustrial "La Angostura"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 2: Información de Contacto -->
+      <div class="profile-form-section">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-address-book" style="color:var(--sena-green);"></i>
+          <span>2. Canales de Contacto y Ubicación</span>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Correo Electrónico Institucional / Principal <span style="color:#ef4444;">*</span></label>
+            <input type="email" name="personal_email" id="inst_personal_email" required value="{{ old('personal_email', $person->personal_email ?? (Auth::user()->email ?? 'instructor.egresados@sena.edu.co')) }}" placeholder="instructor.egresados@sena.edu.co">
+          </div>
+          <div class="profile-input-group">
+            <label>Correo MiSENA / Alternativo (Opcional)</label>
+            <input type="email" name="misena_email" id="inst_misena_email" value="{{ old('misena_email', $person->misena_email ?? '') }}" placeholder="cmendoza@misena.edu.co">
+          </div>
+          <div class="profile-input-group">
+            <label>Celular / WhatsApp de Contacto <span style="color:#ef4444;">*</span></label>
+            <input type="tel" name="telefono" id="inst_telefono" required value="{{ old('telefono', $person->telephone1 ?? '3124567890') }}" placeholder="Ej. 3124567890">
+          </div>
+          <div class="profile-input-group">
+            <label>Teléfono Fijo / Extensión SENA (Opcional)</label>
+            <input type="tel" name="telefono2" id="inst_telefono2" value="{{ old('telefono2', $person->telephone2 ?? '') }}" placeholder="Ej. Ext 82345">
+          </div>
+          <div class="profile-input-group" style="grid-column: 1 / -1;">
+            <label>Sede o Dirección de Residencia Actual</label>
+            <input type="text" name="direccion" id="inst_direccion" value="{{ old('direccion', $person->address ?? 'CEFA La Angostura, Km 38 Vía Neiva - Campoalegre') }}" placeholder="Ej. CEFA La Angostura, Campoalegre - Huila">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3: Seguridad y Contraseña (Opcional) -->
+      <div class="profile-form-section" style="border-left: 3px solid #39A900;">
+        <div class="profile-form-section-title">
+          <i class="fa-solid fa-key" style="color:var(--sena-green);"></i>
+          <span>3. Seguridad y Cambio de Contraseña (Opcional)</span>
+        </div>
+        <p style="font-size:11.5px; color:#64748B; margin:0 0 10px 0;">
+          Si deseas cambiar tu contraseña personal, digítala aquí. Si la dejas vacía, se mantendrá tu contraseña actual sin cambios.
+        </p>
+        <div class="profile-form-grid">
+          <div class="profile-input-group">
+            <label>Nueva Contraseña</label>
+            <div class="input-password-wrapper">
+              <input type="password" name="password" id="inst_password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" oninput="checkInstructorPasswordMatch()">
+              <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('inst_password', this)" title="Ver u ocultar contraseña">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="profile-input-group">
+            <label>Confirmar Nueva Contraseña</label>
+            <div class="input-password-wrapper">
+              <input type="password" name="password_confirmation" id="inst_password_confirmation" placeholder="Repite la nueva contraseña" autocomplete="new-password" oninput="checkInstructorPasswordMatch()">
+              <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('inst_password_confirmation', this)" title="Ver u ocultar contraseña">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="inst-password-match-status" class="pwd-match-status" style="display:none;"></div>
+      </div>
+
+      <!-- Botones de Acción con el Botón Bonito -->
+      <div style="display:flex; justify-content:flex-end; gap:12px; align-items:center; margin-top:10px; padding-top:14px; border-top:1px solid #E2E8F0;">
+        <button type="button" onclick="closeModalActualizarPerfilInstructor()" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#475569; padding:12px 20px; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; transition:all 0.2s ease;">
+          Cancelar
+        </button>
+        <button type="submit" id="btn-submit-instructor-profile" class="btn-actualizar-perfil-bonito">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Guardar y Actualizar Información</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
 <script>
   function shakeSofiaModal(e) {
     if (e) {
@@ -1396,6 +1696,11 @@
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      const modalProfile = document.getElementById('modalActualizarPerfilInstructor');
+      if (modalProfile && modalProfile.classList.contains('active')) {
+        closeModalActualizarPerfilInstructor();
+        return;
+      }
       const modal = document.getElementById('modalActualizarPasswordInicial');
       if (modal && modal.classList.contains('active')) {
         e.preventDefault();
@@ -1403,6 +1708,126 @@
       }
     }
   });
+
+  // Control de Modal de Actualización de Información del Instructor
+  function openModalActualizarPerfilInstructor() {
+    const modal = document.getElementById('modalActualizarPerfilInstructor');
+    if (modal) {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      const errBox = document.getElementById('alert-instructor-profile-error');
+      const sucBox = document.getElementById('alert-instructor-profile-success');
+      if (errBox) errBox.style.display = 'none';
+      if (sucBox) sucBox.style.display = 'none';
+    }
+  }
+
+  function closeModalActualizarPerfilInstructor() {
+    const modal = document.getElementById('modalActualizarPerfilInstructor');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function checkInstructorPasswordMatch() {
+    const p1 = document.getElementById('inst_password');
+    const p2 = document.getElementById('inst_password_confirmation');
+    const status = document.getElementById('inst-password-match-status');
+    if (!p1 || !p2 || !status) return;
+
+    if (!p1.value && !p2.value) {
+      status.style.display = 'none';
+      return;
+    }
+
+    status.style.display = 'flex';
+    if (p1.value && p2.value && p1.value === p2.value) {
+      status.className = 'pwd-match-status ok';
+      status.innerHTML = '<i class="fa-solid fa-check-circle"></i> Las contraseñas coinciden';
+    } else {
+      status.className = 'pwd-match-status err';
+      status.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Las contraseñas no coinciden aún';
+    }
+  }
+
+  function submitActualizarPerfilInstructor(e) {
+    e.preventDefault();
+    const form = document.getElementById('formActualizarPerfilInstructor');
+    const btn = document.getElementById('btn-submit-instructor-profile');
+    const errBox = document.getElementById('alert-instructor-profile-error');
+    const sucBox = document.getElementById('alert-instructor-profile-success');
+
+    const nombres = document.getElementById('inst_nombres').value.trim();
+    const apellidos = document.getElementById('inst_apellidos').value.trim();
+    const email = document.getElementById('inst_personal_email').value.trim();
+    const tel = document.getElementById('inst_telefono').value.trim();
+    const pwd = document.getElementById('inst_password').value.trim();
+    const pwdConf = document.getElementById('inst_password_confirmation').value.trim();
+
+    if (!nombres || !apellidos || !email || !tel) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Por favor completa los campos obligatorios marcados con asterisco (*).';
+      errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    if (pwd && (pwd.length < 6 || pwd !== pwdConf)) {
+      errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Si deseas cambiar la contraseña, debe tener al menos 6 caracteres y coincidir exactamente.';
+      errBox.style.display = 'block';
+      errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    errBox.style.display = 'none';
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando cambios...';
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      }
+    })
+    .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
+    .then(({ status, ok, data }) => {
+      if (ok && data.success) {
+        sucBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.message || '¡Información actualizada con éxito!');
+        sucBox.style.display = 'block';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Información Actualizada con Éxito!';
+        btn.style.background = 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)';
+
+        // Actualizar visualmente el chip de usuario si cambió el nombre
+        const userChipSpan = document.querySelector('#userChipBtn span');
+        if (userChipSpan) {
+          userChipSpan.textContent = nombres + ' ' + apellidos;
+        }
+        const userMenuName = document.querySelector('.user-menu-name');
+        if (userMenuName) {
+          userMenuName.textContent = nombres + ' ' + apellidos;
+        }
+
+        setTimeout(() => {
+          closeModalActualizarPerfilInstructor();
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          btn.style.background = '';
+        }, 1200);
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.message || 'Error al guardar los datos.');
+        errBox.style.display = 'block';
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    })
+    .catch(err => {
+      form.submit();
+    });
+  }
 
   function openModalActualizarPasswordInicial() {
     const modal = document.getElementById('modalActualizarPasswordInicial');

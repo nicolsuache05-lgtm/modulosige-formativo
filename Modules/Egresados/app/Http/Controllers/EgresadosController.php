@@ -522,6 +522,28 @@ class EgresadosController extends Controller
             ->take(4)
             ->get();
 
+        
+        // Determinar si el usuario debe actualizar su contraseña inicial (estilo SOFIA Plus)
+        $userAuth = auth()->user();
+        $personAuth = $userAuth ? $userAuth->person : null;
+        if (!$personAuth && $userAuth && $userAuth->person_id) {
+            $personAuth = \Modules\SICA\Entities\Person::find($userAuth->person_id);
+        }
+        $debeActualizarPassword = false;
+        if ($userAuth && !$userAuth->hasSuperAdmin()) {
+            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
+            $docStr = $personAuth ? (string)$personAuth->document_number : preg_replace('/\D/', '', $userAuth->nickname ?? '');
+            $alreadyUpdated = isset($passwords[$userAuth->id]) || (!empty($docStr) && isset($passwords[$docStr]));
+            if (!$alreadyUpdated) {
+                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $userAuth->password)) {
+                    $debeActualizarPassword = true;
+                } elseif (session('sige_needs_password_change')) {
+                    $debeActualizarPassword = true;
+                }
+            }
+        }
+
         return view('egresados::superadmin.dashboard', compact(
             'totalEgresados',
             'totalEmpleados',
@@ -534,7 +556,8 @@ class EgresadosController extends Controller
             'totalReportes',
             'tasaEmpleo',
             'recentEgresados',
-            'programStats'
+            'programStats',
+            'debeActualizarPassword'
         ));
     }
 
@@ -1723,6 +1746,25 @@ class EgresadosController extends Controller
             // Si envió contraseña para cambiarla
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
+                try {
+                    $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
+                    $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
+                    $docStr = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
+                    $recordPass = [
+                        'user_id' => $user->id,
+                        'nickname' => $user->nickname,
+                        'documento' => $docStr,
+                        'nombre' => $person ? $person->full_name : $user->name,
+                        'updated_at' => now()->toDateTimeString(),
+                        'ip' => $request->ip(),
+                    ];
+                    $passwords[$user->id] = $recordPass;
+                    if (!empty($docStr)) {
+                        $passwords[$docStr] = $recordPass;
+                    }
+                    @file_put_contents($passwordsFile, json_encode($passwords, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    session()->forget('sige_needs_password_change');
+                } catch (\Throwable $e) {}
             }
 
             $user->save();

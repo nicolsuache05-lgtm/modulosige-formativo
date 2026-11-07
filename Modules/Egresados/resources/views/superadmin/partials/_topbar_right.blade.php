@@ -116,8 +116,13 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
-        @if(empty($hideActualizarPerfil) && !request()->routeIs('egresados.dashboard') && !request()->routeIs('egresados.superadmin.dashboard') && !request()->is('egresados/dashboard*') && !request()->is('egresados/superadmin/dashboard*'))
-        <button type="button" class="user-menu-item" onclick="if(typeof openModalActualizarPerfilEgresado === 'function'){ openModalActualizarPerfilEgresado(); } else { window.location.href='{{ route('egresados.dashboard_egresado') }}'; }" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit;">
+        @php
+          $currentUser = Auth::user();
+          $isSuperAdmin = $currentUser && ($currentUser->hasSuperAdmin() || $currentUser->nickname === 'superadmin' || $currentUser->email === 'superadmin.egresados@sena.edu.co' || ($currentUser->roles && $currentUser->roles->contains('slug', 'superadmin')));
+        @endphp
+
+        @if(!$isSuperAdmin)
+        <button type="button" class="user-menu-item" onclick="if(typeof openModalActualizarPerfilInstructor === 'function'){ openModalActualizarPerfilInstructor(); } else if(typeof openModalActualizarPerfilEgresado === 'function'){ openModalActualizarPerfilEgresado(); } else if(typeof openModalActualizarPasswordInicial === 'function'){ openModalActualizarPasswordInicial(); } else { window.location.href='{{ route('egresados.dashboard_instructor') }}'; }" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit;">
           <div class="menu-item-icon bg-green-icon">
             <i class="fa-solid fa-user-pen"></i>
           </div>

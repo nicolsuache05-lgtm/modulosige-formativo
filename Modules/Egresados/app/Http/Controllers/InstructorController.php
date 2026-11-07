@@ -86,11 +86,7 @@ class InstructorController extends Controller
 
             $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
             if (!$alreadyUpdated) {
-                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password)) {
-                    $debeActualizarPassword = true;
-                } elseif (session('sige_needs_password_change')) {
-                    $debeActualizarPassword = true;
-                }
+                $debeActualizarPassword = true;
             }
         }
 
@@ -108,7 +104,9 @@ class InstructorController extends Controller
             'totalReportes',
             'recentEgresados',
             'programStats',
-            'debeActualizarPassword'
+            'debeActualizarPassword',
+            'user',
+            'person'
         ));
     }
 

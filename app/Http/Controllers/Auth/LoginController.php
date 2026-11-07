@@ -124,32 +124,70 @@ class LoginController extends Controller
                     $user->person_id = $person->id;
                     $user->save();
 
-                    // Garantizar asignación del rol de egresado
-                    try {
-                        $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
-                        if (!$roleEgresado) {
-                            $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
-                            $appId = $appEgresados ? $appEgresados->id : 30;
-                            $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
-                                ['slug' => 'egresados.egresado'],
-                                [
-                                    'name' => 'Egresado',
-                                    'description' => 'Graduado / Egresado de formación profesional del CEFA',
-                                    'description_english' => 'Graduate / Alumni of vocational training at CEFA',
-                                    'full_access' => 'No',
-                                    'app_id' => $appId,
-                                ]
-                            );
+                    // Identificar perfil
+                    $isInstructor = ($user->nickname === 'instructor_egresados' || 
+                                     $user->email === 'instructor.egresados@sena.edu.co' || 
+                                     ($user->roles && (
+                                         $user->roles->contains('slug', 'egresados.instructor') || 
+                                         $user->roles->contains('slug', 'sigac.instructor') || 
+                                         $user->roles->contains('slug', 'agrocefa.trainer')
+                                     )));
+                    $isSuperAdmin = ($user->hasSuperAdmin() || 
+                                     $user->nickname === 'superadmin' || 
+                                     $user->email === 'superadmin.egresados@sena.edu.co' || 
+                                     ($user->roles && (
+                                         $user->roles->contains('slug', 'egresados.admin') || 
+                                         $user->roles->contains('slug', 'superadmin')
+                                     )));
+
+                    $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                    $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                        ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                        : [];
+                    $hasChanged = isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]);
+                    if (!$hasChanged && !$isSuperAdmin) {
+                        session(['sige_needs_password_change' => true]);
+                    } else {
+                        session()->forget('sige_needs_password_change');
+                    }
+
+                    // Garantizar asignación del rol de egresado solo si no es instructor ni superadmin
+                    if (!$isInstructor && !$isSuperAdmin) {
+                        try {
+                            $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                            if (!$roleEgresado) {
+                                $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                                $appId = $appEgresados ? $appEgresados->id : 30;
+                                $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
+                                    ['slug' => 'egresados.egresado'],
+                                    [
+                                        'name' => 'Egresado',
+                                        'description' => 'Graduado / Egresado de formación profesional del CEFA',
+                                        'description_english' => 'Graduate / Alumni of vocational training at CEFA',
+                                        'full_access' => 'No',
+                                        'app_id' => $appId,
+                                    ]
+                                );
+                            }
+                            if ($roleEgresado && method_exists($user, 'roles')) {
+                                $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                            }
+                        } catch (\Throwable $e) {
+                            // Resiliente ante restricciones de entorno
                         }
-                        if ($roleEgresado && method_exists($user, 'roles')) {
-                            $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
-                        }
-                    } catch (\Throwable $e) {
-                        // Resiliente ante restricciones de entorno
                     }
 
                     Auth::login($user, $remember);
                     $request->session()->regenerate();
+
+                    if ($isSuperAdmin) {
+                        return redirect()->route('egresados.dashboard')
+                            ->with('success', '¡Bienvenido(a) al Panel de Control de Egresados, ' . ($user->full_name ?: $person->full_name) . '!');
+                    }
+                    if ($isInstructor) {
+                        return redirect()->route('egresados.dashboard_instructor')
+                            ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . ($user->full_name ?: $person->full_name) . '!');
+                    }
 
                     return redirect()->route('egresados.dashboard_egresado')
                         ->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . ($user->full_name ?: $person->full_name) . '!');
@@ -169,13 +207,37 @@ class LoginController extends Controller
         if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
             $user->password = Hash::make($password);
             $user->save();
+
+            $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                : [];
+            if (!isset($passwordsActualizados[$user->id]) && !isset($passwordsActualizados[(string)$user->person->document_number])) {
+                session(['sige_needs_password_change' => true]);
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
+
+            if ($user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.instructor'))) {
+                return redirect()->route('egresados.dashboard_instructor')
+                    ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . $user->full_name . '!');
+            }
+
             return redirect()->route('egresados.dashboard_egresado')
                 ->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . $user->full_name . '!');
         }
 
         if ($user && Hash::check($password, $user->password)) {
+            $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+            $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                : [];
+            $docNum = $user->person ? (string)$user->person->document_number : '';
+            if (!$user->hasSuperAdmin() && !isset($passwordsActualizados[$user->id]) && (empty($docNum) || !isset($passwordsActualizados[$docNum]))) {
+                session(['sige_needs_password_change' => true]);
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
 
