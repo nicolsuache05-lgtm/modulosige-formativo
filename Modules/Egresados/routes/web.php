@@ -206,3 +206,6 @@ Route::middleware([CheckEgresadosRole::class . ':egresado'])->group(function () 
     Route::post('egresados/encuestas/{id?}/responder', [EgresadosController::class, 'responderEncuesta'])->name('egresados.encuestas.responder');
     Route::post('egresados/perfil/actualizar', [EgresadosController::class, 'actualizarPerfilEgresado'])->name('egresados.perfil.actualizar');
 });
+
+// 7. GESTIÓN DE NOTIFICACIONES EN TIEMPO REAL
+Route::post('egresados/notificaciones/marcar-leidas', [\Modules\Egresados\Http\Controllers\NotificationController::class, 'markAllRead'])->name('egresados.notificaciones.marcar_leidas');

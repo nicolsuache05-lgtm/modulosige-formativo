@@ -376,6 +376,35 @@ class EgresadosController extends Controller
                 \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
             }
 
+            
+            // Notificar al superadmin e instructores sobre el nuevo egresado registrado
+            try {
+                \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
+                    'tipo' => 'registro',
+                    'categoria' => 'Nuevo Egresado Registrado',
+                    'icon' => 'fa-solid fa-user-plus',
+                    'iconColor' => '#6b21a8',
+                    'iconBg' => '#f3e8ff',
+                    'titulo' => 'Nuevo Egresado en el Portal SIGE',
+                    'texto' => '<strong>' . htmlspecialchars($nombreCompleto) . '</strong> (Doc: ' . $person->document_number . ') completó su registro.',
+                    'resumen' => 'Un nuevo egresado se ha incorporado a la plataforma institucional SIGE.',
+                    'egresado_nombre' => $nombreCompleto,
+                    'egresado_doc' => (string)$person->document_number,
+                    'egresado_email' => $cleanEmail,
+                    'unread' => true,
+                    'campos' => [
+                        ['etiqueta' => 'Egresado', 'valor' => $nombreCompleto],
+                        ['etiqueta' => 'Documento', 'valor' => (string)$person->document_number],
+                        ['etiqueta' => 'Correo Registrado', 'valor' => $cleanEmail],
+                        ['etiqueta' => 'Estado Inicial', 'valor' => 'Cuenta Creada y Activa'],
+                        ['etiqueta' => 'Fecha de Registro', 'valor' => now()->format('d/m/Y h:i A')]
+                    ],
+                    'accionTexto' => 'Ver en Directorio',
+                    'accionUrl' => route('egresados.index'),
+                    'accionIcon' => 'fa-solid fa-address-book'
+                ]);
+            } catch (\Throwable $e) {}
+
             // 7. NO iniciar sesión automáticamente: Retornar a pantalla con tarjeta de registro exitoso
             $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
 
@@ -1466,6 +1495,38 @@ class EgresadosController extends Controller
             }
             $allRsvps[] = $rsvpData;
             @file_put_contents($rsvpFile, json_encode($allRsvps, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        // Notificar en tiempo real al Superadministrador e Instructores
+        try {
+            $asis = strtolower($asistencia);
+            $asiste = in_array($asis, ['si', 'virtual', 'confirmado']);
+            \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
+                'tipo' => 'evento',
+                'categoria' => 'Confirmación de Evento',
+                'icon' => 'fa-solid fa-calendar-check',
+                'iconColor' => '#b45309',
+                'iconBg' => '#fef3c7',
+                'titulo' => 'Confirmación: ' . ($targetEvento['title'] ?? 'Evento Institucional'),
+                'texto' => '<strong>' . htmlspecialchars($nombre) . '</strong> ' . ($asiste ? 'confirmó asistencia' : 'respondió') . ' al evento <em>"' . htmlspecialchars($targetEvento['title'] ?? 'Evento Institucional') . '"</em>.',
+                'resumen' => 'El egresado(a) ' . $nombre . ' ha respondido la convocatoria al evento institucional.',
+                'egresado_nombre' => $nombre,
+                'egresado_doc' => (string)$doc,
+                'egresado_email' => $email,
+                'unread' => true,
+                'campos' => [
+                    ['etiqueta' => 'Egresado', 'valor' => $nombre],
+                    ['etiqueta' => 'Documento', 'valor' => (string)$doc],
+                    ['etiqueta' => 'Evento Institucional', 'valor' => $targetEvento['title'] ?? 'Evento Institucional'],
+                    ['etiqueta' => 'Confirmación', 'valor' => $asiste ? 'Asistirá (' . $modalidad . ')' : 'No podrá asistir'],
+                    ['etiqueta' => 'Observaciones', 'valor' => !empty($comentario) ? $comentario : 'Sin observaciones adicionales'],
+                    ['etiqueta' => 'Fecha de Respuesta', 'valor' => now()->format('d/m/Y h:i A')]
+                ],
+                'accionTexto' => 'Ver Agenda de Eventos',
+                'accionUrl' => route('egresados.eventos'),
+                'accionIcon' => 'fa-solid fa-calendar-days'
+            ]);
+        } catch (\Throwable $e) {}
+
         } catch (\Throwable $e) {}
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -1513,6 +1574,37 @@ class EgresadosController extends Controller
 
         try {
             @file_put_contents($respuestasFile, json_encode($allRespuestas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        // Registrar notificación en tiempo real para Superadmin e Instructores
+        try {
+            $encTitulo = \Modules\Egresados\Http\Controllers\NotificationController::getEncuestaTitle($id);
+            \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
+                'tipo' => 'encuesta',
+                'categoria' => 'Respuesta de Encuesta',
+                'icon' => 'fa-solid fa-clipboard-check',
+                'iconColor' => '#1e40af',
+                'iconBg' => '#eff6ff',
+                'titulo' => 'Nueva Respuesta: ' . $encTitulo,
+                'texto' => '<strong>' . htmlspecialchars($nombre) . '</strong> respondió la encuesta <em>"' . htmlspecialchars($encTitulo) . '"</em>.',
+                'resumen' => 'El egresado(a) ' . $nombre . ' (Doc: ' . $doc . ') ha respondido satisfactoriamente la encuesta institucional.',
+                'egresado_nombre' => $nombre,
+                'egresado_doc' => (string)$doc,
+                'egresado_email' => $email,
+                'unread' => true,
+                'campos' => [
+                    ['etiqueta' => 'Egresado', 'valor' => $nombre],
+                    ['etiqueta' => 'Documento', 'valor' => (string)$doc],
+                    ['etiqueta' => 'Encuesta Respondida', 'valor' => $encTitulo],
+                    ['etiqueta' => 'Correo de Contacto', 'valor' => $email],
+                    ['etiqueta' => 'Fecha de Respuesta', 'valor' => now()->format('d/m/Y h:i A')],
+                    ['etiqueta' => 'Estado', 'valor' => 'Respuestas recibidas y consolidadas']
+                ],
+                'accionTexto' => 'Ver Resultados de Encuestas',
+                'accionUrl' => route('egresados.encuestas_superadmin'),
+                'accionIcon' => 'fa-solid fa-chart-pie'
+            ]);
+        } catch (\Throwable $e) {}
+
         } catch (\Throwable $e) {}
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -1643,6 +1735,37 @@ class EgresadosController extends Controller
             }
 
             \DB::commit();
+            // Notificar al superadmin e instructores sobre la actualización de datos
+            try {
+                \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
+                    'tipo' => 'actualizacion',
+                    'categoria' => 'Actualización de Perfil',
+                    'icon' => 'fa-solid fa-briefcase',
+                    'iconColor' => '#0d6928',
+                    'iconBg' => '#eaf7ee',
+                    'titulo' => 'Actualización de Datos: ' . $person->full_name,
+                    'texto' => '<strong>' . htmlspecialchars($person->full_name) . '</strong> actualizó sus datos de contacto y situación laboral.',
+                    'resumen' => 'El egresado ha registrado oportunamente su nuevo estado ocupacional y datos de residencia.',
+                    'egresado_nombre' => $person->full_name,
+                    'egresado_doc' => (string)$person->document_number,
+                    'egresado_email' => $person->personal_email,
+                    'unread' => true,
+                    'campos' => [
+                        ['etiqueta' => 'Egresado', 'valor' => $person->full_name],
+                        ['etiqueta' => 'Documento', 'valor' => (string)$person->document_number],
+                        ['etiqueta' => 'Situación Laboral', 'valor' => $request->situacion_laboral ?: 'Actualizada'],
+                        ['etiqueta' => 'Empresa / Entidad', 'valor' => $request->empresa_labora ?: 'No registra'],
+                        ['etiqueta' => 'Cargo', 'valor' => $request->cargo_labora ?: 'No registra'],
+                        ['etiqueta' => 'Teléfono', 'valor' => (string)$request->telefono],
+                        ['etiqueta' => 'Correo Electrónico', 'valor' => (string)$person->personal_email],
+                        ['etiqueta' => 'Fecha de Actualización', 'valor' => now()->format('d/m/Y h:i A')]
+                    ],
+                    'accionTexto' => 'Ver en Directorio',
+                    'accionUrl' => route('egresados.index'),
+                    'accionIcon' => 'fa-solid fa-user-graduate'
+                ]);
+            } catch (\Throwable $e) {}
+
 
             $updatedData = [
                 'full_name' => $person->full_name,

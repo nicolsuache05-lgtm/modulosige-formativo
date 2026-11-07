@@ -1,3 +1,7 @@
+@php
+    $notificaciones = \Modules\Egresados\Http\Controllers\NotificationController::getAllNotificaciones();
+    $unreadCount = count(array_filter($notificaciones, fn($n) => !empty($n['unread'])));
+@endphp
 <!-- Modules/Egresados/resources/views/superadmin/partials/_topbar_right.blade.php -->
 <div class="topbar-right-wrapper" style="display:flex; align-items:center; gap:16px; position:relative;">
   
@@ -5,7 +9,7 @@
   <div class="notif-dropdown-container" style="position:relative;">
     <button type="button" class="icon-btn notif-toggle-btn" id="notifBtn" title="Notificaciones" aria-label="Notificaciones" onclick="toggleNotificationDropdown(event)">
       <i class="fa-regular fa-bell"></i>
-      <span class="dot notif-badge-dot" id="notifBadgeDot" style="display:flex;"></span>
+      <span class="dot notif-badge-dot" id="notifBadgeDot" style="display:{{ $unreadCount > 0 ? 'flex' : 'none' }};"></span>
     </button>
 
     <!-- Menú Desplegable de Notificaciones -->
@@ -14,7 +18,7 @@
         <div class="dropdown-header-title">
           <i class="fa-solid fa-bell" style="color:var(--green, #39A900);"></i>
           <span style="font-weight:700; font-size:14px; color:#001A29;">Notificaciones</span>
-          <span class="badge-count" id="notifCountBadge">4 nuevas</span>
+          <span class="badge-count" id="notifCountBadge">{{ $unreadCount > 0 ? $unreadCount . ' nuevas' : 'Al día' }}</span>
         </div>
         <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead(event)">
           Marcar como leídas
@@ -22,71 +26,27 @@
       </div>
 
       <div class="notif-list" id="notifItemsList">
-        
-        <!-- Notificación 1 -->
-        <div class="notif-item unread" onclick="markNotificationRead(this)">
-          <div class="notif-icon bg-green-light">
-            <i class="fa-solid fa-briefcase" style="color:#0d6928;"></i>
-          </div>
-          <div class="notif-content">
-            <div class="notif-text">
-              <strong>Juan Pérez</strong> (ADSO) actualizó su información laboral a <em>Empleado</em>.
+        @forelse($notificaciones as $notif)
+          <div class="notif-item {{ !empty($notif['unread']) ? 'unread' : 'read' }}" onclick="abrirDetalleNotificacion('{{ $notif['id'] }}', this)">
+            <div class="notif-icon" style="background: {{ $notif['iconBg'] ?? '#eaf7ee' }};">
+              <i class="{{ $notif['icon'] ?? 'fa-solid fa-bell' }}" style="color: {{ $notif['iconColor'] ?? '#39A900' }};"></i>
             </div>
-            <div class="notif-meta">
-              <span class="notif-time"><i class="fa-regular fa-clock"></i> Hace 20 min</span>
-              <span class="unread-dot"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Notificación 2 -->
-        <div class="notif-item unread" onclick="markNotificationRead(this)">
-          <div class="notif-icon bg-blue-light">
-            <i class="fa-solid fa-clipboard-check" style="color:#1e40af;"></i>
-          </div>
-          <div class="notif-content">
-            <div class="notif-text">
-              Se cerró la encuesta <strong>"Seguimiento laboral 2026-1"</strong> con 85% de participación.
-            </div>
-            <div class="notif-meta">
-              <span class="notif-time"><i class="fa-regular fa-clock"></i> Hace 3 horas</span>
-              <span class="unread-dot"></span>
+            <div class="notif-content">
+              <div class="notif-text">
+                {!! $notif['texto'] !!}
+              </div>
+              <div class="notif-meta">
+                <span class="notif-time"><i class="fa-regular fa-clock"></i> {{ $notif['tiempo'] ?? 'Reciente' }}</span>
+                <span class="unread-dot"></span>
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Notificación 3 -->
-        <div class="notif-item unread" onclick="markNotificationRead(this)">
-          <div class="notif-icon bg-amber-light">
-            <i class="fa-solid fa-calendar-check" style="color:#b45309;"></i>
+        @empty
+          <div style="padding: 28px 16px; text-align: center; color: #64748b; font-size: 12px; font-weight: 600;">
+            <i class="fa-solid fa-bell-slash" style="font-size: 24px; color: #94a3b8; display: block; margin-bottom: 8px;"></i>
+            No hay respuestas ni notificaciones registradas.
           </div>
-          <div class="notif-content">
-            <div class="notif-text">
-              Próximo evento institucional: <strong>Feria Laboral 2026</strong> en Auditorio Principal.
-            </div>
-            <div class="notif-meta">
-              <span class="notif-time"><i class="fa-regular fa-clock"></i> Ayer</span>
-              <span class="unread-dot"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Notificación 4 -->
-        <div class="notif-item unread" onclick="markNotificationRead(this)">
-          <div class="notif-icon bg-purple-light">
-            <i class="fa-solid fa-user-plus" style="color:#6b21a8;"></i>
-          </div>
-          <div class="notif-content">
-            <div class="notif-text">
-              <strong>15 egresados</strong> completaron su registro en el portal este mes.
-            </div>
-            <div class="notif-meta">
-              <span class="notif-time"><i class="fa-regular fa-clock"></i> Hace 2 días</span>
-              <span class="unread-dot"></span>
-            </div>
-          </div>
-        </div>
-
+        @endforelse
       </div>
 
       <div class="dropdown-footer">
@@ -156,6 +116,7 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
+        @if(empty($hideActualizarPerfil) && !request()->routeIs('egresados.dashboard') && !request()->routeIs('egresados.superadmin.dashboard') && !request()->is('egresados/dashboard*') && !request()->is('egresados/superadmin/dashboard*'))
         <button type="button" class="user-menu-item" onclick="if(typeof openModalActualizarPerfilEgresado === 'function'){ openModalActualizarPerfilEgresado(); } else { window.location.href='{{ route('egresados.dashboard_egresado') }}'; }" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit;">
           <div class="menu-item-icon bg-green-icon">
             <i class="fa-solid fa-user-pen"></i>
@@ -165,6 +126,7 @@
             <div class="menu-item-desc">Contacto, residencia y contraseña</div>
           </div>
         </button>
+        @endif
 
         <a href="{{ route('home') }}" class="user-menu-item">
           <div class="menu-item-icon bg-blue-icon">
@@ -1021,6 +983,16 @@
       item.classList.add('read');
     });
     updateUnreadNotificationCount();
+    try {
+      fetch('{{ route("egresados.notificaciones.marcar_leidas") }}', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (e) {}
+
   }
 
   function updateUnreadNotificationCount() {
@@ -1044,123 +1016,9 @@
   }
 
   // ================= DICCIONARIO DE DETALLES DE NOTIFICACIONES =================
-  const sigeNotificacionesData = {
-    'notif-1': {
-      categoria: 'Actualización Laboral',
-      icon: 'fa-solid fa-briefcase',
-      iconColor: '#0d6928',
-      iconBg: '#eaf7ee',
-      tiempo: 'Hace 20 min',
-      titulo: 'Actualización de Situación Laboral',
-      resumen: 'El egresado Juan Pérez ha registrado oportunamente su nuevo estado ocupacional dentro de la plataforma.',
-      campos: [
-        { etiqueta: 'Egresado', valor: 'Juan Pérez' },
-        { etiqueta: 'Documento', valor: 'CC 1.098.765.432' },
-        { etiqueta: 'Programa Formativo', valor: 'Análisis y Desarrollo de Software (ADSO)' },
-        { etiqueta: 'Ficha SOFIA Plus', valor: 'Ficha 2670142 - SENA CEFA' },
-        { etiqueta: 'Nuevo Estado', valor: 'Empleado (Término Indefinido)' },
-        { etiqueta: 'Empresa / Entidad', valor: 'Tech Solutions Colombia S.A.S.' },
-        { etiqueta: 'Cargo Desempeñado', valor: 'Desarrollador Full Stack Junior' },
-        { etiqueta: 'Rango Salarial', valor: '$2.800.000 COP' },
-        { etiqueta: 'Fecha de Reporte', valor: 'Hoy, hace 20 minutos' },
-        { etiqueta: 'Validación', valor: 'Información registrada y verificada' }
-      ],
-      accionTexto: 'Ver Directorio de Egresados',
-      accionUrl: '{{ route("egresados.index") }}',
-      accionIcon: 'fa-solid fa-user-graduate'
-    },
-    'notif-2': {
-      categoria: 'Encuesta Institucional',
-      icon: 'fa-solid fa-clipboard-check',
-      iconColor: '#1e40af',
-      iconBg: '#eff6ff',
-      tiempo: 'Hace 3 horas',
-      titulo: 'Cierre de Encuesta "Seguimiento laboral 2026-1"',
-      resumen: 'La encuesta de seguimiento ocupacional 2026-1 culminó con una destacada participación del 85% de la muestra convocada.',
-      campos: [
-        { etiqueta: 'Encuesta', valor: 'Seguimiento laboral 2026-1' },
-        { etiqueta: 'Población Destinataria', valor: 'Egresados titulados 2024 - 2025' },
-        { etiqueta: 'Participación Lograda', valor: '85.2% (426 / 500 respuestas válidas)' },
-        { etiqueta: 'Tasa de Vinculación', valor: '78% de egresados activos laboralmente' },
-        { etiqueta: 'Estado de Encuesta', valor: 'Cerrada oficialmente' },
-        { etiqueta: 'Hora de Cierre', valor: 'Hoy, 10:30 AM' },
-        { etiqueta: 'Responsable', valor: 'Coordinación Académica & Sistema SIGE' }
-      ],
-      accionTexto: 'Ver Reporte de Encuestas',
-      accionUrl: '{{ route("egresados.encuestas") }}',
-      accionIcon: 'fa-solid fa-chart-pie'
-    },
-    'notif-3': {
-      categoria: 'Evento Institucional',
-      icon: 'fa-solid fa-calendar-check',
-      iconColor: '#b45309',
-      iconBg: '#fef3c7',
-      tiempo: 'Ayer',
-      titulo: 'Feria Laboral Institucional 2026',
-      resumen: 'Convocatoria oficial para egresados SENA orientada a vinculación directa y ruedas de empleo con empresas aliadas.',
-      campos: [
-        { etiqueta: 'Nombre del Evento', valor: 'Feria Laboral 2026' },
-        { etiqueta: 'Código', valor: 'EVT-012' },
-        { etiqueta: 'Tipo de Evento', valor: 'Feria laboral y rueda de empleo' },
-        { etiqueta: 'Fecha y Horario', valor: '20 de Octubre de 2026 | 08:00 AM' },
-        { etiqueta: 'Lugar / Sede', valor: 'Auditorio Principal - SENA CEFA' },
-        { etiqueta: 'Aforo / Confirmados', valor: '156 de 200 cupos reservados (78%)' },
-        { etiqueta: 'Empresas Vinculadas', valor: '18 organizaciones aliadas confirmadas' },
-        { etiqueta: 'Coordinador del Evento', valor: 'Coordinación Académica & Egresados' }
-      ],
-      accionTexto: 'Ver Gestión de Eventos',
-      accionUrl: '{{ route("egresados.eventos") }}',
-      accionIcon: 'fa-solid fa-calendar-days'
-    },
-    'notif-4': {
-      categoria: 'Registro de Egresados',
-      icon: 'fa-solid fa-user-plus',
-      iconColor: '#6b21a8',
-      iconBg: '#f3e8ff',
-      tiempo: 'Hace 2 días',
-      titulo: '15 Nuevos Egresados Registrados en el Portal',
-      resumen: 'Quince egresados completaron su vinculación autónoma y actualización de perfil curricular en la plataforma.',
-      campos: [
-        { etiqueta: 'Periodo de Registro', valor: 'Mes en curso (Octubre 2026)' },
-        { etiqueta: 'Nuevos Registrados', valor: '15 egresados activos' },
-        { etiqueta: 'Programas Académicos', valor: 'ADSO (8), Gestión Empresarial (4), Contabilidad (3)' },
-        { etiqueta: 'Hojas de Vida', valor: '12 cargadas y estructuradas al 100%' },
-        { etiqueta: 'Verificación Documental', valor: 'Certificación SOFIA Plus confirmada' },
-        { etiqueta: 'Próximo Paso', valor: 'Asignación a bolsa de empleo e instructores' }
-      ],
-      accionTexto: 'Ver Directorio de Egresados',
-      accionUrl: '{{ route("egresados.index") }}',
-      accionIcon: 'fa-solid fa-users'
-    }
-  };
+  const sigeNotificacionesData = @json(collect($notificaciones)->keyBy('id'));
 
-  @if(!empty($cacheInvitaciones))
-    @foreach($cacheInvitaciones as $invId => $inv)
-      sigeNotificacionesData['inv-{{ $invId }}'] = {
-        categoria: 'Invitación a Evento Institucional',
-        icon: 'fa-solid fa-envelope-circle-check',
-        iconColor: '#059669',
-        iconBg: '#eaf7ee',
-        tiempo: '{{ $inv["fecha_envio"] ?? "Hoy" }}',
-        titulo: 'Invitación Enviada: {{ addslashes($inv["title"] ?? "Evento") }}',
-        resumen: 'Se ha emitido y enviado satisfactoriamente la invitación masiva y enlace de registro para el evento institucional.',
-        campos: [
-          { etiqueta: 'Evento Institucional', valor: '{{ addslashes($inv["title"] ?? "Evento Institucional") }}' },
-          { etiqueta: 'Código Identificador', valor: '{{ $invId }}' },
-          { etiqueta: 'Programa Dirigido', valor: '{{ addslashes($inv["program"] ?? "Egresados CEFA") }}' },
-          { etiqueta: 'Fecha Programada', valor: '{{ addslashes($inv["date"] ?? "14/10/2026") }} | {{ addslashes($inv["time"] ?? "01:22 PM") }}' },
-          { etiqueta: 'Lugar / Instalación', valor: '{{ addslashes($inv["location"] ?? "CEFA") }}' },
-          { etiqueta: 'Canal de Envío', valor: 'Correo electrónico y Dashboard de Egresados' },
-          { etiqueta: 'Estado de Envío', valor: 'Completado con éxito' }
-        ],
-        accionTexto: 'Ir al Módulo de Eventos',
-        accionUrl: '{{ route("egresados.eventos") }}',
-        accionIcon: 'fa-solid fa-calendar-check'
-      };
-    @endforeach
-  @endif
-
-  // Abrir Modal de Detalle de Notificación
+  //  Abrir Modal de Detalle de Notificación
   function abrirDetalleNotificacion(notifKey, element) {
     if (element) {
       element.classList.remove('unread');

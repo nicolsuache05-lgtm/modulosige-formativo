@@ -666,7 +666,7 @@
     <div class="topbar">
       <div class="topbar-left"></div>
 
-      @include('egresados::superadmin.partials._topbar_right')
+      @include('egresados::superadmin.partials._topbar_right', ['hideActualizarPerfil' => true])
     </div>
 
     <!-- Main Content -->
