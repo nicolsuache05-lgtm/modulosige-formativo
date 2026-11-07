@@ -2579,4 +2579,148 @@ class EgresadosController extends Controller
             return redirect()->back()->with('error', 'Hubo un error al procesar el archivo. Verifique que las columnas sean correctas. Detalle: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Datos por defecto del equipo de autores y desarrolladores del módulo SIGE.
+     */
+    public static function getDefaultAutores(): array
+    {
+        return [
+            'hasbleidy' => [
+                'id' => 'hasbleidy',
+                'nombre' => 'Hasbleidy Perdomo',
+                'rol' => 'Líder de Proyecto & Desarrolladora Full Stack',
+                'bio' => 'Líder en diseño y desarrollo del Sistema de Gestión de Egresados (SIGE). Apasionada por la arquitectura de software en Laravel, interfaces de usuario intuitivas y soluciones tecnológicas integrales para el sector educativo.',
+                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
+                'regional' => 'Regional Huila · Campoalegre',
+                'email' => 'hasbleidy.perdomo@sena.edu.co',
+                'telefono' => '+57 312 456 7890',
+                'linkedin' => 'https://linkedin.com',
+                'github' => 'https://github.com',
+                'foto' => null,
+                'avatar_color' => '#39A900',
+                'habilidades' => ['PHP / Laravel', 'Tailwind CSS', 'Arquitectura ERP', 'MySQL', 'UI / UX Design']
+            ],
+            'juand' => [
+                'id' => 'juand',
+                'nombre' => 'Juan D. Lizcano',
+                'rol' => 'Arquitecto Backend & Desarrollador Full Stack',
+                'bio' => 'Desarrollador enfocado en la lógica empresarial, control de accesos por roles institucional, seguridad SOFIA Plus y modelado de datos para el módulo SIGE y ecosistema SENA Empresa.',
+                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
+                'regional' => 'Regional Huila · Campoalegre',
+                'email' => 'juand.lizcano@sena.edu.co',
+                'telefono' => '+57 310 987 6543',
+                'linkedin' => 'https://linkedin.com',
+                'github' => 'https://github.com',
+                'foto' => null,
+                'avatar_color' => '#00324D',
+                'habilidades' => ['PHP / Laravel', 'Seguridad y Roles', 'Bases de Datos', 'REST APIs', 'Optimización']
+            ],
+            'nicolle' => [
+                'id' => 'nicolle',
+                'nombre' => 'Nicolle Suache',
+                'rol' => 'Diseñadora UI/UX & Desarrolladora Frontend',
+                'bio' => 'Especialista en experiencia visual, usabilidad accesible, maquetación interactiva y componentes modulares de encuestas, eventos y reportes estadísticos para graduados.',
+                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
+                'regional' => 'Regional Huila · Campoalegre',
+                'email' => 'nicolle.suache@sena.edu.co',
+                'telefono' => '+57 320 123 4567',
+                'linkedin' => 'https://linkedin.com',
+                'github' => 'https://github.com',
+                'foto' => null,
+                'avatar_color' => '#62E31D',
+                'habilidades' => ['Frontend Moderno', 'Experiencia de Usuario', 'Diseño Responsivo', 'Laravel Blade', 'Reportes']
+            ]
+        ];
+    }
+
+    /**
+     * Muestra la vista dedicada del equipo de autores y desarrolladores del módulo SIGE.
+     */
+    public function autores()
+    {
+        $filePath = storage_path('app/sige_autores.json');
+        $defaults = self::getDefaultAutores();
+        $autores = $defaults;
+
+        if (file_exists($filePath)) {
+            $saved = json_decode(@file_get_contents($filePath), true) ?: [];
+            foreach ($defaults as $key => $defaultData) {
+                if (isset($saved[$key])) {
+                    $autores[$key] = array_merge($defaultData, $saved[$key]);
+                }
+            }
+        }
+
+        return view('egresados::autores', compact('autores'));
+    }
+
+    /**
+     * Guarda o actualiza los datos y foto de un autor del proyecto.
+     */
+    public function guardarAutor(Request $request)
+    {
+        $request->validate([
+            'autor_id' => 'required|in:hasbleidy,juand,nicolle',
+            'nombre'   => 'required|string|max:120',
+            'rol'      => 'required|string|max:150',
+            'bio'      => 'nullable|string|max:1000',
+            'email'    => 'nullable|email|max:150',
+            'telefono' => 'nullable|string|max:50',
+            'linkedin' => 'nullable|string|max:255',
+            'github'   => 'nullable|string|max:255',
+            'foto'     => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+        ]);
+
+        $id = $request->input('autor_id');
+        $filePath = storage_path('app/sige_autores.json');
+        $defaults = self::getDefaultAutores();
+        $allAutores = $defaults;
+
+        if (file_exists($filePath)) {
+            $saved = json_decode(@file_get_contents($filePath), true) ?: [];
+            foreach ($defaults as $key => $defaultData) {
+                if (isset($saved[$key])) {
+                    $allAutores[$key] = array_merge($defaultData, $saved[$key]);
+                }
+            }
+        }
+
+        $autor = $allAutores[$id] ?? ($defaults[$id] ?? []);
+        $autor['nombre'] = $request->input('nombre');
+        $autor['rol'] = $request->input('rol');
+        if ($request->has('bio')) $autor['bio'] = $request->input('bio');
+        if ($request->has('email')) $autor['email'] = $request->input('email');
+        if ($request->has('telefono')) $autor['telefono'] = $request->input('telefono');
+        if ($request->has('linkedin')) $autor['linkedin'] = $request->input('linkedin');
+        if ($request->has('github')) $autor['github'] = $request->input('github');
+
+        // Procesar subida de foto
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = 'autor_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $destDir = public_path('modules/egresados/images/autores');
+            if (!file_exists($destDir)) {
+                @mkdir($destDir, 0777, true);
+            }
+            $file->move($destDir, $filename);
+            $autor['foto'] = asset('modules/egresados/images/autores/' . $filename);
+        }
+
+        $allAutores[$id] = $autor;
+        @file_put_contents($filePath, json_encode($allAutores, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => '¡Información y foto de ' . $autor['nombre'] . ' actualizadas con éxito!',
+                'autor' => $autor
+            ]);
+        }
+
+        return redirect()->back()->with('success', '¡Información de ' . $autor['nombre'] . ' actualizada correctamente!');
+    }
 }

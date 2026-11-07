@@ -21,6 +21,8 @@ use Modules\Egresados\Http\Middleware\CheckEgresadosRole;
 // 1. Portal Público Informativo
 Route::get('egresados', [EgresadosController::class, 'welcome'])->name('egresados.welcome');
 Route::get('egresados/welcome', [EgresadosController::class, 'welcome'])->name('egresados.landing');
+Route::get('egresados/autores', [EgresadosController::class, 'autores'])->name('egresados.autores');
+Route::post('egresados/autores/guardar', [EgresadosController::class, 'guardarAutor'])->name('egresados.autores.guardar');
 
 // 2. Autenticación Institucional Centralizada del ERP
 Route::get('egresados/login', function (\Illuminate\Http\Request $request) {
