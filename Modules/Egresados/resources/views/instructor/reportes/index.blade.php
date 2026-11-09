@@ -854,23 +854,39 @@
             </div>
         `;
 
+        const prevScrollX = window.scrollX || window.pageXOffset || 0;
+        const prevScrollY = window.scrollY || window.pageYOffset || 0;
+
+        // Desplazar instantáneamente arriba para que la captura se inicie en el borde superior de la hoja
+        document.documentElement.style.scrollBehavior = 'auto';
+        document.body.style.scrollBehavior = 'auto';
+        window.scrollTo(0, 0);
+
         const opt = {
-            margin:       [3, 6, 6, 6],
+            margin:       [4, 6, 4, 6],
             filename:     'Reporte_Institucional_' + reportId.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
+            html2canvas:  {
+                scale: 2,
+                scrollY: 0,
+                scrollX: 0
+            },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(container).save().then(() => {
-            if (btnText) btnText.innerText = 'Descargar PDF';
-            if (btn) btn.disabled = false;
-        }).catch(err => {
-            console.error('Error generando reporte PDF:', err);
-            if (btnText) btnText.innerText = 'Descargar PDF';
-            if (btn) btn.disabled = false;
-            alert('Ocurrió un error al generar el archivo PDF.');
-        });
+        setTimeout(() => {
+            html2pdf().set(opt).from(container).save().then(() => {
+                window.scrollTo(prevScrollX, prevScrollY);
+                if (btnText) btnText.innerText = 'Descargar PDF';
+                if (btn) btn.disabled = false;
+            }).catch(err => {
+                window.scrollTo(prevScrollX, prevScrollY);
+                console.error('Error generando reporte PDF:', err);
+                if (btnText) btnText.innerText = 'Descargar PDF';
+                if (btn) btn.disabled = false;
+                alert('Ocurrió un error al generar el archivo PDF.');
+            });
+        }, 50);
     }
 
     // =========================================================================
