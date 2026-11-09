@@ -623,44 +623,32 @@
 
         const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}";
 
-        // Capturar o forzar renderizado de las dos gráficas de Chart.js
-        let chart1Img = '';
-        let chart2Img = '';
-        try {
-            const c1 = document.getElementById('modalChartDoughnut');
-            const c2 = document.getElementById('modalChartBar');
-            if (c1 && c1.width > 0 && modalChartDoughnutInstance) {
-                modalChartDoughnutInstance.update('none');
-                chart1Img = c1.toDataURL('image/png');
-            }
-            if (c2 && c2.width > 0 && modalChartBarInstance) {
-                modalChartBarInstance.update('none');
-                chart2Img = c2.toDataURL('image/png');
-            }
-        } catch (e) {
-            console.warn('Canvas chart export:', e);
-        }
+        // Cálculos matemáticos precisos para gráficos vectoriales SVG instantáneos
+        const numTotal = Math.max(1, parseInt(totalVal) || 1);
+        const numEmp = parseInt(empVal) || 0;
+        const numDes = Math.max(0, parseInt(desVal) || (numTotal - numEmp));
+        const empPercent = Math.min(100, Math.max(0, Math.round((numEmp / numTotal) * 100)));
+        const desPercent = Math.max(0, 100 - empPercent);
 
-        // Si aún no se habían renderizado en pantalla, generarlas de inmediato
-        if (!chart1Img || !chart2Img) {
-            try {
-                renderModalCharts(parseInt(empVal) || 0, parseInt(desVal) || 0, parseInt(totalVal) || 0, parseInt(rateVal) || 100);
-                if (modalChartDoughnutInstance) modalChartDoughnutInstance.update('none');
-                if (modalChartBarInstance) modalChartBarInstance.update('none');
-                const c1 = document.getElementById('modalChartDoughnut');
-                const c2 = document.getElementById('modalChartBar');
-                if (c1 && c1.width > 0) chart1Img = c1.toDataURL('image/png');
-                if (c2 && c2.width > 0) chart2Img = c2.toDataURL('image/png');
-            } catch (e) {}
-        }
+        // Circunferencia del círculo SVG (radio 36) = 2 * PI * 36 = 226.2
+        const circ = 226.2;
+        const dashGreen = ((empPercent / 100) * circ).toFixed(1);
 
-        // Contenedor ajustado exactamente a 1 página A4 ejecutiva
+        // Altura de barras del gráfico de cumplimiento
+        const barHeight1 = Math.max(4, Math.round((empPercent / 100) * 60));
+        const barY1 = 82 - barHeight1;
+
+        // Contenedor temporal insertado en el DOM para que el motor de captura mida las dimensiones con exactitud
         const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
         container.style.width = '750px';
-        container.style.padding = '4px 10px';
+        container.style.backgroundColor = '#ffffff';
+        container.style.zIndex = '999999';
+        container.style.padding = '8px 12px';
         container.style.fontFamily = "'Segoe UI', Arial, Helvetica, sans-serif";
         container.style.color = '#1e293b';
-        container.style.backgroundColor = '#ffffff';
         container.style.boxSizing = 'border-box';
         container.style.lineHeight = '1.3';
 
@@ -706,7 +694,7 @@
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 7px;">
                 <tr>
                     <td style="width: 54%; vertical-align: top; padding-right: 4px;">
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 3.5px solid #39A900; border-radius: 5px; padding: 6px 9px; height: 60px; box-sizing: border-box;">
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 3.5px solid #39A900; border-radius: 5px; padding: 6px 9px; height: 62px; box-sizing: border-box;">
                             <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
                                 <span style="color: #39A900;">■</span> Objetivo y Alcance Institucional
                             </div>
@@ -716,7 +704,7 @@
                         </div>
                     </td>
                     <td style="width: 46%; vertical-align: top; padding-left: 4px;">
-                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 5px 8px; height: 60px; box-sizing: border-box;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 5px 8px; height: 62px; box-sizing: border-box;">
                             <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
                                 Ficha Técnica de Emisión
                             </div>
@@ -765,8 +753,7 @@
                 </table>
             </div>
 
-            <!-- 5. Visualización Gráfica e Indicadores Estadísticos -->
-            ${(chart1Img && chart2Img) ? `
+            <!-- 5. Visualización Gráfica e Indicadores Estadísticos con Gráficos Vectoriales SVG Integrados -->
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-bottom: 7px;">
                 <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 3px; margin-bottom: 4px; display: flex; justify-content: space-between;">
                     <span><strong style="color: #39A900;">■</strong> Visualización Gráfica e Indicadores Estadísticos (SIGE ERP)</span>
@@ -774,22 +761,69 @@
                 </div>
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="width: 50%; padding: 2px 8px; vertical-align: top; text-align: center; border-right: 1px dashed #e2e8f0;">
+                        <!-- Gráfico 1: Donut Vectorial SVG -->
+                        <td style="width: 50%; padding: 4px 8px; vertical-align: middle; text-align: center; border-right: 1px dashed #e2e8f0;">
                             <div style="font-size: 8.5px; font-weight: bold; color: #334155; margin-bottom: 3px;">
                                 Situación Ocupacional (Distribución %)
                             </div>
-                            <img src="${chart1Img}" style="max-width: 95%; max-height: 105px; object-fit: contain; margin: 0 auto; display: block;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 48%; text-align: center; vertical-align: middle;">
+                                        <svg width="86" height="86" viewBox="0 0 100 100" style="display: block; margin: 0 auto;">
+                                            <circle cx="50" cy="50" r="36" fill="none" stroke="#F59E0B" stroke-width="15" />
+                                            <circle cx="50" cy="50" r="36" fill="none" stroke="#39A900" stroke-width="15"
+                                                    stroke-dasharray="${dashGreen} ${circ}" stroke-dashoffset="0"
+                                                    transform="rotate(-90 50 50)" />
+                                            <circle cx="50" cy="50" r="28" fill="#ffffff" />
+                                            <text x="50" y="48" text-anchor="middle" font-size="12" font-weight="900" fill="#001A29">${empPercent}%</text>
+                                            <text x="50" y="59" text-anchor="middle" font-size="6.5" font-weight="800" fill="#166534">TASA</text>
+                                        </svg>
+                                    </td>
+                                    <td style="width: 52%; text-align: left; vertical-align: middle; padding-left: 6px;">
+                                        <div style="margin-bottom: 5px;">
+                                            <div style="font-size: 8px; font-weight: bold; color: #166534;">
+                                                <span style="display: inline-block; width: 7px; height: 7px; background: #39A900; border-radius: 2px; margin-right: 3px;"></span>
+                                                Vinculados: ${numEmp} (${empPercent}%)
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 8px; font-weight: bold; color: #92400e;">
+                                                <span style="display: inline-block; width: 7px; height: 7px; background: #F59E0B; border-radius: 2px; margin-right: 3px;"></span>
+                                                En Búsqueda: ${numDes} (${desPercent}%)
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
-                        <td style="width: 50%; padding: 2px 8px; vertical-align: top; text-align: center;">
+
+                        <!-- Gráfico 2: Barras Vectoriales SVG -->
+                        <td style="width: 50%; padding: 4px 8px; vertical-align: middle; text-align: center;">
                             <div style="font-size: 8.5px; font-weight: bold; color: #334155; margin-bottom: 3px;">
-                                Cumplimiento vs Meta CEFA (85%)
+                                Cumplimiento vs Meta Institucional (85%)
                             </div>
-                            <img src="${chart2Img}" style="max-width: 95%; max-height: 105px; object-fit: contain; margin: 0 auto; display: block;">
+                            <svg width="170" height="86" viewBox="0 0 170 95" style="display: block; margin: 0 auto;">
+                                <line x1="26" y1="18" x2="160" y2="18" stroke="#f1f5f9" stroke-width="1" />
+                                <text x="22" y="21" font-size="6.5" fill="#94a3b8" text-anchor="end">100%</text>
+                                
+                                <line x1="26" y1="50" x2="160" y2="50" stroke="#f1f5f9" stroke-width="1" />
+                                <text x="22" y="53" font-size="6.5" fill="#94a3b8" text-anchor="end">50%</text>
+                                
+                                <line x1="26" y1="82" x2="160" y2="82" stroke="#cbd5e1" stroke-width="1" />
+                                <text x="22" y="85" font-size="6.5" fill="#94a3b8" text-anchor="end">0%</text>
+
+                                <rect x="46" y="${barY1}" width="32" height="${barHeight1}" rx="3" fill="#39A900" />
+                                <text x="62" y="${Math.max(14, barY1 - 3)}" font-size="8" font-weight="900" fill="#166534" text-anchor="middle">${empPercent}%</text>
+                                <text x="62" y="93" font-size="6.5" font-weight="700" fill="#334155" text-anchor="middle">Lograda</text>
+
+                                <rect x="102" y="30" width="32" height="52" rx="3" fill="#002336" />
+                                <text x="118" y="26" font-size="8" font-weight="900" fill="#002336" text-anchor="middle">85%</text>
+                                <text x="118" y="93" font-size="6.5" font-weight="700" fill="#334155" text-anchor="middle">Meta CEFA</text>
+                            </svg>
                         </td>
                     </tr>
                 </table>
             </div>
-            ` : ''}
 
             <!-- 6. Filtros Aplicados y Conclusión en 2 Columnas -->
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 7px;">
@@ -854,19 +888,22 @@
             </div>
         `;
 
+        document.body.appendChild(container);
+
         const opt = {
             margin:       [5, 7, 5, 7],
             filename:     'Reporte_Institucional_' + reportId.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(container).save().then(() => {
+            container.remove();
             if (btnText) btnText.innerText = 'Descargar PDF';
             if (btn) btn.disabled = false;
         }).catch(err => {
+            container.remove();
             console.error('Error generando reporte PDF:', err);
             if (btnText) btnText.innerText = 'Descargar PDF';
             if (btn) btn.disabled = false;
