@@ -90,6 +90,10 @@ class InstructorController extends Controller
             }
         }
 
+        // Solicitudes de registro de egresados pendientes de aprobación institucional
+        $todasSolicitudes = \Modules\Egresados\Http\Controllers\EgresadosController::getSolicitudesRegistro();
+        $solicitudesPendientes = array_values(array_filter($todasSolicitudes, fn($s) => ($s['estado'] ?? '') === 'PENDIENTE'));
+
         return view('egresados::instructor.dashboard', compact(
             'courses',
             'totalEgresados',
@@ -105,6 +109,7 @@ class InstructorController extends Controller
             'recentEgresados',
             'programStats',
             'debeActualizarPassword',
+            'solicitudesPendientes',
             'user',
             'person'
         ));

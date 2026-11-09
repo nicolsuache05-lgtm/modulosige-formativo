@@ -81,6 +81,15 @@ class AuthController extends Controller
                 }
 
                 if ($canAuthenticate) {
+                    // Validar si el egresado tiene una solicitud pendiente de aprobación institucional
+                    if (\Modules\Egresados\Http\Controllers\EgresadosController::isSolicitudPendiente($user ? $user->id : 0, $cleanDoc)) {
+                        return redirect()->back()
+                            ->withInput($request->only('email'))
+                            ->withErrors([
+                                'email' => 'Tu solicitud de registro está en proceso de revisión y validación institucional por parte de la coordinación e instructores. Te informaremos en cuanto sea aprobada para que puedas ingresar.'
+                            ]);
+                    }
+
                     if (!$user) {
                         $uniqueEmail = !empty($person->misena_email) 
                             ? $person->misena_email 
@@ -157,6 +166,15 @@ class AuthController extends Controller
         // =========================================================================
         $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'nickname';
         $user = User::where($field, $loginInput)->first();
+
+        // Validar si el usuario egresado tiene una solicitud pendiente de aprobación institucional
+        if ($user && \Modules\Egresados\Http\Controllers\EgresadosController::isSolicitudPendiente($user->id, $user->person ? (string)$user->person->document_number : '')) {
+            return redirect()->back()
+                ->withInput($request->only('email'))
+                ->withErrors([
+                    'email' => 'Tu solicitud de registro está en proceso de revisión y validación institucional por parte de la coordinación e instructores. Te informaremos en cuanto sea aprobada para que puedas ingresar.'
+                ]);
+        }
 
         // Si la contraseña coincide con el documento de la persona vinculada
         if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {

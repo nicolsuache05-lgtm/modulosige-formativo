@@ -60,6 +60,10 @@ Route::get('egresados/create', [EgresadosController::class, 'create'])->name('eg
 Route::post('egresados/create', [EgresadosController::class, 'store'])->name('egresados.store');
 Route::get('egresados/crear', [EgresadosController::class, 'create']);
 
+// Gestión y Validación de Solicitudes de Registro de Egresados (Aprobación y Rechazo Institucional)
+Route::match(['get', 'post'], 'egresados/solicitudes/{id}/aprobar', [EgresadosController::class, 'aprobarSolicitudRegistro'])->name('egresados.solicitudes.aprobar');
+Route::match(['get', 'post'], 'egresados/solicitudes/{id}/rechazar', [EgresadosController::class, 'rechazarSolicitudRegistro'])->name('egresados.solicitudes.rechazar');
+
 // 3. Servidor de recursos estáticos propios del módulo
 Route::get('egresados/assets/images/{filename}', function ($filename) {
     // Sanitizar nombre de archivo para evitar Directory Traversal

@@ -153,7 +153,56 @@ class NotificationController extends Controller
             }
         }
 
-        // 3. Si la lista está vacía, inicializar con notificaciones basadas en egresados reales del CEFA
+        // 3. Sincronizar solicitudes de registro de egresados pendientes de aprobación
+        $solFile = storage_path('app/sige_solicitudes_registro.json');
+        if (file_exists($solFile)) {
+            $solicitudes = json_decode(@file_get_contents($solFile), true) ?: [];
+            foreach ($solicitudes as $sId => $sol) {
+                if (($sol['estado'] ?? '') === 'PENDIENTE') {
+                    $notifId = 'sol_reg_' . ($sol['id'] ?? $sId);
+                    $exists = false;
+                    foreach ($notificaciones as &$n) {
+                        if (($n['id'] ?? '') === $notifId) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+                    unset($n);
+                    if (!$exists) {
+                        $notificaciones[] = [
+                            'id' => $notifId,
+                            'tipo' => 'solicitud_registro',
+                            'categoria' => 'Solicitud de Registro',
+                            'icon' => 'fa-solid fa-user-clock',
+                            'iconColor' => '#d97706',
+                            'iconBg' => '#fef3c7',
+                            'titulo' => 'Solicitud de Registro: ' . ($sol['nombre'] ?? 'Egresado'),
+                            'texto' => '<strong>' . htmlspecialchars($sol['nombre'] ?? 'Egresado') . '</strong> (Doc: ' . ($sol['documento'] ?? '') . ') se ha registrado en el portal y requiere aprobación institucional.',
+                            'resumen' => 'El egresado completó el formulario de registro y su cuenta requiere validación por parte del instructor o administrador para acceder.',
+                            'egresado_nombre' => $sol['nombre'] ?? 'Egresado',
+                            'egresado_doc' => (string)($sol['documento'] ?? ''),
+                            'egresado_email' => $sol['email'] ?? '',
+                            'solicitud_id' => (string)($sol['id'] ?? $sId),
+                            'created_at' => $sol['fecha'] ?? now()->toDateTimeString(),
+                            'unread' => true,
+                            'campos' => [
+                                ['etiqueta' => 'Egresado', 'valor' => $sol['nombre'] ?? 'Egresado'],
+                                ['etiqueta' => 'Documento', 'valor' => (string)($sol['documento'] ?? '')],
+                                ['etiqueta' => 'Correo Electrónico', 'valor' => $sol['email'] ?? ''],
+                                ['etiqueta' => 'Programa', 'valor' => $sol['programa'] ?? 'CEFA La Angostura'],
+                                ['etiqueta' => 'Estado', 'valor' => 'Pendiente de Aprobación'],
+                                ['etiqueta' => 'Fecha de Solicitud', 'valor' => isset($sol['fecha']) ? Carbon::parse($sol['fecha'])->format('d/m/Y h:i A') : now()->format('d/m/Y h:i A')]
+                            ],
+                            'accionTexto' => 'Revisar y Aprobar',
+                            'accionUrl' => '#solicitudes-pendientes',
+                            'accionIcon' => 'fa-solid fa-user-check'
+                        ];
+                    }
+                }
+            }
+        }
+
+        // 4. Si la lista está vacía, inicializar con notificaciones basadas en egresados reales del CEFA
         if (empty($notificaciones)) {
             $notificaciones = self::getDefaultSeedNotificaciones();
             @file_put_contents($file, json_encode($notificaciones, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));

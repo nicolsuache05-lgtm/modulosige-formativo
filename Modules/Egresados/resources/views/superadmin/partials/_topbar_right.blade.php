@@ -162,6 +162,76 @@
 
 </div>
 
+<!-- ================= MODAL DETALLE DE NOTIFICACIÓN INSTITUCIONAL ================= -->
+<div id="modalDetalleNotificacion" class="sige-notif-modal-overlay" style="display:none;" onclick="cerrarDetalleNotificacion(event)">
+  <div class="sige-notif-modal-box">
+    
+    <!-- Barra decorativa institucional -->
+    <div class="sige-notif-modal-bar"></div>
+
+    <!-- Header del Modal -->
+    <div class="sige-notif-modal-header">
+      <div class="sige-notif-modal-title-row">
+        <div id="modalNotifHeaderIcon" class="sige-notif-modal-icon">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span id="modalNotifBadge" class="sige-notif-badge-category">Notificación</span>
+            <span id="modalNotifTiempo" class="sige-notif-badge-time"><i class="fa-regular fa-clock"></i> Reciente</span>
+          </div>
+          <h3 id="modalNotifTitulo" class="sige-notif-modal-heading">Detalle de Notificación</h3>
+        </div>
+        <button type="button" class="sige-notif-close-btn" onclick="cerrarDetalleNotificacion(event)" title="Cerrar ventana">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cuerpo del Modal -->
+    <div class="sige-notif-modal-body">
+      <p id="modalNotifResumen" class="sige-notif-modal-desc"></p>
+
+      <!-- Campos de Información en Cuadrícula -->
+      <div id="modalNotifGridCampos" class="sige-notif-fields-grid"></div>
+
+      <!-- Contenedor de aprobación rápida para solicitudes de registro de egresados -->
+      <div id="modalNotifApprovalArea" style="display:none; margin-top:16px; padding:14px; background:#fef3c7; border:1px solid #fde68a; border-radius:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800; color:#92400e; font-size:13px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-shield-halved text-[#d97706]"></i> ¿Aprobar registro de este egresado?
+            </div>
+            <div style="font-size:11.5px; color:#78350f; margin-top:3px; line-height:1.4;">
+              Al validar y aprobar, se habilitará el acceso del egresado al portal institucional SIGE.
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="btnModalApproveNow" onclick="aprobarDesdeModalActual()" style="background:#16a34a; color:#fff; border:none; padding:7px 15px; border-radius:9px; font-weight:700; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(22,163,74,0.3); transition:all 0.15s ease;">
+              <i class="fa-solid fa-check"></i> <span>Aprobar Registro</span>
+            </button>
+            <button type="button" id="btnModalRejectNow" onclick="rechazarDesdeModalActual()" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; padding:7px 12px; border-radius:9px; font-weight:600; font-size:12px; cursor:pointer; transition:all 0.15s ease;">
+              <span>Rechazar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer del Modal -->
+    <div class="sige-notif-modal-footer">
+      <button type="button" class="sige-notif-btn-secondary" onclick="cerrarDetalleNotificacion(event)">
+        Cerrar
+      </button>
+      <a id="modalNotifBtnAccion" href="#" class="sige-notif-btn-primary" style="display:none;">
+        <i id="modalNotifBtnIcon" class="fa-solid fa-arrow-right"></i>
+        <span id="modalNotifBtnTexto">Ver en el Módulo</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+
 <style>
   /* ================= ESTILOS GLOBALES DE TOPBAR INSTITUCIONAL SENA ERP ================= */
   .topbar {
@@ -930,6 +1000,177 @@
     opacity: 1 !important;
     transition: opacity 0.15s ease, transform 0.15s ease !important;
   }
+  /* ================= MODAL NOTIFICACIÓN INSTITUCIONAL ================= */
+  .sige-notif-modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 19, 30, 0.72) !important;
+    backdrop-filter: blur(5px) !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+  }
+  .sige-notif-modal-box {
+    background: #ffffff !important;
+    border-radius: 22px !important;
+    box-shadow: 0 25px 60px rgba(0, 19, 30, 0.35) !important;
+    width: 100% !important;
+    max-width: 540px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(0, 19, 30, 0.08) !important;
+    animation: notifModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    position: relative !important;
+  }
+  @keyframes notifModalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .sige-notif-modal-bar {
+    height: 4.5px;
+    background: linear-gradient(90deg, #00131E 0%, #39A900 50%, #62E31D 100%);
+  }
+  .sige-notif-modal-header {
+    padding: 18px 22px 14px 22px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .sige-notif-modal-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .sige-notif-modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .sige-notif-badge-category {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #39A900;
+    background: #eaf7ee;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .sige-notif-badge-time {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .sige-notif-modal-heading {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #00131E;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.3;
+  }
+  .sige-notif-close-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-close-btn:hover {
+    background: #e2e8f0;
+    color: #00131E;
+  }
+  .sige-notif-modal-body {
+    padding: 18px 22px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+  .sige-notif-modal-desc {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+  }
+  .sige-notif-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .sige-notif-field-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 12px;
+  }
+  .sige-notif-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 3px;
+  }
+  .sige-notif-field-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-word;
+  }
+  .sige-notif-modal-footer {
+    padding: 14px 22px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .sige-notif-btn-secondary {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-secondary:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  .sige-notif-btn-primary {
+    background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+    border: none;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
+    transition: all 0.15s ease;
+  }
+  .sige-notif-btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
 </style>
 
 <script>
@@ -1097,11 +1338,89 @@
       btnAccion.style.display = 'none';
     }
 
+    window.currentNotifModalData = notif;
+    const approvalArea = document.getElementById('modalNotifApprovalArea');
+    if (approvalArea) {
+      if (notif.tipo === 'solicitud_registro' && notif.solicitud_id) {
+        approvalArea.style.display = 'block';
+      } else {
+        approvalArea.style.display = 'none';
+      }
+    }
+
     const modal = document.getElementById('modalDetalleNotificacion');
     if (modal) {
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
+  }
+
+  function aprobarDesdeModalActual() {
+    if (!window.currentNotifModalData || !window.currentNotifModalData.solicitud_id) return;
+    const solId = window.currentNotifModalData.solicitud_id;
+    const btn = document.getElementById('btnModalApproveNow');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aprobando...';
+    }
+
+    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const approvalArea = document.getElementById('modalNotifApprovalArea');
+        if (approvalArea) {
+          approvalArea.innerHTML = `
+            <div style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:10px; padding:12px; font-weight:700; font-size:12.5px; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-circle-check text-base"></i>
+              <span>¡Solicitud Aprobada! El egresado ya puede ingresar a SIGE.</span>
+            </div>
+          `;
+        }
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      } else {
+        alert(data.message || 'Error al aprobar solicitud');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Aprobar Registro';
+        }
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar';
+    });
+  }
+
+  function rechazarDesdeModalActual() {
+    if (!window.currentNotifModalData || !window.currentNotifModalData.solicitud_id) return;
+    if (!confirm('¿Estás seguro de que deseas rechazar esta solicitud de registro?')) return;
+    const solId = window.currentNotifModalData.solicitud_id;
+
+    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      window.location.reload();
+    })
+    .catch(err => {
+      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar';
+    });
   }
 
   function cerrarDetalleNotificacion(event) {

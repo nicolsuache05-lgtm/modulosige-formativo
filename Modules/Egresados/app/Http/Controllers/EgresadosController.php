@@ -352,13 +352,17 @@ class EgresadosController extends Controller
 
             $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
 
-            // 5. Vincular registro en Aprendiz
+            // 5. Vincular registro en Aprendiz (inicialmente en revisión institucional)
             $apprentice = Apprentice::firstOrNew(['person_id' => $person->id]);
             $apprentice->course_id = (int) $request->course_id;
             $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->input('estado_egresado', 'CERTIFICADO'));
             $apprentice->save();
 
             DB::commit();
+
+            // Obtener nombre del programa / ficha formativa
+            $course = \Modules\SICA\Entities\Course::with('program')->find($request->course_id);
+            $programaNombre = ($course && $course->program) ? $course->program->name : 'Formación CEFA La Angostura';
 
             // 6. Registrar contraseña elegida en el archivo de contraseñas actualizadas
             try {
@@ -376,43 +380,68 @@ class EgresadosController extends Controller
                 \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
             }
 
-            
-            // Notificar al superadmin e instructores sobre el nuevo egresado registrado
+            $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
+
+            // 7. Guardar solicitud en almacenamiento de solicitudes pendientes
+            try {
+                $solicitudData = [
+                    'id' => (string)$user->id,
+                    'user_id' => $user->id,
+                    'person_id' => $person->id,
+                    'documento' => (string)$person->document_number,
+                    'nombre' => $nombreCompleto,
+                    'email' => $cleanEmail,
+                    'telefono' => $request->input('telephone', ''),
+                    'genero' => $request->input('gender', ''),
+                    'course_id' => (int)$request->course_id,
+                    'programa' => $programaNombre,
+                    'fecha' => now()->toDateTimeString(),
+                    'estado' => 'PENDIENTE',
+                ];
+                self::saveSolicitudRegistro($solicitudData);
+            } catch (\Throwable $e) {
+                \Log::warning('Error al guardar solicitud de registro: ' . $e->getMessage());
+            }
+
+            // 8. Notificar a superadmin e instructores sobre la nueva solicitud de registro
             try {
                 \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
-                    'tipo' => 'registro',
-                    'categoria' => 'Nuevo Egresado Registrado',
-                    'icon' => 'fa-solid fa-user-plus',
-                    'iconColor' => '#6b21a8',
-                    'iconBg' => '#f3e8ff',
-                    'titulo' => 'Nuevo Egresado en el Portal SIGE',
-                    'texto' => '<strong>' . htmlspecialchars($nombreCompleto) . '</strong> (Doc: ' . $person->document_number . ') completó su registro.',
-                    'resumen' => 'Un nuevo egresado se ha incorporado a la plataforma institucional SIGE.',
+                    'id' => 'sol_reg_' . $user->id,
+                    'tipo' => 'solicitud_registro',
+                    'categoria' => 'Solicitud de Registro',
+                    'icon' => 'fa-solid fa-user-clock',
+                    'iconColor' => '#d97706',
+                    'iconBg' => '#fef3c7',
+                    'titulo' => 'Nueva Solicitud: ' . $nombreCompleto,
+                    'texto' => '<strong>' . htmlspecialchars($nombreCompleto) . '</strong> (Doc: ' . $person->document_number . ') se ha registrado y requiere aprobación institucional.',
+                    'resumen' => 'El egresado completó el formulario de registro y su cuenta requiere validación por parte del instructor o administrador para acceder.',
                     'egresado_nombre' => $nombreCompleto,
                     'egresado_doc' => (string)$person->document_number,
                     'egresado_email' => $cleanEmail,
+                    'solicitud_id' => (string)$user->id,
                     'unread' => true,
                     'campos' => [
                         ['etiqueta' => 'Egresado', 'valor' => $nombreCompleto],
                         ['etiqueta' => 'Documento', 'valor' => (string)$person->document_number],
                         ['etiqueta' => 'Correo Registrado', 'valor' => $cleanEmail],
-                        ['etiqueta' => 'Estado Inicial', 'valor' => 'Cuenta Creada y Activa'],
-                        ['etiqueta' => 'Fecha de Registro', 'valor' => now()->format('d/m/Y h:i A')]
+                        ['etiqueta' => 'Programa', 'valor' => $programaNombre],
+                        ['etiqueta' => 'Estado', 'valor' => 'Pendiente de Aprobación'],
+                        ['etiqueta' => 'Fecha de Solicitud', 'valor' => now()->format('d/m/Y h:i A')]
                     ],
-                    'accionTexto' => 'Ver en Directorio',
-                    'accionUrl' => route('egresados.index'),
-                    'accionIcon' => 'fa-solid fa-address-book'
+                    'accionTexto' => 'Revisar y Aprobar',
+                    'accionUrl' => route('egresados.dashboard') . '#solicitudes-pendientes',
+                    'accionIcon' => 'fa-solid fa-user-check'
                 ]);
             } catch (\Throwable $e) {}
 
-            // 7. NO iniciar sesión automáticamente: Retornar a pantalla con tarjeta de registro exitoso
-            $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
-
+            // 9. NO iniciar sesión: Retornar a pantalla con anuncio institucional de revisión
             return redirect()->route('egresados.registro')
                 ->with('registro_exitoso', true)
+                ->with('registro_pendiente', true)
                 ->with('registrado_nombre', $nombreCompleto)
                 ->with('registrado_doc', (string)$person->document_number)
-                ->with('registrado_email', $cleanEmail);
+                ->with('registrado_email', $cleanEmail)
+                ->with('registrado_programa', $programaNombre);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error en processRegistro egresado: ' . $e->getMessage());
@@ -420,6 +449,182 @@ class EgresadosController extends Controller
                 ->with('error', 'Ocurrió un error al procesar tu registro. Por favor verifica tus datos e inténtalo nuevamente.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Métodos auxiliares y de gestión de solicitudes de registro de egresados.
+     */
+    public static function getSolicitudesStorageFile(): string
+    {
+        return storage_path('app/sige_solicitudes_registro.json');
+    }
+
+    public static function getSolicitudesRegistro(): array
+    {
+        $file = self::getSolicitudesStorageFile();
+        return file_exists($file) ? (json_decode(@file_get_contents($file), true) ?: []) : [];
+    }
+
+    public static function saveSolicitudRegistro(array $solicitud): void
+    {
+        $file = self::getSolicitudesStorageFile();
+        $solicitudes = self::getSolicitudesRegistro();
+        $id = (string)($solicitud['id'] ?? $solicitud['user_id'] ?? time());
+        $solicitud['id'] = $id;
+        $solicitudes[$id] = $solicitud;
+        if (!is_dir(dirname($file))) {
+            @mkdir(dirname($file), 0777, true);
+        }
+        @file_put_contents($file, json_encode($solicitudes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+
+    public static function isSolicitudPendiente($userId, string $docNumber = ''): bool
+    {
+        $solicitudes = self::getSolicitudesRegistro();
+        $idStr = (string)$userId;
+        $docClean = preg_replace('/\D/', '', $docNumber);
+
+        foreach ($solicitudes as $id => $s) {
+            $sDoc = preg_replace('/\D/', '', (string)($s['documento'] ?? ''));
+            $sUser = (string)($s['user_id'] ?? $s['id'] ?? '');
+
+            if (($sUser === $idStr || (!empty($docClean) && $sDoc === $docClean)) && ($s['estado'] ?? '') === 'PENDIENTE') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Aprueba una solicitud de registro de egresado (Superadmin o Instructor).
+     */
+    public function aprobarSolicitudRegistro(Request $request, $id)
+    {
+        $solicitudes = self::getSolicitudesRegistro();
+        $idStr = (string)$id;
+
+        $solicitud = null;
+        $foundKey = null;
+        foreach ($solicitudes as $k => $s) {
+            if ((string)($s['id'] ?? $k) === $idStr || (string)($s['user_id'] ?? '') === $idStr || (string)($s['documento'] ?? '') === $idStr) {
+                $solicitud = $s;
+                $foundKey = $k;
+                break;
+            }
+        }
+
+        if (!$solicitud) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Solicitud no encontrada.'], 404);
+            }
+            return redirect()->back()->with('error', 'Solicitud no encontrada.');
+        }
+
+        $adminNombre = Auth::check() ? Auth::user()->full_name : 'Coordinación SIGE';
+
+        // Actualizar estado de la solicitud a APROBADO
+        $solicitudes[$foundKey]['estado'] = 'APROBADO';
+        $solicitudes[$foundKey]['aprobado_por'] = $adminNombre;
+        $solicitudes[$foundKey]['aprobado_at'] = now()->toDateTimeString();
+
+        $file = self::getSolicitudesStorageFile();
+        @file_put_contents($file, json_encode($solicitudes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        // Actualizar estado del aprendiz a CERTIFICADO en base de datos
+        try {
+            $doc = $solicitud['documento'] ?? '';
+            $person = \Modules\SICA\Entities\Person::where('document_number', $doc)->first();
+            if ($person) {
+                $apprentice = Apprentice::where('person_id', $person->id)->first();
+                if ($apprentice) {
+                    $apprentice->apprentice_status = 'CERTIFICADO';
+                    $apprentice->save();
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Error al actualizar estado en Apprentice: ' . $e->getMessage());
+        }
+
+        // Enviar notificación de aprobación exitosa
+        try {
+            \Modules\Egresados\Http\Controllers\NotificationController::pushNotificacion([
+                'tipo' => 'solicitud_aprobada',
+                'categoria' => 'Solicitud Aprobada',
+                'icon' => 'fa-solid fa-user-check',
+                'iconColor' => '#16a34a',
+                'iconBg' => '#dcfce7',
+                'titulo' => 'Solicitud Aprobada: ' . ($solicitud['nombre'] ?? 'Egresado'),
+                'texto' => 'La solicitud de <strong>' . htmlspecialchars($solicitud['nombre'] ?? 'Egresado') . '</strong> ha sido aprobada por ' . $adminNombre . '. El egresado ya puede ingresar al portal.',
+                'resumen' => 'Registro validado y habilitado con éxito.',
+                'egresado_nombre' => $solicitud['nombre'] ?? 'Egresado',
+                'egresado_doc' => (string)($solicitud['documento'] ?? ''),
+                'egresado_email' => $solicitud['email'] ?? '',
+                'unread' => true,
+                'campos' => [
+                    ['etiqueta' => 'Egresado', 'valor' => $solicitud['nombre'] ?? 'Egresado'],
+                    ['etiqueta' => 'Documento', 'valor' => (string)($solicitud['documento'] ?? '')],
+                    ['etiqueta' => 'Estado', 'valor' => 'Aprobado y Habilitado'],
+                    ['etiqueta' => 'Aprobado Por', 'valor' => $adminNombre],
+                    ['etiqueta' => 'Fecha de Aprobación', 'valor' => now()->format('d/m/Y h:i A')]
+                ],
+                'accionTexto' => 'Ver en Directorio',
+                'accionUrl' => route('egresados.index'),
+                'accionIcon' => 'fa-solid fa-address-book'
+            ]);
+        } catch (\Throwable $e) {}
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => '¡Solicitud aprobada con éxito! ' . ($solicitud['nombre'] ?? '') . ' ya cuenta con acceso autorizado a SIGE.',
+                'solicitud' => $solicitudes[$foundKey]
+            ]);
+        }
+
+        return redirect()->back()->with('success', '¡Solicitud aprobada con éxito! ' . ($solicitud['nombre'] ?? '') . ' ya puede acceder a su portal de egresado.');
+    }
+
+    /**
+     * Rechaza una solicitud de registro de egresado.
+     */
+    public function rechazarSolicitudRegistro(Request $request, $id)
+    {
+        $solicitudes = self::getSolicitudesRegistro();
+        $idStr = (string)$id;
+
+        $solicitud = null;
+        $foundKey = null;
+        foreach ($solicitudes as $k => $s) {
+            if ((string)($s['id'] ?? $k) === $idStr || (string)($s['user_id'] ?? '') === $idStr || (string)($s['documento'] ?? '') === $idStr) {
+                $solicitud = $s;
+                $foundKey = $k;
+                break;
+            }
+        }
+
+        if (!$solicitud) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Solicitud no encontrada.'], 404);
+            }
+            return redirect()->back()->with('error', 'Solicitud no encontrada.');
+        }
+
+        $solicitudes[$foundKey]['estado'] = 'RECHAZADO';
+        $solicitudes[$foundKey]['rechazado_por'] = Auth::check() ? Auth::user()->full_name : 'Administrador SIGE';
+        $solicitudes[$foundKey]['rechazado_at'] = now()->toDateTimeString();
+
+        $file = self::getSolicitudesStorageFile();
+        @file_put_contents($file, json_encode($solicitudes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'La solicitud de registro ha sido rechazada.',
+                'solicitud' => $solicitudes[$foundKey]
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'La solicitud de registro de ' . ($solicitud['nombre'] ?? '') . ' ha sido rechazada.');
     }
 
     /**
@@ -544,6 +749,10 @@ class EgresadosController extends Controller
             }
         }
 
+        // Solicitudes de registro de egresados pendientes de aprobación institucional
+        $todasSolicitudes = self::getSolicitudesRegistro();
+        $solicitudesPendientes = array_values(array_filter($todasSolicitudes, fn($s) => ($s['estado'] ?? '') === 'PENDIENTE'));
+
         return view('egresados::superadmin.dashboard', compact(
             'totalEgresados',
             'totalEmpleados',
@@ -557,7 +766,8 @@ class EgresadosController extends Controller
             'tasaEmpleo',
             'recentEgresados',
             'programStats',
-            'debeActualizarPassword'
+            'debeActualizarPassword',
+            'solicitudesPendientes'
         ));
     }
 
