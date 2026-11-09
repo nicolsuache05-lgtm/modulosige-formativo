@@ -514,6 +514,12 @@
         const descElem = document.getElementById('modalDetalleDesc');
         if (descElem) descElem.innerText = data.description || 'Sin descripción detallada.';
 
+        const currentId = encodeURIComponent(data.id || 'EVT-012');
+        const baseUrl = "{{ url('egresados/instructor/eventos') }}/" + currentId;
+
+        const btnExport = document.getElementById('modalDetalleBtnExport');
+        if (btnExport) btnExport.href = baseUrl + "/exportar";
+
         window.dispatchEvent(new CustomEvent('abrir-modal-detalle-evento'));
     }
 
@@ -619,6 +625,12 @@
         // Actualizar enlaces y formularios de acción rápida
         const currentId = encodeURIComponent(data.id || 'EVT-012');
         const baseUrl = "{{ url('egresados/instructor/eventos') }}/" + currentId;
+
+        const btnExportModal = document.getElementById('modalDetalleBtnExport');
+        if (btnExportModal) btnExportModal.href = baseUrl + "/exportar";
+
+        const btnExportSide = document.getElementById('btnActionExportar');
+        if (btnExportSide) btnExportSide.href = baseUrl + "/exportar";
 
         const formInvitar = document.getElementById('formEnviarInvitacion');
         if (formInvitar) formInvitar.action = baseUrl + "/invitar";

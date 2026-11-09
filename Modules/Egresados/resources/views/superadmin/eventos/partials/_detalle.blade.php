@@ -49,7 +49,15 @@
             <span>Ver Detalle Completo</span>
         </button>
 
-        <!-- 2. Enviar Invitación (Abre Modal) -->
+        <!-- 2. Exportar Asistentes (Excel) -->
+        <a id="btnActionExportar" 
+           href="{{ route('egresados.superadmin.eventos.exportar', ['id' => 'EVT-012']) }}" 
+           class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-file-excel text-[#39A900] text-xs"></i>
+            <span>Exportar Asistentes (Excel)</span>
+        </a>
+
+        <!-- 3. Enviar Invitación (Abre Modal) -->
         <button @click="confirmarEnvio = true" type="button" class="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             Enviar Invitación

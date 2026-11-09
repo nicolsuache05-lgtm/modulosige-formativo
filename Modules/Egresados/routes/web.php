@@ -189,6 +189,7 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::put('egresados/instructor/eventos/{id}', [InstructorController::class, 'updateEvento'])->name('egresados.instructor.eventos.update');
     Route::post('egresados/instructor/eventos/{id}/invitar', [InstructorController::class, 'invitarEvento'])->name('egresados.instructor.eventos.invitar');
     Route::put('egresados/instructor/eventos/{id}/cancelar', [InstructorController::class, 'cancelarEvento'])->name('egresados.instructor.eventos.cancelar');
+    Route::get('egresados/instructor/eventos/{id}/exportar', [InstructorController::class, 'exportarEvento'])->name('egresados.instructor.eventos.exportar');
 
     // Módulo de Noticias y Comunicados (Instructor)
     Route::get('egresados/instructor/noticias', [NoticiasController::class, 'instructorIndex'])->name('egresados.instructor.noticias.index');

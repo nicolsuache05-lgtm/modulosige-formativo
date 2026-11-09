@@ -774,4 +774,13 @@ class InstructorController extends Controller
         return redirect()->route('egresados.instructor.eventos.index')
             ->with('success', "¡Invitación al evento despachada exitosamente a {$totalNotificados}!");
     }
+
+    /**
+     * Exportar listado oficial de asistentes a evento institucional en formato Excel (.xlsx).
+     */
+    public function exportarEvento(Request $request, string $id)
+    {
+        $eventosCtrl = app(\Modules\Egresados\Http\Controllers\EventosController::class);
+        return $eventosCtrl->exportarExcel($request, $id);
+    }
 }
