@@ -689,14 +689,10 @@
 
         // Estructura DOM temporal aislada para captura PDF (1 página A4 ejecutiva)
         const container = document.createElement('div');
-        container.style.width = '750px';
-        container.style.minWidth = '750px';
-        container.style.maxWidth = '750px';
         container.style.padding = '4px 14px';
         container.style.fontFamily = "'Segoe UI', Arial, Helvetica, sans-serif";
         container.style.color = '#1e293b';
         container.style.backgroundColor = '#ffffff';
-        container.style.boxSizing = 'border-box';
         container.style.lineHeight = '1.35';
 
         container.innerHTML = `
@@ -878,14 +874,7 @@
             margin:       [3, 6, 6, 6],
             filename:     'Reporte_Institucional_' + reportId.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  {
-                scale: 2,
-                scrollY: 0,
-                scrollX: 0,
-                useCORS: true,
-                logging: false,
-                windowWidth: 1024
-            },
+            html2canvas:  { scale: 2 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
