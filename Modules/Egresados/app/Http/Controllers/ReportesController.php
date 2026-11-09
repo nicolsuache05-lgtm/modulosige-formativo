@@ -740,8 +740,9 @@ class ReportesController extends Controller
 
     /**
      * Genera un archivo Excel genuino (.xlsx / Office Open XML) con diseño corporativo SENA ERP,
-     * encabezados verdes (#39A900), resumen de métricas ejecutivas, anchos de columna automáticos,
-     * filas alternadas tipo cebra y bordes definidos.
+     * métricas ejecutivas en tarjetas KPI perfectamente formateadas, anchos de columna automáticos,
+     * filas alternadas tipo cebra, encabezados fijos (freeze panes) y bordes definidos.
+     * Estrictamente conforme al estándar ECMA-376 para abrir en Microsoft Excel sin advertencias de reparación.
      */
     private function generarExcelOpenXml($reportTitle, $id, $programFilter, $fichaFilter, $targetReport, $columns, $rows)
     {
@@ -760,16 +761,14 @@ class ReportesController extends Controller
         $desVal = $targetReport['desempleados'] ?? 0;
         $rateVal = $targetReport['rate'] ?? '100%';
 
-        // 1. [Content_Types].xml (incluye soporte para imágenes PNG y Drawings)
+        // 1. [Content_Types].xml (OpenXML estricto)
         $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
-  <Default Extension="png" ContentType="image/png"/>
   <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
   <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
   <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-  <Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>
 </Types>';
 
         // 2. _rels/.rels
@@ -785,195 +784,173 @@ class ReportesController extends Controller
   <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
 </Relationships>';
 
-        // 4. xl/worksheets/_rels/sheet1.xml.rels
-        $sheetRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>
-</Relationships>';
-        $zip->addFromString('xl/worksheets/_rels/sheet1.xml.rels', $sheetRels);
-
-        // 5. xl/drawings/_rels/drawing1.xml.rels
-        $drawingRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.png"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image2.png"/>
-</Relationships>';
-
-        // 6. Generar las imágenes de los gráficos con GD
-        $rateNumVal = is_numeric(str_replace('%', '', $rateVal)) ? (int)str_replace('%', '', $rateVal) : 100;
-        $chartImages = $this->generarImagenesGraficasGD($totalVal, $empVal, $desVal, $rateNumVal);
-        $zip->addFromString('xl/media/image1.png', $chartImages[0]);
-        $zip->addFromString('xl/media/image2.png', $chartImages[1]);
-        $zip->addFromString('xl/drawings/_rels/drawing1.xml.rels', $drawingRels);
-
-        // 7. xl/drawings/drawing1.xml (Anclaje exacto de las dos gráficas)
-        $drawingXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-  <xdr:twoCellAnchor>
-    <xdr:from><xdr:col>1</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>6</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
-    <xdr:to><xdr:col>6</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>16</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
-    <xdr:pic>
-      <xdr:nvPicPr>
-        <xdr:cNvPr id="1" name="Grafica_Ocupacion"/>
-        <xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr>
-      </xdr:nvPicPr>
-      <xdr:blipFill>
-        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId1"/>
-        <a:stretch><a:fillRect/></a:stretch>
-      </xdr:blipFill>
-      <xdr:spPr>
-        <a:xfrm><a:off x="0" y="0"/><a:ext cx="3600000" cy="2000000"/></a:xfrm>
-        <a:prstGeom geom="rect"><a:avLst/></a:prstGeom>
-      </xdr:spPr>
-    </xdr:pic>
-    <xdr:clientData/>
-  </xdr:twoCellAnchor>
-  <xdr:twoCellAnchor>
-    <xdr:from><xdr:col>7</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>6</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
-    <xdr:to><xdr:col>12</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>16</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
-    <xdr:pic>
-      <xdr:nvPicPr>
-        <xdr:cNvPr id="2" name="Grafica_Cumplimiento"/>
-        <xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr>
-      </xdr:nvPicPr>
-      <xdr:blipFill>
-        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId2"/>
-        <a:stretch><a:fillRect/></a:stretch>
-      </xdr:blipFill>
-      <xdr:spPr>
-        <a:xfrm><a:off x="0" y="0"/><a:ext cx="3600000" cy="2000000"/></a:xfrm>
-        <a:prstGeom geom="rect"><a:avLst/></a:prstGeom>
-      </xdr:spPr>
-    </xdr:pic>
-    <xdr:clientData/>
-  </xdr:twoCellAnchor>
-</xdr:wsDr>';
-        $zip->addFromString('xl/drawings/drawing1.xml', $drawingXml);
-
-        // 8. xl/workbook.xml
+        // 4. xl/workbook.xml
         $wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <sheets>
-    <sheet name="Reporte Egresados" sheetId="1" r:id="rId1"/>
+    <sheet name="Reporte SIGE" sheetId="1" r:id="rId1"/>
   </sheets>
 </workbook>';
 
-        // 5. xl/styles.xml
+        // 5. xl/styles.xml (Estricto OpenXML ECMA-376 con cellStyles requerido por Microsoft Excel)
         $styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <fonts count="12">
+  <fonts count="14">
     <!-- 0: Default -->
     <font><name val="Calibri"/><sz val="11"/><color rgb="FF1E293B"/></font>
     <!-- 1: Header Banner Titulo (White Bold 13) -->
     <font><b/><name val="Calibri"/><sz val="13"/><color rgb="FFFFFFFF"/></font>
-    <!-- 2: Header Banner Subtitulo (Green Neon Bold 10.5) -->
-    <font><b/><name val="Calibri"/><sz val="10.5"/><color rgb="FF62E31D"/></font>
-    <!-- 3: Meta Info (Navy Bold 10) -->
-    <font><b/><name val="Calibri"/><sz val="10"/><color rgb="FF001A29"/></font>
-    <!-- 4: Metric Box Header (White Bold 9.5) -->
-    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FFFFFFFF"/></font>
-    <!-- 5: Metric Box Value (Navy Bold 11) -->
-    <font><b/><name val="Calibri"/><sz val="11"/><color rgb="FF001A29"/></font>
-    <!-- 6: Metric Box Rate (Green Bold 12) -->
-    <font><b/><name val="Calibri"/><sz val="12"/><color rgb="FF166534"/></font>
-    <!-- 7: Table Header Main (White Bold 10.5) -->
-    <font><b/><name val="Calibri"/><sz val="10.5"/><color rgb="FFFFFFFF"/></font>
-    <!-- 8: Data Normal (Dark 10) -->
+    <!-- 2: Header Banner Subtitulo (Green Neon Bold 10) -->
+    <font><b/><name val="Calibri"/><sz val="10"/><color rgb="FF39A900"/></font>
+    <!-- 3: Meta Info (Navy Bold 9.5) -->
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF001A29"/></font>
+    <!-- 4: Metric Box Header (White Bold 9) -->
+    <font><b/><name val="Calibri"/><sz val="9"/><color rgb="FFFFFFFF"/></font>
+    <!-- 5: Metric Box Value Total (Navy Bold 14) -->
+    <font><b/><name val="Calibri"/><sz val="14"/><color rgb="FF001A29"/></font>
+    <!-- 6: Metric Box Value Green (Green Bold 14) -->
+    <font><b/><name val="Calibri"/><sz val="14"/><color rgb="FF166534"/></font>
+    <!-- 7: Metric Box Value Orange (Orange Bold 14) -->
+    <font><b/><name val="Calibri"/><sz val="14"/><color rgb="FF92400E"/></font>
+    <!-- 8: Section Banner (White Bold 11) -->
+    <font><b/><name val="Calibri"/><sz val="11"/><color rgb="FFFFFFFF"/></font>
+    <!-- 9: Table Header (White Bold 10) -->
+    <font><b/><name val="Calibri"/><sz val="10"/><color rgb="FFFFFFFF"/></font>
+    <!-- 10: Data Text (Dark 10) -->
     <font><name val="Calibri"/><sz val="10"/><color rgb="FF1E293B"/></font>
-    <!-- 9: Badge Green (Green Bold 9.5) -->
+    <!-- 11: Badge Green (Green Bold 9.5) -->
     <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF166534"/></font>
-    <!-- 10: Badge Orange (Orange Bold 9.5) -->
-    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF9A3412"/></font>
-    <!-- 11: Footer note (Italic Gray 9) -->
+    <!-- 12: Badge Orange (Orange Bold 9.5) -->
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF92400E"/></font>
+    <!-- 13: Footer note (Italic Gray 9) -->
     <font><i/><name val="Calibri"/><sz val="9"/><color rgb="FF64748B"/></font>
   </fonts>
-  <fills count="10">
+  <fills count="13">
     <!-- 0: none -->
     <fill><patternFill patternType="none"/></fill>
     <!-- 1: gray125 -->
     <fill><patternFill patternType="gray125"/></fill>
     <!-- 2: Navy #001A29 (Header) -->
     <fill><patternFill patternType="solid"><fgColor rgb="FF001A29"/></patternFill></fill>
-    <!-- 3: SENA Green #39A900 (Brand Green) -->
-    <fill><patternFill patternType="solid"><fgColor rgb="FF39A900"/></patternFill></fill>
+    <!-- 3: Subtitle Navy #0F2432 -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FF0F2432"/></patternFill></fill>
     <!-- 4: Soft Gray #F1F5F9 (Info Bar) -->
     <fill><patternFill patternType="solid"><fgColor rgb="FFF1F5F9"/></patternFill></fill>
     <!-- 5: Metric Header Navy #002336 -->
     <fill><patternFill patternType="solid"><fgColor rgb="FF002336"/></patternFill></fill>
-    <!-- 6: Zebra Alternate #F8FAFC -->
+    <!-- 6: Metric Val Slate #F8FAFC -->
     <fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/></patternFill></fill>
-    <!-- 7: Soft Green Badge #DCFCE7 -->
+    <!-- 7: Metric Val Soft Green #DCFCE7 -->
     <fill><patternFill patternType="solid"><fgColor rgb="FFDCFCE7"/></patternFill></fill>
-    <!-- 8: Metric Highlight Soft Green #EAF7EE -->
-    <fill><patternFill patternType="solid"><fgColor rgb="FFEAF7EE"/></patternFill></fill>
-    <!-- 9: Soft Orange Badge #FFEDD5 -->
-    <fill><patternFill patternType="solid"><fgColor rgb="FFFFEDD5"/></patternFill></fill>
+    <!-- 8: Metric Val Soft Amber #FEF3C7 -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/></patternFill></fill>
+    <!-- 9: SENA Green #39A900 (Section Banner) -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FF39A900"/></patternFill></fill>
+    <!-- 10: Zebra Alternate #F8FAFC -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/></patternFill></fill>
+    <!-- 11: Soft Green Badge #DCFCE7 -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FFDCFCE7"/></patternFill></fill>
+    <!-- 12: Soft Orange Badge #FEF3C7 -->
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/></patternFill></fill>
   </fills>
-  <borders count="3">
+  <borders count="4">
     <!-- 0: none -->
     <border><left/><right/><top/><bottom/><diagonal/></border>
-    <!-- 1: thin soft border -->
+    <!-- 1: thin soft border #CBD5E1 -->
     <border>
-      <left style="thin"><color rgb="FFE2E8F0"/></left>
-      <right style="thin"><color rgb="FFE2E8F0"/></right>
-      <top style="thin"><color rgb="FFE2E8F0"/></top>
-      <bottom style="thin"><color rgb="FFE2E8F0"/></bottom>
+      <left style="thin"><color rgb="FFCBD5E1"/></left>
+      <right style="thin"><color rgb="FFCBD5E1"/></right>
+      <top style="thin"><color rgb="FFCBD5E1"/></top>
+      <bottom style="thin"><color rgb="FFCBD5E1"/></bottom>
     </border>
-    <!-- 2: header border with green bottom -->
+    <!-- 2: table header border -->
     <border>
-      <left style="thin"><color rgb="FF2D8500"/></left>
-      <right style="thin"><color rgb="FF2D8500"/></right>
-      <top style="thin"><color rgb="FF2D8500"/></top>
-      <bottom style="medium"><color rgb="FF001A29"/></bottom>
+      <left style="thin"><color rgb="FF334155"/></left>
+      <right style="thin"><color rgb="FF334155"/></right>
+      <top style="thin"><color rgb="FF334155"/></top>
+      <bottom style="medium"><color rgb="FF39A900"/></bottom>
+    </border>
+    <!-- 3: KPI border #94A3B8 -->
+    <border>
+      <left style="thin"><color rgb="FF94A3B8"/></left>
+      <right style="thin"><color rgb="FF94A3B8"/></right>
+      <top style="thin"><color rgb="FF94A3B8"/></top>
+      <bottom style="thin"><color rgb="FF94A3B8"/></bottom>
     </border>
   </borders>
   <cellStyleXfs count="1">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
   </cellStyleXfs>
-  <cellXfs count="15">
+  <cellXfs count="18">
     <!-- 0: default -->
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-    <!-- 1: Main Title Banner -->
+    <!-- 1: Main Title Banner (A1) -->
     <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 2: Subtitle Banner -->
-    <xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 3: Metadata bar -->
+    <!-- 2: Subtitle Banner (A2) -->
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 3: Metadata bar (A3) -->
     <xf numFmtId="0" fontId="3" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 4: Metric Box Header -->
-    <xf numFmtId="0" fontId="4" fillId="5" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 5: Metric Box Value -->
-    <xf numFmtId="0" fontId="5" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 6: Metric Rate Box -->
-    <xf numFmtId="0" fontId="6" fillId="8" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 7: Main Table Header (SENA Green #39A900) -->
-    <xf numFmtId="0" fontId="7" fillId="3" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
-    <!-- 8: Data Left (White) -->
-    <xf numFmtId="0" fontId="8" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
-    <!-- 9: Data Center (White) -->
-    <xf numFmtId="0" fontId="8" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 10: Data Left (Zebra #F8FAFC) -->
-    <xf numFmtId="0" fontId="8" fillId="6" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
-    <!-- 11: Data Center (Zebra #F8FAFC) -->
-    <xf numFmtId="0" fontId="8" fillId="6" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 12: Data Badge Green (CERTIFICADO / EMPLEADO) -->
-    <xf numFmtId="0" fontId="9" fillId="7" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 13: Data Badge Orange (EN BÚSQUEDA) -->
-    <xf numFmtId="0" fontId="10" fillId="9" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <!-- 14: Footer Note -->
-    <xf numFmtId="0" fontId="11" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 4: KPI Card Header -->
+    <xf numFmtId="0" fontId="4" fillId="5" borderId="3" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 5: KPI Card Value Total -->
+    <xf numFmtId="0" fontId="5" fillId="6" borderId="3" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 6: KPI Card Value Empleados -->
+    <xf numFmtId="0" fontId="6" fillId="7" borderId="3" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 7: KPI Card Value Desempleados -->
+    <xf numFmtId="0" fontId="7" fillId="8" borderId="3" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 8: KPI Card Value Rate -->
+    <xf numFmtId="0" fontId="6" fillId="7" borderId="3" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 9: Section Banner (Row 8) -->
+    <xf numFmtId="0" fontId="8" fillId="9" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 10: Table Column Header (Row 9) -->
+    <xf numFmtId="0" fontId="9" fillId="2" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <!-- 11: Data Left White -->
+    <xf numFmtId="0" fontId="10" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+    <!-- 12: Data Center White -->
+    <xf numFmtId="0" fontId="10" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 13: Data Left Zebra -->
+    <xf numFmtId="0" fontId="10" fillId="10" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+    <!-- 14: Data Center Zebra -->
+    <xf numFmtId="0" fontId="10" fillId="10" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 15: Badge Green -->
+    <xf numFmtId="0" fontId="11" fillId="11" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 16: Badge Orange -->
+    <xf numFmtId="0" fontId="12" fillId="12" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <!-- 17: Footer Note -->
+    <xf numFmtId="0" fontId="13" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
   </cellXfs>
+  <cellStyles count="1">
+    <cellStyle name="Normal" xfId="0" builtinId="0"/>
+  </cellStyles>
 </styleSheet>';
 
-        // 6. Configurar anchos de columna amplios
+        // 6. Configurar anchos de columna amplios y proporcionales
         $widthsMap = [
-            1 => 6, 2 => 14, 3 => 11, 4 => 18, 5 => 34, 6 => 38, 7 => 15, 8 => 16,
-            9 => 42, 10 => 16, 11 => 32, 12 => 28, 13 => 18, 14 => 18, 15 => 18,
-            16 => 34, 17 => 28, 18 => 18, 19 => 14, 20 => 15
+            1  => 6,   // N°
+            2  => 16,  // ID Aprendiz
+            3  => 22,  // Tipo Documento (holgura para Cédula de Ciudadanía / CC)
+            4  => 22,  // Número Documento
+            5  => 36,  // Nombres y Apellidos
+            6  => 44,  // Programa de Formación
+            7  => 26,  // Ficha de Caracterización (sin cortes de texto)
+            8  => 22,  // Nivel de Formación
+            9  => 48,  // Centro de Formación
+            10 => 20,  // Regional
+            11 => 36,  // Correo Institucional (MiSENA)
+            12 => 34,  // Correo Personal
+            13 => 22,  // Teléfono / Celular
+            14 => 24,  // Estado en el Sistema
+            15 => 26,  // Estado Laboral Actual
+            16 => 38,  // Empresa / Unidad Productiva
+            17 => 32,  // Cargo / Ocupación
+            18 => 24,  // Rango Salarial (SMMVL)
+            19 => 18,  // Año Graduación
+            20 => 20   // Fecha Registro
         ];
 
         $colsXml = '<cols>';
         for ($i = 1; $i <= $numCols; $i++) {
-            $w = $widthsMap[$i] ?? 22;
+            $w = $widthsMap[$i] ?? 24;
             $colsXml .= '<col min="' . $i . '" max="' . $i . '" width="' . $w . '" customWidth="1"/>';
         }
         $colsXml .= '</cols>';
@@ -981,79 +958,137 @@ class ReportesController extends Controller
         // 7. Generar Filas y Celdas de la Hoja
         $sheetData = '<sheetData>';
 
-        // Fila 1: Banner Principal
-        $sheetData .= '<row r="1" ht="30" customHeight="1">';
-        $sheetData .= '<c r="A1" s="1" t="inlineStr"><is><t>' . $this->xmlEscape('SERVICIO NACIONAL DE APRENDIZAJE (SENA) · CENTRO DE FORMACIÓN AGROINDUSTRIAL LA ANGOSTURA — CEFA') . '</t></is></c>';
+        // Fila 1: Banner Principal Institucional
+        $sheetData .= '<row r="1" ht="32" customHeight="1">';
+        $sheetData .= '<c r="A1" s="1" t="inlineStr"><is><t>' . $this->xmlEscape('SERVICIO NACIONAL DE APRENDIZAJE (SENA) · CENTRO DE FORMACIÓN AGROINDUSTRIAL LA ANGOSTURA (CEFA)') . '</t></is></c>';
+        for ($c = 2; $c <= $numCols; $c++) {
+            $sheetData .= '<c r="' . $this->getColLetter($c) . '1" s="1"/>';
+        }
         $sheetData .= '</row>';
 
         // Fila 2: Sub-banner
-        $sheetData .= '<row r="2" ht="20" customHeight="1">';
+        $sheetData .= '<row r="2" ht="22" customHeight="1">';
         $sheetData .= '<c r="A2" s="2" t="inlineStr"><is><t>' . $this->xmlEscape('SISTEMA INSTITUCIONAL DE GESTIÓN Y SEGUIMIENTO A EGRESADOS (SIGE) · REPORTE OFICIAL') . '</t></is></c>';
+        for ($c = 2; $c <= $numCols; $c++) {
+            $sheetData .= '<c r="' . $this->getColLetter($c) . '2" s="2"/>';
+        }
         $sheetData .= '</row>';
 
         // Fila 3: Metadatos del Reporte
         $sheetData .= '<row r="3" ht="22" customHeight="1">';
         $sheetData .= '<c r="A3" s="3" t="inlineStr"><is><t>' . $this->xmlEscape("Reporte Oficial: {$reportTitle} | Código: {$id} | Emisión: " . date('d/m/Y') . " | Ámbito: Regional Huila — CEFA") . '</t></is></c>';
+        for ($c = 2; $c <= $numCols; $c++) {
+            $sheetData .= '<c r="' . $this->getColLetter($c) . '3" s="3"/>';
+        }
         $sheetData .= '</row>';
 
-        // Fila 4: Bloque de Métricas Ejecutivas (Estilo Dashboard como en la imagen)
-        $sheetData .= '<row r="4" ht="22" customHeight="1">';
-        $sheetData .= '<c r="B4" s="4" t="inlineStr"><is><t>TOTAL EGRESADOS</t></is></c>';
-        $sheetData .= '<c r="C4" s="5" t="inlineStr"><is><t>' . $this->xmlEscape($totalVal) . '</t></is></c>';
-        $sheetData .= '<c r="E4" s="4" t="inlineStr"><is><t>VINCULADOS LABORALMENTE</t></is></c>';
-        $sheetData .= '<c r="F4" s="5" t="inlineStr"><is><t>' . $this->xmlEscape($empVal) . '</t></is></c>';
-        $sheetData .= '<c r="H4" s="4" t="inlineStr"><is><t>EN BÚSQUEDA ACTIVA</t></is></c>';
-        $sheetData .= '<c r="I4" s="5" t="inlineStr"><is><t>' . $this->xmlEscape($desVal) . '</t></is></c>';
-        $sheetData .= '<c r="K4" s="4" t="inlineStr"><is><t>TASA DE EMPLEABILIDAD</t></is></c>';
-        $sheetData .= '<c r="L4" s="6" t="inlineStr"><is><t>' . $this->xmlEscape($rateVal) . '</t></is></c>';
-        $sheetData .= '</row>';
+        // Fila 4: Espaciador visual limpio
+        $sheetData .= '<row r="4" ht="10" customHeight="1"></row>';
 
-        // Fila 5: Separador visual
-        $sheetData .= '<row r="5" ht="12" customHeight="1"></row>';
+        // Filas 5 y 6: Bloque de 4 Tarjetas KPI Ejecutivas organizadas armónicamente
+        $merges = [
+            'A1:' . $lastColLetter . '1',
+            'A2:' . $lastColLetter . '2',
+            'A3:' . $lastColLetter . '3',
+        ];
 
-        // Fila 6: Título de la Sección Gráfica
-        $sheetData .= '<row r="6" ht="22" customHeight="1">';
-        $sheetData .= '<c r="A6" s="1" t="inlineStr"><is><t>' . $this->xmlEscape('VISUALIZACIÓN GRÁFICA E INDICADORES ESTADÍSTICOS (SIGE ERP)') . '</t></is></c>';
-        $sheetData .= '</row>';
+        if ($numCols >= 16) {
+            // Mapeo amplio para tablas completas (20 columnas)
+            $kpiCols = [
+                ['start' => 'B', 'mid' => 'C', 'end' => 'D', 'title' => 'TOTAL EGRESADOS', 'val' => $totalVal, 'vStyle' => 5],
+                ['start' => 'F', 'mid' => 'G', 'end' => 'H', 'title' => 'VINCULADOS LABORALMENTE', 'val' => $empVal, 'vStyle' => 6],
+                ['start' => 'J', 'mid' => 'K', 'end' => 'L', 'title' => 'EN BÚSQUEDA ACTIVA', 'val' => $desVal, 'vStyle' => 7],
+                ['start' => 'N', 'mid' => 'O', 'end' => 'P', 'title' => 'TASA DE EMPLEABILIDAD', 'val' => $rateVal, 'vStyle' => 8]
+            ];
+            foreach ($kpiCols as $card) {
+                $merges[] = "{$card['start']}5:{$card['end']}5";
+                $merges[] = "{$card['start']}6:{$card['end']}6";
+            }
 
-        // Filas 7 a 17: Espacio reservado para las dos gráficas institucionales (Donut y Barras)
-        for ($chartRow = 7; $chartRow <= 17; $chartRow++) {
-            $sheetData .= '<row r="' . $chartRow . '" ht="18" customHeight="1"></row>';
+            // Fila 5: Encabezados KPI
+            $sheetData .= '<row r="5" ht="20" customHeight="1">';
+            foreach ($kpiCols as $card) {
+                $sheetData .= '<c r="' . $card['start'] . '5" s="4" t="inlineStr"><is><t>' . $this->xmlEscape($card['title']) . '</t></is></c>';
+                $sheetData .= '<c r="' . $card['mid'] . '5" s="4"/>';
+                $sheetData .= '<c r="' . $card['end'] . '5" s="4"/>';
+            }
+            $sheetData .= '</row>';
+
+            // Fila 6: Valores KPI
+            $sheetData .= '<row r="6" ht="26" customHeight="1">';
+            foreach ($kpiCols as $card) {
+                $sheetData .= '<c r="' . $card['start'] . '6" s="' . $card['vStyle'] . '" t="inlineStr"><is><t>' . $this->xmlEscape($card['val']) . '</t></is></c>';
+                $sheetData .= '<c r="' . $card['mid'] . '6" s="' . $card['vStyle'] . '"/>';
+                $sheetData .= '<c r="' . $card['end'] . '6" s="' . $card['vStyle'] . '"/>';
+            }
+            $sheetData .= '</row>';
+        } else {
+            // Mapeo compacto para listados con menos columnas
+            $kpiCols = [
+                ['start' => 'B', 'end' => 'C', 'title' => 'TOTAL EGRESADOS', 'val' => $totalVal, 'vStyle' => 5],
+                ['start' => 'E', 'end' => 'F', 'title' => 'VINCULADOS', 'val' => $empVal, 'vStyle' => 6],
+                ['start' => 'H', 'end' => 'I', 'title' => 'EN BÚSQUEDA', 'val' => $desVal, 'vStyle' => 7],
+                ['start' => 'K', 'end' => 'L', 'title' => 'TASA EMPLEABILIDAD', 'val' => $rateVal, 'vStyle' => 8]
+            ];
+            foreach ($kpiCols as $card) {
+                $merges[] = "{$card['start']}5:{$card['end']}5";
+                $merges[] = "{$card['start']}6:{$card['end']}6";
+            }
+
+            // Fila 5: Encabezados KPI
+            $sheetData .= '<row r="5" ht="20" customHeight="1">';
+            foreach ($kpiCols as $card) {
+                $sheetData .= '<c r="' . $card['start'] . '5" s="4" t="inlineStr"><is><t>' . $this->xmlEscape($card['title']) . '</t></is></c>';
+                $sheetData .= '<c r="' . $card['end'] . '5" s="4"/>';
+            }
+            $sheetData .= '</row>';
+
+            // Fila 6: Valores KPI
+            $sheetData .= '<row r="6" ht="26" customHeight="1">';
+            foreach ($kpiCols as $card) {
+                $sheetData .= '<c r="' . $card['start'] . '6" s="' . $card['vStyle'] . '" t="inlineStr"><is><t>' . $this->xmlEscape($card['val']) . '</t></is></c>';
+                $sheetData .= '<c r="' . $card['end'] . '6" s="' . $card['vStyle'] . '"/>';
+            }
+            $sheetData .= '</row>';
         }
 
-        // Fila 18: Separador visual
-        $sheetData .= '<row r="18" ht="12" customHeight="1"></row>';
+        // Fila 7: Espaciador visual
+        $sheetData .= '<row r="7" ht="12" customHeight="1"></row>';
 
-        // Fila 19: Título de la Tabla de Datos
-        $sheetData .= '<row r="19" ht="22" customHeight="1">';
-        $sheetData .= '<c r="A19" s="1" t="inlineStr"><is><t>' . $this->xmlEscape('DETALLE DE APRENDICES Y EGRESADOS REGISTRADOS EN EL SISTEMA') . '</t></is></c>';
+        // Fila 8: Título de Sección
+        $sheetData .= '<row r="8" ht="24" customHeight="1">';
+        $sheetData .= '<c r="A8" s="9" t="inlineStr"><is><t>' . $this->xmlEscape('DETALLE DE APRENDICES Y EGRESADOS REGISTRADOS (SIGE ERP)') . '</t></is></c>';
+        for ($c = 2; $c <= $numCols; $c++) {
+            $sheetData .= '<c r="' . $this->getColLetter($c) . '8" s="9"/>';
+        }
         $sheetData .= '</row>';
+        $merges[] = 'A8:' . $lastColLetter . '8';
 
-        // Fila 20: Encabezados de Columna (Verde SENA)
-        $sheetData .= '<row r="20" ht="26" customHeight="1">';
+        // Fila 9: Encabezados de Columna (Verde SENA y Azul Navy con bordes nítidos)
+        $sheetData .= '<row r="9" ht="28" customHeight="1">';
         foreach ($columns as $cIdx => $colName) {
             $colLetter = $this->getColLetter($cIdx + 1);
-            $sheetData .= '<c r="' . $colLetter . '20" s="7" t="inlineStr"><is><t>' . $this->xmlEscape($colName) . '</t></is></c>';
+            $sheetData .= '<c r="' . $colLetter . '9" s="10" t="inlineStr"><is><t>' . $this->xmlEscape($colName) . '</t></is></c>';
         }
         $sheetData .= '</row>';
 
-        // Filas de Datos (a partir de la Fila 21)
-        $currRow = 21;
+        // Filas de Datos (a partir de la Fila 10)
+        $currRow = 10;
         foreach ($rows as $rIdx => $row) {
             $isZebra = ($rIdx % 2 !== 0);
-            $sheetData .= '<row r="' . $currRow . '" ht="20" customHeight="1">';
+            $sheetData .= '<row r="' . $currRow . '" ht="22" customHeight="1">';
             foreach ($row as $cIdx => $val) {
                 $colLetter = $this->getColLetter($cIdx + 1);
                 $valUpper = strtoupper(trim((string)$val));
                 
-                if (in_array($valUpper, ['CERTIFICADO', 'EMPLEADO', 'EMPRENDEDOR', 'GENERADO'])) {
-                    $styleId = 12; // Badge Verde
+                if (in_array($valUpper, ['CERTIFICADO', 'EMPLEADO', 'EMPRENDEDOR', 'GENERADO', 'VINCULADO'])) {
+                    $styleId = 15; // Badge Verde
                 } elseif (in_array($valUpper, ['EN BÚSQUEDA', 'EN FORMACIÓN', 'CONDICIONADO', 'DESEMPLEADO'])) {
-                    $styleId = 13; // Badge Naranja
+                    $styleId = 16; // Badge Naranja
                 } elseif (in_array($cIdx, [0, 1, 2, 3, 6, 7, 9, 12, 18, 19])) {
-                    $styleId = $isZebra ? 11 : 9; // Centrado
+                    $styleId = $isZebra ? 14 : 12; // Centrado
                 } else {
-                    $styleId = $isZebra ? 10 : 8; // Alineado a la izquierda
+                    $styleId = $isZebra ? 13 : 11; // Alineado a la izquierda
                 }
                 
                 $sheetData .= '<c r="' . $colLetter . $currRow . '" s="' . $styleId . '" t="inlineStr"><is><t>' . $this->xmlEscape($val) . '</t></is></c>';
@@ -1064,28 +1099,35 @@ class ReportesController extends Controller
 
         // Fila Final de Pie
         $footerRow = $currRow;
-        $sheetData .= '<row r="' . $footerRow . '" ht="20" customHeight="1">';
-        $sheetData .= '<c r="A' . $footerRow . '" s="14" t="inlineStr"><is><t>' . $this->xmlEscape('Informe Oficial expedido por el Sistema Institucional SIGE • SENA Empresa CEFA • Total Registros: ' . count($rows) . ' • ' . date('d/m/Y H:i')) . '</t></is></c>';
+        $sheetData .= '<row r="' . $footerRow . '" ht="22" customHeight="1">';
+        $sheetData .= '<c r="A' . $footerRow . '" s="17" t="inlineStr"><is><t>' . $this->xmlEscape('Informe Oficial expedido por el Sistema Institucional SIGE · SENA Empresa CEFA · Total Registros: ' . count($rows) . ' · Generado el ' . date('d/m/Y H:i')) . '</t></is></c>';
+        for ($c = 2; $c <= $numCols; $c++) {
+            $sheetData .= '<c r="' . $this->getColLetter($c) . $footerRow . '" s="17"/>';
+        }
         $sheetData .= '</row>';
+        $merges[] = 'A' . $footerRow . ':' . $lastColLetter . $footerRow;
 
         $sheetData .= '</sheetData>';
 
         // 8. Celdas Combinadas (Merges)
-        $mergesXml = '<mergeCells count="6">';
-        $mergesXml .= '<mergeCell ref="A1:' . $lastColLetter . '1"/>';
-        $mergesXml .= '<mergeCell ref="A2:' . $lastColLetter . '2"/>';
-        $mergesXml .= '<mergeCell ref="A3:' . $lastColLetter . '3"/>';
-        $mergesXml .= '<mergeCell ref="A6:' . $lastColLetter . '6"/>';
-        $mergesXml .= '<mergeCell ref="A19:' . $lastColLetter . '19"/>';
-        $mergesXml .= '<mergeCell ref="A' . $footerRow . ':' . $lastColLetter . $footerRow . '"/>';
+        $mergesXml = '<mergeCells count="' . count($merges) . '">';
+        foreach ($merges as $mRef) {
+            $mergesXml .= '<mergeCell ref="' . $mRef . '"/>';
+        }
         $mergesXml .= '</mergeCells>';
 
+        // 9. Sheet XML con Paneles Fijos (Fila 9 de encabezados inmovilizada para scrolling suave)
         $sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0">
+      <pane ySplit="9" topLeftCell="A10" activePane="bottomLeft" state="frozen"/>
+    </sheetView>
+  </sheetViews>
   ' . $colsXml . '
   ' . $sheetData . '
   ' . $mergesXml . '
-  <drawing r:id="rId1"/>
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>';
 
         $zip->addFromString('[Content_Types].xml', $contentTypes);
