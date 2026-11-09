@@ -208,7 +208,7 @@
                 </h1>
 
                 <p class="font-sans text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
-                    Conecta con eventos de actualización, noticias institucionales y encuestas de seguimiento del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong> a través del ecosistema SIGE ERP.
+                    Conecta con eventos de actualización, noticias institucionales y encuestas de seguimiento del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong> a través del sistema SIGE.
                 </p>
 
                 <!-- Botones CTA con Mayor Presencia -->
