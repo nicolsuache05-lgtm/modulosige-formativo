@@ -607,22 +607,30 @@
 
         const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}";
 
-        // Capturar las dos gráficas renderizadas de Chart.js
+        // Capturar o forzar renderizado de las dos gráficas de Chart.js
         let chart1Img = '';
         let chart2Img = '';
         try {
             const c1 = document.getElementById('modalChartDoughnut');
             const c2 = document.getElementById('modalChartBar');
-            if (c1 && c1.width > 0) chart1Img = c1.toDataURL('image/png');
-            if (c2 && c2.width > 0) chart2Img = c2.toDataURL('image/png');
+            if (c1 && c1.width > 0 && modalChartDoughnutInstance) {
+                modalChartDoughnutInstance.update('none');
+                chart1Img = c1.toDataURL('image/png');
+            }
+            if (c2 && c2.width > 0 && modalChartBarInstance) {
+                modalChartBarInstance.update('none');
+                chart2Img = c2.toDataURL('image/png');
+            }
         } catch (e) {
             console.warn('Canvas chart export:', e);
         }
 
-        // Si aún no se habían renderizado en pantalla, generarlas
+        // Si aún no se habían renderizado en pantalla, generarlas de inmediato
         if (!chart1Img || !chart2Img) {
             try {
                 renderModalCharts(parseInt(empVal) || 0, parseInt(desVal) || 0, parseInt(totalVal) || 0, parseInt(rateVal) || 100);
+                if (modalChartDoughnutInstance) modalChartDoughnutInstance.update('none');
+                if (modalChartBarInstance) modalChartBarInstance.update('none');
                 const c1 = document.getElementById('modalChartDoughnut');
                 const c2 = document.getElementById('modalChartBar');
                 if (c1 && c1.width > 0) chart1Img = c1.toDataURL('image/png');
@@ -630,197 +638,213 @@
             } catch (e) {}
         }
 
+        // Contenedor ajustado exactamente a 1 página A4 ejecutiva
         const container = document.createElement('div');
-        container.style.padding = '4px 18px 14px 18px';
-        container.style.fontFamily = 'Arial, Helvetica, sans-serif';
+        container.style.width = '750px';
+        container.style.padding = '4px 10px';
+        container.style.fontFamily = "'Segoe UI', Arial, Helvetica, sans-serif";
         container.style.color = '#1e293b';
         container.style.backgroundColor = '#ffffff';
-        container.style.lineHeight = '1.45';
+        container.style.boxSizing = 'border-box';
+        container.style.lineHeight = '1.3';
 
         container.innerHTML = `
-            <!-- Encabezado Institucional SENA ERP con Logo Oficial -->
-            <div style="background: #001A29; border-bottom: 4px solid #39A900; border-radius: 8px 8px 0 0; padding: 14px 18px; color: #ffffff;">
+            <!-- 1. Encabezado Institucional SENA CEFA -->
+            <div style="background: linear-gradient(135deg, #00131E 0%, #001A29 60%, #002336 100%); border-bottom: 3.5px solid #39A900; border-radius: 8px 8px 0 0; padding: 10px 14px; color: #ffffff;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="width: 48px; vertical-align: middle;">
-                            <img src="${senaLogo}" style="width: 38px; height: 38px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                        <td style="width: 42px; vertical-align: middle;">
+                            <img src="${senaLogo}" style="width: 36px; height: 36px; object-fit: contain; background: white; border-radius: 6px; padding: 2px;">
                         </td>
                         <td style="vertical-align: middle; padding-left: 10px;">
-                            <div style="font-size: 8.5px; font-weight: bold; color: #62E31D; text-transform: uppercase; letter-spacing: 1px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>
-                            <div style="font-size: 14.5px; font-weight: bold; color: #ffffff; margin-top: 2px;">Centro de Formación Agroindustrial La Angostura — CEFA</div>
-                            <div style="font-size: 10px; color: #cbd5e1; margin-top: 1px;">Sistema Institucional de Gestión y Seguimiento a Egresados (SIGE)</div>
+                            <div style="font-size: 7.5px; font-weight: 800; color: #62E31D; text-transform: uppercase; letter-spacing: 0.8px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>
+                            <div style="font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: -0.2px;">Centro de Formación Agroindustrial La Angostura — CEFA</div>
+                            <div style="font-size: 9px; color: #94a3b8;">Sistema Institucional de Gestión y Seguimiento a Egresados (SIGE ERP)</div>
                         </td>
                         <td style="text-align: right; vertical-align: middle;">
-                            <span style="background: #39A900; color: #ffffff; padding: 4px 10px; font-size: 9.5px; font-weight: bold; border-radius: 4px; text-transform: uppercase;">INFORME OFICIAL</span>
-                            <div style="font-size: 9.5px; color: #94a3b8; margin-top: 3px;">Emisión: ${new Date().toLocaleDateString('es-CO')}</div>
+                            <div style="display: inline-block; background: #39A900; color: #ffffff; padding: 3px 8px; font-size: 8.5px; font-weight: 800; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">INFORME OFICIAL</div>
+                            <div style="font-size: 8.5px; color: #cbd5e1; margin-top: 2px;">Emisión: ${new Date().toLocaleDateString('es-CO')}</div>
+                            <div style="font-size: 8.5px; color: #62E31D; font-weight: bold;">Cód: ${reportId}</div>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <!-- Franja de Identificación del Reporte -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; padding: 10px 18px; margin-bottom: 14px; border-radius: 0 0 8px 8px;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <!-- 2. Franja de Identificación del Reporte -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; padding: 6px 12px; margin-bottom: 7px; border-radius: 0 0 6px 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
                     <tr>
                         <td style="color: #001A29; font-weight: bold;">
-                            <span style="color: #39A900; margin-right: 4px;">●</span> Reporte: <span style="color: #0f172a;">${reportTitle}</span>
+                            <span style="color: #39A900; margin-right: 3px;">●</span> REPORTE: <span style="color: #0f172a; text-transform: uppercase;">${reportTitle}</span>
                         </td>
-                        <td style="text-align: right; color: #64748b;">
-                            Código: <strong style="color: #001A29;">${reportId}</strong> &nbsp;|&nbsp; 
-                            Estado: <strong style="color: #166534;">${status}</strong>
+                        <td style="text-align: right; color: #475569;">
+                            Programa: <strong style="color: #001A29;">${program}</strong> &nbsp;|&nbsp; 
+                            Ficha: <strong style="color: #001A29;">${filtroFicha}</strong> &nbsp;|&nbsp; 
+                            Estado: <span style="background: #dcfce7; color: #166534; font-weight: 800; padding: 1px 6px; border-radius: 3px; font-size: 8.5px;">${status}</span>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <!-- Ficha Técnica de Registro y Metadatos -->
-            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
-                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #edf2f7; padding-bottom: 5px; margin-bottom: 8px;">
-                    Ficha Técnica y Datos de Emisión
-                </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; background: #f8fafc; border-radius: 6px;">
-                    <tr>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Código de Control:</strong> <span style="color:#0f172a; font-weight: bold;">${reportId}</span></td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 33%;"><strong>Fecha de Corte:</strong> ${dateStr}</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; width: 34%;"><strong>Programa Académico:</strong> <span style="color:#166534; font-weight:bold;">${program}</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Responsable de Gestión:</strong> ${resp}</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0;"><strong>Ámbito:</strong> Regional Huila — CEFA</td>
-                    </tr>
-                </table>
-            </div>
-
-            <!-- Objetivo y Alcance Institucional -->
-            <div style="border: 1px solid #e2e8f0; border-left: 4px solid #39A900; border-radius: 6px; padding: 11px 15px; margin-bottom: 14px; background: #ffffff;">
-                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 5px;">
-                    Objetivo y Alcance del Reporte
-                </div>
-                <p style="font-size: 10.5px; color: #334155; margin: 0; line-height: 1.5; text-align: justify;">
-                    Este documento técnico e institucional consolida los datos de inserción laboral, estado de vinculación productiva y desempeño de los egresados certificados en el Centro de Formación Agroindustrial La Angostura (CEFA). Proporciona evidencia cuantitativa y trazabilidad ocupacional para orientar los procesos de mejora continua, pertinencia curricular y acreditación ante el sector productivo.
-                </p>
-            </div>
-
-            <!-- Consolidado Numérico y Desempeño Operativo -->
-            <div style="font-size: 11px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 7px;">
-                Consolidado Numérico y Desempeño Ocupacional
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 11px;">
-                <thead>
-                    <tr style="background: #001A29; color: #ffffff;">
-                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Indicador de Empleabilidad</th>
-                        <th style="padding: 8px 10px; text-align: center; border: 1px solid #001A29; width: 90px;">Muestra</th>
-                        <th style="padding: 8px 10px; text-align: left; border: 1px solid #001A29;">Detalle Operativo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Total Egresados Evaluados</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #0f172a;">${totalVal}</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">Aprendices con estado de formación CERTIFICADO en el software</td>
-                    </tr>
-                    <tr style="background: #f8fafc;">
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">Egresados Vinculados Laboralmente</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #39A900;">${empVal}</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">En contrato laboral formal, independiente o unidades productivas</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: bold; color: #334155;">En Búsqueda Activa de Oportunidad</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; font-size: 13px; color: #d97706;">${desVal}</td>
-                        <td style="padding: 7px 10px; border: 1px solid #e2e8f0; color: #64748b; font-size: 10px;">En proceso de postulación a través de la APE SENA u otros canales</td>
-                    </tr>
-                    <tr style="background: #f0fdf4;">
-                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; font-weight: bold; color: #166534;">Tasa de Empleabilidad Efectiva</td>
-                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; text-align: center; font-weight: 900; font-size: 15px; color: #15803d;">${rateVal}</td>
-                        <td style="padding: 8px 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 10px; font-weight: 600;">Porcentaje de absorción y ubicación productiva en el mercado laboral</td>
-                    </tr>
-                </tbody>
+            <!-- 3. Ficha Técnica y Objetivo (Lado a lado en 2 columnas) -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 7px;">
+                <tr>
+                    <td style="width: 54%; vertical-align: top; padding-right: 4px;">
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 3.5px solid #39A900; border-radius: 5px; padding: 6px 9px; height: 60px; box-sizing: border-box;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
+                                <span style="color: #39A900;">■</span> Objetivo y Alcance Institucional
+                            </div>
+                            <p style="font-size: 8px; color: #334155; margin: 0; line-height: 1.35; text-align: justify;">
+                                Consolida la trazabilidad de inserción laboral y desempeño de egresados certificados en el CEFA, suministrando evidencia cuantitativa para acreditar pertinencia ante el sector productivo regional.
+                            </p>
+                        </div>
+                    </td>
+                    <td style="width: 46%; vertical-align: top; padding-left: 4px;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 5px 8px; height: 60px; box-sizing: border-box;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
+                                Ficha Técnica de Emisión
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 8px; color: #334155;">
+                                <tr>
+                                    <td style="padding: 1px 0;"><strong>Código:</strong> ${reportId}</td>
+                                    <td style="padding: 1px 0; text-align: right;"><strong>Fecha Corte:</strong> ${dateStr}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1px 0;" colspan="2"><strong>Responsable:</strong> ${resp}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1px 0;" colspan="2"><strong>Sede:</strong> CEFA La Angostura · Campoalegre (Huila)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
             </table>
 
-            <!-- Visualización Gráfica e Indicadores Estadísticos -->
+            <!-- 4. Cuatro Tarjetas KPI Ejecutivas en Dashboard -->
+            <div style="margin-bottom: 7px;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 5px 0;">
+                    <tr>
+                        <td style="width: 25%; background: #ffffff; border: 1px solid #cbd5e1; border-top: 3px solid #001A29; border-radius: 5px; padding: 6px 8px; text-align: center;">
+                            <div style="font-size: 7.5px; font-weight: 800; color: #64748b; text-transform: uppercase;">TOTAL EVALUADOS</div>
+                            <div style="font-size: 16px; font-weight: 900; color: #001A29; line-height: 1.1; margin-top: 1px;">${totalVal}</div>
+                            <div style="font-size: 7.5px; color: #94a3b8; margin-top: 1px;">Egresados certificados</div>
+                        </td>
+                        <td style="width: 25%; background: #f0fdf4; border: 1px solid #bbf7d0; border-top: 3px solid #39A900; border-radius: 5px; padding: 6px 8px; text-align: center;">
+                            <div style="font-size: 7.5px; font-weight: 800; color: #166534; text-transform: uppercase;">VINCULADOS LABORAL</div>
+                            <div style="font-size: 16px; font-weight: 900; color: #166534; line-height: 1.1; margin-top: 1px;">${empVal}</div>
+                            <div style="font-size: 7.5px; color: #15803d; margin-top: 1px;">Contrato / Empresa</div>
+                        </td>
+                        <td style="width: 25%; background: #fffbeb; border: 1px solid #fde68a; border-top: 3px solid #f59e0b; border-radius: 5px; padding: 6px 8px; text-align: center;">
+                            <div style="font-size: 7.5px; font-weight: 800; color: #92400e; text-transform: uppercase;">EN BÚSQUEDA ACTIVA</div>
+                            <div style="font-size: 16px; font-weight: 900; color: #b45309; line-height: 1.1; margin-top: 1px;">${desVal}</div>
+                            <div style="font-size: 7.5px; color: #92400e; margin-top: 1px;">Intermediación APE</div>
+                        </td>
+                        <td style="width: 25%; background: #f0fdf4; border: 1px solid #86efac; border-top: 3px solid #16a34a; border-radius: 5px; padding: 6px 8px; text-align: center;">
+                            <div style="font-size: 7.5px; font-weight: 800; color: #15803d; text-transform: uppercase;">TASA EMPLEABILIDAD</div>
+                            <div style="font-size: 16px; font-weight: 900; color: #15803d; line-height: 1.1; margin-top: 1px;">${rateVal}</div>
+                            <div style="font-size: 7.5px; color: #166534; font-weight: bold; margin-top: 1px;">Meta CEFA: 85% ✓</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 5. Visualización Gráfica e Indicadores Estadísticos -->
             ${(chart1Img && chart2Img) ? `
-            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; background: #ffffff;">
-                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #edf2f7; padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between;">
-                    <span>Visualización Gráfica del Reporte (SIGE ERP)</span>
-                    <span style="color: #39A900; font-size: 9.5px; font-weight: bold;">CEFA · Regional Huila</span>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-bottom: 7px;">
+                <div style="font-size: 8.5px; font-weight: bold; color: #001A29; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 3px; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                    <span><strong style="color: #39A900;">■</strong> Visualización Gráfica e Indicadores Estadísticos (SIGE ERP)</span>
+                    <span style="color: #39A900; font-size: 8px; font-weight: bold;">CEFA · Regional Huila</span>
                 </div>
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="width: 50%; padding: 4px 10px; vertical-align: top; text-align: center; border-right: 1px dashed #e2e8f0;">
-                            <div style="font-size: 9.5px; font-weight: bold; color: #334155; margin-bottom: 6px;">
+                        <td style="width: 50%; padding: 2px 8px; vertical-align: top; text-align: center; border-right: 1px dashed #e2e8f0;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #334155; margin-bottom: 3px;">
                                 Situación Ocupacional (Distribución %)
                             </div>
-                            <img src="${chart1Img}" style="max-width: 100%; max-height: 155px; object-fit: contain; margin: 0 auto; display: block;">
+                            <img src="${chart1Img}" style="max-width: 95%; max-height: 105px; object-fit: contain; margin: 0 auto; display: block;">
                         </td>
-                        <td style="width: 50%; padding: 4px 10px; vertical-align: top; text-align: center;">
-                            <div style="font-size: 9.5px; font-weight: bold; color: #334155; margin-bottom: 6px;">
+                        <td style="width: 50%; padding: 2px 8px; vertical-align: top; text-align: center;">
+                            <div style="font-size: 8.5px; font-weight: bold; color: #334155; margin-bottom: 3px;">
                                 Cumplimiento vs Meta CEFA (85%)
                             </div>
-                            <img src="${chart2Img}" style="max-width: 100%; max-height: 155px; object-fit: contain; margin: 0 auto; display: block;">
+                            <img src="${chart2Img}" style="max-width: 95%; max-height: 105px; object-fit: contain; margin: 0 auto; display: block;">
                         </td>
                     </tr>
                 </table>
             </div>
             ` : ''}
 
-            <!-- Parámetros y Filtros de Segmentación -->
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 6px;">
-                    Criterios de Segmentación y Filtros Aplicados
-                </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-                    <tr>
-                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Programa Académico: <strong style="color: #0f172a;">${program}</strong></td>
-                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Ficha de Caracterización: <strong style="color: #0f172a;">${filtroFicha}</strong></td>
-                    </tr>
-                    <tr>
-                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Cobertura Territorial: <strong style="color: #0f172a;">${filtroRegion}</strong></td>
-                        <td style="width: 50%; padding: 4px 6px; color: #334155;"><strong style="color:#39A900;">•</strong> Período Cronológico: <strong style="color: #0f172a;">${filtroPeriodo}</strong></td>
-                    </tr>
-                </table>
-            </div>
-
-            <!-- Conclusión y Dictamen Técnico -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 10px; color: #334155; line-height: 1.45;">
-                <strong style="color: #001A29; text-transform: uppercase;">Conclusión del Seguimiento:</strong> La tasa de empleabilidad registrada valida el alto impacto del programa formativo en el entorno productivo regional. Se recomienda continuar articulando a los egresados con las convocatorias del Fondo Emprender y la Agencia Pública de Empleo (APE) del SENA.
-            </div>
-
-            <!-- Certificación de Confidencialidad (Habeas Data) -->
-            <div style="background: #f0faf3; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; font-size: 9.5px; color: #166534; margin-bottom: 22px; line-height: 1.4;">
-                <strong>Tratamiento de Información (Ley 1581 de 2012):</strong> Los datos contenidos en este reporte gozan de reserva estadística institucional. Su uso es estrictamente confidencial para planeación y acreditación educativa del SENA.
-            </div>
-
-            <!-- Firmas Institucionales de Responsabilidad -->
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px;">
+            <!-- 6. Filtros Aplicados y Conclusión en 2 Columnas -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 7px;">
                 <tr>
-                    <td style="width: 46%; text-align: center; vertical-align: top;">
-                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
-                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Coordinación Académica</div>
-                            <div style="font-size: 9px; color: #64748b;">CEFA La Angostura — SENA</div>
+                    <td style="width: 49%; vertical-align: top; padding-right: 4px;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 5px 8px; height: 56px; box-sizing: border-box;">
+                            <div style="font-size: 8px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
+                                Criterios y Filtros Aplicados
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 7.5px; color: #334155;">
+                                <tr>
+                                    <td style="padding: 1px 0;"><strong style="color: #39A900;">•</strong> Programa: <strong style="color: #0f172a;">${program}</strong></td>
+                                    <td style="padding: 1px 0;"><strong style="color: #39A900;">•</strong> Ficha: <strong style="color: #0f172a;">${filtroFicha}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 1px 0;"><strong style="color: #39A900;">•</strong> Región: <strong style="color: #0f172a;">${filtroRegion}</strong></td>
+                                    <td style="padding: 1px 0;"><strong style="color: #39A900;">•</strong> Período: <strong style="color: #0f172a;">${filtroPeriodo}</strong></td>
+                                </tr>
+                            </table>
                         </div>
                     </td>
-                    <td style="width: 8%;"></td>
-                    <td style="width: 46%; text-align: center; vertical-align: top;">
-                        <div style="border-top: 1px solid #94a3b8; width: 85%; margin: 0 auto; padding-top: 5px;">
-                            <div style="font-size: 10px; font-weight: bold; color: #001A29;">Líder de Seguimiento a Egresados</div>
-                            <div style="font-size: 9px; color: #64748b;">Sistema Institucional SIGE</div>
+                    <td style="width: 51%; vertical-align: top; padding-left: 4px;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 5px 8px; height: 56px; box-sizing: border-box;">
+                            <div style="font-size: 8px; font-weight: bold; color: #001A29; text-transform: uppercase; margin-bottom: 2px;">
+                                Conclusión y Recomendación Institucional
+                            </div>
+                            <p style="font-size: 7.5px; color: #334155; margin: 0; line-height: 1.35; text-align: justify;">
+                                El índice de vinculación ratifica la pertinencia formativa del CEFA. Se recomienda afianzar articulación con la APE y convocatorias de capital semilla del Fondo Emprender.
+                            </p>
                         </div>
                     </td>
                 </tr>
             </table>
 
-            <!-- Pie de Página Institucional -->
-            <div style="border-top: 1px solid #cbd5e1; padding-top: 8px; text-align: center; font-size: 9px; color: #64748b; margin-top: 10px;">
-                SISTEMA DE GESTIÓN DE EGRESADOS (SIGE) • SENA EMPRESA ERP • CEFA LA ANGOSTURA — {{ date('Y') }}
+            <!-- 7. Marco Legal Habeas Data Compacto -->
+            <div style="background: #f0faf3; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 8px; font-size: 7.5px; color: #166534; margin-bottom: 10px; line-height: 1.3;">
+                <strong>Tratamiento de Información (Ley 1581 de 2012):</strong> Datos con reserva estadística y carácter confidencial para fines de aseguramiento de la calidad académica del SENA.
+            </div>
+
+            <!-- 8. Firmas Institucionales de Responsabilidad -->
+            <table style="width: 100%; border-collapse: collapse; margin-top: 6px; margin-bottom: 6px;">
+                <tr>
+                    <td style="width: 45%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #64748b; width: 80%; margin: 0 auto; padding-top: 3px;">
+                            <div style="font-size: 9px; font-weight: bold; color: #001A29;">Coordinación Académica</div>
+                            <div style="font-size: 7.5px; color: #64748b;">CEFA La Angostura — SENA</div>
+                        </div>
+                    </td>
+                    <td style="width: 10%;"></td>
+                    <td style="width: 45%; text-align: center; vertical-align: top;">
+                        <div style="border-top: 1px solid #64748b; width: 80%; margin: 0 auto; padding-top: 3px;">
+                            <div style="font-size: 9px; font-weight: bold; color: #001A29;">Líder de Seguimiento a Egresados</div>
+                            <div style="font-size: 7.5px; color: #64748b;">Sistema Institucional SIGE ERP</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- 9. Pie de Página Institucional -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; text-align: center; font-size: 7.5px; color: #94a3b8; margin-top: 4px;">
+                SISTEMA DE GESTIÓN Y SEGUIMIENTO A EGRESADOS (SIGE) • SENA EMPRESA CEFA • LA ANGOSTURA — {{ date('Y') }}
             </div>
         `;
 
         const opt = {
-            margin:       [3, 6, 6, 6],
+            margin:       [5, 7, 5, 7],
             filename:     'Reporte_Institucional_' + reportId.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         html2pdf().set(opt).from(container).save().then(() => {
