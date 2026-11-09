@@ -520,9 +520,11 @@
                             <i class="fa-solid fa-location-dot text-[#39A900] mt-0.5"></i>
                             <span>Kilómetro 38 Vía Neiva - Campoalegre (Huila)</span>
                         </li>
-                        <li class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-envelope text-[#39A900]"></i>
-                            <span>angostura@sena.edu.co</span>
+                        <li>
+                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=angostura@sena.edu.co" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 hover:text-[#62E31D] transition-colors group" title="Redirigir a Gmail para redactar correo">
+                                <i class="fa-solid fa-envelope text-[#39A900] group-hover:text-[#62E31D] transition-colors"></i>
+                                <span class="group-hover:underline">angostura@sena.edu.co</span>
+                            </a>
                         </li>
                         <li class="flex items-center gap-2.5">
                             <i class="fa-solid fa-clock text-[#39A900]"></i>
@@ -536,9 +538,9 @@
                     <h4 class="font-poppins text-xs uppercase tracking-widest text-[#62E31D] font-black mb-4">Comunidad</h4>
                     <p class="font-sans text-xs text-gray-300 mb-4 font-medium">Síguenos en nuestros canales oficiales para estar al día con las novedades:</p>
                     <div class="flex items-center space-x-3">
-                        <a href="https://facebook.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://instagram.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://youtube.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/share/1A6p2yyUDc/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/10 hover:bg-[#1877F2] text-white flex items-center justify-center text-base transition-all duration-200 hover:scale-110 shadow-sm" title="Síguenos en Facebook Oficial">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
                     </div>
                 </div>
 
