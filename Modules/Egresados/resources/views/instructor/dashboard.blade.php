@@ -1198,7 +1198,7 @@
 
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px;">
             @foreach($solicitudesPendientes as $sol)
-              <div id="sol-card-inst-{{ $sol['id'] }}" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; transition:all 0.2s ease;">
+              <div id="sol-card-inst-{{ $sol['id'] }}" data-sol-nombre="{{ $sol['nombre'] ?? 'Egresado' }}" data-sol-documento="{{ $sol['documento'] ?? '' }}" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; transition:all 0.2s ease;">
                 <div>
                   <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px;">
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -1961,68 +1961,15 @@
   }
 
   function aprobarSolicitudInstructor(solId, btn) {
-    if (!solId) return;
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aprobando...';
-
-    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        const card = document.getElementById('sol-card-inst-' + solId);
-        if (card) {
-          card.innerHTML = `
-            <div style="padding:18px; text-align:center; background:#dcfce7; color:#15803d; border-radius:12px; font-weight:700; font-size:12.5px;">
-              <i class="fa-solid fa-circle-check" style="font-size:24px; display:block; margin-bottom:6px;"></i>
-              ¡Registro Aprobado! El egresado ya puede ingresar al portal SIGE.
-            </div>
-          `;
-          setTimeout(() => {
-            window.location.reload();
-          }, 1200);
-        } else {
-          window.location.reload();
-        }
-      } else {
-        alert(data.message || 'Error al aprobar solicitud');
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar';
-    });
+    if (typeof window.handleSolicitudRegistro === 'function') {
+      window.handleSolicitudRegistro('aprobar', solId, btn);
+    }
   }
 
   function rechazarSolicitudInstructor(solId, btn) {
-    if (!solId) return;
-    if (!confirm('¿Deseas rechazar esta solicitud de registro?')) return;
-    btn.disabled = true;
-
-    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(r => r.json())
-    .then(data => {
-      window.location.reload();
-    })
-    .catch(err => {
-      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar';
-    });
+    if (typeof window.handleSolicitudRegistro === 'function') {
+      window.handleSolicitudRegistro('rechazar', solId, btn);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -2187,5 +2134,6 @@
     }
   });
 </script>
+@include('egresados::superadmin.partials._modal_alertas')
 </body>
 </html>
