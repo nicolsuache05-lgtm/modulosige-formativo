@@ -491,14 +491,7 @@ class InstructorController extends Controller
             return redirect()->back()->withErrors(['nombre_evento' => 'Nombre y Lugar son campos obligatorios.']);
         }
 
-        $tiposMap = [
-            'FERIA' => 'Feria laboral',
-            'TALLER' => 'Taller práctico',
-            'ENCUENTRO' => 'Encuentro institucional',
-            'HACKATHON' => 'Concurso / Hackathon',
-            'CONFERENCIA' => 'Conferencia / Charla',
-        ];
-        $tipoLabel = $tiposMap[$tipo] ?? ucfirst(strtolower($tipo ?? 'Evento Institucional'));
+        $tipoLabel = EventosController::resolveEventTypeLabel($tipo);
 
         $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
         $count = count($customEventos) + 13;

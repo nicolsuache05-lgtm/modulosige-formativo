@@ -106,7 +106,14 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 mb-1">Tipo de Evento</label>
-                            <input type="text" name="type" value="{{ old('type', $evento['type'] ?? '') }}" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-hidden transition" placeholder="Ej. Feria laboral, Taller práctico">
+                            <input type="text" name="type" list="edit_page_tipos_sugeridos" value="{{ old('type', $evento['type'] ?? '') }}" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-hidden transition" placeholder="Ej. Feria Laboral, Taller Práctico o escribe uno...">
+                            <datalist id="edit_page_tipos_sugeridos">
+                                <option value="Feria Laboral">
+                                <option value="Taller Práctico">
+                                <option value="Encuentro Institucional">
+                                <option value="Concurso / Hackathon">
+                                <option value="Conferencia / Charla">
+                            </datalist>
                         </div>
 
                         <div>

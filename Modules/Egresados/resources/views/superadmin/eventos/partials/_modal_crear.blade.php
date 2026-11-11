@@ -69,14 +69,16 @@
                                 <span>Tipo de Evento</span>
                                 <span class="text-red-500">*</span>
                             </label>
-                            <select name="tipo_evento" required 
-                                    class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] focus:ring-2 focus:ring-[#39A900]/20 outline-none transition">
-                                <option value="FERIA">Feria Laboral</option>
-                                <option value="TALLER">Taller Práctico</option>
-                                <option value="ENCUENTRO">Encuentro Institucional</option>
-                                <option value="HACKATHON">Concurso / Hackathon</option>
-                                <option value="CONFERENCIA">Conferencia / Charla</option>
-                            </select>
+                            <input type="text" name="tipo_evento" required list="crear_tipos_evento_sugeridos"
+                                   class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] focus:ring-2 focus:ring-[#39A900]/20 outline-none transition"
+                                   placeholder="Ej. Feria Laboral, Taller Práctico o escribe uno...">
+                            <datalist id="crear_tipos_evento_sugeridos">
+                                <option value="Feria Laboral">
+                                <option value="Taller Práctico">
+                                <option value="Encuentro Institucional">
+                                <option value="Concurso / Hackathon">
+                                <option value="Conferencia / Charla">
+                            </datalist>
                         </div>
 
                         <div>

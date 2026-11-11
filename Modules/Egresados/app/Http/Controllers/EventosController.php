@@ -442,6 +442,28 @@ class EventosController extends Controller
     }
 
     /**
+     * Normaliza el tipo de evento preservando valores personalizados escritos por el usuario.
+     */
+    public static function resolveEventTypeLabel(?string $rawTipo): string
+    {
+        $clean = trim(strip_tags((string) $rawTipo));
+        if ($clean === '') {
+            return 'Evento Institucional';
+        }
+
+        $tiposMap = [
+            'FERIA'       => 'Feria laboral',
+            'TALLER'      => 'Taller práctico',
+            'ENCUENTRO'   => 'Encuentro institucional',
+            'HACKATHON'   => 'Concurso / Hackathon',
+            'CONFERENCIA' => 'Conferencia / Charla',
+        ];
+
+        $upper = strtoupper($clean);
+        return $tiposMap[$upper] ?? $clean;
+    }
+
+    /**
      * Guarda un nuevo evento programado.
      */
     public function store(Request $request)
@@ -465,14 +487,7 @@ class EventosController extends Controller
             $horaStr = '08:00 AM';
         }
 
-        $tiposMap = [
-            'FERIA' => 'Feria laboral',
-            'TALLER' => 'Taller práctico',
-            'ENCUENTRO' => 'Encuentro institucional',
-            'HACKATHON' => 'Concurso / Hackathon',
-            'CONFERENCIA' => 'Conferencia / Charla',
-        ];
-        $tipoLabel = $tiposMap[$request->tipo_evento] ?? ucfirst(strtolower($request->tipo_evento));
+        $tipoLabel = self::resolveEventTypeLabel($request->tipo_evento);
 
         $progsRaw = $request->programas_dirigidos;
         if (is_array($progsRaw)) {
