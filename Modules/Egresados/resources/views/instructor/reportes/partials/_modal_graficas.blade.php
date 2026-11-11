@@ -2,6 +2,8 @@
 <!-- 5. MODAL DE ANÁLISIS GRÁFICO E INDICADORES (SENA ERP) -->
 <!-- ============================================== -->
 <div x-show="openGraficasModal" 
+     @open-modal-graficas.window="openGraficasModal = true"
+     @close-modal-graficas.window="openGraficasModal = false"
      style="display: none;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
@@ -152,12 +154,8 @@
                 Sistema Integrado de Gestión de Egresados — CEFA
             </span>
             <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                <button @click="openGraficasModal = false" type="button" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                <button @click="openGraficasModal = false" type="button" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
                     Cerrar
-                </button>
-                <button type="button" onclick="descargarReportePDF(currentReportData)" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-sm shadow-red-600/25 cursor-pointer">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    <span>Descargar PDF</span>
                 </button>
             </div>
         </div>

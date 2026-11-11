@@ -144,36 +144,36 @@
 
                 @if(session('registro_exitoso'))
             <!-- ============================================== -->
-            <!-- PANTALLA DE CONFIRMACIÓN DE REGISTRO EXITOSO   -->
+            <!-- PANTALLA / ANUNCIO DE SOLICITUD EN REVISIÓN    -->
             <!-- ============================================== -->
-            <div class="max-w-[560px] mx-auto bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden text-center relative z-10 transform transition-all animate-fade-in my-4">
+            <div class="max-w-[580px] mx-auto bg-white rounded-3xl shadow-2xl border border-amber-100 overflow-hidden text-center relative z-10 transform transition-all animate-fade-in my-4">
                 
-                <!-- Barra superior degradada institucional SENA ERP -->
-                <div class="h-2.5 bg-gradient-to-r from-[#00131E] via-[#39A900] to-[#62E31D]"></div>
+                <!-- Barra superior degradada institucional SENA ERP & Alerta Ámbar -->
+                <div class="h-2.5 bg-gradient-to-r from-[#00131E] via-[#D97706] to-[#39A900]"></div>
                 
                 <div class="p-6 sm:p-9">
-                    <!-- Icono Animado con Anillos de Resplandor SENA -->
+                    <!-- Icono Animado con Anillos de Resplandor Institucional de Validación -->
                     <div class="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
-                        <div class="absolute inset-0 rounded-full bg-[#39A900]/20 animate-ping opacity-60" style="animation-duration: 2.2s;"></div>
-                        <div class="absolute inset-1 rounded-full bg-[#EAF7EE] border border-[#39A900]/30"></div>
-                        <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#206600] text-white flex items-center justify-center shadow-lg shadow-[#39A900]/40 transform hover:scale-105 transition-transform">
-                            <i class="fa-solid fa-check text-2xl text-white"></i>
+                        <div class="absolute inset-0 rounded-full bg-[#D97706]/20 animate-ping opacity-60" style="animation-duration: 2.2s;"></div>
+                        <div class="absolute inset-1 rounded-full bg-[#FEF3C7] border border-[#D97706]/30"></div>
+                        <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[#D97706] to-[#B45309] text-white flex items-center justify-center shadow-lg shadow-[#D97706]/35 transform hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-user-clock text-2xl text-white"></i>
                         </div>
                     </div>
 
-                    <!-- Píldora de estado de éxito -->
-                    <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#EAF7EE] border border-[#39A900]/30 text-[#166534] text-xs font-bold mb-3">
-                        <i class="fa-solid fa-circle-check text-[#39A900]"></i>
-                        <span>¡Registro Guardado Exitosamente!</span>
+                    <!-- Píldora de estado de revisión -->
+                    <div class="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full bg-[#FEF3C7] border border-[#D97706]/30 text-[#92400E] text-xs font-bold mb-3 shadow-sm">
+                        <i class="fa-solid fa-hourglass-half text-[#D97706] animate-pulse"></i>
+                        <span>Solicitud en Proceso de Revisión Institucional</span>
                     </div>
 
                     <!-- Título principal -->
                     <h1 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight mb-2">
-                        ¡Bienvenido(a) a SIGE!
+                        ¡Solicitud Recibida con Éxito!
                     </h1>
 
                     <p class="text-gray-600 text-xs sm:text-sm font-medium mb-6 leading-relaxed">
-                        Hola, <strong class="text-[#00131E]">{{ session('registrado_nombre') }}</strong>. Tu cuenta de egresado(a) del <strong class="text-[#166534]">Centro de Formación Agroindustrial La Angostura</strong> ha sido registrada con éxito en el sistema.
+                        Hola, <strong class="text-[#00131E]">{{ session('registrado_nombre') }}</strong>. Tus datos han sido recibidos en el sistema del <strong class="text-[#166534]">Centro de Formación Agroindustrial La Angostura</strong> y se encuentran en proceso de revisión de datos académicos.
                     </p>
 
                     <!-- Resumen de datos registrados -->
@@ -190,42 +190,48 @@
                             </span>
                             <span class="font-bold text-[#00131E] truncate max-w-[210px]">{{ session('registrado_email') }}</span>
                         </div>
+                        @if(session('registrado_programa'))
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-200/60">
+                            <span class="text-gray-500 font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap text-gray-400"></i> Programa de Formación:
+                            </span>
+                            <span class="font-bold text-[#00131E] truncate max-w-[210px]">{{ session('registrado_programa') }}</span>
+                        </div>
+                        @endif
                         <div class="flex items-center justify-between">
                             <span class="text-gray-500 font-semibold flex items-center gap-1.5">
-                                <i class="fa-solid fa-shield-halved text-[#39A900]"></i> Estado en Plataforma:
+                                <i class="fa-solid fa-shield-halved text-[#D97706]"></i> Estado de Acceso:
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#39A900]/10 text-[#166534] font-bold text-[11px]">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#39A900] animate-pulse"></span>
-                                Cuenta Activa y Lista
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#92400E] font-extrabold text-[11px] border border-[#D97706]/30">
+                                <span class="w-2 h-2 rounded-full bg-[#D97706] animate-pulse"></span>
+                                Pendiente de Aprobación
                             </span>
                         </div>
                     </div>
 
-                    <!-- Mensaje informativo de seguridad -->
-                    <div class="bg-[#EAF7EE]/70 border border-[#39A900]/30 rounded-xl p-3 text-[11.5px] text-[#166534] mb-6 flex items-start space-x-2 text-left">
-                        <i class="fa-solid fa-circle-info text-[#39A900] text-sm mt-0.5 flex-shrink-0"></i>
-                        <p class="leading-relaxed">
-                            Tu registro ya quedó guardado. Puedes iniciar sesión en cualquier momento ingresando con tu <strong>número de documento o correo</strong> y la <strong>contraseña</strong> que acabas de asignar.
-                        </p>
+                    <!-- Mensaje institucional explicativo -->
+                    <div class="bg-[#FFFBEB] border border-[#D97706]/35 rounded-2xl p-4 text-[12px] text-[#92400E] mb-6 flex items-start space-x-3 text-left shadow-sm">
+                        <div class="w-8 h-8 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center flex-shrink-0 mt-0.5 font-bold shadow-inner">
+                            <i class="fa-solid fa-user-shield text-base"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <strong class="block font-poppins text-xs text-[#78350F]">Validación Académica por Coordinación e Instructores</strong>
+                            <p class="leading-relaxed text-gray-700">
+                                Por políticas de seguridad institucional, la coordinación académica y los instructores de seguimiento del CEFA La Angostura revisarán tus datos antes de habilitar tu acceso al portal. Te notificaremos en cuanto tu cuenta sea validada y aprobada.
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Botones de Acción SENA ERP -->
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <a href="{{ route('egresados.login') }}" class="w-full sm:w-auto bg-gradient-to-r from-[#39A900] to-[#2a7c00] hover:from-[#43be04] hover:to-[#319400] text-white font-extrabold px-6 py-2.5 rounded-xl shadow-md shadow-[#39A900]/30 hover:shadow-lg transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs sm:text-sm font-poppins">
-                            <i class="fa-solid fa-right-to-bracket text-xs"></i>
-                            <span>Iniciar Sesión Ahora</span>
-                        </a>
-
-                        <a href="{{ route('egresados.welcome') }}" class="w-full sm:w-auto bg-[#001A29] hover:bg-[#002336] text-white font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 text-xs sm:text-sm font-poppins">
+                        <a href="{{ route('egresados.welcome') }}" class="w-full sm:w-auto bg-gradient-to-r from-[#001A29] to-[#002b44] hover:from-[#002b44] hover:to-[#001A29] text-white font-extrabold px-6 py-2.5 rounded-xl shadow-md transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs sm:text-sm font-poppins">
                             <i class="fa-solid fa-house text-xs text-[#62E31D]"></i>
-                            <span>Volver al Inicio</span>
+                            <span>Volver al Inicio del Portal</span>
                         </a>
-                    </div>
 
-                    <div class="mt-5 pt-4 border-t border-gray-100">
-                        <a href="{{ route('egresados.registro') }}" class="text-[11.5px] text-gray-500 hover:text-[#39A900] font-semibold transition inline-flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-plus text-[10px]"></i>
-                            <span>¿Deseas registrar a otro egresado? Clic aquí</span>
+                        <a href="{{ route('egresados.registro') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-5 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-2 text-xs sm:text-sm font-poppins">
+                            <i class="fa-solid fa-user-plus text-xs text-gray-500"></i>
+                            <span>Registrar a otro egresado</span>
                         </a>
                     </div>
 
@@ -240,7 +246,7 @@
                     Registro de Egresado(a)
                 </h1>
                 <p class="text-gray-600 text-xs sm:text-sm max-w-lg mx-auto mt-1 font-medium">
-                    Completa tus datos para activar tu cuenta de egresado del CEFA, acceder a ofertas laborales y encuestas institucionales.
+                    Completa tus datos para registrar tu solicitud de cuenta de egresado(a) del CEFA y acceder a noticias, eventos y encuestas institucionales.
                 </p>
             </div>
 

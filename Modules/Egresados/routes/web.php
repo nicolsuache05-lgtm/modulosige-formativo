@@ -60,6 +60,10 @@ Route::get('egresados/create', [EgresadosController::class, 'create'])->name('eg
 Route::post('egresados/create', [EgresadosController::class, 'store'])->name('egresados.store');
 Route::get('egresados/crear', [EgresadosController::class, 'create']);
 
+// Gestión y Validación de Solicitudes de Registro de Egresados (Aprobación y Rechazo Institucional)
+Route::match(['get', 'post'], 'egresados/solicitudes/{id}/aprobar', [EgresadosController::class, 'aprobarSolicitudRegistro'])->name('egresados.solicitudes.aprobar');
+Route::match(['get', 'post'], 'egresados/solicitudes/{id}/rechazar', [EgresadosController::class, 'rechazarSolicitudRegistro'])->name('egresados.solicitudes.rechazar');
+
 // 3. Servidor de recursos estáticos propios del módulo
 Route::get('egresados/assets/images/{filename}', function ($filename) {
     // Sanitizar nombre de archivo para evitar Directory Traversal
@@ -86,6 +90,7 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     // Directorio y gestión de egresados
     Route::get('egresados/directorio', [EgresadosController::class, 'index'])->name('egresados.index');
     Route::get('egresados/superadmin/directorio', [EgresadosController::class, 'index'])->name('egresados.superadmin.directorio');
+    Route::get('egresados/superadmin/exportar', [EgresadosController::class, 'exportarExcel'])->name('egresados.superadmin.exportar');
     Route::get('egresados/superadmin/create', [EgresadosController::class, 'create'])->name('egresados.superadmin.create');
     Route::post('egresados/superadmin/store', [EgresadosController::class, 'store'])->name('egresados.superadmin.store');
     Route::post('egresados/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.superadmin.seguimiento.store');
@@ -158,6 +163,7 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::get('egresados/instructor', [InstructorController::class, 'dashboard'])->name('egresados.instructor');
     Route::get('egresados/instructor/dashboard', [InstructorController::class, 'dashboard'])->name('egresados.instructor.dashboard');
     Route::get('egresados/instructor/directorio', [InstructorController::class, 'directorio'])->name('egresados.instructor.directorio');
+    Route::get('egresados/instructor/directorio/exportar', [InstructorController::class, 'exportarDirectorio'])->name('egresados.instructor.directorio.exportar');
     Route::post('egresados/instructor/store', [EgresadosController::class, 'store'])->name('egresados.instructor.store');
     Route::post('egresados/instructor/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.instructor.seguimiento.store');
     Route::match(['put', 'post'], 'egresados/instructor/{id}/update', [EgresadosController::class, 'update'])->name('egresados.instructor.update')->whereNumber('id');
@@ -185,6 +191,7 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::put('egresados/instructor/eventos/{id}', [InstructorController::class, 'updateEvento'])->name('egresados.instructor.eventos.update');
     Route::post('egresados/instructor/eventos/{id}/invitar', [InstructorController::class, 'invitarEvento'])->name('egresados.instructor.eventos.invitar');
     Route::put('egresados/instructor/eventos/{id}/cancelar', [InstructorController::class, 'cancelarEvento'])->name('egresados.instructor.eventos.cancelar');
+    Route::get('egresados/instructor/eventos/{id}/exportar', [InstructorController::class, 'exportarEvento'])->name('egresados.instructor.eventos.exportar');
 
     // Módulo de Noticias y Comunicados (Instructor)
     Route::get('egresados/instructor/noticias', [NoticiasController::class, 'instructorIndex'])->name('egresados.instructor.noticias.index');

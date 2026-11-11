@@ -151,8 +151,8 @@
                     <span>Inicio</span>
                 </a>
                 <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
-                    <i class="fa-solid fa-briefcase text-xs"></i>
-                    <span>Oportunidades</span>
+                    <i class="fa-solid fa-newspaper text-xs"></i>
+                    <span>Noticias</span>
                 </a>
                 <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
                     <i class="fa-solid fa-clipboard-check text-xs"></i>
@@ -160,7 +160,7 @@
                 </a>
                 <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
                     <i class="fa-solid fa-calendar-days text-xs"></i>
-                    <span>Eventos & Noticias</span>
+                    <span>Eventos</span>
                 </a>
                 <a href="#contacto" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
                     <i class="fa-solid fa-phone text-xs"></i>
@@ -208,7 +208,7 @@
                 </h1>
 
                 <p class="font-sans text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
-                    Conecta con vacantes de empleo, eventos de actualización institucional, noticias y seguimiento del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong> a través del ecosistema SIGE ERP.
+                    Conecta con eventos de actualización, noticias institucionales y encuestas de seguimiento del <strong class="text-[#00131E] font-bold">Centro de Formación Agroindustrial La Angostura</strong> a través del sistema SIGE.
                 </p>
 
                 <!-- Botones CTA con Mayor Presencia -->
@@ -234,9 +234,9 @@
                 <div class="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs sm:text-sm text-[#00131E] font-bold border-t border-gray-200/60 max-w-lg mx-auto lg:mx-0 font-poppins">
                     <div class="flex items-center gap-2 hover:text-[#39A900] transition-colors">
                         <span class="w-6 h-6 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-sm">
-                            <i class="fa-solid fa-briefcase"></i>
+                            <i class="fa-solid fa-newspaper"></i>
                         </span>
-                        <span>Oportunidades Laborales</span>
+                        <span>Noticias Institucionales</span>
                     </div>
                     <div class="flex items-center gap-2 hover:text-[#39A900] transition-colors">
                         <span class="w-6 h-6 rounded-full bg-[#EAF7EE] text-[#39A900] flex items-center justify-center text-xs shadow-sm">
@@ -505,9 +505,9 @@
                     <h4 class="font-poppins text-xs uppercase tracking-widest text-[#62E31D] font-black mb-4">Plataforma SIGE</h4>
                     <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 font-sans font-medium">
                         <li><a href="#inicio" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Inicio</a></li>
-                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Oportunidades</a></li>
+                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Noticias</a></li>
                         <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Encuestas</a></li>
-                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Eventos & Noticias</a></li>
+                        <li><a href="#servicios" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Eventos</a></li>
                         <li><a href="#contacto" class="hover:text-[#62E31D] transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-[#39A900]"></i> Contacto</a></li>
                     </ul>
                 </div>
@@ -520,9 +520,11 @@
                             <i class="fa-solid fa-location-dot text-[#39A900] mt-0.5"></i>
                             <span>Kilómetro 38 Vía Neiva - Campoalegre (Huila)</span>
                         </li>
-                        <li class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-envelope text-[#39A900]"></i>
-                            <span>angostura@sena.edu.co</span>
+                        <li>
+                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=angostura@sena.edu.co" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 hover:text-[#62E31D] transition-colors group" title="Redirigir a Gmail para redactar correo">
+                                <i class="fa-solid fa-envelope text-[#39A900] group-hover:text-[#62E31D] transition-colors"></i>
+                                <span class="group-hover:underline">angostura@sena.edu.co</span>
+                            </a>
                         </li>
                         <li class="flex items-center gap-2.5">
                             <i class="fa-solid fa-clock text-[#39A900]"></i>
@@ -536,9 +538,9 @@
                     <h4 class="font-poppins text-xs uppercase tracking-widest text-[#62E31D] font-black mb-4">Comunidad</h4>
                     <p class="font-sans text-xs text-gray-300 mb-4 font-medium">Síguenos en nuestros canales oficiales para estar al día con las novedades:</p>
                     <div class="flex items-center space-x-3">
-                        <a href="https://facebook.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://instagram.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://youtube.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#39A900] text-white flex items-center justify-center text-sm transition"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/share/1A6p2yyUDc/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/10 hover:bg-[#1877F2] text-white flex items-center justify-center text-base transition-all duration-200 hover:scale-110 shadow-sm" title="Síguenos en Facebook Oficial">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
                     </div>
                 </div>
 

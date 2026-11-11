@@ -1160,6 +1160,83 @@
       </div>
       @endif
 
+      <!-- ================= SOLICITUDES DE REGISTRO PENDIENTES ================= -->
+      @if(!empty($solicitudesPendientes) && count($solicitudesPendientes) > 0)
+        <div id="solicitudes-pendientes" class="solicitudes-pendientes-banner" style="background:#fff; border:1.5px solid #f59e0b; border-radius:20px; padding:22px 26px; margin-bottom:28px; box-shadow:0 10px 30px rgba(217, 119, 6, 0.12); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, #d97706, #f59e0b, #39a900);"></div>
+          
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:42px; height:42px; border-radius:12px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:19px; box-shadow:0 4px 10px rgba(217, 119, 6, 0.15);">
+                <i class="fa-solid fa-user-clock"></i>
+              </div>
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <h3 style="margin:0; font-size:16px; font-weight:800; color:#00131E; font-family:'Poppins',sans-serif;">
+                    Solicitudes de Registro Pendientes de Aprobación
+                  </h3>
+                  <span style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
+                    <span style="width:6px; height:6px; border-radius:50%; background:#d97706; display:inline-block;"></span>
+                    {{ count($solicitudesPendientes) }} pendiente{{ count($solicitudesPendientes) != 1 ? 's' : '' }}
+                  </span>
+                </div>
+                <p style="margin:2px 0 0 0; font-size:12px; color:#64748b;">
+                  Egresados que completaron el formulario público y requieren validación institucional antes de poder acceder al portal.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px;">
+            @foreach($solicitudesPendientes as $sol)
+              <div id="sol-card-inst-{{ $sol['id'] }}" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; transition:all 0.2s ease;">
+                <div>
+                  <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:36px; height:36px; border-radius:10px; background:#eaf7ee; color:#39A900; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px;">
+                        {{ strtoupper(substr($sol['nombre'] ?? 'EG', 0, 2)) }}
+                      </div>
+                      <div>
+                        <div style="font-weight:800; font-size:13.5px; color:#00131E; line-height:1.2;">
+                          {{ $sol['nombre'] ?? 'Egresado' }}
+                        </div>
+                        <div style="font-size:11.5px; color:#64748b; font-family:monospace;">
+                          CC/TI: {{ $sol['documento'] ?? 'N/D' }}
+                        </div>
+                      </div>
+                    </div>
+                    <span style="background:#fef3c7; color:#92400e; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; border:1px solid #fde68a;">
+                      En Revisión
+                    </span>
+                  </div>
+
+                  <div style="font-size:11.5px; color:#475569; display:flex; flex-direction:column; gap:4px; margin-top:8px; padding-top:8px; border-top:1px dashed #e2e8f0;">
+                    <div><strong style="color:#00131E;">Programa:</strong> {{ $sol['programa'] ?? 'CEFA La Angostura' }}</div>
+                    <div><strong style="color:#00131E;">Correo:</strong> {{ $sol['email'] ?? 'N/D' }}</div>
+                    @if(!empty($sol['telefono']))
+                      <div><strong style="color:#00131E;">Teléfono:</strong> {{ $sol['telefono'] }}</div>
+                    @endif
+                    <div style="font-size:10.5px; color:#94a3b8; margin-top:2px;">
+                      <i class="fa-regular fa-clock"></i> Solicitado: {{ $sol['fecha'] ?? 'Recientemente' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:8px; margin-top:4px; padding-top:10px; border-top:1px solid #e2e8f0;">
+                  <button type="button" onclick="aprobarSolicitudInstructor('{{ $sol['id'] }}', this)" style="flex:1; background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; border:none; padding:8px 12px; border-radius:9px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 8px rgba(22,163,74,0.25); transition:all 0.15s ease;">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Aprobar Registro</span>
+                  </button>
+                  <button type="button" onclick="rechazarSolicitudInstructor('{{ $sol['id'] }}', this)" title="Rechazar solicitud" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; padding:8px 12px; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        </div>
+      @endif
+
       <!-- Stats Grid (5 Cards sincronizadas con los módulos del ERP) -->
       <div class="stats-grid">
         
@@ -1938,6 +2015,71 @@
     })
     .catch(err => {
       form.submit();
+    });
+  }
+
+  function aprobarSolicitudInstructor(solId, btn) {
+    if (!solId) return;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aprobando...';
+
+    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const card = document.getElementById('sol-card-inst-' + solId);
+        if (card) {
+          card.innerHTML = `
+            <div style="padding:18px; text-align:center; background:#dcfce7; color:#15803d; border-radius:12px; font-weight:700; font-size:12.5px;">
+              <i class="fa-solid fa-circle-check" style="font-size:24px; display:block; margin-bottom:6px;"></i>
+              ¡Registro Aprobado! El egresado ya puede ingresar al portal SIGE.
+            </div>
+          `;
+          setTimeout(() => {
+            window.location.reload();
+          }, 1200);
+        } else {
+          window.location.reload();
+        }
+      } else {
+        alert(data.message || 'Error al aprobar solicitud');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/aprobar';
+    });
+  }
+
+  function rechazarSolicitudInstructor(solId, btn) {
+    if (!solId) return;
+    if (!confirm('¿Deseas rechazar esta solicitud de registro?')) return;
+    btn.disabled = true;
+
+    fetch('{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      window.location.reload();
+    })
+    .catch(err => {
+      window.location.href = '{{ url("egresados/solicitudes") }}/' + encodeURIComponent(solId) + '/rechazar';
     });
   }
 

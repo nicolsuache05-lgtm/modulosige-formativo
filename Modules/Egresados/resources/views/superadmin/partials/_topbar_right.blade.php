@@ -1023,7 +1023,7 @@
   // ================= DICCIONARIO DE DETALLES DE NOTIFICACIONES =================
   const sigeNotificacionesData = @json(collect($notificaciones)->keyBy('id'));
 
-  //  Abrir Modal de Detalle de Notificación
+  // Procesar clic en notificación
   function abrirDetalleNotificacion(notifKey, element) {
     if (element) {
       element.classList.remove('unread');
@@ -1039,79 +1039,18 @@
     const notif = sigeNotificacionesData[notifKey];
     if (!notif) return;
 
-    const modalHeaderIcon = document.getElementById('modalNotifHeaderIcon');
-    if (modalHeaderIcon) {
-      modalHeaderIcon.innerHTML = `<i class="${notif.icon}"></i>`;
-      modalHeaderIcon.style.background = notif.iconBg;
-      modalHeaderIcon.style.color = notif.iconColor;
-      modalHeaderIcon.style.borderColor = notif.iconColor + '40';
-    }
-
-    const badgeElem = document.getElementById('modalNotifBadge');
-    if (badgeElem) {
-      badgeElem.textContent = notif.categoria;
-    }
-
-    const tituloElem = document.getElementById('modalNotifTitulo');
-    if (tituloElem) {
-      tituloElem.textContent = notif.titulo;
-    }
-
-    const tiempoElem = document.getElementById('modalNotifTiempo');
-    if (tiempoElem) {
-      tiempoElem.innerHTML = `<i class="fa-regular fa-clock"></i> <span>${notif.tiempo}</span>`;
-    }
-
-    const resumenElem = document.getElementById('modalNotifResumen');
-    if (resumenElem) {
-      resumenElem.textContent = notif.resumen;
-    }
-
-    const gridElem = document.getElementById('modalNotifGridCampos');
-    if (gridElem) {
-      gridElem.innerHTML = '';
-      if (notif.campos && notif.campos.length > 0) {
-        notif.campos.forEach(c => {
-          const card = document.createElement('div');
-          card.className = 'sige-notif-field-card';
-          card.innerHTML = `
-            <div class="sige-notif-field-label">${c.etiqueta}</div>
-            <div class="sige-notif-field-value">${c.valor}</div>
-          `;
-          gridElem.appendChild(card);
-        });
+    if (notif.accionUrl) {
+      if (notif.accionUrl.startsWith('#') || notif.accionUrl.includes('#solicitudes-pendientes')) {
+        const target = document.getElementById('solicitudes-pendientes');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.style.transition = 'all 0.3s ease';
+          target.style.transform = 'scale(1.015)';
+          setTimeout(() => { target.style.transform = ''; }, 600);
+          return;
+        }
       }
-    }
-
-    const btnAccion = document.getElementById('modalNotifBtnAccion');
-    const btnIcon = document.getElementById('modalNotifBtnIcon');
-    const btnTexto = document.getElementById('modalNotifBtnTexto');
-    if (btnAccion && notif.accionUrl) {
-      btnAccion.href = notif.accionUrl;
-      btnAccion.style.display = 'inline-flex';
-      if (btnTexto) btnTexto.textContent = notif.accionTexto || 'Ver en el Módulo';
-      if (btnIcon && notif.accionIcon) {
-        btnIcon.className = notif.accionIcon;
-      }
-    } else if (btnAccion) {
-      btnAccion.style.display = 'none';
-    }
-
-    const modal = document.getElementById('modalDetalleNotificacion');
-    if (modal) {
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-  }
-
-  function cerrarDetalleNotificacion(event) {
-    if (event && event.target && event.target.id !== 'modalDetalleNotificacion' && !event.target.closest('.sige-notif-close-btn') && !event.target.closest('.sige-notif-btn-secondary')) {
-      return;
-    }
-    const modal = document.getElementById('modalDetalleNotificacion');
-    if (modal) {
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
+      window.location.href = notif.accionUrl;
     }
   }
 
@@ -1135,11 +1074,6 @@
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      const modal = document.getElementById('modalDetalleNotificacion');
-      if (modal && modal.style.display === 'flex') {
-        cerrarDetalleNotificacion();
-        return;
-      }
       const userMenu = document.getElementById('userDropdownMenu');
       const notifMenu = document.getElementById('notifDropdownMenu');
       const chevron = document.getElementById('userChevronIcon');
@@ -1148,6 +1082,7 @@
       if (chevron) chevron.classList.remove('rotate');
     }
   });
+
   // ================= TRANSICIÓN FLUIDA ENTRE MÓDULOS =================
   document.addEventListener('DOMContentLoaded', function() {
     // 0. Sincronizar contador inicial de notificaciones

@@ -133,10 +133,6 @@
                     <i class="fa-solid fa-pen-to-square text-xs text-gray-500"></i>
                     <span>Editar Evento</span>
                 </button>
-                <a id="modalDetalleBtnExport" href="#" class="px-4 py-2 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-file-excel text-xs"></i>
-                    <span>Exportar Asistentes</span>
-                </a>
             </div>
         </div>
 
