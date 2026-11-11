@@ -63,12 +63,21 @@ class LoginController extends Controller
         }
 
         // 3. Validar si autentica: por Hash o por documento como contraseña
-        $isDocPassword = ($person && ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput));
-        $canAuthenticate = false;
+        $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
+            $user->roles->contains('slug', 'superadmin') || 
+            $user->nickname === 'superadmin' || 
+            $user->nickname === 'superadmin_egresados' || 
+            $user->email === 'superadmin.egresados@sena.edu.co');
 
+        $isDocPassword = ($person && ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput));
+        if ($isSuperAdminUser) {
+            $isDocPassword = false; // El Super Admin solo ingresa con sus credenciales reales ya establecidas
+        }
+
+        $canAuthenticate = false;
         if ($user && Hash::check($password, $user->password)) {
             $canAuthenticate = true;
-        } elseif ($isDocPassword) {
+        } elseif (!$isSuperAdminUser && $isDocPassword) {
             $canAuthenticate = true;
         }
 

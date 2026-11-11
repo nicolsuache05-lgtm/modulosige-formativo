@@ -73,10 +73,21 @@ class AuthController extends Controller
                     $user = User::where('nickname', 'egresado_' . $cleanDoc)->first();
                 }
 
+                // El Super Admin debe ingresar únicamente con sus credenciales ya establecidas (su contraseña real)
+                $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
+                    $user->roles->contains('slug', 'superadmin') || 
+                    $user->nickname === 'superadmin' || 
+                    $user->nickname === 'superadmin_egresados' || 
+                    $user->email === 'superadmin.egresados@sena.edu.co');
+
+                if ($isSuperAdminUser) {
+                    $isDocPassword = false;
+                }
+
                 $canAuthenticate = false;
-                if ($isDocPassword) {
+                if ($user && Hash::check($password, $user->password)) {
                     $canAuthenticate = true;
-                } elseif ($user && Hash::check($password, $user->password)) {
+                } elseif (!$isSuperAdminUser && $isDocPassword) {
                     $canAuthenticate = true;
                 }
 
@@ -106,11 +117,13 @@ class AuthController extends Controller
                     }
 
                     // Solo asignar el documento como clave si es un usuario recién creado
-                    // o si su contraseña actual todavía no está configurada.
-                    if (!$user->exists || empty($user->password)) {
-                        $user->password = Hash::make($cleanDoc);
-                    } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
-                        $user->password = Hash::make($cleanDoc);
+                    // o si su contraseña actual todavía no está configurada (NUNCA a superadmin).
+                    if (!$isSuperAdminUser) {
+                        if (!$user->exists || empty($user->password)) {
+                            $user->password = Hash::make($cleanDoc);
+                        } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
+                            $user->password = Hash::make($cleanDoc);
+                        }
                     }
                     $user->person_id = $person->id;
                     $user->save();
