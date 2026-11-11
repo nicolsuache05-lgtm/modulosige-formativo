@@ -783,4 +783,13 @@ class InstructorController extends Controller
         $eventosCtrl = app(\Modules\Egresados\Http\Controllers\EventosController::class);
         return $eventosCtrl->exportarExcel($request, $id);
     }
+
+    /**
+     * Exportar directorio institucional de egresados en formato Excel (.xlsx).
+     */
+    public function exportarDirectorio(Request $request)
+    {
+        $egresadosCtrl = app(\Modules\Egresados\Http\Controllers\EgresadosController::class);
+        return $egresadosCtrl->exportarExcel($request);
+    }
 }

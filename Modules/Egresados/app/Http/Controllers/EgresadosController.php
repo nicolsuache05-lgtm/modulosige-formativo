@@ -2122,6 +2122,407 @@ class EgresadosController extends Controller
     }
 
     /**
+     * Exporta el directorio oficial de egresados en formato Excel genuino (.xlsx / OpenXML)
+     * Con diseño institucional oficial SENA, métricas de aforo/estado, estilos cebra y bordes definidos.
+     */
+    public function exportarExcel(Request $request)
+    {
+        $query = Apprentice::withTrashed()
+            ->with(['person.users.roles', 'course.program'])
+            ->where(function($q) {
+                $q->whereHas('person.users.roles', function($rq) {
+                    $rq->where('slug', 'egresados.egresado');
+                })->orWhere('apprentice_status', 'CERTIFICADO');
+            });
+
+        // Búsqueda por nombre, apellido o número de documento
+        if ($request->filled('search')) {
+            $search = trim(strip_tags($request->input('search')));
+            $query->whereHas('person', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('first_last_name', 'like', "%{$search}%")
+                  ->orWhere('second_last_name', 'like', "%{$search}%")
+                  ->orWhere('document_number', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro por estado solo si se selecciona uno específico distinto de TODOS
+        $filtroEstado = 'Todos los Egresados (Módulo)';
+        if ($request->filled('apprentice_status') && $request->input('apprentice_status') !== 'TODOS') {
+            $stFilter = $request->input('apprentice_status');
+            $filtroEstado = $stFilter;
+            if ($stFilter === 'ACTIVOS') {
+                $query->whereNull('deleted_at')->whereNotIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO']);
+            } elseif ($stFilter === 'INACTIVOS') {
+                $query->where(function($sub) {
+                    $sub->whereNotNull('deleted_at')->orWhereIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO']);
+                });
+            } else {
+                $query->where('apprentice_status', $stFilter);
+            }
+        }
+
+        $egresados = $query->orderBy('id', 'desc')->get();
+
+        $rows = [];
+        $consecutivo = 1;
+        $totalActivos = 0;
+        $totalInactivos = 0;
+        $totalCertificados = 0;
+
+        foreach ($egresados as $item) {
+            $person = $item->person;
+            $course = $item->course;
+            $program = $course ? $course->program : null;
+
+            $docType = $person ? ($person->document_type ?? 'CC') : 'CC';
+            $docNumber = $person ? ($person->document_number ?? 'N/A') : 'N/A';
+
+            $nombresRaw = $person ? trim(($person->first_name ?? '') . ' ' . ($person->first_last_name ?? '') . ' ' . ($person->second_last_name ?? '')) : ('Aprendiz #' . $item->id);
+            $nombres = mb_convert_case(mb_strtolower($nombresRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+
+            $misena = $person && !empty($person->misena_email) ? $person->misena_email : 'No registra';
+            $personal = $person && !empty($person->personal_email) ? $person->personal_email : 'No registra';
+            $telefono = $person && !empty($person->telephone1) ? $person->telephone1 : ($person && !empty($person->telephone2) ? $person->telephone2 : 'No registra');
+
+            $progNameRaw = $program ? $program->name : 'No asignado';
+            $progName = mb_convert_case(mb_strtolower($progNameRaw, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+            $ficha = $course ? ($course->code ?? 'No asignada') : 'No asignada';
+            $nivelFormacion = $program ? ($program->program_type ?? 'Tecnólogo') : 'Tecnólogo';
+            $centro = 'Centro Agroindustrial La Angostura — CEFA';
+
+            $statusAcad = strtoupper(trim($item->apprentice_status ?? 'CERTIFICADO'));
+            if ($statusAcad === 'CERTIFICADO') {
+                $totalCertificados++;
+            }
+
+            $isActivo = (!$item->trashed() && !in_array($statusAcad, ['CANCELADO', 'RETIRO VOLUNTARIO']));
+            if ($isActivo) {
+                $totalActivos++;
+                $statusSige = 'ACTIVO';
+            } else {
+                $totalInactivos++;
+                $statusSige = 'INACTIVO';
+            }
+
+            $fechaReg = $item->created_at ? $item->created_at->format('d/m/Y H:i') : date('d/m/Y');
+
+            $rows[] = [
+                $consecutivo++,
+                $docType,
+                $docNumber,
+                $nombres,
+                $misena,
+                $personal,
+                $telefono,
+                $progName,
+                $ficha,
+                $nivelFormacion,
+                $centro,
+                $statusAcad,
+                $statusSige,
+                $fechaReg
+            ];
+        }
+
+        $metrics = [
+            'total'        => count($rows),
+            'activos'      => $totalActivos,
+            'inactivos'    => $totalInactivos,
+            'certificados' => $totalCertificados,
+            'filtro'       => $filtroEstado,
+            'busqueda'     => $request->input('search', 'Ninguna') ?: 'Ninguna',
+        ];
+
+        $xlsxContent = $this->generarExcelEgresadosOpenXml($metrics, $rows);
+
+        $fileName = 'Directorio_General_Egresados_CEFA_' . date('Ymd_His') . '.xlsx';
+
+        return response($xlsxContent, 200, [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Content-Length'      => strlen($xlsxContent),
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ]);
+    }
+
+    /**
+     * Construye la estructura binaria .xlsx (Office OpenXML) con diseño institucional SENA CEFA.
+     */
+    private function generarExcelEgresadosOpenXml(array $metrics, array $rows): string
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'egresados_xlsx_');
+        $zip = new \ZipArchive();
+        if ($zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            throw new \Exception("No se pudo inicializar el archivo Excel para el directorio de egresados.");
+        }
+
+        $xmlEscape = function($str) {
+            return htmlspecialchars((string)$str, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        };
+
+        // 1. [Content_Types].xml
+        $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>';
+
+        // 2. _rels/.rels
+        $rootRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>';
+
+        // 3. xl/_rels/workbook.xml.rels
+        $wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>';
+
+        // 4. xl/workbook.xml
+        $wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Directorio de Egresados" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>';
+
+        // 5. xl/styles.xml (Estricto OpenXML ECMA-376)
+        $styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="15">
+    <font><name val="Calibri"/><sz val="11"/><color rgb="FF1E293B"/></font>
+    <font><b/><name val="Calibri"/><sz val="13"/><color rgb="FFFFFFFF"/></font>
+    <font><b/><name val="Calibri"/><sz val="10.5"/><color rgb="FF62E31D"/></font>
+    <font><b/><name val="Calibri"/><sz val="10"/><color rgb="FF001A29"/></font>
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FFFFFFFF"/></font>
+    <font><b/><name val="Calibri"/><sz val="11"/><color rgb="FF001A29"/></font>
+    <font><b/><name val="Calibri"/><sz val="12"/><color rgb="FF166534"/></font>
+    <font><b/><name val="Calibri"/><sz val="10.5"/><color rgb="FFFFFFFF"/></font>
+    <font><name val="Calibri"/><sz val="10"/><color rgb="FF1E293B"/></font>
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF166534"/></font>
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF9A3412"/></font>
+    <font><i/><name val="Calibri"/><sz val="9"/><color rgb="FF64748B"/></font>
+    <font><b/><name val="Calibri"/><sz val="11"/><color rgb="FFFFFFFF"/></font>
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FF047857"/></font>
+    <font><b/><name val="Calibri"/><sz val="9.5"/><color rgb="FFB91C1C"/></font>
+  </fonts>
+  <fills count="13">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF001A29"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF39A900"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFF1F5F9"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF002336"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFDCFCE7"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFEAF7EE"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFEDD5"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF00324D"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF2A7C00"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFEE2E2"/></patternFill></fill>
+  </fills>
+  <borders count="3">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FFE2E8F0"/></left>
+      <right style="thin"><color rgb="FFE2E8F0"/></right>
+      <top style="thin"><color rgb="FFE2E8F0"/></top>
+      <bottom style="thin"><color rgb="FFE2E8F0"/></bottom>
+    </border>
+    <border>
+      <left style="thin"><color rgb="FF2D8500"/></left>
+      <right style="thin"><color rgb="FF2D8500"/></right>
+      <top style="thin"><color rgb="FF2D8500"/></top>
+      <bottom style="medium"><color rgb="FF001A29"/></bottom>
+    </border>
+  </borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="16">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="4" fillId="5" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="5" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="6" fillId="8" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="7" fillId="3" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="8" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="8" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="8" fillId="6" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="8" fillId="6" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="9" fillId="7" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="14" fillId="12" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="11" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="12" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  </cellXfs>
+</styleSheet>';
+
+        // Column widths para 14 columnas (A - N)
+        $cols = '<cols>
+          <col min="1" max="1" width="6" customWidth="1"/>
+          <col min="2" max="2" width="16" customWidth="1"/>
+          <col min="3" max="3" width="18" customWidth="1"/>
+          <col min="4" max="4" width="36" customWidth="1"/>
+          <col min="5" max="5" width="32" customWidth="1"/>
+          <col min="6" max="6" width="30" customWidth="1"/>
+          <col min="7" max="7" width="18" customWidth="1"/>
+          <col min="8" max="8" width="40" customWidth="1"/>
+          <col min="9" max="9" width="16" customWidth="1"/>
+          <col min="10" max="10" width="18" customWidth="1"/>
+          <col min="11" max="11" width="36" customWidth="1"/>
+          <col min="12" max="12" width="20" customWidth="1"/>
+          <col min="13" max="13" width="18" customWidth="1"/>
+          <col min="14" max="14" width="20" customWidth="1"/>
+        </cols>';
+
+        $totalCount = $metrics['total'] ?? count($rows);
+        $activosCount = $metrics['activos'] ?? 0;
+        $inactivosCount = $metrics['inactivos'] ?? 0;
+        $certificadosCount = $metrics['certificados'] ?? 0;
+        $filtroStr = $metrics['filtro'] ?? 'Todos';
+        $busquedaStr = $metrics['busqueda'] ?? 'Ninguna';
+
+        // Sheet Data
+        $sData = '<sheetData>';
+
+        // Fila 1: Banner Principal
+        $sData .= '<row r="1" ht="30" customHeight="1"><c r="A1" s="1" t="inlineStr"><is><t>' . $xmlEscape('SERVICIO NACIONAL DE APRENDIZAJE (SENA) · CENTRO DE FORMACIÓN AGROINDUSTRIAL LA ANGOSTURA — CEFA') . '</t></is></c></row>';
+
+        // Fila 2: Subtítulo Oficial
+        $sData .= '<row r="2" ht="20" customHeight="1"><c r="A2" s="2" t="inlineStr"><is><t>' . $xmlEscape('SISTEMA INSTITUCIONAL DE GESTIÓN Y SEGUIMIENTO A EGRESADOS (SIGE ERP) · DIRECTORIO GENERAL DE EGRESADOS') . '</t></is></c></row>';
+
+        // Fila 3: Metadatos de Emisión y Filtros
+        $metaLine = "Ámbito: Regional Huila — CEFA | Fecha Emisión: " . date('d/m/Y H:i') . " | Filtro Estado: " . $filtroStr . " | Búsqueda: " . $busquedaStr . " | Responsable: Administración SIGE";
+        $sData .= '<row r="3" ht="22" customHeight="1"><c r="A3" s="3" t="inlineStr"><is><t>' . $xmlEscape($metaLine) . '</t></is></c></row>';
+
+        // Fila 4: Bloque de Métricas Ejecutivas (KPI Cards)
+        $sData .= '<row r="4" ht="24" customHeight="1">';
+        $sData .= '<c r="B4" s="4" t="inlineStr"><is><t>TOTAL REGISTRADOS</t></is></c>';
+        $sData .= '<c r="C4" s="4" t="inlineStr"><is><t></t></is></c>';
+        $sData .= '<c r="D4" s="5" t="inlineStr"><is><t>' . $xmlEscape($totalCount) . '</t></is></c>';
+
+        $sData .= '<c r="F4" s="4" t="inlineStr"><is><t>ACTIVOS EN SIGE</t></is></c>';
+        $sData .= '<c r="G4" s="4" t="inlineStr"><is><t></t></is></c>';
+        $sData .= '<c r="H4" s="6" t="inlineStr"><is><t>' . $xmlEscape($activosCount) . '</t></is></c>';
+
+        $sData .= '<c r="J4" s="4" t="inlineStr"><is><t>INACTIVOS EN SIGE</t></is></c>';
+        $sData .= '<c r="K4" s="4" t="inlineStr"><is><t></t></is></c>';
+        $sData .= '<c r="L4" s="5" t="inlineStr"><is><t>' . $xmlEscape($inactivosCount) . '</t></is></c>';
+
+        $sData .= '<c r="M4" s="4" t="inlineStr"><is><t>CERTIFICADOS</t></is></c>';
+        $sData .= '<c r="N4" s="6" t="inlineStr"><is><t>' . $xmlEscape($certificadosCount) . '</t></is></c>';
+        $sData .= '</row>';
+
+        // Fila 5: Separador visual
+        $sData .= '<row r="5" ht="12" customHeight="1"></row>';
+
+        // Fila 6: Título de Sección
+        $sData .= '<row r="6" ht="24" customHeight="1"><c r="A6" s="15" t="inlineStr"><is><t>' . $xmlEscape('REGISTRO NOMINAL Y SEGUIMIENTO A EGRESADOS INSTITUCIONALES') . '</t></is></c></row>';
+
+        // Fila 7: Encabezados de Columna
+        $headers = [
+            'N°',
+            'Tipo Documento',
+            'Documento',
+            'Nombres y Apellidos',
+            'Correo Institucional (Misena)',
+            'Correo Personal',
+            'Teléfono de Contacto',
+            'Programa de Formación',
+            'Código Ficha',
+            'Nivel de Formación',
+            'Centro de Formación',
+            'Estado Académico',
+            'Estado en SIGE',
+            'Fecha de Registro'
+        ];
+        $colsLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+
+        $sData .= '<row r="7" ht="26" customHeight="1">';
+        foreach ($headers as $hIdx => $hName) {
+            $sData .= '<c r="' . $colsLetters[$hIdx] . '7" s="7" t="inlineStr"><is><t>' . $xmlEscape($hName) . '</t></is></c>';
+        }
+        $sData .= '</row>';
+
+        // Filas de Datos (8 en adelante)
+        $rowNum = 8;
+        foreach ($rows as $rIdx => $row) {
+            $isZebra = ($rIdx % 2 !== 0);
+            $sData .= '<row r="' . $rowNum . '" ht="21" customHeight="1">';
+            foreach ($row as $cIdx => $val) {
+                $colLetter = $colsLetters[$cIdx];
+
+                if ($cIdx === 11) {
+                    // Estado Académico
+                    $style = ($val === 'CERTIFICADO') ? 12 : ($isZebra ? 11 : 9);
+                } elseif ($cIdx === 12) {
+                    // Estado en SIGE
+                    $style = ($val === 'ACTIVO') ? 12 : 13;
+                } elseif (in_array($cIdx, [0, 1, 2, 6, 8, 9, 13])) {
+                    // Columnas centradas: N°, TipoDoc, Doc, Tel, Ficha, Nivel, Fecha
+                    $style = $isZebra ? 11 : 9;
+                } else {
+                    // Columnas alineadas a izquierda: Nombres, Correos, Programa, Centro
+                    $style = $isZebra ? 10 : 8;
+                }
+
+                $sData .= '<c r="' . $colLetter . $rowNum . '" s="' . $style . '" t="inlineStr"><is><t>' . $xmlEscape($val) . '</t></is></c>';
+            }
+            $sData .= '</row>';
+            $rowNum++;
+        }
+
+        // Fila de Pie Institucional
+        $sData .= '<row r="' . $rowNum . '" ht="22" customHeight="1"><c r="A' . $rowNum . '" s="14" t="inlineStr"><is><t>' . $xmlEscape('Directorio Oficial expedido por el Sistema Institucional SIGE · SENA Empresa CEFA · Total Registros: ' . count($rows) . ' · Emisión: ' . date('d/m/Y H:i')) . '</t></is></c></row>';
+
+        $sData .= '</sheetData>';
+
+        $merges = '<mergeCells count="8">
+          <mergeCell ref="A1:N1"/>
+          <mergeCell ref="A2:N2"/>
+          <mergeCell ref="A3:N3"/>
+          <mergeCell ref="B4:C4"/>
+          <mergeCell ref="F4:G4"/>
+          <mergeCell ref="J4:K4"/>
+          <mergeCell ref="A6:N6"/>
+          <mergeCell ref="A' . $rowNum . ':N' . $rowNum . '"/>
+        </mergeCells>';
+
+        $sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0">
+      <pane ySplit="7" topLeftCell="A8" activePane="bottomLeft" state="frozen"/>
+    </sheetView>
+  </sheetViews>
+  ' . $cols . '
+  ' . $sData . '
+  ' . $merges . '
+</worksheet>';
+
+        $zip->addFromString('[Content_Types].xml', $contentTypes);
+        $zip->addFromString('_rels/.rels', $rootRels);
+        $zip->addFromString('xl/_rels/workbook.xml.rels', $wbRels);
+        $zip->addFromString('xl/workbook.xml', $wb);
+        $zip->addFromString('xl/styles.xml', $styles);
+        $zip->addFromString('xl/worksheets/sheet1.xml', $sheet);
+        $zip->close();
+
+        $content = file_get_contents($tempFile);
+        @unlink($tempFile);
+
+        return $content;
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

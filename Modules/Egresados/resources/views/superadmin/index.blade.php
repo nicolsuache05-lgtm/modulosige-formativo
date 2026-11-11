@@ -513,6 +513,33 @@
         background: var(--green);
       }
 
+      .btn-export-excel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 16px;
+        background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+        color: #ffffff !important;
+        text-decoration: none;
+        border: none;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(57, 169, 0, 0.25);
+        white-space: nowrap;
+      }
+      .btn-export-excel:hover {
+        background: linear-gradient(135deg, #2e8b00 0%, #246f00 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(57, 169, 0, 0.35);
+        color: #ffffff !important;
+      }
+      .btn-export-excel i {
+        font-size: 13.5px;
+      }
+
       /* Table rows */
       .egresados-table {
         width: 100%;
@@ -996,6 +1023,11 @@
             <button type="submit" class="btn-filter">
               Filtrar
             </button>
+
+            <a href="{{ route('egresados.superadmin.exportar', request()->query()) }}" class="btn-export-excel" title="Exportar listado a Excel">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Exportar Excel</span>
+            </a>
 
             @if(request('search') || (request('apprentice_status') && request('apprentice_status') !== 'TODOS'))
               <a href="{{ route('egresados.index') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar">

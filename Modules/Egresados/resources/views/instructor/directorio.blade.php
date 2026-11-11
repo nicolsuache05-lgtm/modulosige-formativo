@@ -976,9 +976,15 @@
                 </h3>
                 <p class="text-[11px] text-gray-400 mt-0.5">Haz clic en una fila para ver su desglose o gestionarla</p>
               </div>
-              <span id="filteredCounter" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
-                Mostrando {{ count($egresados) }} egresados
-              </span>
+              <div class="flex items-center gap-2.5">
+                <a href="{{ route('egresados.instructor.directorio.exportar', request()->query()) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition shadow-xs">
+                  <i class="fa-solid fa-file-excel"></i>
+                  <span>Exportar Excel</span>
+                </a>
+                <span id="filteredCounter" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+                  Mostrando {{ count($egresados) }} egresados
+                </span>
+              </div>
             </div>
 
             <!-- Tabla -->

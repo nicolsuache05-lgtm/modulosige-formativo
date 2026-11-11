@@ -90,6 +90,7 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
     // Directorio y gestión de egresados
     Route::get('egresados/directorio', [EgresadosController::class, 'index'])->name('egresados.index');
     Route::get('egresados/superadmin/directorio', [EgresadosController::class, 'index'])->name('egresados.superadmin.directorio');
+    Route::get('egresados/superadmin/exportar', [EgresadosController::class, 'exportarExcel'])->name('egresados.superadmin.exportar');
     Route::get('egresados/superadmin/create', [EgresadosController::class, 'create'])->name('egresados.superadmin.create');
     Route::post('egresados/superadmin/store', [EgresadosController::class, 'store'])->name('egresados.superadmin.store');
     Route::post('egresados/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.superadmin.seguimiento.store');
@@ -162,6 +163,7 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
     Route::get('egresados/instructor', [InstructorController::class, 'dashboard'])->name('egresados.instructor');
     Route::get('egresados/instructor/dashboard', [InstructorController::class, 'dashboard'])->name('egresados.instructor.dashboard');
     Route::get('egresados/instructor/directorio', [InstructorController::class, 'directorio'])->name('egresados.instructor.directorio');
+    Route::get('egresados/instructor/directorio/exportar', [InstructorController::class, 'exportarDirectorio'])->name('egresados.instructor.directorio.exportar');
     Route::post('egresados/instructor/store', [EgresadosController::class, 'store'])->name('egresados.instructor.store');
     Route::post('egresados/instructor/seguimiento/store', [EgresadosController::class, 'storeSeguimiento'])->name('egresados.instructor.seguimiento.store');
     Route::match(['put', 'post'], 'egresados/instructor/{id}/update', [EgresadosController::class, 'update'])->name('egresados.instructor.update')->whereNumber('id');
