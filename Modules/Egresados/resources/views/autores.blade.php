@@ -123,24 +123,6 @@
     <!-- ================= CONTENIDO: TARJETAS DE AUTORES ================= -->
     <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-14">
 
-        <!-- Mensaje Institucional de Créditos -->
-        <div class="bg-gradient-to-r from-[#F0FDF4] via-[#EAF7EE] to-[#DCFCE7] border border-[#BBF7D0] border-l-4 border-l-[#39A900] rounded-2xl p-4 sm:p-5 mb-10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-[#39A900] text-white flex items-center justify-center text-lg shrink-0 shadow-sm">
-                    <i class="fa-solid fa-laptop-code"></i>
-                </div>
-                <div>
-                    <h4 class="font-poppins font-bold text-sm text-[#00131E]">Equipo de Desarrollo y Autoría Institucional</h4>
-                    <p class="text-xs text-[#166534] font-medium leading-relaxed">
-                        Créditos oficiales y perfil profesional de los autores del Sistema de Gestión de Egresados (SIGE). Formación profesional integral SENA.
-                    </p>
-                </div>
-            </div>
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#166534] bg-white/80 px-3 py-1.5 rounded-full border border-[#BBF7D0] shrink-0">
-                <i class="fa-solid fa-shield-halved text-[#39A900] mr-1"></i> Créditos Oficiales
-            </span>
-        </div>
-
         <!-- Grid de Autores (3 Tarjetas) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             
