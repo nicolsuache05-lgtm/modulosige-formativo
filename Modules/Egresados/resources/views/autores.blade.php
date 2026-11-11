@@ -261,35 +261,28 @@
                     </div>
 
                     <!-- Footer de la Tarjeta con Enlaces y Redes -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
-                        <!-- Redes / Contacto -->
-                        <div class="flex items-center gap-2">
-                            @if(!empty($email))
-                                <a href="mailto:{{ $email }}" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#39A900] hover:text-[#39A900] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="Enviar correo">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </a>
-                            @endif
-                            @if(!empty($telefono))
-                                @php $cleanPhone = preg_replace('/\D/', '', $telefono); @endphp
-                                <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#39A900] hover:text-[#39A900] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="WhatsApp">
-                                    <i class="fa-brands fa-whatsapp"></i>
-                                </a>
-                            @endif
-                            @if(!empty($linkedin))
-                                <a href="{{ $linkedin }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#0077b5] hover:text-[#0077b5] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="LinkedIn">
-                                    <i class="fa-brands fa-linkedin-in"></i>
-                                </a>
-                            @endif
-                            @if(!empty($github))
-                                <a href="{{ $github }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#00131E] hover:text-[#00131E] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="GitHub">
-                                    <i class="fa-brands fa-github"></i>
-                                </a>
-                            @endif
-                        </div>
-
-                        <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-code text-[#39A900]"></i> SIGE SENA
-                        </span>
+                    <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-2">
+                        @if(!empty($email))
+                            <a href="mailto:{{ $email }}" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#39A900] hover:text-[#39A900] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="Enviar correo">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
+                        @endif
+                        @if(!empty($telefono))
+                            @php $cleanPhone = preg_replace('/\D/', '', $telefono); @endphp
+                            <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#39A900] hover:text-[#39A900] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="WhatsApp">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                        @endif
+                        @if(!empty($linkedin))
+                            <a href="{{ $linkedin }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#0077b5] hover:text-[#0077b5] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="LinkedIn">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                            </a>
+                        @endif
+                        @if(!empty($github))
+                            <a href="{{ $github }}" target="_blank" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-[#00131E] hover:text-[#00131E] text-slate-600 flex items-center justify-center text-xs transition shadow-2xs" title="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        @endif
                     </div>
 
                 </div>
