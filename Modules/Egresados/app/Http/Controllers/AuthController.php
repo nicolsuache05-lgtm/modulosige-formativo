@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Modules\SICA\Entities\Apprentice;
+use Modules\SICA\Entities\Person;
+use Modules\SICA\Entities\Role;
 
 class AuthController extends Controller
 {
@@ -16,7 +20,9 @@ class AuthController extends Controller
     public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
-            return $this->redirectByRole(Auth::user());
+            /** @var User $user */
+            $user = Auth::user();
+            return $this->redirectByRole($user);
         }
         $redirect = $request->query('redirect', route('egresados.home'));
         return redirect()->route('login', ['redirect' => $redirect]);
@@ -46,12 +52,12 @@ class AuthController extends Controller
         // =========================================================================
         $cleanDoc = preg_replace('/\D/', '', $loginInput);
         if (!empty($cleanDoc) && strlen($cleanDoc) >= 5) {
-            $person = \Modules\SICA\Entities\Person::where('document_number', $cleanDoc)
+            $person = Person::where('document_number', $cleanDoc)
                 ->orWhere('document_number', (int)$cleanDoc)
                 ->first();
 
-            if (!$person && class_exists('\Modules\SICA\Entities\Apprentice')) {
-                $apprentice = \Modules\SICA\Entities\Apprentice::whereHas('person', function($q) use ($cleanDoc) {
+            if (!$person && class_exists(Apprentice::class)) {
+                $apprentice = Apprentice::whereHas('person', function($q) use ($cleanDoc) {
                     $q->where('document_number', $cleanDoc)->orWhere('document_number', (int)$cleanDoc);
                 })->with('person')->first();
                 if ($apprentice && $apprentice->person) {
@@ -62,6 +68,7 @@ class AuthController extends Controller
             if ($person) {
                 $isDocPassword = ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput);
 
+                /** @var User|null $user */
                 $user = User::where('person_id', $person->id)->first();
                 if (!$user && !empty($person->misena_email)) {
                     $user = User::where('email', $person->misena_email)->first();
@@ -82,7 +89,7 @@ class AuthController extends Controller
 
                 if ($canAuthenticate) {
                     // Validar si el egresado tiene una solicitud pendiente de aprobación institucional
-                    if (\Modules\Egresados\Http\Controllers\EgresadosController::isSolicitudPendiente($user ? $user->id : 0, $cleanDoc)) {
+                    if (EgresadosController::isSolicitudPendiente($user ? $user->id : 0, $cleanDoc)) {
                         return redirect()->back()
                             ->withInput($request->only('email'))
                             ->withErrors([
@@ -105,8 +112,7 @@ class AuthController extends Controller
                         $user->email = $uniqueEmail;
                     }
 
-                    // Solo asignar el documento como clave si es un usuario recién creado
-                    // o si su contraseña actual todavía no está configurada.
+                    /** @var User $user */
                     if (!$user->exists || empty($user->password)) {
                         $user->password = Hash::make($cleanDoc);
                     } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
@@ -131,11 +137,11 @@ class AuthController extends Controller
                     }
 
                     try {
-                        $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                        $roleEgresado = Role::where('slug', 'egresados.egresado')->first();
                         if (!$roleEgresado) {
-                            $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                            $appEgresados = DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
                             $appId = $appEgresados ? $appEgresados->id : 30;
-                            $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
+                            $roleEgresado = Role::firstOrCreate(
                                 ['slug' => 'egresados.egresado'],
                                 [
                                     'name' => 'Egresado',
@@ -165,10 +171,11 @@ class AuthController extends Controller
         // B. AUTENTICACIÓN INSTITUCIONAL POR USUARIO O CORREO
         // =========================================================================
         $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'nickname';
+        /** @var User|null $user */
         $user = User::where($field, $loginInput)->first();
 
         // Validar si el usuario egresado tiene una solicitud pendiente de aprobación institucional
-        if ($user && \Modules\Egresados\Http\Controllers\EgresadosController::isSolicitudPendiente($user->id, $user->person ? (string)$user->person->document_number : '')) {
+        if ($user && EgresadosController::isSolicitudPendiente($user->id, $user->person ? (string)$user->person->document_number : '')) {
             return redirect()->back()
                 ->withInput($request->only('email'))
                 ->withErrors([
@@ -195,8 +202,8 @@ class AuthController extends Controller
         }
 
         if ($user && Hash::check($password, $user->password)) {
-            $isInstructorOrEgresado = ($user->roles->contains('slug', 'egresados.egresado') || 
-                                       $user->roles->contains('slug', 'egresados.instructor') ||
+            $isInstructorOrEgresado = ($user->hasRole('egresados.egresado') || 
+                                       $user->hasRole('egresados.instructor') ||
                                        $user->nickname === 'egresado_sige' ||
                                        $user->nickname === 'instructor_egresados');
 
@@ -238,8 +245,8 @@ class AuthController extends Controller
             $user->email === 'superadmin.egresados@sena.edu.co' || 
             $user->nickname === 'superadmin' || 
             $user->nickname === 'admin' || 
-            $user->roles->contains('slug', 'egresados.admin') || 
-            $user->roles->contains('slug', 'superadmin')) {
+            $user->hasRole('egresados.admin') || 
+            $user->hasRole('superadmin')) {
             return redirect()->route('egresados.dashboard')
                 ->with('success', '¡Bienvenido(a) al Panel de Control de Egresados, ' . $user->full_name . '!');
         }
@@ -247,17 +254,17 @@ class AuthController extends Controller
         // 2. Instructor / Seguimiento -> Dashboard de Instructor de Egresados
         if ($user->nickname === 'instructor_egresados' || 
             $user->email === 'instructor.egresados@sena.edu.co' || 
-            $user->roles->contains('slug', 'egresados.instructor') || 
-            $user->roles->contains('slug', 'sigac.instructor') || 
-            $user->roles->contains('slug', 'agrocefa.trainer')) {
+            $user->hasRole('egresados.instructor') || 
+            $user->hasRole('sigac.instructor') || 
+            $user->hasRole('agrocefa.trainer')) {
             return redirect()->route('egresados.dashboard_instructor')
                 ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . $user->full_name . '!');
         }
 
         // 3. Egresado -> Portal del Egresado
-        if ($user->roles->contains('slug', 'egresados.egresado') || 
-            $user->roles->contains('slug', 'senaempresa.apprentice') || 
-            $user->roles->contains('slug', 'sigac.apprentice') || 
+        if ($user->hasRole('egresados.egresado') || 
+            $user->hasRole('senaempresa.apprentice') || 
+            $user->hasRole('sigac.apprentice') || 
             $user->nickname === 'egresado_sige' || 
             $user->email === 'egresado.sige@sena.edu.co') {
             return redirect()->route('egresados.dashboard_egresado')
@@ -294,26 +301,27 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
+        /** @var User $user */
         $user = Auth::user();
         $person = $user->person;
         if (!$person && $user->person_id) {
-            $person = \Modules\SICA\Entities\Person::find($user->person_id);
+            $person = Person::find($user->person_id);
         }
         if (!$person) {
-            $cleanDocFromNick = preg_replace('/\D/', '', $user->nickname ?? '');
+            $cleanDocFromNick = preg_replace('/\D/', '', (string) $user->nickname);
             if (!empty($cleanDocFromNick) && strlen($cleanDocFromNick) >= 5) {
-                $person = \Modules\SICA\Entities\Person::where('document_number', $cleanDocFromNick)->first();
+                $person = Person::where('document_number', $cleanDocFromNick)->first();
             }
         }
-        if (!$person && class_exists('\Modules\SICA\Entities\Apprentice')) {
-            $appr = \Modules\SICA\Entities\Apprentice::with('person')->whereHas('person', function($q) use ($user) {
+        if (!$person && class_exists(Apprentice::class)) {
+            $appr = Apprentice::with('person')->whereHas('person', function($q) use ($user) {
                 $q->where('personal_email', $user->email)->orWhere('misena_email', $user->email);
             })->first();
             if ($appr && $appr->person) {
                 $person = $appr->person;
             }
         }
-        $cleanDoc = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
+        $cleanDoc = $person ? (string)$person->document_number : preg_replace('/\D/', '', (string) $user->nickname);
 
         $request->validate([
             'current_password' => 'required|string',
@@ -389,7 +397,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user->roles && ($user->roles->contains('slug', 'egresados.instructor') || $user->nickname === 'instructor_egresados')) {
+        if ($user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados') {
             return redirect()->route('egresados.dashboard_instructor')->with('success', $successMsg);
         }
         return redirect()->route('egresados.dashboard_egresado')->with('success', $successMsg);
