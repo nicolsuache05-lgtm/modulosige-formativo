@@ -10,6 +10,23 @@ use Illuminate\Notifications\Notifiable;
 use Modules\SICA\Entities\Person;
 use Modules\SICA\Entities\Role;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $nickname
+ * @property int|null $person_id
+ * @property string|null $email
+ * @property string $password
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Role>|null $roles
+ * @property-read Person|null $person
+ * @property-read string $full_name
+ * @property-read string $primary_role
+ * @property-read string $first_name
+ * @property-read string $short_name
+ * @method bool hasRole(string $roleSlug)
+ * @method bool hasAnyRole(array $roles)
+ * @method bool hasSuperAdmin()
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

@@ -2,9 +2,12 @@
 
 namespace Modules\Egresados\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Modules\SICA\Entities\Apprentice;
+use Modules\SICA\Entities\Person;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckEgresadosRole
@@ -12,8 +15,10 @@ class CheckEgresadosRole
     /**
      * Handle an incoming request and ensure role-based access control and confidentiality.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      * @param  string  $roleType (superadmin|instructor|egresado)
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next, string $roleType = 'superadmin'): Response
     {
@@ -25,9 +30,12 @@ class CheckEgresadosRole
                     'egresado'   => 'egresado_sige',
                     default      => 'superadmin_egresados',
                 };
-                $devUser = \App\Models\User::where('nickname', $targetNick)
+
+                /** @var User|null $devUser */
+                $devUser = User::where('nickname', $targetNick)
                     ->orWhere('email', $targetNick . '@sena.edu.co')
                     ->first();
+
                 if ($devUser) {
                     Auth::login($devUser);
                     return $next($request);
@@ -39,6 +47,7 @@ class CheckEgresadosRole
                 ->with('error', 'Debes iniciar sesión con tus credenciales institucionales para acceder a esta área confidencial.');
         }
 
+        /** @var User $user */
         $user = Auth::user();
 
         // 2. Si es Super Administrador del ERP, Administrador de Egresados o Coordinador
@@ -109,23 +118,32 @@ class CheckEgresadosRole
 
             case 'egresado':
                 // Permite a los egresados
-                if ($user->hasRole('egresados.egresado') || 
+                $isEgresadoRole = $user->hasRole('egresados.egresado') || 
                     $user->hasRole('senaempresa.apprentice') || 
                     $user->hasRole('sigac.apprentice') ||
                     $user->nickname === 'egresado_sige' ||
                     $user->email === 'egresado.sige@sena.edu.co' ||
-                    str_contains(strtolower($user->nickname ?? ''), 'egresad') ||
-                    str_contains(strtolower($user->email ?? ''), 'egresad') ||
-                    ($user->roles && (
-                        $user->roles->contains(fn($r) => str_contains(strtolower($r->slug ?? ''), 'egresad')) ||
-                        $user->roles->contains(fn($r) => str_contains(strtolower($r->slug ?? ''), 'apprentice'))
-                    )) ||
-                    ($user->person_id && (
-                        \Modules\SICA\Entities\Person::where('id', $user->person_id)->exists() ||
-                        \Modules\SICA\Entities\Apprentice::where('person_id', $user->person_id)->exists() ||
-                        (class_exists('\Modules\Egresados\Entities\Apprentice') && \Modules\Egresados\Entities\Apprentice::where('person_id', $user->person_id)->exists())
-                    ))
-                ) {
+                    str_contains(strtolower((string) $user->nickname), 'egresad') ||
+                    str_contains(strtolower((string) $user->email), 'egresad');
+
+                $hasRoleSlugMatching = false;
+                if ($user->roles) {
+                    foreach ($user->roles as $role) {
+                        $slug = strtolower((string) ($role->slug ?? ''));
+                        if (str_contains($slug, 'egresad') || str_contains($slug, 'apprentice')) {
+                            $hasRoleSlugMatching = true;
+                            break;
+                        }
+                    }
+                }
+
+                $hasPersonOrApprentice = false;
+                if (!empty($user->person_id)) {
+                    $hasPersonOrApprentice = Person::where('id', $user->person_id)->exists() ||
+                        Apprentice::where('person_id', $user->person_id)->exists();
+                }
+
+                if ($isEgresadoRole || $hasRoleSlugMatching || $hasPersonOrApprentice) {
                     return $next($request);
                 }
 
