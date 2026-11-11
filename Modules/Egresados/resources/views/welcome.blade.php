@@ -1,3 +1,11 @@
+<?php
+    /** @var array<string, mixed>|null $noticiaDestacada */
+    /** @var array<int, mixed>|null $noticiasPublicadas */
+    use Illuminate\Support\Facades\Auth;
+
+    $destacadaId = (string)(isset($noticiaDestacada['id']) ? $noticiaDestacada['id'] : 'NOT-001');
+    $noticiasJson = json_encode(isset($noticiasPublicadas) ? $noticiasPublicadas : [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -116,20 +124,23 @@
     <!-- ============================================== -->
     <!-- 1. NAVBAR SUPERIOR INSTITUCIONAL (SENA ERP) -->
     <!-- ============================================== -->
-    @php
+    <?php
         $panelUrl = route('egresados.dashboard');
         if (Auth::check()) {
+            /** @var \App\Models\User|null $user */
             $user = Auth::user();
-            $roleSlugs = $user->roles ? $user->roles->pluck('slug')->toArray() : [];
-            if ($user->nickname === 'admin' || in_array('egresados.instructor', $roleSlugs) || in_array('sigac.instructor', $roleSlugs) || $user->email === 'instructor.egresados@sena.edu.co' || $user->nickname === 'instructor_egresados') {
+            $roleSlugs = ($user && $user->roles) ? $user->roles->pluck('slug')->toArray() : [];
+            $userEmail = $user ? (string)$user->email : '';
+            $userNick  = $user ? (string)$user->nickname : '';
+            if ($userNick === 'admin' || in_array('egresados.instructor', $roleSlugs) || in_array('sigac.instructor', $roleSlugs) || $userEmail === 'instructor.egresados@sena.edu.co' || $userNick === 'instructor_egresados') {
                 $panelUrl = route('egresados.dashboard_instructor');
-            } elseif (in_array('egresados.egresado', $roleSlugs) || in_array('senaempresa.apprentice', $roleSlugs) || in_array('sigac.apprentice', $roleSlugs) || $user->email === 'egresado.sige@sena.edu.co' || $user->nickname === 'egresado_sige') {
+            } elseif (in_array('egresados.egresado', $roleSlugs) || in_array('senaempresa.apprentice', $roleSlugs) || in_array('sigac.apprentice', $roleSlugs) || $userEmail === 'egresado.sige@sena.edu.co' || $userNick === 'egresado_sige') {
                 $panelUrl = route('egresados.dashboard_egresado');
             } else {
                 $panelUrl = route('egresados.dashboard');
             }
         }
-    @endphp
+    ?>
     <header class="bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#00131E] text-white shadow-xl sticky top-0 z-50 border-b-[3px] border-[#39A900] backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
             
@@ -175,7 +186,7 @@
                         <i class="fa-solid fa-gauge-high text-xs"></i>
                         <span>Ir a mi Panel</span>
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                    <form action="{{ route('egresados.logout') }}" method="POST" class="inline">
                         @csrf
                         <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
                         <button type="submit" class="bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-400/30 px-3.5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition flex items-center space-x-1.5" title="Cerrar sesión">
@@ -183,6 +194,11 @@
                             <span class="hidden sm:inline">Salir</span>
                         </button>
                     </form>
+                @else
+                    <a href="{{ route('egresados.login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-[#39A900]/30 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        <span>Ingresar</span>
+                    </a>
                 @endauth
             </div>
 
@@ -219,7 +235,7 @@
                             <span>Ir a mi Panel ({{ Auth::user()->primary_role }})</span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                        <a href="{{ route('egresados.login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                             <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
                             <span>Iniciar sesión</span>
                         </a>
@@ -331,7 +347,7 @@
                                 {{ $noticiaDestacada['summary'] ?? 'Historias de éxito de nuestros graduados, convenios del CEFA e innovaciones productivas en el Huila.' }}
                             </p>
                             <div class="mt-3 flex items-center gap-2">
-                                <button type="button" onclick="event.stopPropagation(); abrirModalNoticia('{{ $noticiaDestacada['id'] ?? 'NOT-001' }}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#62E31D] hover:text-white bg-[#001A29]/80 hover:bg-[#39A900] px-3.5 py-1.5 rounded-full border border-[#62E31D]/40 transition shadow-sm font-poppins">
+                                <button type="button" data-noticia-id="{{ $destacadaId }}" onclick="event.stopPropagation(); abrirModalNoticia(this.getAttribute('data-noticia-id'))" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#62E31D] hover:text-white bg-[#001A29]/80 hover:bg-[#39A900] px-3.5 py-1.5 rounded-full border border-[#62E31D]/40 transition shadow-sm font-poppins">
                                     <span>Leer noticia completa</span>
                                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                 </button>
@@ -632,13 +648,18 @@
 
     <!-- SCRIPT DEL CARRUSEL DE IMÁGENES "¿QUÉ ENCUENTRAS EN SIGE?" -->
     <!-- ============================================== -->
+    <script id="sigeNoticiasPublicadasData" type="text/template" data-destacada-id="<?php echo $destacadaId; ?>">
+<?php echo $noticiasJson; ?>
+    </script>
+
     <script>
         let currentSigeSlide = 0;
         const totalSigeSlides = 5;
         let sigeCoverflowTimer = null;
 
-        const sigeNoticiasPublicadas = @json($noticiasPublicadas ?? []);
-        const sigeNoticiaDestacadaId = '{{ $noticiaDestacada['id'] ?? 'NOT-001' }}';
+        const sigeNoticiasScriptEl = document.getElementById('sigeNoticiasPublicadasData');
+        const sigeNoticiasPublicadas = sigeNoticiasScriptEl ? JSON.parse(sigeNoticiasScriptEl.textContent || '[]') : [];
+        const sigeNoticiaDestacadaId = sigeNoticiasScriptEl ? (sigeNoticiasScriptEl.getAttribute('data-destacada-id') || 'NOT-001') : 'NOT-001';
 
         function abrirModalNoticia(id) {
             let noticia = sigeNoticiasPublicadas.find(n => n.id === id);

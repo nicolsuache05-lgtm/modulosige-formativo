@@ -203,10 +203,10 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item py-2 rounded-3 text-danger fw-semibold d-flex align-items-center gap-2" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-master').submit();">
+                                <a class="dropdown-item py-2 rounded-3 text-danger fw-semibold d-flex align-items-center gap-2" href="{{ route('egresados.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-master').submit();">
                                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                                 </a>
-                                <form id="logout-form-master" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form-master" action="{{ route('egresados.logout') }}" method="POST" class="d-none">
                                     @csrf
                                     <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
                                 </form>
@@ -279,5 +279,6 @@
     <!-- Bootstrap 5 Bundle JS with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
+    @include('egresados::partials._security_session')
 </body>
 </html>

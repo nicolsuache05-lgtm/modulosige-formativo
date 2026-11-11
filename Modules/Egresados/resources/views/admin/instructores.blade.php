@@ -100,19 +100,19 @@
             
             <nav class="space-y-1.5">
                 <!-- Panel de Control -->
-                <a href="{{ route('egresados.dashboard_admin') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-gauge-high w-4 text-center text-sm text-green-300/80"></i>
                     <span>Panel de Control</span>
                 </a>
 
                 <!-- Directorio Egresados -->
-                <a href="{{ route('egresados.dashboard_admin') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-user-graduate w-4 text-center text-sm text-green-300/80"></i>
                     <span>Directorio Egresados</span>
                 </a>
 
                 <!-- Instructores (ACTIVO EN ESTA VISTA) -->
-                <a href="{{ route('egresados.admin.instructores') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#39A900] to-[#2e8800] text-white font-semibold text-xs shadow-md shadow-green-950/40 border border-white/20 transition-all">
+                <a href="{{ route('egresados.instructores') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#39A900] to-[#2e8800] text-white font-semibold text-xs shadow-md shadow-green-950/40 border border-white/20 transition-all">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-chalkboard-user w-4 text-center text-sm text-[#62E31D]"></i>
                         <span>Instructores</span>
@@ -121,7 +121,7 @@
                 </a>
 
                 <!-- Encuestas (Exclusivo Administrador) -->
-                <a href="{{ route('egresados.admin.encuestas') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
+                <a href="{{ route('egresados.encuestas') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-clipboard-question w-4 text-center text-sm text-green-300/80 group-hover:text-[#62E31D] transition"></i>
                         <span>Encuestas</span>
@@ -130,13 +130,13 @@
                 </a>
 
                 <!-- Reportes & Métricas -->
-                <a href="{{ route('egresados.admin.reportes') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.reportes') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-file-invoice w-4 text-center text-sm text-green-300/80"></i>
                     <span>Reportes & Métricas</span>
                 </a>
 
                 <!-- Eventos & Ferias (Exclusivo Administrador) -->
-                <a href="{{ route('egresados.admin.eventos') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
+                <a href="{{ route('egresados.eventos') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
                     <div class="flex items-center gap-3">
                         <i class="fa-regular fa-calendar-check w-4 text-center text-sm text-green-300/80 group-hover:text-[#62E31D] transition"></i>
                         <span>Eventos & Ferias</span>
@@ -325,7 +325,7 @@
                     </div>
 
                     <!-- Buscador y Filtros Integrados -->
-                    <form action="{{ route('egresados.admin.instructores') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                    <form action="{{ route('egresados.instructores') }}" method="GET" class="flex flex-wrap items-center gap-2">
                         <div class="relative">
                             <input type="text" name="search" value="{{ request('search') }}" 
                                 placeholder="Buscar por documento, nombre o correo..."
@@ -339,7 +339,7 @@
                         </button>
 
                         @if(request('search'))
-                            <a href="{{ route('egresados.admin.instructores') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
+                            <a href="{{ route('egresados.instructores') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
                                 <i class="fa-solid fa-xmark"></i> Limpiar
                             </a>
                         @endif

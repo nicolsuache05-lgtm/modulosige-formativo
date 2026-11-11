@@ -1,9 +1,12 @@
+<?php
+    /** @var array<int, array>|null $reportes */
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGE Â· Generador de Reportes â€” Panel Administrador</title>
+    <title>SIGE · Generador de Reportes — Panel Administrador</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
@@ -100,25 +103,25 @@
             
             <nav class="space-y-1.5">
                 <!-- Panel de Control -->
-                <a href="{{ route('egresados.dashboard_admin') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-gauge-high w-4 text-center text-sm text-green-300/80"></i>
                     <span>Panel de Control</span>
                 </a>
 
                 <!-- Directorio Egresados -->
-                <a href="{{ route('egresados.dashboard_admin') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-user-graduate w-4 text-center text-sm text-green-300/80"></i>
                     <span>Directorio Egresados</span>
                 </a>
 
                 <!-- Instructores -->
-                <a href="{{ route('egresados.admin.instructores') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
+                <a href="{{ route('egresados.instructores') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-chalkboard-user w-4 text-center text-sm text-green-300/80"></i>
                     <span>Instructores</span>
                 </a>
 
                 <!-- Encuestas (Exclusivo Administrador) -->
-                <a href="{{ route('egresados.admin.encuestas') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
+                <a href="{{ route('egresados.encuestas') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-clipboard-question w-4 text-center text-sm text-green-300/80 group-hover:text-[#62E31D] transition"></i>
                         <span>Encuestas</span>
@@ -126,17 +129,17 @@
                     <span class="text-[9px] bg-white/10 group-hover:bg-[#62E31D] group-hover:text-[#012410] font-bold px-1.5 py-0.5 rounded-md transition">Admin</span>
                 </a>
 
-                <!-- Reportes & MÃ©tricas (ACTIVO EN ESTA VISTA) -->
-                <a href="{{ route('egresados.admin.reportes') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#39A900] to-[#2e8800] text-white font-semibold text-xs shadow-md shadow-green-950/40 border border-white/20 transition-all">
+                <!-- Reportes & Métricas (ACTIVO EN ESTA VISTA) -->
+                <a href="{{ route('egresados.reportes') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#39A900] to-[#2e8800] text-white font-semibold text-xs shadow-md shadow-green-950/40 border border-white/20 transition-all">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-file-invoice w-4 text-center text-sm text-[#62E31D]"></i>
-                        <span>Reportes & MÃ©tricas</span>
+                        <span>Reportes & Métricas</span>
                     </div>
                     <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
                 </a>
 
                 <!-- Eventos & Ferias (Exclusivo Administrador) -->
-                <a href="{{ route('egresados.admin.eventos') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
+                <a href="{{ route('egresados.eventos') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-green-100/80 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200 group">
                     <div class="flex items-center gap-3">
                         <i class="fa-regular fa-calendar-check w-4 text-center text-sm text-green-300/80 group-hover:text-[#62E31D] transition"></i>
                         <span>Eventos & Ferias</span>
@@ -149,7 +152,7 @@
             <nav class="space-y-1">
                 <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-green-100/70 hover:text-white hover:bg-white/10 font-medium text-xs transition duration-200">
                     <i class="fa-solid fa-globe w-4 text-center text-green-300/60"></i>
-                    <span>Portal PÃºblico SIGE</span>
+                    <span>Portal Público SIGE</span>
                 </a>
             </nav>
         </div>
@@ -170,7 +173,7 @@
                 @csrf
                 <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/20 text-red-200 hover:text-white text-xs font-bold transition duration-200">
                     <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-                    <span>Cerrar SesiÃ³n</span>
+                    <span>Cerrar Sesión</span>
                 </button>
             </form>
         </div>
@@ -203,10 +206,10 @@
             </div>
         </header>
 
-        <!-- Main Body HomogÃ©neo -->
+        <!-- Main Body Homogéneo -->
         <main class="flex-1 p-6 sm:p-8 space-y-7 overflow-y-auto custom-scrollbar">
 
-            <!-- Mensajes Flash de SesiÃ³n -->
+            <!-- Mensajes Flash de Sesión -->
             @if(session('success'))
                 <div id="flash-success" class="bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold px-4 py-3.5 rounded-2xl flex items-center justify-between shadow-lg shadow-green-900/10 border border-green-400/30 animate-fadeIn">
                     <div class="flex items-center gap-3">
@@ -221,7 +224,7 @@
                 </div>
             @endif
 
-            <!-- 1. Hero Banner Reportes con BotÃ³n de AcciÃ³n HomogÃ©neo -->
+            <!-- 1. Hero Banner Reportes con Botón de Acción Homogéneo -->
             <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#012410] via-[#013819] to-[#084b23] text-white p-7 sm:p-9 shadow-xl border border-white/10">
                 <div class="absolute -right-8 -bottom-8 w-72 h-72 bg-[#62E31D]/15 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -229,13 +232,13 @@
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[#62E31D] text-xs font-bold mb-3 border border-white/15 shadow-xs">
                             <i class="fa-solid fa-file-invoice text-[11px]"></i>
-                            <span>AuditorÃ­a, EstadÃ­sticas & Empleabilidad Â· CEFA La Angostura</span>
+                            <span>AuditorÃ­a, EstadÃ­sticas & Empleabilidad · CEFA La Angostura</span>
                         </div>
                         <h2 class="font-editorial text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
                             Consolidado de Reportes Institucionales
                         </h2>
                         <p class="text-xs sm:text-sm text-green-100/80 mt-2 max-w-2xl font-normal leading-relaxed">
-                            Genera, consulta y exporta informes ejecutivos de inserciÃ³n laboral, auditorÃ­a y efectividad ocupacional de los egresados del centro.
+                            Genera, consulta y exporta informes ejecutivos de inserción laboral, auditorÃ­a y efectividad ocupacional de los egresados del centro.
                         </p>
                     </div>
 
@@ -248,9 +251,9 @@
                 </div>
             </div>
 
-            <!-- 2. Tarjetas MÃ©tricas Superiores con Estilo HomogÃ©neo -->
+            <!-- 2. Tarjetas Métricas Superiores con Estilo Homogéneo -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- MÃ©trica 1: Total Reportes -->
+                <!-- Métrica 1: Total Reportes -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between">
                     <div>
                         <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Reportes</div>
@@ -262,7 +265,7 @@
                     </div>
                 </div>
 
-                <!-- MÃ©trica 2: Egresados -->
+                <!-- Métrica 2: Egresados -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between">
                     <div>
                         <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Egresados</div>
@@ -274,19 +277,19 @@
                     </div>
                 </div>
 
-                <!-- MÃ©trica 3: Tasa Promedio -->
+                <!-- Métrica 3: Tasa Promedio -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between">
                     <div>
                         <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Tasa Promedio</div>
                         <div class="font-editorial text-2xl font-extrabold text-green-700 mt-1">{{ $tasaPromedio }}</div>
-                        <div class="text-[11px] text-green-600 font-semibold mt-0.5">InserciÃ³n laboral media</div>
+                        <div class="text-[11px] text-green-600 font-semibold mt-0.5">Inserción laboral media</div>
                     </div>
                     <div class="w-11 h-11 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
 
-                <!-- MÃ©trica 4: Documentos PDF -->
+                <!-- Métrica 4: Documentos PDF -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between">
                     <div>
                         <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Documentos PDF</div>
@@ -298,7 +301,7 @@
                     </div>
                 </div>
 
-                <!-- MÃ©trica 5: Hojas Excel -->
+                <!-- Métrica 5: Hojas Excel -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between">
                     <div>
                         <div class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Hojas Excel</div>
@@ -311,7 +314,7 @@
                 </div>
             </div>
 
-            <!-- 3. Tabla Principal de Reportes con Cabecera y Filtro Integrado HomogÃ©neo -->
+            <!-- 3. Tabla Principal de Reportes con Cabecera y Filtro Integrado Homogéneo -->
             <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden flex flex-col">
                 <div class="p-5 border-b border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
@@ -325,9 +328,9 @@
                     </div>
 
                     <!-- Buscador y Filtros Integrados -->
-                    <form method="GET" action="{{ route('egresados.admin.reportes') }}" class="flex flex-wrap items-center gap-2">
+                    <form method="GET" action="{{ route('egresados.reportes') }}" class="flex flex-wrap items-center gap-2">
                         <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por tÃ­tulo, programa..."
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por título, programa..."
                                 class="pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-[#39A900]/30 focus:border-[#39A900] outline-none font-medium shadow-xs w-48 sm:w-56">
                             <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
                         </div>
@@ -336,14 +339,14 @@
                             <option value="">Todos los Tipos</option>
                             <option value="Consolidado de Empleabilidad" {{ request('type') == 'Consolidado de Empleabilidad' ? 'selected' : '' }}>Empleabilidad General</option>
                             <option value="Egresados por Programa" {{ request('type') == 'Egresados por Programa' ? 'selected' : '' }}>Por Programa</option>
-                            <option value="ParticipaciÃ³n en Eventos" {{ request('type') == 'ParticipaciÃ³n en Eventos' ? 'selected' : '' }}>ParticipaciÃ³n en Eventos</option>
+                            <option value="Participación en Eventos" {{ request('type') == 'Participación en Eventos' ? 'selected' : '' }}>Participación en Eventos</option>
                             <option value="Emprendimiento Egresados" {{ request('type') == 'Emprendimiento Egresados' ? 'selected' : '' }}>Emprendimiento</option>
                         </select>
 
                         <select name="format" class="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 font-semibold focus:ring-2 focus:ring-[#39A900]/30 focus:border-[#39A900] outline-none shadow-xs" onchange="this.form.submit()">
                             <option value="">Todos los Formatos</option>
-                            <option value="PDF" {{ request('format') == 'PDF' ? 'selected' : '' }}>ðŸ“„ Solo PDF</option>
-                            <option value="EXCEL" {{ request('format') == 'EXCEL' ? 'selected' : '' }}>ðŸ“Š Solo Excel</option>
+                            <option value="PDF" {{ request('format') == 'PDF' ? 'selected' : '' }}>📄 Solo PDF</option>
+                            <option value="EXCEL" {{ request('format') == 'EXCEL' ? 'selected' : '' }}>📊 Solo Excel</option>
                         </select>
 
                         <button type="submit" class="px-3.5 py-2 bg-[#39A900] hover:bg-[#2a7c00] text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5">
@@ -352,7 +355,7 @@
                         </button>
 
                         @if(request()->anyFilled(['search', 'type', 'format']))
-                            <a href="{{ route('egresados.admin.reportes') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
+                            <a href="{{ route('egresados.reportes') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
                                 <i class="fa-solid fa-xmark"></i> Limpiar
                             </a>
                         @endif
@@ -367,14 +370,14 @@
                                 <th class="py-3.5 px-4">Programa / Cobertura</th>
                                 <th class="py-3.5 px-4">Periodo Evaluado</th>
                                 <th class="py-3.5 px-4">Formato</th>
-                                <th class="py-3.5 px-4">MÃ©tricas Clave</th>
+                                <th class="py-3.5 px-4">Métricas Clave</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-gray-700">
                             @forelse($reportes as $item)
                                 @php
                                     $itemData = array_merge($item, [
-                                        'delete_url' => route('egresados.admin.reportes.destroy', $item['id']),
+                                        'delete_url' => route('egresados.superadmin.reportes.destroy', $item['id']),
                                     ]);
                                     $fmt = strtoupper($item['format'] ?? 'PDF');
                                     $formatBadge = match($fmt) {
@@ -385,6 +388,10 @@
                                         'EXCEL', 'XLSX', 'CSV' => 'fa-file-excel',
                                         default => 'fa-file-pdf'
                                     };
+                                    $cleanRate = (int) filter_var($item['rate'], FILTER_SANITIZE_NUMBER_INT);
+                                    $barColor = $cleanRate >= 70 ? 'bg-[#39A900]' : ($cleanRate >= 50 ? 'bg-amber-500' : 'bg-rose-500');
+                                    $barWidth = min(100, max(10, $cleanRate)) . '%';
+                                    $itemDataJson = htmlspecialchars(json_encode($itemData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8');
                                 @endphp
                                 <tr class="hover:bg-emerald-50/30 transition duration-150">
                                     <!-- Reporte & Tipo -->
@@ -394,11 +401,11 @@
                                                 <i class="fa-solid {{ $formatIcon }}"></i>
                                             </div>
                                             <div>
-                                                <div class="font-bold text-gray-900 text-xs hover:text-[#39A900] transition cursor-pointer" onclick="abrirModalVerReporte({{ json_encode($itemData) }})">
+                                                <div class="font-bold text-gray-900 text-xs hover:text-[#39A900] transition cursor-pointer" data-reporte="{{ $itemDataJson }}" onclick="handleVerReporteBtn(this)">
                                                     {{ $item['title'] }}
                                                 </div>
                                                 <div class="text-[10px] text-gray-500 font-medium mt-0.5">
-                                                    {{ $item['type'] }} Â· CÃ³digo: <span class="font-mono text-gray-700 font-bold">{{ $item['id'] }}</span>
+                                                    {{ $item['type'] }} · Código: <span class="font-mono text-gray-700 font-bold">{{ $item['id'] }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -424,18 +431,14 @@
                                         </span>
                                     </td>
 
-                                    <!-- MÃ©tricas Clave -->
+                                    <!-- Métricas Clave -->
                                     <td class="py-3.5 px-4">
                                         <div class="flex items-center justify-between text-[11px] font-medium text-gray-700 mb-1">
                                             <span>{{ $item['total_egresados'] }} egresados</span>
                                             <span class="font-extrabold text-[#39A900]">{{ $item['rate'] }}</span>
                                         </div>
-                                        @php
-                                            $cleanRate = (int) filter_var($item['rate'], FILTER_SANITIZE_NUMBER_INT);
-                                            $barColor = $cleanRate >= 70 ? 'bg-[#39A900]' : ($cleanRate >= 50 ? 'bg-amber-500' : 'bg-rose-500');
-                                        @endphp
                                         <div class="w-24 bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                                            <div class="{{ $barColor }} h-1.5 rounded-full" style="width: {{ min(100, max(10, $cleanRate)) }}%"></div>
+                                            <div class="{{ $barColor }} h-1.5 rounded-full" style="width: {{ $barWidth }};"></div>
                                         </div>
                                     </td>
                                 </tr>
@@ -459,9 +462,9 @@
 
         </main>
 
-        <!-- Footer HomogÃ©neo -->
+        <!-- Footer Homogéneo -->
         <footer class="bg-white border-t border-gray-200/80 py-3.5 px-7 text-center text-xs text-gray-500 font-medium">
-            Â© {{ date('Y') }} <strong>SIGE â€” Sistema de GestiÃ³n de Egresados</strong> â€¢ CEFA La Angostura â€¢ SENA Empresa ERP
+            &copy; {{ date('Y') }} <strong>SIGE — Sistema de Gestión de Egresados</strong> • CEFA La Angostura • SENA Empresa ERP
         </footer>
 
     </div>
@@ -478,7 +481,7 @@
                     </div>
                     <div>
                         <h3 class="font-editorial text-base font-bold text-white">Generar Reporte Institucional</h3>
-                        <p class="text-[11px] text-green-200/70">Consolidado y anÃ¡lisis estadÃ­stico CEFA</p>
+                        <p class="text-[11px] text-green-200/70">Consolidado y análisis estadÃ­stico CEFA</p>
                     </div>
                 </div>
                 <button type="button" onclick="cerrarModalGenerarReporte()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
@@ -486,14 +489,14 @@
                 </button>
             </div>
 
-            <form action="{{ route('egresados.admin.reportes.store') }}" method="POST" class="p-6 space-y-4 text-xs">
+            <form action="{{ route('egresados.superadmin.reportes.store') }}" method="POST" class="p-6 space-y-4 text-xs">
                 @csrf
                 <div>
                     <label class="block font-bold text-gray-700 uppercase tracking-wider text-[10px] mb-1">Tipo de Instrumento / Reporte *</label>
                     <select name="type" id="rep_type_select" required onchange="autoSugerirTitulo(this.value)" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#39A900]">
                         <option value="Consolidado de Empleabilidad">Consolidado General de Empleabilidad</option>
-                        <option value="Egresados por Programa">Egresados por Programa de FormaciÃ³n</option>
-                        <option value="ParticipaciÃ³n en Eventos">ParticipaciÃ³n en Ferias y Ruedas de Empleo</option>
+                        <option value="Egresados por Programa">Egresados por Programa de Formación</option>
+                        <option value="Participación en Eventos">Participación en Ferias y Ruedas de Empleo</option>
                         <option value="Emprendimiento Egresados">Sondeo de Emprendimiento y Fondo Emprender</option>
                     </select>
                 </div>
@@ -508,9 +511,9 @@
                         <label class="block font-bold text-gray-700 uppercase tracking-wider text-[10px] mb-1">Programa / Cobertura</label>
                         <select name="program" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#39A900]">
                             <option value="Todos los Programas">Todos los Programas</option>
-                            <option value="ADSO (AnÃ¡lisis y Desarrollo de Software)">ADSO</option>
+                            <option value="ADSO (Análisis y Desarrollo de Software)">ADSO</option>
                             <option value="Agropecuario & Pecuario">Agropecuario & Pecuario</option>
-                            <option value="GestiÃ³n Empresarial">GestiÃ³n Empresarial</option>
+                            <option value="Gestión Empresarial">Gestión Empresarial</option>
                             <option value="Mantenimiento Industrial">Mantenimiento Industrial</option>
                         </select>
                     </div>
@@ -519,11 +522,11 @@
                         <div class="flex items-center gap-3 pt-1.5">
                             <label class="flex items-center gap-1.5 cursor-pointer font-bold text-gray-700">
                                 <input type="radio" name="format" value="PDF" checked class="text-[#39A900] focus:ring-[#39A900]">
-                                <span>ðŸ“„ PDF</span>
+                                <span>📄 PDF</span>
                             </label>
                             <label class="flex items-center gap-1.5 cursor-pointer font-bold text-gray-700">
                                 <input type="radio" name="format" value="EXCEL" class="text-[#39A900] focus:ring-[#39A900]">
-                                <span>ðŸ“Š Excel</span>
+                                <span>📊 Excel</span>
                             </label>
                         </div>
                     </div>
@@ -542,7 +545,7 @@
 
                 <div>
                     <label class="block font-bold text-gray-700 uppercase tracking-wider text-[10px] mb-1">Objetivo / Observaciones</label>
-                    <textarea name="description" rows="2" placeholder="Resumen o justificaciÃ³n del informe para archivo institucional..." class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#39A900] resize-none"></textarea>
+                    <textarea name="description" rows="2" placeholder="Resumen o justificación del informe para archivo institucional..." class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#39A900] resize-none"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
@@ -594,10 +597,10 @@
                     </div>
                 </div>
 
-                <!-- DistribuciÃ³n Visual -->
+                <!-- Distribución Visual -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <span class="font-bold text-gray-700 uppercase tracking-wider text-[10px]">Tasa Global de InserciÃ³n</span>
+                        <span class="font-bold text-gray-700 uppercase tracking-wider text-[10px]">Tasa Global de Inserción</span>
                         <span id="ver_rep_rate" class="font-extrabold text-[#39A900] text-sm">0%</span>
                     </div>
 
@@ -622,7 +625,7 @@
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] text-gray-600 mb-0.5">
-                                <span>En bÃºsqueda de empleo</span>
+                                <span>En búsqueda de empleo</span>
                                 <span id="ver_rep_desemp_pct" class="font-bold">0%</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2">
@@ -661,7 +664,7 @@
             </div>
             <div>
                 <h3 class="font-editorial text-base font-bold text-gray-900">Â¿Eliminar este Reporte?</h3>
-                <p class="text-xs text-gray-500 mt-1">Esta acciÃ³n retirarÃ¡ el registro <span id="delete_rep_id" class="font-mono font-bold text-gray-800"></span> del histÃ³rico de auditorÃ­as.</p>
+                <p class="text-xs text-gray-500 mt-1">Esta acciÃ³n retirará el registro <span id="delete_rep_id" class="font-mono font-bold text-gray-800"></span> del histórico de auditorÃ­as.</p>
                 <div id="delete_rep_title" class="font-bold text-gray-800 text-xs mt-2 bg-gray-50 p-2 rounded-xl border border-gray-100 truncate">TÃ­tulo</div>
             </div>
 
@@ -673,7 +676,7 @@
                         Cancelar
                     </button>
                     <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition text-xs shadow-md shadow-rose-900/20">
-                        SÃ­, Eliminar
+                        Sí, Eliminar
                     </button>
                 </div>
             </form>
@@ -687,7 +690,7 @@
             const ano = new Date().getFullYear();
             if (type === 'Consolidado de Empleabilidad') input.value = `Consolidado General de Empleabilidad ${ano}`;
             else if (type === 'Egresados por Programa') input.value = `Seguimiento Laboral Egresados ADSO ${ano}`;
-            else if (type === 'ParticipaciÃ³n en Eventos') input.value = `ParticipaciÃ³n en Ferias y Ruedas de Empleo ${ano}`;
+            else if (type === 'Participación en Eventos') input.value = `Participación en Ferias y Ruedas de Empleo ${ano}`;
             else if (type === 'Emprendimiento Egresados') input.value = `Sondeo de Emprendimiento & Fondo Emprender ${ano}`;
         }
 
@@ -776,7 +779,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>${data.title} â€” SENA SIGE</title>
+                    <title>${data.title} — SENA SIGE</title>
                     <style>
                         body { font-family: Arial, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
                         .header { border-bottom: 2px solid #39A900; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -790,14 +793,14 @@
                 <body>
                     <div class="header">
                         <div>
-                            <h2 style="margin:0; color:#013819;">SENA Â· CENTRO CEFA LA ANGOSTURA</h2>
-                            <p style="margin:4px 0 0; color:#666;">Sistema de InformaciÃ³n y GestiÃ³n de Egresados (SIGE ERP)</p>
+                            <h2 style="margin:0; color:#013819;">SENA · CENTRO CEFA LA ANGOSTURA</h2>
+                            <p style="margin:4px 0 0; color:#666;">Sistema de Información y Gestión de Egresados (SIGE ERP)</p>
                         </div>
                         <div class="sena-badge">REPORTE OFICIAL ${fmt}</div>
                     </div>
                     <h1>${data.title}</h1>
                     <table class="meta-table">
-                        <tr><td><strong>CÃ³digo de Registro:</strong></td><td>${data.id}</td><td><strong>Fecha EmisiÃ³n:</strong></td><td>${data.date}</td></tr>
+                        <tr><td><strong>Código de Registro:</strong></td><td>${data.id}</td><td><strong>Fecha Emisión:</strong></td><td>${data.date}</td></tr>
                         <tr><td><strong>Tipo de Instrumento:</strong></td><td>${data.type}</td><td><strong>Formato Generado:</strong></td><td>${data.format}</td></tr>
                         <tr><td><strong>Programa:</strong></td><td>${data.program}</td><td><strong>Periodo:</strong></td><td>${data.period}</td></tr>
                         <tr><td><strong>Generado por:</strong></td><td colspan="3">${data.author || 'Administrador SIGE'}</td></tr>
@@ -805,18 +808,40 @@
                     <div class="metric-card">
                         <h3 style="margin:0 0 10px 0; color:#013819;">Resumen Ejecutivo de Indicadores:</h3>
                         <p><strong>Total Egresados Analizados:</strong> ${data.total_egresados} egresados</p>
-                        <p><strong>Tasa Global de InserciÃ³n:</strong> ${data.rate}</p>
-                        <p><strong>Empleados:</strong> ${data.empleados} (${Math.round((data.empleados/data.total_egresados)*100)}%) | <strong>Independientes/Emprendedores:</strong> ${data.independientes} | <strong>En BÃºsqueda:</strong> ${data.desempleados}</p>
+                        <p><strong>Tasa Global de Inserción:</strong> ${data.rate}</p>
+                        <p><strong>Empleados:</strong> ${data.empleados} (${Math.round((data.empleados/data.total_egresados)*100)}%) | <strong>Independientes/Emprendedores:</strong> ${data.independientes} | <strong>En Búsqueda:</strong> ${data.desempleados}</p>
                     </div>
                     <p><strong>Conclusiones del Informe:</strong> ${data.description}</p>
                     <div class="footer">
-                        Documento oficial generado desde el Panel Administrador SIGE el ${new Date().toLocaleString()} Â· CEFA La Angostura, Campoalegre - Huila.
+                        Documento oficial generado desde el Panel Administrador SIGE el ${new Date().toLocaleString()} · CEFA La Angostura, Campoalegre - Huila.
                     </div>
-                    <script>window.print();<\/script>
                 </body>
                 </html>
             `);
             win.document.close();
+            win.focus();
+            setTimeout(function() { win.print(); }, 250);
+        }
+
+        function handleVerReporteBtn(el) {
+            try {
+                const data = JSON.parse(el.getAttribute('data-reporte'));
+                abrirModalVerReporte(data);
+            } catch(e) {}
+        }
+
+        function handleDescargarReporteBtn(el) {
+            try {
+                const data = JSON.parse(el.getAttribute('data-reporte'));
+                descargarReporteSimulado(data);
+            } catch(e) {}
+        }
+
+        function handleEliminarReporteBtn(el) {
+            try {
+                const data = JSON.parse(el.getAttribute('data-reporte'));
+                abrirModalEliminarReporte(data);
+            } catch(e) {}
         }
 
         // Escape y backdrop

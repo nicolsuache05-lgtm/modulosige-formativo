@@ -2,142 +2,250 @@
 
 namespace Modules\Egresados\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Modules\Egresados\Services\SigeSecurityLogger;
+use Modules\SICA\Entities\Apprentice;
+use Modules\SICA\Entities\Person;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckEgresadosRole
 {
     /**
-     * Handle an incoming request and ensure role-based access control and confidentiality.
+     * Valida la autenticación, control de acceso basado en roles (RBAC) y autorización institucional.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      * @param  string  $roleType (superadmin|instructor|egresado)
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next, string $roleType = 'superadmin'): Response
     {
-        // 1. Validar si el usuario está autenticado
+        // 1. Validar autenticación estricta: ninguna solicitud anónima puede acceder a áreas protegidas
         if (!Auth::check()) {
-            if (app()->environment('local')) {
-                $targetNick = match ($roleType) {
-                    'instructor' => 'instructor_egresados',
-                    'egresado'   => 'egresado_sige',
-                    default      => 'superadmin_egresados',
-                };
-                $devUser = \App\Models\User::where('nickname', $targetNick)
-                    ->orWhere('email', $targetNick . '@sena.edu.co')
-                    ->first();
-                if ($devUser) {
-                    Auth::login($devUser);
-                    return $next($request);
-                }
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'authenticated' => false,
+                    'message'       => 'No autenticado. Por favor inicia sesión institucional.',
+                    'redirect'      => route('egresados.login'),
+                ], 401)->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
             }
 
             $redirectUrl = $request->fullUrl();
-            return redirect()->route('login', ['redirect' => $redirectUrl])
-                ->with('error', 'Debes iniciar sesión con tus credenciales institucionales para acceder a esta área confidencial.');
+            return redirect()->route('egresados.login', ['redirect' => $redirectUrl])
+                ->with('error', 'Debes iniciar sesión con tus credenciales institucionales para acceder a esta área confidencial.')
+                ->withHeaders([
+                    'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+                    'Pragma'        => 'no-cache',
+                ]);
         }
 
+        /** @var User $user */
         $user = Auth::user();
 
-        // 2. Si es Super Administrador del ERP, Administrador de Egresados o Coordinador
-        if ($user->hasSuperAdmin() || 
-            $user->hasRole('egresados.admin') || 
-            $user->hasRole('superadmin') ||
-            $user->hasRole('sica.admin') ||
-            $user->hasRole('sigac.academic_coordinator') ||
-            $user->hasRole('sica.coordinator') ||
-            $user->nickname === 'superadmin_egresados' ||
-            $user->email === 'superadmin.egresados@sena.edu.co') {
-            return $next($request);
-        }
+        // 2. Comprobación de identidad autorizada de Superadministrador
+        $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
+        $authorizedSuperadminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
 
-        // 3. Validar accesos según el rol requerido
+        $userEmail = strtolower((string) $user->email);
+        $userNick  = strtolower((string) $user->nickname);
+
+        $isAuthorizedSuperadminEmail = ($userEmail === $authorizedSuperadminEmail || $userNick === $authorizedSuperadminNick);
+        $hasSuperadminRole = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
+
+        // Solo es Superadministrador válido si cumple AMBAS condiciones: correo autorizado Y rol administrativo
+        $isLegitimateSuperadmin = $isAuthorizedSuperadminEmail && $hasSuperadminRole;
+
+        // 3. Control de Acceso Basado en Roles (RBAC)
         switch ($roleType) {
             case 'superadmin':
-                // Requiere rol de administración de Egresados
-                if ($user->hasRole('egresados.admin') || $user->hasRole('superadmin') || $user->hasRole('sigac.academic_coordinator')) {
-                    return $next($request);
+                if ($isLegitimateSuperadmin) {
+                    $response = $next($request);
+                    return $this->applySecurityHeaders($response);
                 }
 
-                // Permitir a instructores registrar egresados, seguimientos, sincronizar, importar o actualizar sin redirecciones bruscas
-                if (($request->isMethod('post') || $request->isMethod('put')) && ($request->is('*store*') || $request->is('*seguimiento*') || $request->is('*sincronizar*') || $request->is('*importar*') || $request->is('*update*') || $request->is('*toggle*'))) {
-                    if ($user->hasRole('egresados.instructor') || 
-                        $user->hasRole('sigac.instructor') || 
-                        $user->hasRole('agrocefa.trainer') ||
-                        $user->nickname === 'instructor_egresados' || 
-                        $user->email === 'instructor.egresados@sena.edu.co') {
-                        return $next($request);
-                    }
+                // Registro de auditoría: intento de escalamiento vertical o acceso no autorizado
+                SigeSecurityLogger::log(
+                    'UNAUTHORIZED_ACCESS_ATTEMPT',
+                    "Acceso denegado a módulo Superadmin para usuario: {$user->email} (Rol intentado: superadmin)",
+                    $request,
+                    $user
+                );
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'error'   => 'Acceso denegado',
+                        'message' => 'No tienes permisos de Superadministrador autorizados.',
+                    ], 403)->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+                }
+
+                // Redirigir según el rol legítimo del usuario
+                if ($this->isInstructor($user)) {
+                    return redirect()->route('egresados.dashboard_instructor')
+                        ->with('warning', 'Acceso denegado: No tienes permisos de Superadministrador. Redirigido a tu panel de instructor.')
+                        ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
+                }
+
+                if ($this->isEgresado($user)) {
+                    return redirect()->route('egresados.dashboard_egresado')
+                        ->with('warning', 'Acceso denegado: No tienes permisos de Superadministrador. Redirigido a tu portal de egresado.')
+                        ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
+                }
+
+                return redirect()->route('egresados.welcome')
+                    ->with('error', 'Acceso denegado: Se requieren permisos de Superadministrador autorizados.')
+                    ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
+
+            case 'instructor':
+                // Superadministrador puede supervisar
+                if ($isLegitimateSuperadmin) {
+                    $response = $next($request);
+                    return $this->applySecurityHeaders($response);
+                }
+
+                // Instructor autorizado
+                if ($this->isInstructor($user)) {
+                    $response = $next($request);
+                    return $this->applySecurityHeaders($response);
+                }
+
+                SigeSecurityLogger::log(
+                    'UNAUTHORIZED_ACCESS_ATTEMPT',
+                    "Acceso denegado a módulo Instructor para usuario: {$user->email}",
+                    $request,
+                    $user
+                );
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'error'   => 'Acceso denegado',
+                        'message' => 'Esta vista es exclusiva para instructores y evaluadores.',
+                    ], 403)->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+                }
+
+                // Si es egresado intentando entrar al panel de instructores, bloquearlo y redirigirlo a su portal
+                if ($this->isEgresado($user)) {
+                    return redirect()->route('egresados.dashboard_egresado')
+                        ->with('warning', 'Acceso denegado: Esta vista es exclusiva para instructores y evaluadores.')
+                        ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
+                }
+
+                return redirect()->route('egresados.welcome')
+                    ->with('error', 'Acceso denegado: Se requieren permisos de instructor.')
+                    ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
+
+            case 'egresado':
+                // Superadministrador puede supervisar
+                if ($isLegitimateSuperadmin) {
+                    $response = $next($request);
+                    return $this->applySecurityHeaders($response);
+                }
+
+                // Egresado legítimo
+                if ($this->isEgresado($user)) {
+                    $response = $next($request);
+                    return $this->applySecurityHeaders($response);
+                }
+
+                SigeSecurityLogger::log(
+                    'UNAUTHORIZED_ACCESS_ATTEMPT',
+                    "Acceso denegado a portal de Egresados para usuario: {$user->email}",
+                    $request,
+                    $user
+                );
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'error'   => 'Acceso denegado',
+                        'message' => 'No tienes los permisos requeridos para consultar el portal de egresados.',
+                    ], 403)->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
                 }
 
                 // Si es instructor, redirigir a su panel correspondiente
-                if ($user->hasRole('egresados.instructor') || $user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co') {
+                if ($this->isInstructor($user)) {
                     return redirect()->route('egresados.dashboard_instructor')
-                        ->with('warning', 'Acceso denegado: Tu perfil tiene asignado el panel de seguimiento de instructores.');
+                        ->with('warning', 'Acceso denegado: Tu perfil tiene asignado el panel de instructores.')
+                        ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
                 }
 
-                // Si es egresado, redirigir a su portal
-                if ($user->hasRole('egresados.egresado') || $user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co') {
-                    return redirect()->route('egresados.dashboard_egresado')
-                        ->with('warning', 'Acceso denegado: Tu perfil tiene asignado el portal de egresados.');
-                }
-                break;
-
-            case 'instructor':
-                // Permite Superadmins y Administradores de Egresados
-                if ($user->hasRole('egresados.admin')) {
-                    return $next($request);
-                }
-
-                // Permite instructores
-                if ($user->hasRole('egresados.instructor') || 
-                    $user->hasRole('sigac.instructor') || 
-                    $user->hasRole('agrocefa.trainer') ||
-                    $user->nickname === 'instructor_egresados' ||
-                    $user->email === 'instructor.egresados@sena.edu.co') {
-                    return $next($request);
-                }
-
-                // Si es egresado, redirigir a su portal
-                if ($user->hasRole('egresados.egresado') || $user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co') {
-                    return redirect()->route('egresados.dashboard_egresado')
-                        ->with('warning', 'Acceso denegado: Esta vista es exclusiva para instructores y evaluadores.');
-                }
-                break;
-
-            case 'egresado':
-                // Permite a los egresados
-                if ($user->hasRole('egresados.egresado') || 
-                    $user->hasRole('senaempresa.apprentice') || 
-                    $user->hasRole('sigac.apprentice') ||
-                    $user->nickname === 'egresado_sige' ||
-                    $user->email === 'egresado.sige@sena.edu.co' ||
-                    str_contains(strtolower($user->nickname ?? ''), 'egresad') ||
-                    str_contains(strtolower($user->email ?? ''), 'egresad') ||
-                    ($user->roles && (
-                        $user->roles->contains(fn($r) => str_contains(strtolower($r->slug ?? ''), 'egresad')) ||
-                        $user->roles->contains(fn($r) => str_contains(strtolower($r->slug ?? ''), 'apprentice'))
-                    )) ||
-                    ($user->person_id && (
-                        \Modules\SICA\Entities\Person::where('id', $user->person_id)->exists() ||
-                        \Modules\SICA\Entities\Apprentice::where('person_id', $user->person_id)->exists() ||
-                        (class_exists('\Modules\Egresados\Entities\Apprentice') && \Modules\Egresados\Entities\Apprentice::where('person_id', $user->person_id)->exists())
-                    ))
-                ) {
-                    return $next($request);
-                }
-
-                // Superadmins y administradores pueden supervisar el portal
-                if ($user->hasRole('egresados.admin') || $user->hasSuperAdmin() || $user->nickname === 'superadmin' || $user->nickname === 'admin') {
-                    return $next($request);
-                }
-                break;
+                return redirect()->route('egresados.welcome')
+                    ->with('error', 'No tienes los permisos requeridos para consultar esta sección.')
+                    ->withHeaders(['Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate']);
         }
 
-        // Por seguridad, si el rol no coincide, redirigir a la bienvenida con aviso
         return redirect()->route('egresados.welcome')
             ->with('error', 'No tienes los permisos requeridos para consultar esta sección.');
+    }
+
+    /**
+     * Determina si el usuario tiene rol autorizado de instructor.
+     */
+    protected function isInstructor(User $user): bool
+    {
+        return $user->hasRole('egresados.instructor') ||
+            $user->hasRole('sigac.instructor') ||
+            $user->hasRole('agrocefa.trainer') ||
+            $user->nickname === 'instructor_egresados' ||
+            strtolower((string)$user->email) === 'instructor.egresados@sena.edu.co';
+    }
+
+    /**
+     * Determina si el usuario es un egresado/aprendiz válido.
+     */
+    protected function isEgresado(User $user): bool
+    {
+        if ($user->hasRole('egresados.egresado') ||
+            $user->hasRole('senaempresa.apprentice') ||
+            $user->hasRole('sigac.apprentice') ||
+            $user->nickname === 'egresado_sige' ||
+            strtolower((string)$user->email) === 'egresado.sige@sena.edu.co') {
+            return true;
+        }
+
+        // Revisión de roles
+        if ($user->roles) {
+            foreach ($user->roles as $role) {
+                $slug = strtolower((string) ($role->slug ?? ''));
+                if (str_contains($slug, 'egresad') || str_contains($slug, 'apprentice')) {
+                    return true;
+                }
+            }
+        }
+
+        // Revisión de vinculación con Person / Apprentice
+        if (!empty($user->person_id)) {
+            return Person::where('id', $user->person_id)->exists() ||
+                Apprentice::where('person_id', $user->person_id)->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Aplica los encabezados de prevención de caché y protección a la respuesta.
+     */
+    protected function applySecurityHeaders(Response $response): Response
+    {
+        $headers = [
+            'Cache-Control'             => 'no-cache, no-store, max-age=0, must-revalidate, no-transform',
+            'Pragma'                    => 'no-cache',
+            'Expires'                   => 'Sun, 02 Jan 1990 00:00:00 GMT',
+            'X-Content-Type-Options'    => 'nosniff',
+            'X-Frame-Options'           => 'SAMEORIGIN',
+            'X-XSS-Protection'          => '1; mode=block',
+            'Referrer-Policy'           => 'strict-origin-when-cross-origin',
+        ];
+
+        foreach ($headers as $key => $val) {
+            if (method_exists($response, 'header')) {
+                $response->header($key, $val);
+            } elseif (isset($response->headers)) {
+                $response->headers->set($key, $val);
+            }
+        }
+
+        return $response;
     }
 }

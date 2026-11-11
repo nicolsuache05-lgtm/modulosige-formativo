@@ -1,18 +1,12 @@
-@php
-    header("Location: " . route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]));
-    exit();
-@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url={{ route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]) }}">
-    <title>Redirigiendo al Login Central ERP...</title>
-</head>
-<body>
-    <p>Redirigiendo al <a href="{{ route('login', ['redirect' => request('redirect', route('egresados.dashboard_egresado'))]) }}">Login Central de SENA Empresa ERP</a>...</p>
-</body>
-</html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Iniciar Sesión · SIGE — Sistema de Información de Gestión de Egresados</title>
 
     <!-- Google Fonts: Fraunces + Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -144,6 +138,20 @@
                     </div>
 
                     <!-- Alerts / Error messages -->
+                    @if(session('warning') || request('inactivity'))
+                        <div class="bg-amber-50 text-amber-900 text-xs font-semibold p-3.5 rounded-xl border border-amber-300 mb-4 flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+                            <span>{{ session('warning') ?? 'Tu sesión ha expirado por inactividad. Inicia sesión nuevamente.' }}</span>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="bg-red-50 text-red-800 text-xs font-semibold p-3.5 rounded-xl border border-red-200 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-xmark text-red-600 text-base"></i>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    @endif
+
                     @if(session('info'))
                         <div class="bg-blue-50 text-blue-800 text-xs font-semibold p-3.5 rounded-xl border border-blue-200 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-info-circle text-blue-600"></i>
