@@ -194,11 +194,6 @@
                             <span class="hidden sm:inline">Salir</span>
                         </button>
                     </form>
-                @else
-                    <a href="{{ route('egresados.login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-[#39A900]/30 transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
-                        <span>Ingresar</span>
-                    </a>
                 @endauth
             </div>
 
