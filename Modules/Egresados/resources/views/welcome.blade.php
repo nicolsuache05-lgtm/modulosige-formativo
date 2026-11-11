@@ -487,6 +487,7 @@
     <!-- ============================================== -->
     @php
         $tituloQuienesSomos = preg_split('/\s+/', '¿Quiénes somos?');
+        $quienesSomosPalabras = preg_split('/\s+/', 'Somos el sistema oficial de gestión y articulación de la comunidad de egresados del Centro de Formación Agroindustrial La Angostura. Esta plataforma tecnológica fue desarrollada para centralizar, dinamizar y consolidar la conexión continua entre nuestros graduados y el sector productivo regional y nacional, a través de este software, facilitamos el seguimiento ocupacional, la difusión de noticias laborales, la gestión de encuestas de impacto, convocatorias de capacitación y eventos de actualización técnica. Transformamos los datos y la interacción digital en herramientas concretas para respaldar la evolución profesional de cada egresado y fortalecer el ecosistema productivo.');
         $misionPalabras = preg_split('/\s+/', 'Fortalecer el vínculo entre los egresados del Centro de Formación Agroindustrial La Angostura y el sector productivo mediante una plataforma tecnológica innovadora que permita centralizar información, realizar seguimiento laboral y facilitar el acceso a oportunidades de empleo, capacitaciones, eventos y noticias, contribuyendo al crecimiento personal y profesional de nuestra comunidad de egresados.');
         $visionPalabras = preg_split('/\s+/', 'Para el año 2030, consolidar a SIGE como una plataforma tecnológica de referencia en la gestión y seguimiento de egresados del Centro de Formación Agroindustrial La Angostura, destacándose por su innovación, accesibilidad y eficiencia en la conexión entre egresados, institución y sector productivo, promoviendo la empleabilidad, la formación continua y el desarrollo profesional.');
     @endphp
@@ -498,12 +499,7 @@
         <div class="relative z-10 max-w-7xl mx-auto">
 
             <!-- Encabezado Grande con Revelado al Bajar -->
-            <div class="sige-reveal-block text-center max-w-3xl mx-auto mb-12 space-y-3" data-sige-reveal="heading">
-                <span class="inline-flex items-center gap-2 bg-white text-[#2a7c00] border border-[#39A900]/35 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest font-poppins shadow-xs">
-                    <i class="fa-solid fa-seedling text-[#39A900]"></i>
-                    <span>Identidad Institucional · SIGE CEFA</span>
-                </span>
-
+            <div class="sige-reveal-block text-center max-w-4xl mx-auto mb-6 space-y-3" data-sige-reveal="heading">
                 <h2 class="font-poppins text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight text-[#00131E] leading-tight">
                     @foreach($tituloQuienesSomos as $idx => $palabra)
                         <span class="sige-word {{ $loop->last ? 'text-[#39A900]' : '' }}">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
@@ -511,6 +507,15 @@
                 </h2>
 
                 <div class="w-24 h-1.5 rounded-full bg-gradient-to-r from-[#001A29] via-[#39A900] to-[#62E31D] mx-auto"></div>
+            </div>
+
+            <!-- Descripción Institucional Ancha debajo de ¿Quiénes somos? -->
+            <div class="sige-reveal-block w-full mb-10" data-sige-reveal="intro">
+                <p class="font-sans text-[15px] sm:text-base lg:text-[16.5px] text-slate-700 leading-relaxed font-medium text-justify sm:text-center w-full">
+                    @foreach($quienesSomosPalabras as $idx => $palabra)
+                        <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                    @endforeach
+                </p>
             </div>
 
             <!-- 2 Cuadros claros por dentro con borde exterior en degradado oficial del ERP (Misión y Visión) -->
@@ -975,7 +980,7 @@
                 if (quienesSomosSection) {
                     quienesSomosSection.addEventListener('mousemove', (ev) => {
                         blockData.forEach(item => {
-                            if (item.kind !== 'card') return;
+                            if (item.kind !== 'card' && item.kind !== 'intro') return;
                             const targetBox = item.paragraph || item.el;
                             const rect = targetBox.getBoundingClientRect();
                             if (rect.height <= 0) return;
