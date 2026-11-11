@@ -18,6 +18,9 @@
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
       :root {
         /* ========================================================
@@ -475,19 +478,24 @@
         text-decoration: underline;
       }
 
-      /* Lower section: activity + progress */
+      /* Lower section: compact ERP summary charts */
       .lower-grid {
         display: grid;
-        grid-template-columns: 1.55fr 1fr;
-        gap: 24px;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 20px;
       }
 
       .panel {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 16px;
-        padding: 24px 26px;
+        padding: 20px 22px;
         box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
+      }
+      .chart-wrap-compact {
+        position: relative;
+        height: 220px;
+        width: 100%;
       }
       .panel-head {
         display: flex;
@@ -1010,120 +1018,48 @@
 
       </div>
 
-      <!-- Lower Grid: Actividad Reciente + Avance por Programa -->
+      <!-- Lower Grid: Gráficas Resumidas del Software (Colores ERP) -->
+      @php
+        $progLabels = [];
+        $progValues = [];
+        if (isset($programStats) && $programStats->count() > 0) {
+            foreach ($programStats as $prog) {
+                $progLabels[] = \Illuminate\Support\Str::limit($prog->name, 26);
+                $progValues[] = (int) $prog->total;
+            }
+        } else {
+            $progLabels = ['Gestión Agroempresarial', 'ADSO', 'Producción Agrícola', 'Contabilización'];
+            $progValues = [4, 4, 3, 1];
+        }
+      @endphp
       <div class="lower-grid">
-        
-        <!-- Panel Izquierdo: Actividad Reciente Dinámica -->
+
+        <!-- Gráfica 1: Resumen del Software SIGE -->
         <div class="panel">
-          <div class="panel-head">
-            <h3 class="panel-title">
-              <i class="fa-solid fa-bolt text-[#39A900]"></i>
-              <span>Actividad reciente</span>
+          <div class="panel-head" style="margin-bottom:14px; padding-bottom:10px;">
+            <h3 class="panel-title" style="font-size:16px;">
+              <i class="fa-solid fa-chart-column text-[#39A900]"></i>
+              <span>Resumen del Software SIGE</span>
+            </h3>
+            <a href="{{ route('egresados.reportes') }}" class="panel-action">Ver reportes</a>
+          </div>
+          <div class="chart-wrap-compact">
+            <canvas id="sigeResumenBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfica 2: Distribución por Programa -->
+        <div class="panel">
+          <div class="panel-head" style="margin-bottom:14px; padding-bottom:10px;">
+            <h3 class="panel-title" style="font-size:16px;">
+              <i class="fa-solid fa-chart-pie text-[#39A900]"></i>
+              <span>Egresados por Programa</span>
             </h3>
             <a href="{{ route('egresados.index') }}" class="panel-action">Ver todo</a>
           </div>
-
-          @forelse($recentEgresados as $item)
-            @php
-              $p = $item->person;
-              $fullName = $p ? trim($p->first_name . ' ' . $p->first_last_name) : 'Aprendiz SENA';
-              $progName = $item->course && $item->course->program ? $item->course->program->name : 'Formación SENA';
-              $isUpdated = $item->updated_at && $item->created_at && ($item->updated_at->timestamp > $item->created_at->timestamp + 60);
-              $timeDiff = $item->updated_at ? $item->updated_at->diffForHumans() : ($item->created_at ? $item->created_at->diffForHumans() : 'Recientemente');
-            @endphp
-            <div class="activity-row">
-              <div class="activity-dot" style="{{ $isUpdated ? 'background:#e0f2fe; color:#0284c7;' : 'background:#dcfce7; color:#166534;' }}">
-                <i class="fa-solid {{ $isUpdated ? 'fa-user-pen' : 'fa-user-plus' }}"></i>
-              </div>
-              <div style="flex:1;">
-                <div class="activity-text">
-                  @if($isUpdated)
-                    Se actualizaron los datos de <b>{{ $fullName }}</b> ({{ $progName }})
-                  @else
-                    Nuevo egresado registrado: <b>{{ $fullName }}</b> ({{ $progName }})
-                  @endif
-                </div>
-                <div class="activity-time flex items-center gap-2">
-                  <span>{{ $timeDiff }}</span>
-                  <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(0,19,30,0.06); font-weight:600;">{{ $item->apprentice_status }}</span>
-                </div>
-              </div>
-            </div>
-          @empty
-            <div style="text-align:center; padding: 28px 16px; color: var(--ink-soft); font-size:13px;">
-              <i class="fa-regular fa-clock" style="font-size:24px; margin-bottom:8px; display:block; opacity:0.4;"></i>
-              No hay actividades registradas recientemente.
-            </div>
-          @endforelse
-        </div>
-
-        <!-- Panel Derecho: Avance por Programa -->
-        <div class="panel">
-          <div class="panel-head">
-            <h3 class="panel-title">
-              <i class="fa-solid fa-chart-simple text-[#39A900]"></i>
-              <span>Avance por programa</span>
-            </h3>
+          <div class="chart-wrap-compact">
+            <canvas id="sigeProgramasDonutChart"></canvas>
           </div>
-
-          @php
-            $maxCount = (isset($programStats) && $programStats->count() > 0) ? $programStats->max('total') : 1;
-            if ($maxCount <= 0) $maxCount = 1;
-          @endphp
-
-          @if(isset($programStats) && $programStats->count() > 0)
-            @foreach($programStats as $prog)
-              @php
-                $pct = round(($prog->total / $maxCount) * 100);
-              @endphp
-              <div class="progress-item">
-                <div class="progress-label">
-                  <span>{{ $prog->name }}</span>
-                  <span>{{ $prog->total }} egresado{{ $prog->total != 1 ? 's' : '' }} ({{ $pct }}%)</span>
-                </div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: {{ $pct }}%"></div>
-                </div>
-              </div>
-            @endforeach
-          @else
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Gestión Agroempresarial</span>
-                <span>82%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 82%"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>ADSO (Desarrollo de Software)</span>
-                <span>68%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 68%"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Producción Agrícola</span>
-                <span>54%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 54%"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Contabilización</span>
-                <span>41%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 41%"></div>
-              </div>
-            </div>
-          @endif
         </div>
 
       </div>
@@ -1479,11 +1415,112 @@
     });
   }
 
-  @if(!empty($debeActualizarPassword))
   document.addEventListener('DOMContentLoaded', function() {
-    document.body.style.overflow = 'hidden';
+    @if(!empty($debeActualizarPassword))
+      document.body.style.overflow = 'hidden';
+    @endif
+
+    if (typeof Chart !== 'undefined') {
+      const erpPalette = ['#39A900', '#001A29', '#2d8500', '#00324D', '#62E31D'];
+
+      const barCtx = document.getElementById('sigeResumenBarChart');
+      if (barCtx) {
+        new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Egresados', 'Instructores', 'Encuestas', 'Eventos', 'Reportes'],
+            datasets: [{
+              label: 'Registros',
+              data: [
+                {{ (int) ($totalEgresados ?? 0) }},
+                {{ (int) ($totalInstructores ?? 0) }},
+                {{ (int) ($totalEncuestas ?? 0) }},
+                {{ (int) ($totalEventos ?? 0) }},
+                {{ (int) ($totalReportes ?? 0) }}
+              ],
+              backgroundColor: erpPalette,
+              borderRadius: 8,
+              maxBarThickness: 38,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#00131E',
+                titleColor: '#62E31D',
+                bodyColor: '#ffffff',
+                padding: 10,
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0, color: '#5A6E7D', font: { family: 'Poppins', size: 11 } },
+                grid: { color: 'rgba(0, 19, 30, 0.06)' }
+              },
+              x: {
+                ticks: { color: '#00131E', font: { family: 'Poppins', size: 11, weight: '600' } },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      const donutCtx = document.getElementById('sigeProgramasDonutChart');
+      if (donutCtx) {
+        new Chart(donutCtx, {
+          type: 'doughnut',
+          data: {
+            labels: @json($progLabels),
+            datasets: [{
+              data: @json($progValues),
+              backgroundColor: ['#39A900', '#001A29', '#62E31D', '#00324D'],
+              borderColor: '#ffffff',
+              borderWidth: 2,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '64%',
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  boxWidth: 10,
+                  boxHeight: 10,
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  color: '#00131E',
+                  font: { family: 'Poppins', size: 11, weight: '600' }
+                }
+              },
+              tooltip: {
+                backgroundColor: '#00131E',
+                titleColor: '#62E31D',
+                bodyColor: '#ffffff',
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(ctx) {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0) || 1;
+                    const pct = Math.round((ctx.parsed / total) * 100);
+                    return ' ' + ctx.parsed + ' egresado(s) (' + pct + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
   });
-  @endif
 </script>
 </body>
 </html>
