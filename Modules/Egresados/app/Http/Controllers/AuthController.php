@@ -73,6 +73,14 @@ class AuthController extends Controller
                     $user = User::where('nickname', 'egresado_' . $cleanDoc)->first();
                 }
 
+                // Cargar archivo persistente de contraseñas actualizadas
+                $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                    ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                    : [];
+
+                $hasExplicitlyChanged = $user && (isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]));
+
                 // El Super Admin debe ingresar únicamente con sus credenciales ya establecidas (su contraseña real)
                 $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
                     $user->roles->contains('slug', 'superadmin') || 
@@ -80,14 +88,15 @@ class AuthController extends Controller
                     $user->nickname === 'superadmin_egresados' || 
                     $user->email === 'superadmin.egresados@sena.edu.co');
 
-                if ($isSuperAdminUser) {
+                // Si ya actualizó su contraseña previamente o si es Super Admin, NO se permite ingresar con el documento como clave
+                if ($isSuperAdminUser || $hasExplicitlyChanged) {
                     $isDocPassword = false;
                 }
 
                 $canAuthenticate = false;
                 if ($user && Hash::check($password, $user->password)) {
                     $canAuthenticate = true;
-                } elseif (!$isSuperAdminUser && $isDocPassword) {
+                } elseif (!$isSuperAdminUser && !$hasExplicitlyChanged && $isDocPassword) {
                     $canAuthenticate = true;
                 }
 
@@ -116,9 +125,8 @@ class AuthController extends Controller
                         $user->email = $uniqueEmail;
                     }
 
-                    // Solo asignar el documento como clave si es un usuario recién creado
-                    // o si su contraseña actual todavía no está configurada (NUNCA a superadmin).
-                    if (!$isSuperAdminUser) {
+                    // Solo asignar el documento como clave si es un usuario nuevo y aún no ha actualizado clave (NUNCA a superadmin)
+                    if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
                         if (!$user->exists || empty($user->password)) {
                             $user->password = Hash::make($cleanDoc);
                         } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
@@ -128,16 +136,8 @@ class AuthController extends Controller
                     $user->person_id = $person->id;
                     $user->save();
 
-                    // Detectar si requiere actualizar la contraseña inicial (por ser primer acceso con cédula)
-                    $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-                    $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-                        ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-                        : [];
-                    
-                    $hasExplicitlyChanged = isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]);
-                    $isUsingDocAsPassword = Hash::check($cleanDoc, $user->password) || $isDocPassword;
-                    
-                    if ($isUsingDocAsPassword && !$hasExplicitlyChanged) {
+                    // Forzar cambio obligatorio de contraseña en primer ingreso con cédula para Instructor o Egresado
+                    if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
                         session(['sige_needs_password_change' => true]);
                     } else {
                         session()->forget('sige_needs_password_change');
@@ -225,18 +225,19 @@ class AuthController extends Controller
                 ]);
         }
 
-        // Si la contraseña coincide con el documento de la persona vinculada
-        if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
+        // Cargar registro de contraseñas actualizadas
+        $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+        $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+            ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+            : [];
+        $hasAlreadyUpdated = $user && (isset($passwordsActualizados[$user->id]) || ($user->person && isset($passwordsActualizados[(string)$user->person->document_number])));
+
+        // Si la contraseña coincide con el documento de la persona vinculada (SOLO si no ha cambiado clave y no es SuperAdmin)
+        if (!$hasAlreadyUpdated && $user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
             $user->password = Hash::make($password);
             $user->save();
 
-            $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-            $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-                ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-                : [];
-            if (!isset($passwordsActualizados[$user->id]) && !isset($passwordsActualizados[(string)$user->person->document_number])) {
-                session(['sige_needs_password_change' => true]);
-            }
+            session(['sige_needs_password_change' => true]);
 
             Auth::login($user, $remember);
             $request->session()->regenerate();

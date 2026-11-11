@@ -86,7 +86,9 @@ class InstructorController extends Controller
 
             $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
             if (!$alreadyUpdated) {
-                $debeActualizarPassword = true;
+                if (session('sige_needs_password_change') || (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password))) {
+                    $debeActualizarPassword = true;
+                }
             }
         }
 

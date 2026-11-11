@@ -63,6 +63,13 @@ class LoginController extends Controller
         }
 
         // 3. Validar si autentica: por Hash o por documento como contraseña
+        $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+        $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+            ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+            : [];
+
+        $hasExplicitlyChanged = $user && (isset($passwordsActualizados[$user->id]) || ($person && isset($passwordsActualizados[(string)$person->document_number])));
+
         $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
             $user->roles->contains('slug', 'superadmin') || 
             $user->nickname === 'superadmin' || 
@@ -70,18 +77,24 @@ class LoginController extends Controller
             $user->email === 'superadmin.egresados@sena.edu.co');
 
         $isDocPassword = ($person && ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput));
-        if ($isSuperAdminUser) {
-            $isDocPassword = false; // El Super Admin solo ingresa con sus credenciales reales ya establecidas
+        if ($isSuperAdminUser || $hasExplicitlyChanged) {
+            $isDocPassword = false; // El Super Admin o quien ya cambió su clave NO puede entrar con documento como clave
         }
 
         $canAuthenticate = false;
         if ($user && Hash::check($password, $user->password)) {
             $canAuthenticate = true;
-        } elseif (!$isSuperAdminUser && $isDocPassword) {
+        } elseif (!$isSuperAdminUser && !$hasExplicitlyChanged && $isDocPassword) {
             $canAuthenticate = true;
         }
 
         if ($canAuthenticate) {
+            // Forzar cambio obligatorio de contraseña en primer ingreso con cédula
+            if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
+                session(['sige_needs_password_change' => true]);
+            } else {
+                session()->forget('sige_needs_password_change');
+            }
             if (!$user && $person) {
                 $uniqueEmail = !empty($person->misena_email) 
                     ? $person->misena_email 
