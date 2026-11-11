@@ -41,18 +41,96 @@ class LoginController extends Controller
         $password = $request->input('password');
         $remember = $request->boolean('remember');
 
-        // Buscar al usuario por correo o por nickname
+        // 1. Buscar al usuario por correo o por nickname
         $user = User::where('email', $loginInput)
             ->orWhere('nickname', $loginInput)
             ->first();
 
+        // 2. Si no se encontró por email/nickname, buscar si es un número de documento
+        $cleanDoc = preg_replace('/\D/', '', $loginInput);
+        $person = null;
+        if (!empty($cleanDoc) && strlen($cleanDoc) >= 5) {
+            $person = \Modules\SICA\Entities\Person::where('document_number', $cleanDoc)
+                ->orWhere('document_number', (int)$cleanDoc)
+                ->first();
+
+            if ($person && !$user) {
+                $user = User::where('person_id', $person->id)->first()
+                    ?: User::where('email', $person->misena_email)->first()
+                    ?: User::where('email', $person->personal_email)->first()
+                    ?: User::where('nickname', 'egresado_' . $cleanDoc)->first();
+            }
+        }
+
+        // 3. Validar si autentica: por Hash o por documento como contraseña
+        $isDocPassword = ($person && ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput));
+        $canAuthenticate = false;
+
         if ($user && Hash::check($password, $user->password)) {
+            $canAuthenticate = true;
+        } elseif ($isDocPassword) {
+            $canAuthenticate = true;
+        }
+
+        if ($canAuthenticate) {
+            if (!$user && $person) {
+                $uniqueEmail = !empty($person->misena_email) 
+                    ? $person->misena_email 
+                    : (!empty($person->personal_email) ? $person->personal_email : 'egresado.' . $cleanDoc . '@sena.edu.co');
+
+                $user = User::firstOrCreate(
+                    ['person_id' => $person->id],
+                    [
+                        'nickname' => 'egresado_' . $cleanDoc,
+                        'email'    => $uniqueEmail,
+                        'password' => Hash::make($cleanDoc),
+                    ]
+                );
+            }
+
+            // Sincronizar roles si es instructor o egresado
+            $isSuperAdmin = $user->hasSuperAdmin() || 
+                $user->roles->contains('slug', 'egresados.admin') || 
+                $user->roles->contains('slug', 'superadmin') || 
+                $user->nickname === 'superadmin' || 
+                $user->nickname === 'admin';
+
+            $isInstructor = !$isSuperAdmin && (
+                $user->roles->contains('slug', 'egresados.instructor') || 
+                $user->roles->contains('slug', 'sigac.instructor') || 
+                $user->roles->contains('slug', 'agrocefa.trainer') || 
+                $user->roles->contains('slug', 'sica.instructor') ||
+                $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer')) ||
+                ($user->person_id && \Modules\SICA\Entities\Course::where('person_id', $user->person_id)->exists())
+            );
+
+            if ($isInstructor) {
+                $roleInst = \Modules\SICA\Entities\Role::where('slug', 'egresados.instructor')->first();
+                if ($roleInst && method_exists($user, 'roles')) {
+                    $user->roles()->syncWithoutDetaching([$roleInst->id]);
+                }
+            } elseif (!$isSuperAdmin) {
+                $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                if ($roleEgresado && method_exists($user, 'roles')) {
+                    $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                }
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
 
             $redirectUrl = $request->input('redirect');
             if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {
                 return redirect($redirectUrl)->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');
+            }
+
+            // Redirección inteligente al dashboard correspondiente
+            if ($isSuperAdmin) {
+                return redirect()->route('egresados.dashboard')->with('success', '¡Bienvenido(a) Administrador(a), ' . $user->full_name . '!');
+            } elseif ($isInstructor) {
+                return redirect()->route('egresados.dashboard_instructor')->with('success', '¡Bienvenido(a) Instructor(a), ' . $user->full_name . '!');
+            } elseif ($user->roles->contains('slug', 'egresados.egresado')) {
+                return redirect()->route('egresados.dashboard_egresado')->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . $user->full_name . '!');
             }
 
             return redirect()->intended(route('direccion.welcome'))->with('success', '¡Bienvenido(a) a SENA Empresa, ' . $user->full_name . '!');

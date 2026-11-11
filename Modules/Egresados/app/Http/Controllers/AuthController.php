@@ -130,24 +130,61 @@ class AuthController extends Controller
                         session()->forget('sige_needs_password_change');
                     }
 
+                    // Sincronizar rol según el perfil en el ERP (Admin, Instructor o Egresado)
+                    $isSuperAdmin = $user->hasSuperAdmin() || 
+                        $user->roles->contains('slug', 'egresados.admin') || 
+                        $user->roles->contains('slug', 'superadmin') || 
+                        $user->nickname === 'superadmin' || 
+                        $user->nickname === 'admin';
+
+                    $isInstructor = !$isSuperAdmin && (
+                        $user->roles->contains('slug', 'egresados.instructor') || 
+                        $user->roles->contains('slug', 'sigac.instructor') || 
+                        $user->roles->contains('slug', 'agrocefa.trainer') || 
+                        $user->roles->contains('slug', 'sica.instructor') ||
+                        $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer')) ||
+                        ($person && \Modules\SICA\Entities\Course::where('person_id', $person->id)->exists())
+                    );
+
                     try {
-                        $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
-                        if (!$roleEgresado) {
-                            $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
-                            $appId = $appEgresados ? $appEgresados->id : 30;
-                            $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
-                                ['slug' => 'egresados.egresado'],
-                                [
-                                    'name' => 'Egresado',
-                                    'description' => 'Graduado / Egresado de formación profesional del CEFA',
-                                    'description_english' => 'Graduate / Alumni of vocational training at CEFA',
-                                    'full_access' => 'No',
-                                    'app_id' => $appId,
-                                ]
-                            );
-                        }
-                        if ($roleEgresado && method_exists($user, 'roles')) {
-                            $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                        if ($isInstructor) {
+                            $roleInst = \Modules\SICA\Entities\Role::where('slug', 'egresados.instructor')->first();
+                            if (!$roleInst) {
+                                $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                                $appId = $appEgresados ? $appEgresados->id : 30;
+                                $roleInst = \Modules\SICA\Entities\Role::firstOrCreate(
+                                    ['slug' => 'egresados.instructor'],
+                                    [
+                                        'name' => 'Instructor Egresados',
+                                        'description' => 'Instructor / Coordinador de seguimiento a egresados',
+                                        'description_english' => 'Instructor / Coordinator alumni tracking',
+                                        'full_access' => 'No',
+                                        'app_id' => $appId,
+                                    ]
+                                );
+                            }
+                            if ($roleInst && method_exists($user, 'roles')) {
+                                $user->roles()->syncWithoutDetaching([$roleInst->id]);
+                            }
+                        } elseif (!$isSuperAdmin) {
+                            $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                            if (!$roleEgresado) {
+                                $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                                $appId = $appEgresados ? $appEgresados->id : 30;
+                                $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
+                                    ['slug' => 'egresados.egresado'],
+                                    [
+                                        'name' => 'Egresado',
+                                        'description' => 'Graduado / Egresado de formación profesional del CEFA',
+                                        'description_english' => 'Graduate / Alumni of vocational training at CEFA',
+                                        'full_access' => 'No',
+                                        'app_id' => $appId,
+                                    ]
+                                );
+                            }
+                            if ($roleEgresado && method_exists($user, 'roles')) {
+                                $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                            }
                         }
                     } catch (\Throwable $e) {
                     }
@@ -155,8 +192,7 @@ class AuthController extends Controller
                     Auth::login($user, $remember);
                     $request->session()->regenerate();
 
-                    return redirect()->route('egresados.dashboard_egresado')
-                        ->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . ($user->full_name ?: $person->full_name) . '!');
+                    return $this->redirectByRole($user);
                 }
             }
         }
@@ -249,7 +285,10 @@ class AuthController extends Controller
             $user->email === 'instructor.egresados@sena.edu.co' || 
             $user->roles->contains('slug', 'egresados.instructor') || 
             $user->roles->contains('slug', 'sigac.instructor') || 
-            $user->roles->contains('slug', 'agrocefa.trainer')) {
+            $user->roles->contains('slug', 'agrocefa.trainer') ||
+            $user->roles->contains('slug', 'sica.instructor') ||
+            $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer')) ||
+            ($user->person_id && \Modules\SICA\Entities\Course::where('person_id', $user->person_id)->exists())) {
             return redirect()->route('egresados.dashboard_instructor')
                 ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . $user->full_name . '!');
         }
