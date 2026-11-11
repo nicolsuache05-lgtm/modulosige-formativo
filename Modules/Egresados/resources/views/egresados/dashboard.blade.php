@@ -2401,9 +2401,7 @@
 
     <!-- Marca / Logo SENA SIGE Institucional -->
     <a href="{{ route('egresados.dashboard_egresado') }}" class="brand" onclick="showSection('inicio')">
-      <div class="brand-badge">
-        <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
-      </div>
+      @include('egresados::partials._sidebar_brand_logo')
       <div>
         <div class="brand-name">
           <span>SIGE</span>

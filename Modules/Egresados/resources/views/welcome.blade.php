@@ -146,9 +146,7 @@
             
             <!-- Brand Logo & Name -->
             <a href="{{ route('egresados.welcome') }}" class="flex items-center space-x-3 text-white no-underline group font-poppins">
-                <div class="w-11 h-11 rounded-full overflow-hidden shadow-md group-hover:scale-105 transition border-2 border-white/80 flex items-center justify-center bg-[#39A900] shrink-0">
-                    <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA" class="w-full h-full object-cover rounded-full">
-                </div>
+                @include('egresados::partials._sidebar_brand_logo')
                 <div>
                     <span class="text-2xl font-black tracking-wider leading-none text-white font-poppins">SIGE</span>
                     <p class="text-[11px] text-[#62E31D] font-bold font-sans mt-0.5">Centro de Formación Agroindustrial</p>

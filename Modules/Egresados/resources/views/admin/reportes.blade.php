@@ -87,9 +87,7 @@
         <div class="overflow-y-auto custom-scrollbar pr-1 -mr-1">
             <!-- Brand -->
             <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 pb-5 border-b border-white/15 no-underline text-white group">
-                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg shrink-0 border-2 border-[#62E31D] transform transition duration-300 group-hover:scale-105">
-                    <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="SENA" class="w-full h-full object-contain">
-                </div>
+                @include('egresados::partials._sidebar_brand_logo')
                 <div>
                     <div class="font-editorial text-lg font-extrabold tracking-wide text-white leading-none">SIGE</div>
                     <div class="text-[10.5px] text-[#62E31D] font-bold tracking-wider uppercase mt-1">GESTIÓN DE EGRESADOS</div>

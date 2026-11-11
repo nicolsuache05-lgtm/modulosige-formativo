@@ -379,9 +379,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <a href="{{ route('egresados.dashboard_egresado') }}" class="brand">
-      <div class="brand-badge">
-        <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA">
-      </div>
+      @include('egresados::partials._sidebar_brand_logo')
       <div>
         <div class="brand-name">SIGE</div>
         <div class="brand-sub">GESTIÓN DE EGRESADOS</div>

@@ -72,9 +72,7 @@
             
             <!-- Brand -->
             <a href="{{ route('egresados.welcome') }}" class="flex items-center gap-3 group">
-                <div class="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                    <img src="{{ route('egresados.assets.image', 'sena-empresa-logo.png') }}" alt="SENA Empresa Logo" class="w-full h-full object-contain">
-                </div>
+                @include('egresados::partials._sidebar_brand_logo')
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="font-poppins font-black text-xl text-white tracking-wide">SIGE</span>
