@@ -76,35 +76,49 @@ class InstructoresImport
         }
         $person->save();
 
-        // 2. Crear o Actualizar Usuario si tiene correo
-        if (!empty($person->personal_email)) {
-            $user = User::where('person_id', $person->id)->orWhere('email', $person->personal_email)->first();
-            if (!$user) {
-                $user = new User();
-                $baseNick = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstName . '.' . $firstLastName)) ?: 'instructor.' . $docNum;
-                $nick = $baseNick;
-                $c = 1;
-                while (User::where('nickname', $nick)->exists()) {
-                    $nick = $baseNick . $c++;
-                }
-                $user->nickname = $nick;
+        // 2. Crear o Actualizar Usuario garantizando acceso inicial con documento
+        $targetEmail = !empty($person->personal_email)
+            ? $person->personal_email
+            : ('instructor.' . $docNum . '@sena.edu.co');
+
+        $user = User::where('person_id', $person->id)->orWhere('email', $targetEmail)->first();
+        if (!$user) {
+            if (User::where('email', $targetEmail)->exists()) {
+                $targetEmail = 'instructor.' . $docNum . '.' . time() . '@sena.edu.co';
+            }
+            $user = new User();
+            $baseNick = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstName . '.' . $firstLastName)) ?: 'instructor.' . $docNum;
+            $nick = $baseNick;
+            $c = 1;
+            while (User::where('nickname', $nick)->exists()) {
+                $nick = $baseNick . $c++;
+            }
+            $user->nickname = $nick;
+            $user->person_id = $person->id;
+            $user->email = $targetEmail;
+            $user->password = \Illuminate\Support\Facades\Hash::make((string)$docNum);
+            $user->save();
+        } else {
+            if (!$user->person_id) {
                 $user->person_id = $person->id;
-                $user->email = $person->personal_email;
+            }
+            if (!\Modules\Egresados\Http\Controllers\AuthController::isSuperAdminAccount($user)
+                && !\Modules\Egresados\Http\Controllers\AuthController::hasCompletedInitialPasswordChange($user, $person)) {
                 $user->password = \Illuminate\Support\Facades\Hash::make((string)$docNum);
+            }
+            if ($user->isDirty()) {
                 $user->save();
             }
-
-            // Asignar rol de instructor
-            $role = Role::where('slug', 'egresados.instructor')->first()
-                ?: Role::where('slug', 'like', '%instructor%')->first();
-            if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
-                $user->roles()->attach($role->id);
-            }
-
-            return $user;
         }
 
-        return null;
+        // Asignar rol de instructor
+        $role = Role::where('slug', 'egresados.instructor')->first()
+            ?: Role::where('slug', 'like', '%instructor%')->first();
+        if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
+            $user->roles()->attach($role->id);
+        }
+
+        return $user;
     }
 
     /**

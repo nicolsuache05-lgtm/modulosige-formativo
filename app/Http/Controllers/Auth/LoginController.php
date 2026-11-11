@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Modules\Egresados\Http\Controllers\AuthController as SigeAuthController;
 
 class LoginController extends Controller
 {
@@ -37,8 +38,8 @@ class LoginController extends Controller
             'password.required' => 'Debes ingresar tu contraseña.',
         ]);
 
-        $loginInput = trim($request->input('email'));
-        $password = $request->input('password');
+        $loginInput = trim((string) $request->input('email'));
+        $password = trim((string) $request->input('password'));
         $remember = $request->boolean('remember');
 
         // 1. Buscar al usuario por correo o por nickname
@@ -63,21 +64,20 @@ class LoginController extends Controller
             }
         }
 
+        if ($user && !$person) {
+            $person = SigeAuthController::resolvePersonForUser($user);
+        }
+
         // 3. Validar si autentica: por Hash o por documento como contraseña
-        $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-        $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-            ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-            : [];
+        $docFallback = !empty($cleanDoc) && strlen($cleanDoc) >= 5 ? $cleanDoc : null;
+        $hasExplicitlyChanged = SigeAuthController::hasCompletedInitialPasswordChange($user, $person, $docFallback);
+        $isSuperAdminUser = SigeAuthController::isSuperAdminAccount($user);
 
-        $hasExplicitlyChanged = $user && (isset($passwordsActualizados[$user->id]) || ($person && isset($passwordsActualizados[(string)$person->document_number])));
-
-        $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
-            $user->roles->contains('slug', 'superadmin') || 
-            $user->nickname === 'superadmin' || 
-            $user->nickname === 'superadmin_egresados' || 
-            $user->email === 'superadmin.egresados@sena.edu.co');
-
-        $isDocPassword = ($person && ($password === (string)$person->document_number || $password === $cleanDoc || $password === $loginInput));
+        $isDocPassword = ($person && (
+            $password === (string)$person->document_number
+            || (!empty($cleanDoc) && $password === $cleanDoc)
+            || $password === $loginInput
+        ));
         if ($isSuperAdminUser || $hasExplicitlyChanged) {
             $isDocPassword = false; // El Super Admin o quien ya cambió su clave NO puede entrar con documento como clave
         }
@@ -100,24 +100,20 @@ class LoginController extends Controller
                     ]);
             }
 
-            // Forzar cambio obligatorio de contraseña en primer ingreso con cédula
-            if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
-                session(['sige_needs_password_change' => true]);
-            } else {
-                session()->forget('sige_needs_password_change');
-            }
             if (!$user && $person) {
-                $uniqueEmail = !empty($person->misena_email) 
-                    ? $person->misena_email 
-                    : (!empty($person->personal_email) ? $person->personal_email : 'egresado.' . $cleanDoc . '@sena.edu.co');
+                $isCourseInstructor = \Modules\SICA\Entities\Course::where('person_id', $person->id)->exists();
+                $nickPrefix = $isCourseInstructor ? 'instructor_' : 'egresado_';
+                $uniqueEmail = !empty($person->misena_email)
+                    ? $person->misena_email
+                    : (!empty($person->personal_email) ? $person->personal_email : ($isCourseInstructor ? 'instructor.' : 'egresado.') . $cleanDoc . '@sena.edu.co');
 
                 if (User::where('email', $uniqueEmail)->exists()) {
-                    $uniqueEmail = 'egresado.' . $cleanDoc . '.' . time() . '@sena.edu.co';
+                    $uniqueEmail = ($isCourseInstructor ? 'instructor.' : 'egresado.') . $cleanDoc . '.' . time() . '@sena.edu.co';
                 }
 
-                $nickname = 'egresado_' . $cleanDoc;
+                $nickname = $nickPrefix . $cleanDoc;
                 if (User::where('nickname', $nickname)->exists()) {
-                    $nickname = 'egresado_' . $cleanDoc . '_' . time();
+                    $nickname = $nickPrefix . $cleanDoc . '_' . time();
                 }
 
                 $user = User::firstOrCreate(
@@ -125,39 +121,37 @@ class LoginController extends Controller
                     [
                         'nickname' => $nickname,
                         'email'    => $uniqueEmail,
-                        'password' => Hash::make($cleanDoc),
+                        'password' => Hash::make($cleanDoc ?: (string)$person->document_number),
                     ]
                 );
             }
 
-            // Sincronizar roles si es instructor o egresado
-            $isSuperAdmin = $user->hasSuperAdmin() || 
-                $user->roles->contains('slug', 'egresados.admin') || 
-                $user->roles->contains('slug', 'superadmin') || 
-                $user->nickname === 'superadmin' || 
-                $user->nickname === 'admin';
-
-            $isInstructor = !$isSuperAdmin && (
-                $user->roles->contains('slug', 'egresados.instructor') || 
-                $user->roles->contains('slug', 'sigac.instructor') || 
-                $user->roles->contains('slug', 'agrocefa.trainer') || 
-                $user->roles->contains('slug', 'sica.instructor') ||
-                $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer')) ||
-                ($user->person_id && \Modules\SICA\Entities\Course::where('person_id', $user->person_id)->exists())
-            );
-
-            if ($isInstructor) {
-                $roleInst = \Modules\SICA\Entities\Role::where('slug', 'egresados.instructor')->first();
-                if ($roleInst && method_exists($user, 'roles')) {
-                    $user->roles()->syncWithoutDetaching([$roleInst->id]);
+            // Reevaluar cambio obligatorio sobre el usuario resuelto/creado y sincronizar vínculo/clave inicial
+            $hasExplicitlyChanged = SigeAuthController::hasCompletedInitialPasswordChange($user, $person, $docFallback);
+            if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
+                session(['sige_needs_password_change' => true]);
+                if ($user && $person) {
+                    $docForHash = (string)$person->document_number;
+                    if (!$user->person_id) {
+                        $user->person_id = $person->id;
+                    }
+                    if ($isDocPassword && !Hash::check($docForHash, $user->password)) {
+                        $user->password = Hash::make($docForHash);
+                    }
+                    if ($user->isDirty()) {
+                        $user->save();
+                    }
                 }
-            } elseif (!$isSuperAdmin) {
-                $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
-                if ($roleEgresado && method_exists($user, 'roles')) {
-                    $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+            } else {
+                session()->forget('sige_needs_password_change');
+                if ($user && $person && !$user->person_id) {
+                    $user->person_id = $person->id;
+                    $user->save();
                 }
             }
-            $user->load('roles');
+
+            $isSuperAdmin = SigeAuthController::isSuperAdminAccount($user);
+            $isInstructor = SigeAuthController::syncSigeRoleForUser($user, $person);
 
             Auth::login($user, $remember);
             $request->session()->regenerate();

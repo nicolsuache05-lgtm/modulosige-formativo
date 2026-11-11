@@ -77,20 +77,8 @@ class InstructorController extends Controller
             ->get();
 
         $user = auth()->user();
-        $person = $user ? $user->person : null;
-        $debeActualizarPassword = false;
-        if ($user && !$user->hasSuperAdmin()) {
-            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
-            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
-            $docStr = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
-
-            $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
-            if (!$alreadyUpdated) {
-                if (session('sige_needs_password_change') || (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password))) {
-                    $debeActualizarPassword = true;
-                }
-            }
-        }
+        $person = AuthController::resolvePersonForUser($user);
+        $debeActualizarPassword = AuthController::shouldRequireInitialPasswordChange($user, $person);
 
         // Solicitudes de registro de egresados pendientes de aprobación institucional
         $todasSolicitudes = \Modules\Egresados\Http\Controllers\EgresadosController::getSolicitudesRegistro();

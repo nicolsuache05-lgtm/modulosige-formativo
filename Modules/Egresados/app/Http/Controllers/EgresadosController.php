@@ -500,23 +500,8 @@ class EgresadosController extends Controller
 
             DB::commit();
 
-            // 6. Registrar contraseña elegida solo si es distinta al número de documento
-            if ((string)$request->password !== (string)$docNumber) {
-                try {
-                    $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-                    $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-                        ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-                        : [];
-                    $passwordsActualizados[$user->id] = date('Y-m-d H:i:s');
-                    $passwordsActualizados[(string)$docNumber] = date('Y-m-d H:i:s');
-                    if (!is_dir(dirname($passwordsActualizadosFile))) {
-                        @mkdir(dirname($passwordsActualizadosFile), 0777, true);
-                    }
-                    @file_put_contents($passwordsActualizadosFile, json_encode($passwordsActualizados, JSON_PRETTY_PRINT));
-                } catch (\Exception $ex) {
-                    \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
-                }
-            }
+            // Limpiar cualquier marca heredada no estructurada para permitir el primer ingreso por documento y cambio obligatorio con foto
+            AuthController::clearStalePasswordChangeRecord($user, (string)$docNumber);
 
             $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
 
@@ -668,10 +653,16 @@ class EgresadosController extends Controller
         $file = self::getSolicitudesStorageFile();
         @file_put_contents($file, json_encode($solicitudes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        // Actualizar estado del aprendiz a CERTIFICADO en base de datos
+        // Actualizar estado del aprendiz a CERTIFICADO y garantizar acceso inicial por documento en BD
         try {
-            $doc = $solicitud['documento'] ?? '';
-            $person = \Modules\SICA\Entities\Person::where('document_number', $doc)->first();
+            $doc = (string) ($solicitud['documento'] ?? '');
+            $person = \Modules\SICA\Entities\Person::where('document_number', $doc)
+                ->orWhere('document_number', (int) $doc)
+                ->first();
+            $userReg = !empty($solicitud['user_id']) ? User::find($solicitud['user_id']) : null;
+            if (!$userReg && $person) {
+                $userReg = User::where('person_id', $person->id)->first();
+            }
             if ($person) {
                 $apprentice = Apprentice::where('person_id', $person->id)->first();
                 if ($apprentice) {
@@ -679,6 +670,14 @@ class EgresadosController extends Controller
                     $apprentice->save();
                 }
             }
+            if ($userReg) {
+                if ($person && !$userReg->person_id) {
+                    $userReg->person_id = $person->id;
+                    $userReg->save();
+                }
+                AuthController::syncSigeRoleForUser($userReg, $person);
+            }
+            AuthController::clearStalePasswordChangeRecord($userReg, $doc);
         } catch (\Throwable $e) {
             \Log::warning('Error al actualizar estado en Apprentice: ' . $e->getMessage());
         }
@@ -868,24 +867,8 @@ class EgresadosController extends Controller
         
         // Determinar si el usuario debe actualizar su contraseña inicial (estilo SOFIA Plus)
         $userAuth = auth()->user();
-        $personAuth = $userAuth ? $userAuth->person : null;
-        if (!$personAuth && $userAuth && $userAuth->person_id) {
-            $personAuth = \Modules\SICA\Entities\Person::find($userAuth->person_id);
-        }
-        $debeActualizarPassword = false;
-        if ($userAuth && !$userAuth->hasSuperAdmin()) {
-            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
-            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
-            $docStr = $personAuth ? (string)$personAuth->document_number : preg_replace('/\D/', '', $userAuth->nickname ?? '');
-            $alreadyUpdated = isset($passwords[$userAuth->id]) || (!empty($docStr) && isset($passwords[$docStr]));
-            if (!$alreadyUpdated) {
-                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $userAuth->password)) {
-                    $debeActualizarPassword = true;
-                } elseif (session('sige_needs_password_change')) {
-                    $debeActualizarPassword = true;
-                }
-            }
-        }
+        $personAuth = AuthController::resolvePersonForUser($userAuth);
+        $debeActualizarPassword = AuthController::shouldRequireInitialPasswordChange($userAuth, $personAuth);
 
         // Solicitudes de registro de egresados pendientes de aprobación institucional
         $todasSolicitudes = self::getSolicitudesRegistro();
@@ -1082,6 +1065,10 @@ class EgresadosController extends Controller
                 $user->person_id = $person->id;
                 if (!\App\Models\User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
                     $user->email = $cleanEmail;
+                }
+                if (!AuthController::isSuperAdminAccount($user) && !AuthController::hasCompletedInitialPasswordChange($user, $person)) {
+                    $user->password = Hash::make((string)$docNum);
+                    AuthController::clearStalePasswordChangeRecord($user, (string)$docNum);
                 }
                 $user->save();
             }
@@ -1598,21 +1585,7 @@ class EgresadosController extends Controller
         $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');
 
         // Determinar si el egresado debe actualizar su contraseña inicial (primer ingreso con cédula)
-        $debeActualizarPassword = false;
-        if ($user && !$user->hasSuperAdmin()) {
-            $passwordsFile = storage_path('app/sige_passwords_actualizados.json');
-            $passwords = file_exists($passwordsFile) ? (json_decode(@file_get_contents($passwordsFile), true) ?: []) : [];
-            $docStr = $person ? (string)$person->document_number : preg_replace('/\D/', '', $user->nickname ?? '');
-
-            $alreadyUpdated = isset($passwords[$user->id]) || (!empty($docStr) && isset($passwords[$docStr]));
-            if (!$alreadyUpdated) {
-                if (!empty($docStr) && \Illuminate\Support\Facades\Hash::check($docStr, $user->password)) {
-                    $debeActualizarPassword = true;
-                } elseif (session('sige_needs_password_change')) {
-                    $debeActualizarPassword = true;
-                }
-            }
-        }
+        $debeActualizarPassword = AuthController::shouldRequireInitialPasswordChange($user, $person);
 
         // Obtener encuestas unificadas creadas por Admin o Superadmin
         $todasEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
@@ -3171,6 +3144,10 @@ class EgresadosController extends Controller
                     $user->person_id = $person->id;
                     if (!User::where('email', $cleanEmail)->where('id', '!=', $user->id)->exists()) {
                         $user->email = $cleanEmail;
+                    }
+                    if (!AuthController::isSuperAdminAccount($user) && !AuthController::hasCompletedInitialPasswordChange($user, $person)) {
+                        $user->password = Hash::make((string)$person->document_number);
+                        AuthController::clearStalePasswordChangeRecord($user, (string)$person->document_number);
                     }
                     $user->save();
                 }
