@@ -509,21 +509,18 @@
                     @endforeach
                 </h2>
 
-                <div class="w-24 h-1.5 rounded-full bg-gradient-to-r from-[#001A29] via-[#39A900] to-[#62E31D] mx-auto"></div>
+                <div class="w-24 h-1.5 rounded-full bg-[#39A900] mx-auto"></div>
             </div>
 
-            <!-- 2 Cuadros con Degradado Oficial del ERP (Misión y Visión) -->
+            <!-- 2 Cuadros con Colores Fijos y Bordes Oficiales del ERP (Misión y Visión) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 items-stretch">
 
                 <!-- Cuadro 1: MISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-gradient-to-br from-[#00131E] via-[#001A29] to-[#0E3F14] p-8 sm:p-10 text-white shadow-xl border border-[#39A900]/45 overflow-hidden flex flex-col justify-between" data-sige-reveal>
-                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#39A900]/25 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-20 -left-16 w-56 h-56 bg-[#62E31D]/15 rounded-full blur-3xl pointer-events-none"></div>
-
+                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#001A29] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#39A900] flex flex-col justify-between" data-sige-reveal>
                     <div class="relative z-10 space-y-5">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#39A900] to-[#62E31D] text-[#00131E] flex items-center justify-center text-xl shadow-lg shadow-[#39A900]/30 shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-md shrink-0 border-2 border-[#62E31D]">
                                     <i class="fa-solid fa-bullseye"></i>
                                 </div>
                                 <div>
@@ -531,12 +528,12 @@
                                     <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">Misión</h3>
                                 </div>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/10 text-[#62E31D] border border-[#62E31D]/30 font-poppins">CEFA La Angostura</span>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#002336] text-[#62E31D] border border-[#39A900] font-poppins">CEFA La Angostura</span>
                         </div>
 
-                        <div class="h-px w-full bg-gradient-to-r from-[#62E31D]/60 via-white/15 to-transparent"></div>
+                        <div class="h-0.5 w-full bg-[#39A900]"></div>
 
-                        <p class="font-sans text-[15px] sm:text-base text-slate-100/95 leading-relaxed font-medium text-justify">
+                        <p class="font-sans text-[15px] sm:text-base text-slate-100 leading-relaxed font-medium text-justify">
                             @foreach($misionPalabras as $idx => $palabra)
                                 <span class="sige-word" style="--w-idx: {{ $idx + 2 }};">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
                             @endforeach
@@ -545,14 +542,11 @@
                 </article>
 
                 <!-- Cuadro 2: VISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-gradient-to-br from-[#0A3811] via-[#1C6B00] to-[#001A29] p-8 sm:p-10 text-white shadow-xl border border-[#62E31D]/45 overflow-hidden flex flex-col justify-between" style="transition-delay: 140ms;" data-sige-reveal>
-                    <div class="absolute -top-20 -left-20 w-64 h-64 bg-[#62E31D]/20 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-20 -right-16 w-64 h-64 bg-[#00131E]/45 rounded-full blur-3xl pointer-events-none"></div>
-
+                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#2a7c00] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#001A29] flex flex-col justify-between" style="transition-delay: 140ms;" data-sige-reveal>
                     <div class="relative z-10 space-y-5">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#001A29] to-[#002336] text-[#62E31D] border border-[#62E31D]/50 flex items-center justify-center text-xl shadow-lg shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-[#001A29] text-[#62E31D] border-2 border-[#62E31D] flex items-center justify-center text-xl shadow-md shrink-0">
                                     <i class="fa-solid fa-eye"></i>
                                 </div>
                                 <div>
@@ -560,12 +554,12 @@
                                     <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">Visión</h3>
                                 </div>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#00131E]/45 text-[#62E31D] border border-[#62E31D]/35 font-poppins">Horizonte 2030</span>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#001A29] text-[#62E31D] border border-[#62E31D] font-poppins">Horizonte 2030</span>
                         </div>
 
-                        <div class="h-px w-full bg-gradient-to-r from-[#62E31D]/70 via-white/20 to-transparent"></div>
+                        <div class="h-0.5 w-full bg-[#001A29]"></div>
 
-                        <p class="font-sans text-[15px] sm:text-base text-white/95 leading-relaxed font-medium text-justify">
+                        <p class="font-sans text-[15px] sm:text-base text-white leading-relaxed font-medium text-justify">
                             @foreach($visionPalabras as $idx => $palabra)
                                 <span class="sige-word" style="--w-idx: {{ $idx + 4 }};">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
                             @endforeach
