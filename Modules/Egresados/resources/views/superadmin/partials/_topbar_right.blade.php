@@ -9,13 +9,9 @@
     /** @var \App\Models\User|null $currentUser */
     $currentUser = Auth::user();
     
-    $authAdminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
-    $authAdminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
-    
     $userEmail = $currentUser ? strtolower((string) $currentUser->email) : '';
-    $userNick  = $currentUser ? strtolower((string) $currentUser->nickname) : '';
 
-    $isSuperAdmin = $currentUser && (($userEmail === $authAdminEmail || $userNick === $authAdminNick) && ($currentUser->hasSuperAdmin() || $currentUser->hasRole('egresados.admin')));
+    $isSuperAdmin = $currentUser && ($currentUser->hasSuperAdmin() || $currentUser->hasRole('egresados.admin') || $currentUser->hasRole('superadmin'));
 
     $targetDirectorioUrl = route('egresados.dashboard_egresado');
     if ($isSuperAdmin) {

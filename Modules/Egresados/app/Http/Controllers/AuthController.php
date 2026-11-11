@@ -325,34 +325,6 @@ class AuthController extends Controller
 
         // Verificación estándar con Hash::check
         if ($user && Hash::check($password, $user->password)) {
-            // =====================================================================
-            // VALIDACIÓN CRÍTICA DE SUPERADMINISTRADOR:
-            // Solo una cuenta autorizada puede actuar como Superadministrador
-            // =====================================================================
-            $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
-            $authorizedSuperadminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
-            $isTryingSuperadmin = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
-
-            if ($isTryingSuperadmin) {
-                $userEmail = strtolower((string) $user->email);
-                $userNick  = strtolower((string) $user->nickname);
-                $isLegitimateEmail = ($userEmail === $authorizedSuperadminEmail || $userNick === $authorizedSuperadminNick);
-
-                if (!$isLegitimateEmail) {
-                    RateLimiter::hit($throttleKey, $decaySeconds);
-                    SigeSecurityLogger::log(
-                        'UNAUTHORIZED_SUPERADMIN_ATTEMPT',
-                        "Intento de inicio de sesión como Superadministrador denegado para correo no autorizado: {$user->email}",
-                        $request,
-                        $user
-                    );
-
-                    return redirect()->back()
-                        ->withErrors(['email' => 'La cuenta indicada no está autorizada para las funciones administrativas de SIGE.'])
-                        ->withInput($request->only('email'));
-                }
-            }
-
             $isInstructorOrEgresado = ($user->hasRole('egresados.egresado') || 
                                        $user->hasRole('egresados.instructor') ||
                                        $user->nickname === 'egresado_sige' ||
@@ -412,14 +384,7 @@ class AuthController extends Controller
      */
     public function redirectByRole(User $user)
     {
-        $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
-        $authorizedSuperadminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
-
-        $userEmail = strtolower((string) $user->email);
-        $userNick  = strtolower((string) $user->nickname);
-
-        $isAuthorizedSuperadmin = ($userEmail === $authorizedSuperadminEmail || $userNick === $authorizedSuperadminNick) 
-            && ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
+        $isAuthorizedSuperadmin = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
 
         // 1. Super Administrador General del ERP / Coordinación Académica -> Dashboard General
         if ($isAuthorizedSuperadmin) {

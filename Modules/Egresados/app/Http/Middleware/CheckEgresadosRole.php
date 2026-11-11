@@ -46,17 +46,8 @@ class CheckEgresadosRole
         $user = Auth::user();
 
         // 2. Comprobación de identidad autorizada de Superadministrador
-        $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
-        $authorizedSuperadminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
-
-        $userEmail = strtolower((string) $user->email);
-        $userNick  = strtolower((string) $user->nickname);
-
-        $isAuthorizedSuperadminEmail = ($userEmail === $authorizedSuperadminEmail || $userNick === $authorizedSuperadminNick);
         $hasSuperadminRole = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
-
-        // Solo es Superadministrador válido si cumple AMBAS condiciones: correo autorizado Y rol administrativo
-        $isLegitimateSuperadmin = $isAuthorizedSuperadminEmail && $hasSuperadminRole;
+        $isLegitimateSuperadmin = $hasSuperadminRole;
 
         // 3. Control de Acceso Basado en Roles (RBAC)
         switch ($roleType) {
