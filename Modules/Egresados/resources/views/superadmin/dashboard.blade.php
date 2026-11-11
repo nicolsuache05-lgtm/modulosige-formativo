@@ -482,7 +482,7 @@
       /* Lower section: compact ERP summary charts */
       .lower-grid {
         display: grid;
-        grid-template-columns: 1.2fr 1fr;
+        grid-template-columns: 1.05fr 1.15fr;
         gap: 20px;
       }
 
@@ -495,7 +495,7 @@
       }
       .chart-wrap-compact {
         position: relative;
-        height: 220px;
+        height: 225px;
         width: 100%;
       }
       .panel-head {
@@ -1507,8 +1507,8 @@
           chart: {
             type: 'pie',
             backgroundColor: 'transparent',
-            height: 220,
-            margin: [6, 6, 6, 6],
+            height: 225,
+            spacing: [8, 8, 8, 8],
             style: { fontFamily: 'Poppins, Nunito, sans-serif' },
             options3d: {
               enabled: true,
@@ -1529,10 +1529,14 @@
             align: 'right',
             verticalAlign: 'middle',
             layout: 'vertical',
+            margin: 24,
+            padding: 6,
             symbolRadius: 4,
             symbolHeight: 8,
             symbolWidth: 8,
-            itemMarginBottom: 6,
+            symbolPadding: 8,
+            itemMarginTop: 4,
+            itemMarginBottom: 8,
             itemStyle: {
               color: '#00131E',
               fontSize: '10px',
@@ -1541,7 +1545,9 @@
           },
           plotOptions: {
             pie: {
-              innerSize: 52,
+              center: ['50%', '50%'],
+              size: '86%',
+              innerSize: '50%',
               depth: 26,
               colors: ['#39A900', '#001A29', '#62E31D', '#00324D'],
               showInLegend: true,
@@ -1550,7 +1556,7 @@
                 distance: -16,
                 format: '{point.y}',
                 style: {
-                  fontSize: '10px',
+                  fontSize: '9.5px',
                   fontWeight: '800',
                   color: '#ffffff',
                   textOutline: '1px rgba(0, 19, 30, 0.7)'
