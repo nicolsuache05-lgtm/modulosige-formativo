@@ -107,12 +107,6 @@
         <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[#62E31D]/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            
-            <!-- Badge Superior -->
-            <div class="inline-flex items-center gap-2 bg-white/10 border border-[#62E31D]/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-[#62E31D] mb-6 shadow-sm">
-                <i class="fa-solid fa-users-gear text-sm"></i>
-                <span>TECNOLOGÍA EN ADSO · FICHA 3230026</span>
-            </div>
 
             <!-- Título Principal -->
             <h1 class="text-3xl sm:text-5xl font-black font-poppins text-white tracking-tight mb-5 leading-tight">
