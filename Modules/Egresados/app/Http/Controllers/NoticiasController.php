@@ -336,11 +336,12 @@ class NoticiasController extends Controller
 
         $allNoticias = $this->getAllNoticias();
         $totalNoticias = count($allNoticias);
-        $totalPublicadas = count(array_filter($allNoticias, fn($n) => in_array($n['status'], ['PUBLICADA', 'DESTACADA'])));
-        $totalDestacadas = count(array_filter($allNoticias, fn($n) => $n['status'] === 'DESTACADA'));
+        $excludedStatuses = ['BORRADOR', 'EXPIRADA', 'CERRADA', 'INACTIVA', 'ARCHIVADA'];
+        $totalPublicadas = count(array_filter($allNoticias, fn($n) => !in_array(strtoupper(trim($n['status'] ?? 'PUBLICADA')), $excludedStatuses)));
+        $totalDestacadas = count(array_filter($allNoticias, fn($n) => strtoupper(trim($n['status'] ?? '')) === 'DESTACADA'));
         $totalLecturas = array_sum(array_column($allNoticias, 'views_count'));
 
-        $categories = ['Convocatorias', 'Empleabilidad', 'Capacitación', 'Institucional', 'Comunidad'];
+        [$categories, $statuses] = $this->buildFilterOptions($allNoticias);
 
         return view('egresados::superadmin.noticias.index', [
             'noticias' => array_values($noticias),
@@ -349,10 +350,61 @@ class NoticiasController extends Controller
             'totalDestacadas' => $totalDestacadas,
             'totalLecturas' => $totalLecturas,
             'categories' => $categories,
+            'statuses' => $statuses,
             'filterSearch' => $search ?? '',
             'filterCategory' => $category ?? '',
             'filterStatus' => $status ?? '',
         ]);
+    }
+
+    /**
+     * Resuelve colores e ícono institucional según la categoría escrita.
+     */
+    private function resolveCategoryMeta(string $category): array
+    {
+        $key = mb_strtolower(trim($category), 'UTF-8');
+        $map = [
+            'convocatorias' => ['pill' => 'status-green', 'icon' => 'fa-solid fa-bullhorn', 'bg' => '#EAF7EE', 'color' => '#39A900'],
+            'empleabilidad' => ['pill' => 'status-blue',  'icon' => 'fa-solid fa-briefcase', 'bg' => '#EEF4FF', 'color' => '#2563EB'],
+            'capacitación'  => ['pill' => 'status-amber', 'icon' => 'fa-solid fa-certificate', 'bg' => '#FEF3C7', 'color' => '#D97706'],
+            'capacitacion'  => ['pill' => 'status-amber', 'icon' => 'fa-solid fa-certificate', 'bg' => '#FEF3C7', 'color' => '#D97706'],
+            'institucional' => ['pill' => 'status-green', 'icon' => 'fa-solid fa-building-columns', 'bg' => '#E0F2FE', 'color' => '#0284C7'],
+            'comunidad'     => ['pill' => 'status-blue',  'icon' => 'fa-solid fa-users-rays', 'bg' => '#F3E8FF', 'color' => '#9333EA'],
+        ];
+
+        return $map[$key] ?? ['pill' => 'status-green', 'icon' => 'fa-solid fa-newspaper', 'bg' => '#EAF7EE', 'color' => '#39A900'];
+    }
+
+    /**
+     * Resuelve el estilo visual del estado de publicación.
+     */
+    private function resolveStatusPill(string $status): string
+    {
+        $key = strtoupper(trim($status));
+        if (str_contains($key, 'DESTACAD') || str_contains($key, 'PRIORIDAD')) {
+            return 'status-blue';
+        }
+        if (str_contains($key, 'BORRADOR') || str_contains($key, 'PENDIENTE') || str_contains($key, 'EXPIRAD') || str_contains($key, 'CERRAD')) {
+            return 'status-amber';
+        }
+        return 'status-green';
+    }
+
+    /**
+     * Combina categorías y estados predeterminados con valores personalizados registrados.
+     */
+    private function buildFilterOptions(array $allNoticias): array
+    {
+        $defaultCats = ['Convocatorias', 'Empleabilidad', 'Capacitación', 'Institucional', 'Comunidad'];
+        $defaultStatuses = ['PUBLICADA', 'DESTACADA', 'BORRADOR', 'EXPIRADA'];
+
+        $extraCats = array_values(array_filter(array_map(fn($n) => trim((string)($n['category'] ?? '')), $allNoticias)));
+        $extraStatuses = array_values(array_filter(array_map(fn($n) => trim((string)($n['status'] ?? '')), $allNoticias)));
+
+        $categories = array_values(array_unique(array_merge($defaultCats, $extraCats)));
+        $statuses = array_values(array_unique(array_merge($defaultStatuses, $extraStatuses)));
+
+        return [$categories, $statuses];
     }
 
     /**
@@ -362,10 +414,10 @@ class NoticiasController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category' => 'required|string|max:100',
             'summary' => 'required|string|max:500',
             'content' => 'required|string',
-            'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
+            'status' => 'required|string|max:100',
             'target' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
             'fecha_vigencia' => 'nullable|string|max:50',
@@ -373,30 +425,9 @@ class NoticiasController extends Controller
             'image_url' => 'nullable|string|max:1000',
         ]);
 
-        $categoryPillMap = [
-            'Convocatorias' => 'status-green',
-            'Empleabilidad' => 'status-blue',
-            'Capacitación' => 'status-amber',
-            'Institucional' => 'status-green',
-            'Comunidad' => 'status-blue',
-        ];
-
-        $statusPillMap = [
-            'PUBLICADA' => 'status-green',
-            'DESTACADA' => 'status-blue',
-            'BORRADOR' => 'status-amber',
-        ];
-
-        $iconMap = [
-            'Convocatorias' => ['icon' => 'fa-solid fa-bullhorn', 'bg' => '#EAF7EE', 'color' => '#39A900'],
-            'Empleabilidad' => ['icon' => 'fa-solid fa-briefcase', 'bg' => '#EEF4FF', 'color' => '#2563EB'],
-            'Capacitación' => ['icon' => 'fa-solid fa-certificate', 'bg' => '#FEF3C7', 'color' => '#D97706'],
-            'Institucional' => ['icon' => 'fa-solid fa-building-columns', 'bg' => '#E0F2FE', 'color' => '#0284C7'],
-            'Comunidad' => ['icon' => 'fa-solid fa-users-rays', 'bg' => '#F3E8FF', 'color' => '#9333EA'],
-        ];
-
-        $cat = $validated['category'];
-        $iconData = $iconMap[$cat] ?? ['icon' => 'fa-solid fa-newspaper', 'bg' => '#EAF7EE', 'color' => '#39A900'];
+        $cat = trim($validated['category']);
+        $status = trim($validated['status']);
+        $catMeta = $this->resolveCategoryMeta($cat);
 
         $uploadedImage = $this->processUploadedImage($request);
 
@@ -415,20 +446,20 @@ class NoticiasController extends Controller
             'id' => 'NOT-' . str_pad((count($this->getAllNoticias()) + 1), 3, '0', STR_PAD_LEFT),
             'title' => $validated['title'],
             'category' => $cat,
-            'category_pill' => $categoryPillMap[$cat] ?? 'status-green',
+            'category_pill' => $catMeta['pill'],
             'summary' => $validated['summary'],
             'content' => $validated['content'],
             'author' => !empty($validated['author']) ? $validated['author'] : (auth()->check() ? (auth()->user()->name ?? 'Administración CEFA') : 'Super Administrador SIGE'),
             'author_role' => 'Administración CEFA La Angostura',
             'date' => Carbon::now()->locale('es')->isoFormat('D MMM Y'),
             'fecha_vigencia' => $fechaVigencia,
-            'status' => $validated['status'],
-            'status_pill' => $statusPillMap[$validated['status']] ?? 'status-green',
+            'status' => $status,
+            'status_pill' => $this->resolveStatusPill($status),
             'views_count' => 1,
             'target' => !empty($validated['target']) ? $validated['target'] : 'Todos los Egresados CEFA',
-            'icon' => $iconData['icon'],
-            'icon_bg' => $iconData['bg'],
-            'icon_color' => $iconData['color'],
+            'icon' => $catMeta['icon'],
+            'icon_bg' => $catMeta['bg'],
+            'icon_color' => $catMeta['color'],
             'image' => $uploadedImage ?: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&auto=format&fit=crop&q=80',
         ];
 
@@ -445,10 +476,10 @@ class NoticiasController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category' => 'required|string|max:100',
             'summary' => 'required|string|max:500',
             'content' => 'required|string',
-            'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
+            'status' => 'required|string|max:100',
             'target' => 'nullable|string|max:255',
             'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
@@ -469,18 +500,20 @@ class NoticiasController extends Controller
             return redirect()->back()->with('error', 'La noticia especificada no fue encontrada.');
         }
 
-        $statusPillMap = [
-            'PUBLICADA' => 'status-green',
-            'DESTACADA' => 'status-blue',
-            'BORRADOR' => 'status-amber',
-        ];
+        $cat = trim($validated['category']);
+        $status = trim($validated['status']);
+        $catMeta = $this->resolveCategoryMeta($cat);
 
         $targetNoticia['title'] = $validated['title'];
-        $targetNoticia['category'] = $validated['category'];
+        $targetNoticia['category'] = $cat;
+        $targetNoticia['category_pill'] = $catMeta['pill'];
+        $targetNoticia['icon'] = $catMeta['icon'];
+        $targetNoticia['icon_bg'] = $catMeta['bg'];
+        $targetNoticia['icon_color'] = $catMeta['color'];
         $targetNoticia['summary'] = $validated['summary'];
         $targetNoticia['content'] = $validated['content'];
-        $targetNoticia['status'] = $validated['status'];
-        $targetNoticia['status_pill'] = $statusPillMap[$validated['status']] ?? 'status-green';
+        $targetNoticia['status'] = $status;
+        $targetNoticia['status_pill'] = $this->resolveStatusPill($status);
         if (!empty($validated['target'])) {
             $targetNoticia['target'] = $validated['target'];
         }
@@ -568,11 +601,12 @@ class NoticiasController extends Controller
 
         $allNoticias = self::getAllNoticias();
         $totalNoticias = count($allNoticias);
-        $totalPublicadas = count(array_filter($allNoticias, fn($n) => in_array($n['status'], ['PUBLICADA', 'DESTACADA'])));
-        $totalDestacadas = count(array_filter($allNoticias, fn($n) => $n['status'] === 'DESTACADA'));
+        $excludedStatuses = ['BORRADOR', 'EXPIRADA', 'CERRADA', 'INACTIVA', 'ARCHIVADA'];
+        $totalPublicadas = count(array_filter($allNoticias, fn($n) => !in_array(strtoupper(trim($n['status'] ?? 'PUBLICADA')), $excludedStatuses)));
+        $totalDestacadas = count(array_filter($allNoticias, fn($n) => strtoupper(trim($n['status'] ?? '')) === 'DESTACADA'));
         $totalLecturas = array_sum(array_column($allNoticias, 'views_count'));
 
-        $categories = ['Convocatorias', 'Empleabilidad', 'Capacitación', 'Institucional', 'Comunidad'];
+        [$categories, $statuses] = $this->buildFilterOptions($allNoticias);
 
         return view('egresados::instructor.noticias.index', [
             'noticias' => array_values($noticias),
@@ -581,6 +615,7 @@ class NoticiasController extends Controller
             'totalDestacadas' => $totalDestacadas,
             'totalLecturas' => $totalLecturas,
             'categories' => $categories,
+            'statuses' => $statuses,
             'filterSearch' => $search ?? '',
             'filterCategory' => $category ?? '',
             'filterStatus' => $status ?? '',
@@ -594,10 +629,10 @@ class NoticiasController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category' => 'required|string|max:100',
             'summary' => 'required|string|max:500',
             'content' => 'required|string',
-            'status' => 'nullable|string|in:PUBLICADA,BORRADOR,DESTACADA',
+            'status' => 'nullable|string|max:100',
             'target' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
             'fecha_vigencia' => 'nullable|string|max:50',
@@ -605,34 +640,12 @@ class NoticiasController extends Controller
             'image_url' => 'nullable|string|max:1000',
         ]);
 
-        $categoryPillMap = [
-            'Convocatorias' => 'status-green',
-            'Empleabilidad' => 'status-blue',
-            'Capacitación' => 'status-amber',
-            'Institucional' => 'status-green',
-            'Comunidad' => 'status-blue',
-        ];
-
-        $statusPillMap = [
-            'PUBLICADA' => 'status-green',
-            'DESTACADA' => 'status-blue',
-            'BORRADOR' => 'status-amber',
-        ];
-
-        $iconMap = [
-            'Convocatorias' => ['icon' => 'fa-solid fa-bullhorn', 'bg' => '#EAF7EE', 'color' => '#39A900'],
-            'Empleabilidad' => ['icon' => 'fa-solid fa-briefcase', 'bg' => '#EEF4FF', 'color' => '#2563EB'],
-            'Capacitación' => ['icon' => 'fa-solid fa-certificate', 'bg' => '#FEF3C7', 'color' => '#D97706'],
-            'Institucional' => ['icon' => 'fa-solid fa-building-columns', 'bg' => '#E0F2FE', 'color' => '#0284C7'],
-            'Comunidad' => ['icon' => 'fa-solid fa-users-rays', 'bg' => '#F3E8FF', 'color' => '#9333EA'],
-        ];
-
-        $cat = $validated['category'];
-        $iconData = $iconMap[$cat] ?? ['icon' => 'fa-solid fa-newspaper', 'bg' => '#EAF7EE', 'color' => '#39A900'];
+        $cat = trim($validated['category']);
+        $catMeta = $this->resolveCategoryMeta($cat);
 
         $defaultAuthor = auth()->check() ? (auth()->user()->name ?? 'Instructor CEFA') : 'Carlos Mendoza';
         $author = !empty($validated['author']) ? $validated['author'] : $defaultAuthor;
-        $status = !empty($validated['status']) ? $validated['status'] : 'PUBLICADA';
+        $status = !empty($validated['status']) ? trim($validated['status']) : 'PUBLICADA';
 
         $uploadedImage = $this->processUploadedImage($request);
 
@@ -651,7 +664,7 @@ class NoticiasController extends Controller
             'id' => 'NOT-' . str_pad((count(self::getAllNoticias()) + 1), 3, '0', STR_PAD_LEFT),
             'title' => $validated['title'],
             'category' => $cat,
-            'category_pill' => $categoryPillMap[$cat] ?? 'status-green',
+            'category_pill' => $catMeta['pill'],
             'summary' => $validated['summary'],
             'content' => $validated['content'],
             'author' => $author,
@@ -659,12 +672,12 @@ class NoticiasController extends Controller
             'date' => Carbon::now()->locale('es')->isoFormat('D MMM Y'),
             'fecha_vigencia' => $fechaVigencia,
             'status' => $status,
-            'status_pill' => $statusPillMap[$status] ?? 'status-green',
+            'status_pill' => $this->resolveStatusPill($status),
             'views_count' => 1,
             'target' => !empty($validated['target']) ? $validated['target'] : 'Fichas Asignadas del Instructor',
-            'icon' => $iconData['icon'],
-            'icon_bg' => $iconData['bg'],
-            'icon_color' => $iconData['color'],
+            'icon' => $catMeta['icon'],
+            'icon_bg' => $catMeta['bg'],
+            'icon_color' => $catMeta['color'],
             'image' => $uploadedImage ?: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
         ];
 
@@ -681,10 +694,10 @@ class NoticiasController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category' => 'required|string|max:100',
             'summary' => 'required|string|max:500',
             'content' => 'required|string',
-            'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
+            'status' => 'required|string|max:100',
             'target' => 'nullable|string|max:255',
             'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
@@ -705,18 +718,20 @@ class NoticiasController extends Controller
             return redirect()->back()->with('error', 'La noticia especificada no fue encontrada.');
         }
 
-        $statusPillMap = [
-            'PUBLICADA' => 'status-green',
-            'DESTACADA' => 'status-blue',
-            'BORRADOR' => 'status-amber',
-        ];
+        $cat = trim($validated['category']);
+        $status = trim($validated['status']);
+        $catMeta = $this->resolveCategoryMeta($cat);
 
         $targetNoticia['title'] = $validated['title'];
-        $targetNoticia['category'] = $validated['category'];
+        $targetNoticia['category'] = $cat;
+        $targetNoticia['category_pill'] = $catMeta['pill'];
+        $targetNoticia['icon'] = $catMeta['icon'];
+        $targetNoticia['icon_bg'] = $catMeta['bg'];
+        $targetNoticia['icon_color'] = $catMeta['color'];
         $targetNoticia['summary'] = $validated['summary'];
         $targetNoticia['content'] = $validated['content'];
-        $targetNoticia['status'] = $validated['status'];
-        $targetNoticia['status_pill'] = $statusPillMap[$validated['status']] ?? 'status-green';
+        $targetNoticia['status'] = $status;
+        $targetNoticia['status_pill'] = $this->resolveStatusPill($status);
         if (!empty($validated['target'])) {
             $targetNoticia['target'] = $validated['target'];
         }

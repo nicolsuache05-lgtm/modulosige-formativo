@@ -576,10 +576,9 @@
 
                   <select name="status" class="px-3 py-2 border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#39A900] bg-white text-gray-700 font-medium">
                       <option value="Todos" {{ ($filterStatus ?? '') == 'Todos' ? 'selected' : '' }}>Todos los estados</option>
-                      <option value="PUBLICADA" {{ ($filterStatus ?? '') == 'PUBLICADA' ? 'selected' : '' }}>Publicadas</option>
-                      <option value="DESTACADA" {{ ($filterStatus ?? '') == 'DESTACADA' ? 'selected' : '' }}>Destacadas</option>
-                      <option value="BORRADOR" {{ ($filterStatus ?? '') == 'BORRADOR' ? 'selected' : '' }}>Borrador</option>
-                      <option value="EXPIRADA" {{ ($filterStatus ?? '') == 'EXPIRADA' ? 'selected' : '' }}>Expiradas (Vencidas)</option>
+                      @foreach($statuses ?? ['PUBLICADA', 'DESTACADA', 'BORRADOR', 'EXPIRADA'] as $st)
+                          <option value="{{ $st }}" {{ ($filterStatus ?? '') == $st ? 'selected' : '' }}>{{ $st }}</option>
+                      @endforeach
                   </select>
 
                   <button type="submit" class="px-4 py-2 bg-gray-800 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer">
@@ -761,26 +760,35 @@
                 </div>
 
                 <!-- Categoría, Estado y Fecha de Vigencia -->
+                <datalist id="noticiasCategoriasListInstructor">
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat }}">
+                    @endforeach
+                </datalist>
+                <datalist id="noticiasEstadosListInstructor">
+                    <option value="Publicada">
+                    <option value="Destacada">
+                    <option value="Borrador">
+                    @foreach($statuses ?? [] as $st)
+                        <option value="{{ $st }}">
+                    @endforeach
+                </datalist>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Categoría <span class="text-red-500">*</span>
                         </label>
-                        <select name="category" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat }}">{{ $cat }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="category" list="noticiasCategoriasListInstructor" required
+                               placeholder="Escribe la categoría..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Estado <span class="text-red-500">*</span>
                         </label>
-                        <select name="status" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
-                            <option value="PUBLICADA">Publicada Inmediata</option>
-                            <option value="DESTACADA">Destacada (Prioridad)</option>
-                            <option value="BORRADOR">Guardar como Borrador</option>
-                        </select>
+                        <input type="text" name="status" list="noticiasEstadosListInstructor" required
+                               placeholder="Escribe el estado..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
@@ -1018,20 +1026,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Categoría *</label>
-                        <select name="category" required x-model="noticiaActiva.category" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat }}">{{ $cat }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="category" list="noticiasCategoriasListInstructor" required x-model="noticiaActiva.category"
+                               placeholder="Escribe la categoría..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Estado de Publicación *</label>
-                        <select name="status" required x-model="noticiaActiva.status" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
-                            <option value="PUBLICADA">Publicada</option>
-                            <option value="DESTACADA">Destacada</option>
-                            <option value="BORRADOR">Borrador</option>
-                            <option value="EXPIRADA">Expirada (Cerrada)</option>
-                        </select>
+                        <input type="text" name="status" list="noticiasEstadosListInstructor" required x-model="noticiaActiva.status"
+                               placeholder="Escribe el estado..."
+                               class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Vigencia / Fecha Límite</label>

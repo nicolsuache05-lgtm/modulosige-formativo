@@ -121,13 +121,19 @@
                                 <span>Público Objetivo (Egresados)</span>
                                 <span class="text-red-500">*</span>
                             </label>
-                            <select name="publico_objetivo" required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
-                                <option value="TODOS">Todos los Egresados (General CEFA)</option>
-                                <option value="ADSO">Egresados ADSO (Software)</option>
-                                <option value="GAE">Egresados Gestión Agroempresarial</option>
-                                <option value="EMPRENDEDORES">Egresados con Unidades Productivas</option>
-                                <option value="INSTRUCTORES">Docentes / Coordinadores de Seguimiento</option>
-                            </select>
+                            <input type="text"
+                                   name="publico_objetivo"
+                                   list="publicoObjetivoSugerido"
+                                   required
+                                   placeholder="Escribe el público objetivo (Ej. Todos los Egresados, ADSO)..."
+                                   class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                            <datalist id="publicoObjetivoSugerido">
+                                <option value="Todos los Egresados (General CEFA)">
+                                <option value="Egresados ADSO (Software)">
+                                <option value="Egresados Gestión Agroempresarial">
+                                <option value="Egresados con Unidades Productivas">
+                                <option value="Docentes / Coordinadores de Seguimiento">
+                            </datalist>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">

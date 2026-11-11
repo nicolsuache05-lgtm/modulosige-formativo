@@ -32,7 +32,7 @@ class ReportesController extends Controller
         $programs = Program::orderBy('name')->get();
         $courses = Course::with('program')->orderBy('code')->get();
         $totalProgramas = $programs->count() ?: 12;
-        $totalFormatos = 3;
+        $totalFormatos = 2;
 
         // Reportes Base preconfigurados y guardados en sesión si existen
         $baseReports = $this->getBaseReports($totalEgresadosCount, $totalEmpleadosCount, $totalDesempleadosCount, $tasaEmpleabilidad, $rateValue);
@@ -59,16 +59,16 @@ class ReportesController extends Controller
     {
         $request->validate([
             'nombre_reporte' => 'required|string|max:150',
-            'tipo_reporte' => 'required|string',
+            'tipo_reporte' => 'required|string|max:150',
             'filtro_programa' => 'nullable|string',
             'filtro_ficha' => 'nullable|string',
             'fecha_inicio' => 'nullable|date',
             'fecha_fin' => 'nullable|date',
-            'formato_exportacion' => 'required|string|in:EXCEL,PDF,CSV',
+            'formato_exportacion' => 'required|string|in:EXCEL,PDF',
             'columnas' => 'nullable|array',
         ], [
             'nombre_reporte.required' => 'El nombre del reporte es obligatorio.',
-            'tipo_reporte.required' => 'Debe seleccionar un tipo de reporte u origen de datos.',
+            'tipo_reporte.required' => 'Debe indicar el tipo de reporte u origen de datos.',
             'formato_exportacion.required' => 'Debe seleccionar el formato de exportación.',
         ]);
 

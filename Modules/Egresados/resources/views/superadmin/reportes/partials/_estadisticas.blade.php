@@ -60,10 +60,10 @@
                 <i class="fa-solid fa-file-export"></i>
             </span>
         </div>
-        <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ $totalFormatos ?? 3 }}</div>
+        <div class="font-editorial text-2xl sm:text-3xl font-bold text-[#00131E]">{{ $totalFormatos ?? 2 }}</div>
         <div class="mt-2 flex items-center gap-1.5">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAF7EE] text-[#166534] border border-[#BBF7D0]">
-                PDF · Excel · CSV
+                PDF · Excel
             </span>
         </div>
     </div>

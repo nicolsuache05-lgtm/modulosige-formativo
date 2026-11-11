@@ -777,8 +777,8 @@ class EgresadosController extends Controller
 
         $todasNoticias = \Modules\Egresados\Http\Controllers\NoticiasController::getAllNoticias();
         $noticiasPublicadas = array_values(array_filter($todasNoticias, function ($n) {
-            $status = strtoupper($n['status'] ?? 'PUBLICADA');
-            return in_array($status, ['PUBLICADA', 'DESTACADA', 'ACTIVA']);
+            $status = strtoupper(trim($n['status'] ?? 'PUBLICADA'));
+            return !in_array($status, ['BORRADOR', 'EXPIRADA', 'CERRADA', 'INACTIVA', 'ARCHIVADA']);
         }));
         $noticiaDestacada = !empty($noticiasPublicadas) ? $noticiasPublicadas[0] : ($todasNoticias[0] ?? null);
 
@@ -1680,8 +1680,8 @@ class EgresadosController extends Controller
 
         $todasNoticias = \Modules\Egresados\Http\Controllers\NoticiasController::getAllNoticias();
         $noticiasPublicadas = array_values(array_filter($todasNoticias, function ($n) {
-            $status = strtoupper($n['status'] ?? 'PUBLICADA');
-            return in_array($status, ['PUBLICADA', 'DESTACADA', 'ACTIVA']);
+            $status = strtoupper(trim($n['status'] ?? 'PUBLICADA'));
+            return !in_array($status, ['BORRADOR', 'EXPIRADA', 'CERRADA', 'INACTIVA', 'ARCHIVADA']);
         }));
         if (empty($noticiasPublicadas)) {
             $noticiasPublicadas = $todasNoticias;

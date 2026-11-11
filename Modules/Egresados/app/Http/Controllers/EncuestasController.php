@@ -297,13 +297,13 @@ class EncuestasController extends Controller
         $request->validate([
             'titulo'               => 'required|string|max:255',
             'descripcion'          => 'nullable|string',
-            'publico_objetivo'     => 'required|string',
+            'publico_objetivo'     => 'required|string|max:200',
             'fecha_cierre'         => 'required|date',
             'url_formulario'       => 'nullable|url|max:500',
             'estructura_preguntas' => 'nullable|string',
         ], [
             'titulo.required'           => 'El título de la encuesta es obligatorio.',
-            'publico_objetivo.required' => 'Debe seleccionar el público objetivo.',
+            'publico_objetivo.required' => 'Debe indicar el público objetivo.',
             'fecha_cierre.required'     => 'Debe definir la fecha de cierre.',
             'url_formulario.url'        => 'El enlace del formulario debe ser una URL válida.',
         ]);

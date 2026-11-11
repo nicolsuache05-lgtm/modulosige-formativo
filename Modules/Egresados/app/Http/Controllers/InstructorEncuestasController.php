@@ -50,7 +50,7 @@ class InstructorEncuestasController extends Controller
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'publico_objetivo' => 'required|string',
+            'publico_objetivo' => 'required|string|max:200',
             'fecha_cierre' => 'required|date',
             'estructura_preguntas' => 'nullable|string',
         ]);

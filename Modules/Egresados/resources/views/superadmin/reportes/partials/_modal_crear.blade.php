@@ -69,13 +69,15 @@
                                 <span>Tipo de Reporte (Origen de Datos)</span>
                                 <span class="text-red-500">*</span>
                             </label>
-                            <select name="tipo_reporte" required 
-                                    class="w-full px-4 py-2.5 text-sm bg-gray-50/60 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
-                                <option value="EMPLEABILIDAD">Empleabilidad y Estado Laboral</option>
-                                <option value="SEGUIMIENTO">Seguimientos Realizados (Llamadas, Visitas, Trazabilidad)</option>
-                                <option value="ENCUESTAS">Resultados de Encuestas</option>
-                                <option value="DIRECTORIO">Directorio General de Egresados</option>
-                            </select>
+                            <input type="text" name="tipo_reporte" list="tiposReporteSugeridos" required
+                                   class="w-full px-4 py-2.5 text-sm bg-gray-50/60 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition"
+                                   placeholder="Escribe el tipo de reporte u origen de datos...">
+                            <datalist id="tiposReporteSugeridos">
+                                <option value="Empleabilidad y Estado Laboral">
+                                <option value="Seguimientos Realizados (Llamadas, Visitas, Trazabilidad)">
+                                <option value="Resultados de Encuestas">
+                                <option value="Directorio General de Egresados">
+                            </datalist>
                         </div>
                     </div>
                 </div>
@@ -128,9 +130,8 @@
                                 <span class="text-red-500">*</span>
                             </label>
                             <select name="formato_exportacion" required class="w-full px-3.5 py-2.5 text-sm bg-gray-50/60 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-semibold text-gray-800 transition">
-                                <option value="EXCEL">📊 Hoja de Cálculo (Excel / CSV)</option>
+                                <option value="EXCEL">📊 Hoja de Cálculo (Excel)</option>
                                 <option value="PDF">📄 Documento PDF Oficial (Resumen y Tablas)</option>
-                                <option value="CSV">📝 Texto Delimitado por Comas (.CSV)</option>
                             </select>
                         </div>
                     </div>
