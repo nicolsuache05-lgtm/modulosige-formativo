@@ -3115,7 +3115,8 @@ class EgresadosController extends Controller
     }
 
     /**
-     * Datos por defecto del equipo de autores y desarrolladores del módulo SIGE.
+     * Datos del equipo de autores y desarrolladores del módulo SIGE.
+     * Puedes editar cualquier dato (nombre, rol, bio, foto, redes, habilidades) directamente desde este arreglo de código.
      */
     public static function getDefaultAutores(): array
     {
@@ -3132,7 +3133,7 @@ class EgresadosController extends Controller
                 'telefono' => '+57 312 456 7890',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/hasbleidy.jpg')
                 'avatar_color' => '#39A900',
                 'habilidades' => ['PHP / Laravel', 'Tailwind CSS', 'Arquitectura ERP', 'MySQL', 'UI / UX Design']
             ],
@@ -3148,7 +3149,7 @@ class EgresadosController extends Controller
                 'telefono' => '+57 310 987 6543',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/juand.jpg')
                 'avatar_color' => '#00324D',
                 'habilidades' => ['PHP / Laravel', 'Seguridad y Roles', 'Bases de Datos', 'REST APIs', 'Optimización']
             ],
@@ -3164,7 +3165,7 @@ class EgresadosController extends Controller
                 'telefono' => '+57 320 123 4567',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/nicolle.jpg')
                 'avatar_color' => '#62E31D',
                 'habilidades' => ['Frontend Moderno', 'Experiencia de Usuario', 'Diseño Responsivo', 'Laravel Blade', 'Reportes']
             ]
@@ -3173,22 +3174,11 @@ class EgresadosController extends Controller
 
     /**
      * Muestra la vista dedicada del equipo de autores y desarrolladores del módulo SIGE.
+     * Los datos se editan directamente desde el método getDefaultAutores() en este código.
      */
     public function autores()
     {
-        $filePath = storage_path('app/sige_autores.json');
-        $defaults = self::getDefaultAutores();
-        $autores = $defaults;
-
-        if (file_exists($filePath)) {
-            $saved = json_decode(@file_get_contents($filePath), true) ?: [];
-            foreach ($defaults as $key => $defaultData) {
-                if (isset($saved[$key])) {
-                    $autores[$key] = array_merge($defaultData, $saved[$key]);
-                }
-            }
-        }
-
+        $autores = self::getDefaultAutores();
         return view('egresados::autores', compact('autores'));
     }
 
