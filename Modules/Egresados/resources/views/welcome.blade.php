@@ -118,8 +118,8 @@
         /* Scroll Reveal & Movimiento progresivo de texto (¿Quiénes somos?) */
         .sige-reveal-block {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+            transform: translateY(24px);
+            transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .sige-reveal-block.is-visible {
             opacity: 1;
@@ -129,15 +129,13 @@
         .sige-word {
             display: inline-block;
             opacity: 0;
-            transform: translateY(10px);
-            filter: blur(2px);
-            transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), filter 0.42s ease;
-            transition-delay: calc(var(--w-idx, 0) * 18ms);
+            transform: translateY(8px);
+            transition: opacity 0.16s linear, transform 0.2s ease-out;
+            will-change: opacity, transform;
         }
-        .sige-reveal-block.is-visible .sige-word {
+        .sige-word.is-revealed {
             opacity: 1;
             transform: translateY(0);
-            filter: blur(0);
         }
 
         .sige-mv-card {
@@ -497,7 +495,7 @@
         <div class="max-w-7xl mx-auto">
 
             <!-- Encabezado Grande con Revelado al Bajar -->
-            <div class="sige-reveal-block text-center max-w-3xl mx-auto mb-12 space-y-3" data-sige-reveal>
+            <div class="sige-reveal-block text-center max-w-3xl mx-auto mb-12 space-y-3" data-sige-reveal="heading">
                 <span class="inline-flex items-center gap-2 bg-[#EAF7EE] text-[#2a7c00] border border-[#39A900]/30 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest font-poppins shadow-xs">
                     <i class="fa-solid fa-seedling text-[#39A900]"></i>
                     <span>Identidad Institucional · SIGE CEFA</span>
@@ -505,7 +503,7 @@
 
                 <h2 class="font-poppins text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight text-[#00131E] leading-tight">
                     @foreach($tituloQuienesSomos as $idx => $palabra)
-                        <span class="sige-word {{ $loop->last ? 'text-[#39A900]' : '' }}" style="--w-idx: {{ $idx * 4 }};">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                        <span class="sige-word {{ $loop->last ? 'text-[#39A900]' : '' }}">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
                     @endforeach
                 </h2>
 
@@ -516,7 +514,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 items-stretch">
 
                 <!-- Cuadro 1: MISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#001A29] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#39A900] flex flex-col justify-between" data-sige-reveal>
+                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#001A29] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#39A900] flex flex-col justify-between" data-sige-reveal="card">
                     <div class="relative z-10 space-y-5">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3.5">
@@ -535,14 +533,14 @@
 
                         <p class="font-sans text-[15px] sm:text-base text-slate-100 leading-relaxed font-medium text-justify">
                             @foreach($misionPalabras as $idx => $palabra)
-                                <span class="sige-word" style="--w-idx: {{ $idx + 2 }};">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                                <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
                             @endforeach
                         </p>
                     </div>
                 </article>
 
                 <!-- Cuadro 2: VISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#2a7c00] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#001A29] flex flex-col justify-between" style="transition-delay: 140ms;" data-sige-reveal>
+                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#2a7c00] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#001A29] flex flex-col justify-between" style="transition-delay: 100ms;" data-sige-reveal="card">
                     <div class="relative z-10 space-y-5">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3.5">
@@ -561,7 +559,7 @@
 
                         <p class="font-sans text-[15px] sm:text-base text-white leading-relaxed font-medium text-justify">
                             @foreach($visionPalabras as $idx => $palabra)
-                                <span class="sige-word" style="--w-idx: {{ $idx + 4 }};">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                                <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
                             @endforeach
                         </p>
                     </div>
@@ -890,23 +888,105 @@
             iniciarTimerCoverflowSige();
             window.addEventListener('resize', renderCoverflowSige);
 
-            // Animación progresiva al hacer scroll hacia "¿Quiénes somos?"
-            const revealBlocks = document.querySelectorAll('[data-sige-reveal]');
+            // Revelado progresivo de letra sincronizado al desplazamiento (scroll y movimiento del puntero)
+            const revealBlocks = Array.from(document.querySelectorAll('[data-sige-reveal]'));
             if (revealBlocks.length) {
-                if ('IntersectionObserver' in window) {
-                    const revealObserver = new IntersectionObserver((entries, observer) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                entry.target.classList.add('is-visible');
-                                observer.unobserve(entry.target);
+                const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const blockData = revealBlocks.map(el => ({
+                    el,
+                    kind: el.getAttribute('data-sige-reveal') || 'card',
+                    words: Array.from(el.querySelectorAll('.sige-word')),
+                    paragraph: el.querySelector('p'),
+                    pointerProgress: 0
+                }));
+
+                const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+                const paintWords = (words, progress) => {
+                    const total = words.length;
+                    if (!total) return;
+                    const feather = 0.08;
+
+                    for (let i = 0; i < total; i++) {
+                        const start = (i / total) * (1 - feather);
+                        const t = clamp01((progress - start) / feather);
+                        const word = words[i];
+                        word.style.opacity = t.toFixed(3);
+                        word.style.transform = `translateY(${((1 - t) * 8).toFixed(2)}px)`;
+                    }
+                };
+
+                let rafPending = false;
+                const updateRevealProgress = () => {
+                    rafPending = false;
+                    if (reducedMotion) {
+                        blockData.forEach(item => {
+                            item.el.classList.add('is-visible');
+                            paintWords(item.words, 1);
+                        });
+                        return;
+                    }
+
+                    const vh = window.innerHeight || document.documentElement.clientHeight || 800;
+                    const docHeight = document.documentElement.scrollHeight || document.body.scrollHeight || vh;
+                    const distFromBottom = Math.max(0, docHeight - (window.scrollY + vh));
+                    const bottomBoost = distFromBottom < 180 ? clamp01(1 - distFromBottom / 180) : 0;
+
+                    blockData.forEach(item => {
+                        const rect = item.el.getBoundingClientRect();
+
+                        if (rect.top <= vh * 0.96) {
+                            item.el.classList.add('is-visible');
+                        } else if (rect.top > vh * 1.05) {
+                            item.el.classList.remove('is-visible');
+                            item.pointerProgress = 0;
+                        }
+
+                        if (rect.top >= vh) {
+                            paintWords(item.words, 0);
+                            return;
+                        }
+
+                        const startRatio = item.kind === 'heading' ? 0.96 : 0.90;
+                        const endRatio = item.kind === 'heading' ? 0.58 : 0.36;
+                        const span = Math.max(1, vh * (startRatio - endRatio));
+                        const scrollProgress = clamp01((vh * startRatio - rect.top) / span);
+                        const progress = clamp01(Math.max(scrollProgress, bottomBoost, item.pointerProgress));
+
+                        paintWords(item.words, progress);
+                    });
+                };
+
+                const requestRevealUpdate = () => {
+                    if (!rafPending) {
+                        rafPending = true;
+                        window.requestAnimationFrame(updateRevealProgress);
+                    }
+                };
+
+                const quienesSomosSection = document.getElementById('quienes-somos');
+                if (quienesSomosSection) {
+                    quienesSomosSection.addEventListener('mousemove', (ev) => {
+                        blockData.forEach(item => {
+                            if (item.kind !== 'card') return;
+                            const targetBox = item.paragraph || item.el;
+                            const rect = targetBox.getBoundingClientRect();
+                            if (rect.height <= 0) return;
+
+                            if (ev.clientY <= rect.top) {
+                                item.pointerProgress = 0;
+                            } else {
+                                item.pointerProgress = clamp01((ev.clientY - rect.top) / rect.height);
                             }
                         });
-                    }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
-
-                    revealBlocks.forEach(el => revealObserver.observe(el));
-                } else {
-                    revealBlocks.forEach(el => el.classList.add('is-visible'));
+                        requestRevealUpdate();
+                    }, { passive: true });
                 }
+
+                window.addEventListener('scroll', requestRevealUpdate, { passive: true });
+                window.addEventListener('resize', requestRevealUpdate, { passive: true });
+                window.addEventListener('load', requestRevealUpdate, { passive: true });
+                updateRevealProgress();
             }
         });
     </script>
