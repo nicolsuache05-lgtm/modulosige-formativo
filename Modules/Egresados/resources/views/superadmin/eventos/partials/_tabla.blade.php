@@ -78,7 +78,6 @@
                         <th class="py-3.5 px-4">Fecha</th>
                         <th class="py-3.5 px-4">Estado</th>
                         <th class="py-3.5 px-4">Registro / Cupo</th>
-                        <th class="py-3.5 px-4 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
