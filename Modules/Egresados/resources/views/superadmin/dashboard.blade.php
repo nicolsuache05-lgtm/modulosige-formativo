@@ -1035,24 +1035,24 @@
       @endphp
       <div class="lower-grid">
 
-        <!-- Gráfica 1: Resumen del Software SIGE -->
+        <!-- Gráfica 1: Estadísticas de SIGE -->
         <div class="panel">
           <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
             <h3 class="panel-title" style="font-size:16px;">
               <i class="fa-solid fa-chart-column text-[#39A900]"></i>
-              <span>Resumen del Software SIGE</span>
+              <span>Estadísticas de SIGE</span>
             </h3>
             <a href="{{ route('egresados.reportes') }}" class="panel-action">Ver reportes</a>
           </div>
           <div id="sigeResumenBarChart" class="chart-wrap-compact"></div>
         </div>
 
-        <!-- Gráfica 2: Distribución por Programa -->
+        <!-- Gráfica 2: Estadísticas por Programa -->
         <div class="panel">
           <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
             <h3 class="panel-title" style="font-size:16px;">
               <i class="fa-solid fa-chart-pie text-[#39A900]"></i>
-              <span>Egresados por Programa</span>
+              <span>Estadísticas por Programa</span>
             </h3>
             <a href="{{ route('egresados.index') }}" class="panel-action">Ver todo</a>
           </div>
