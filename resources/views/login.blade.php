@@ -241,28 +241,28 @@
                         </div>
                     @endif
 
-                    <form id="loginForm" action="{{ route('login.post') }}" method="POST">
+                    <form action="{{ route('login.post') }}" method="POST">
                         @csrf
                         <input type="hidden" name="redirect" value="{{ old('redirect', $redirect ?? request('redirect')) }}">
 
                         <!-- User / Email Input -->
                         <div class="mb-3 position-relative form-group-custom">
-                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico, Usuario o Cédula</label>
+                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico / Usuario</label>
                             <div class="position-relative">
-                                <i class="fas fa-id-card input-group-text-icon"></i>
-                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="ejemplo@sena.edu.co, usuario o número de cédula" required autofocus>
+                                <i class="fas fa-envelope input-group-text-icon"></i>
+                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="ejemplo@sena.edu.co o usuario" required autofocus>
                             </div>
                         </div>
 
                         <!-- Password Input -->
                         <div class="mb-3 position-relative form-group-custom">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label for="password" class="form-label fw-semibold text-secondary fs-7 mb-0">Contraseña (o Cédula)</label>
+                                <label for="password" class="form-label fw-semibold text-secondary fs-7 mb-0">Contraseña</label>
                                 <a href="javascript:void(0)" onclick="alert('Por favor contacte al Administrador del Sistema ERP o Soporte TIC.');" class="fs-7 text-decoration-none fw-semibold" style="color: var(--sena-green);">¿Olvidaste tu contraseña?</a>
                             </div>
                             <div class="position-relative">
                                 <i class="fas fa-lock input-group-text-icon"></i>
-                                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Contraseña o número de cédula" required>
+                                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
                                 <i class="far fa-eye toggle-password" id="togglePassword"></i>
                             </div>
                         </div>
@@ -276,33 +276,17 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" id="btnSubmitLogin" class="btn btn-sena w-100 mb-3">
+                        <button type="submit" class="btn btn-sena w-100 mb-3">
                             <i class="fas fa-right-to-bracket btn-icon-navy me-2"></i>
                             <span>Iniciar Sesión en SENA Empresa</span>
                         </button>
 
                         <!-- Demo test credentials helper -->
-                        <div class="p-3 bg-light rounded-3 border text-center fs-8 text-muted">
-                            <span class="fw-bold text-dark d-block mb-2">
-                                <i class="fas fa-key text-warning me-1"></i> Credenciales de Acceso Rápido (Los 3 Paneles):
+                        <div class="p-2 bg-light rounded-3 border text-center fs-8 text-muted">
+                            <span class="fw-bold text-dark d-block mb-1"><i class="fas fa-key text-warning me-1"></i> Credencial de Acceso Rápido:</span>
+                            <span class="badge bg-dark text-white cursor-pointer px-2 py-1 me-1" style="cursor: pointer;" onclick="fillDemo('damendez', '12345678')">
+                                Usuario: <code>damendez</code> (SuperAdmin / Director)
                             </span>
-                            <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
-                                <button type="button" class="btn btn-sm btn-dark text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('superadmin_egresados', '12345678')" title="Clic para autocompletar Super Admin">
-                                    🛡️ <strong>Super Admin</strong>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-primary text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('instructor_egresados', '12345678')" title="Clic para autocompletar Admin">
-                                    👨‍🏫 <strong>Admin</strong>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-success text-white px-2 py-1 fs-8 shadow-sm" onclick="fillDemo('egresado_sige', '12345678')" title="Clic para autocompletar Egresado">
-                                    🎓 <strong>Egresado</strong>
-                                </button>
-                            </div>
-                            <div class="small text-muted" style="font-size: 0.75rem;">
-                                Contraseña para roles de prueba: <strong class="text-dark">12345678</strong><br>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle mt-1 py-1 px-2 fw-semibold">
-                                    <i class="fas fa-check-circle me-1"></i> Egresados registrados: ingresan con su número de cédula en usuario y contraseña
-                                </span>
-                            </div>
                         </div>
                     </form>
                 </div>
