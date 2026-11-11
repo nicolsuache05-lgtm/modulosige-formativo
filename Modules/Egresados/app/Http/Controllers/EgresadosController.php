@@ -114,6 +114,67 @@ class EgresadosController extends Controller
     }
 
     /**
+     * Guarda la foto de perfil de una persona en public/modules/egresados/images/avatars y actualiza su campo avatar.
+     */
+    public static function savePersonAvatar(Person $person, ?\Illuminate\Http\UploadedFile $file): ?string
+    {
+        if (!$file || !$file->isValid()) {
+            return null;
+        }
+
+        $destDir = public_path('modules/egresados/images/avatars');
+        if (!is_dir($destDir)) {
+            @mkdir($destDir, 0775, true);
+        }
+
+        if (!empty($person->avatar)) {
+            $oldRel = ltrim(str_replace('\\', '/', $person->avatar), '/');
+            if (str_starts_with($oldRel, 'modules/egresados/images/avatars/')) {
+                $oldFull = public_path($oldRel);
+                if (file_exists($oldFull) && is_file($oldFull)) {
+                    @unlink($oldFull);
+                }
+            }
+        }
+
+        $ext = strtolower($file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'jpg');
+        $identifier = $person->id ?: ($person->document_number ?: time());
+        $filename = 'avatar_' . $identifier . '_' . time() . '.' . $ext;
+        $file->move($destDir, $filename);
+
+        $relPath = 'modules/egresados/images/avatars/' . $filename;
+        $person->avatar = $relPath;
+        $person->save();
+
+        return asset($relPath);
+    }
+
+    /**
+     * Resuelve la URL pública de la foto de perfil de una persona si existe.
+     */
+    public static function getAvatarUrl(?Person $person): ?string
+    {
+        if (!$person || empty($person->avatar)) {
+            return null;
+        }
+
+        $raw = trim((string) $person->avatar);
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://') || str_starts_with($raw, 'data:image/')) {
+            return $raw;
+        }
+
+        $clean = ltrim(str_replace('\\', '/', $raw), '/');
+        if (file_exists(public_path($clean))) {
+            return asset($clean);
+        }
+        if (file_exists(public_path('storage/' . $clean))) {
+            return asset('storage/' . $clean);
+        }
+
+        return null;
+    }
+
+    /**
      * Localiza inteligentemente un Programa de formación en el ERP o lo crea cumpliendo el esquema relacional.
      */
     public static function findOrCreateProgram(?string $progName): ?Program
@@ -328,6 +389,10 @@ class EgresadosController extends Controller
             self::ensurePersonDefaults($person);
             $person->save();
 
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
+
             // 3. Crear o actualizar el Usuario de manera segura
             $baseNickname = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $person->first_name . '.' . $person->first_last_name));
             $nickname = $baseNickname ?: 'egresado.' . $person->document_number;
@@ -435,20 +500,22 @@ class EgresadosController extends Controller
 
             DB::commit();
 
-            // 6. Registrar contraseña elegida en el archivo de contraseñas actualizadas
-            try {
-                $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-                $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-                    ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-                    : [];
-                $passwordsActualizados[$user->id] = date('Y-m-d H:i:s');
-                $passwordsActualizados[(string)$docNumber] = date('Y-m-d H:i:s');
-                if (!is_dir(dirname($passwordsActualizadosFile))) {
-                    @mkdir(dirname($passwordsActualizadosFile), 0777, true);
+            // 6. Registrar contraseña elegida solo si es distinta al número de documento
+            if ((string)$request->password !== (string)$docNumber) {
+                try {
+                    $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                    $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                        ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                        : [];
+                    $passwordsActualizados[$user->id] = date('Y-m-d H:i:s');
+                    $passwordsActualizados[(string)$docNumber] = date('Y-m-d H:i:s');
+                    if (!is_dir(dirname($passwordsActualizadosFile))) {
+                        @mkdir(dirname($passwordsActualizadosFile), 0777, true);
+                    }
+                    @file_put_contents($passwordsActualizadosFile, json_encode($passwordsActualizados, JSON_PRETTY_PRINT));
+                } catch (\Exception $ex) {
+                    \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
                 }
-                @file_put_contents($passwordsActualizadosFile, json_encode($passwordsActualizados, JSON_PRETTY_PRINT));
-            } catch (\Exception $ex) {
-                \Log::warning('No se pudo registrar contrasenia en sige_passwords_actualizados.json: ' . $ex->getMessage());
             }
 
             $nombreCompleto = !empty($user->full_name) ? $user->full_name : (trim($person->first_name . ' ' . $person->first_last_name));
@@ -991,6 +1058,10 @@ class EgresadosController extends Controller
             self::ensurePersonDefaults($person);
             $person->save();
 
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
+
             // 3. Crear o asociar Usuario en la tabla users sin colisiones
             $user = \App\Models\User::where('person_id', $person->id)->orWhere('email', $cleanEmail)->first();
             if (!$user) {
@@ -1005,7 +1076,7 @@ class EgresadosController extends Controller
                     $nickname = $baseNickname . $count++;
                 }
                 $user->nickname = $nickname;
-                $user->password = bcrypt('Sena12345*');
+                $user->password = Hash::make((string)$docNum);
                 $user->save();
             } else {
                 $user->person_id = $person->id;
@@ -1149,6 +1220,10 @@ class EgresadosController extends Controller
 
             self::ensurePersonDefaults($person);
             $person->save();
+
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
 
             // Sincronizar datos del usuario
             $user->person_id = $person->id;
@@ -1887,6 +1962,7 @@ class EgresadosController extends Controller
             'empresa_labora'   => 'nullable|string|max:200',
             'cargo_labora'     => 'nullable|string|max:200',
             'password'         => 'nullable|string|min:6|confirmed',
+            'foto'             => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
         ], [
             'nombres.required'        => 'Los nombres son requeridos.',
             'apellidos.required'      => 'Los apellidos son requeridos.',
@@ -1938,6 +2014,10 @@ class EgresadosController extends Controller
 
             self::ensurePersonDefaults($person);
             $person->save();
+
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
 
             // Asociar persona al usuario si no lo estaba
             $user->person_id = $person->id;
@@ -2020,6 +2100,7 @@ class EgresadosController extends Controller
                 'telephone' => $person->telephone1,
                 'address' => $person->address,
                 'status' => $apprentice ? $apprentice->apprentice_status : ($request->situacion_laboral ?? 'CERTIFICADO'),
+                'avatar_url' => self::getAvatarUrl($person),
             ];
 
             if ($request->ajax() || $request->wantsJson()) {
@@ -2780,6 +2861,10 @@ class EgresadosController extends Controller
             self::ensurePersonDefaults($person);
             $person->save();
 
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
+
             // Actualizar curso y programa según lo que el usuario editó
             $cleanFicha = $request->filled('ficha') ? preg_replace('/\D/', '', (string)$request->ficha) : null;
             $progName = $request->filled('programa') ? trim(strip_tags($request->programa)) : null;
@@ -3060,6 +3145,10 @@ class EgresadosController extends Controller
 
             self::ensurePersonDefaults($person);
             $person->save();
+
+            if ($request->hasFile('foto')) {
+                self::savePersonAvatar($person, $request->file('foto'));
+            }
 
             // 3. Crear o asociar usuario de acceso si se proporcionó correo
             if ($request->filled('correo')) {

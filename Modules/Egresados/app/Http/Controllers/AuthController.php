@@ -119,7 +119,9 @@ class AuthController extends Controller
                     $user = User::where('email', $person->personal_email)->first();
                 }
                 if (!$user) {
-                    $user = User::where('nickname', 'egresado_' . $cleanDoc)->first();
+                    $user = User::where('nickname', 'egresado_' . $cleanDoc)
+                        ->orWhere('nickname', 'instructor_' . $cleanDoc)
+                        ->first();
                 }
 
                 // Cargar archivo persistente de contraseñas actualizadas
@@ -260,6 +262,7 @@ class AuthController extends Controller
                     } catch (\Throwable $e) {
                     }
 
+                    $user->load('roles');
                     RateLimiter::clear($throttleKey);
                     Auth::login($user, $remember);
                     $request->session()->regenerate();
@@ -595,12 +598,16 @@ class AuthController extends Controller
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:6',
             'new_password_confirmation' => 'required|string|same:new_password',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
         ], [
             'current_password.required' => 'Debes ingresar tu contraseña inicial (tu documento de identidad).',
             'new_password.required' => 'Debes ingresar una nueva contraseña personal.',
             'new_password.min' => 'La nueva contraseña debe tener como mínimo 6 caracteres.',
             'new_password_confirmation.required' => 'Debes confirmar tu nueva contraseña.',
             'new_password_confirmation.same' => 'La confirmación de la contraseña no coincide.',
+            'foto.image' => 'El archivo seleccionado para la foto debe ser una imagen válida.',
+            'foto.mimes' => 'La foto debe ser en formato JPG, PNG, WEBP o GIF.',
+            'foto.max' => 'La foto no puede superar los 5 MB.',
         ]);
 
         $currentPass = trim($request->input('current_password'));
@@ -633,6 +640,30 @@ class AuthController extends Controller
 
         // Actualizar la contraseña del usuario
         $user->password = Hash::make($newPass);
+
+        // Guardar foto de perfil si el usuario la adjuntó en el formulario de primer ingreso
+        $avatarUrl = null;
+        if ($request->hasFile('foto')) {
+            if (!$person) {
+                $docForPerson = $cleanDoc ?: (string)(time() % 100000000);
+                $person = Person::withTrashed()->where('document_number', $docForPerson)->first()
+                    ?: new Person([
+                        'document_number' => $docForPerson,
+                        'first_name'      => $user->name ?: ($user->nickname ?: 'Usuario'),
+                        'first_last_name' => 'SENA',
+                        'personal_email'  => $user->email,
+                    ]);
+                EgresadosController::ensurePersonDefaults($person);
+                $person->save();
+            }
+            if (!$user->person_id) {
+                $user->person_id = $person->id;
+            }
+            $avatarUrl = EgresadosController::savePersonAvatar($person, $request->file('foto'));
+        } elseif ($person) {
+            $avatarUrl = EgresadosController::getAvatarUrl($person);
+        }
+
         $user->save();
 
         // Registrar en el archivo persistente de contraseñas actualizadas
@@ -658,12 +689,13 @@ class AuthController extends Controller
 
         SigeSecurityLogger::log('PASSWORD_CHANGED', "Contraseña actualizada exitosamente para el usuario {$user->email}", $request, $user);
 
-        $successMsg = '¡Tu contraseña ha sido actualizada con éxito! A partir de tu próximo ingreso, usa tu nueva clave personal.';
+        $successMsg = '¡Tu contraseña y perfil han sido actualizados con éxito! A partir de tu próximo ingreso, usa tu nueva clave personal.';
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => $successMsg
+                'message' => $successMsg,
+                'avatar_url' => $avatarUrl,
             ]);
         }
 

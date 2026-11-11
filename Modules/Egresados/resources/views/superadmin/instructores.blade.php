@@ -1017,12 +1017,14 @@
                     // Programa asociado al instructor a través de los cursos del CEFA
                     $instCourse = \Modules\SICA\Entities\Course::with('program')->where('person_id', $person?->id)->first();
                     $instProgramName = $instCourse?->program?->name ?? 'Análisis y Desarrollo de Software (ADSO)';
+                    $avatarUrl = \Modules\Egresados\Http\Controllers\EgresadosController::getAvatarUrl($person);
 
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
                         'id' => $inst->id,
                         'name' => $fullName,
                         'initials' => $initials ?: 'IN',
+                        'avatar' => $avatarUrl,
                         'document' => $person->document_number ?? '107584578',
                         'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
                         'email' => $inst->email ?? ($person->misena_email ?? 'instructor@sena.edu.co'),
@@ -1046,7 +1048,13 @@
 
                     <td>
                       <div class="avatar-cell">
-                        <div class="avatar-bubble">{{ $initials ?: 'IN' }}</div>
+                        <div class="avatar-bubble" style="overflow:hidden;">
+                          @if(!empty($avatarUrl))
+                            <img src="{{ $avatarUrl }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+                          @else
+                            {{ $initials ?: 'IN' }}
+                          @endif
+                        </div>
                         <div>
                           <div class="name-main">{{ $fullName }}</div>
                           <div class="name-email">{{ $inst->email }}</div>
@@ -1099,6 +1107,7 @@
           }
           $firstCourse = \Modules\SICA\Entities\Course::with('program')->where('person_id', $firstPerson?->id)->first();
           $firstProgram = $firstCourse?->program?->name ?? 'Gestión de Empresas Agropecuarias';
+          $firstAvatarUrl = \Modules\Egresados\Http\Controllers\EgresadosController::getAvatarUrl($firstPerson);
         @endphp
         <div class="detail-card">
           
@@ -1112,7 +1121,13 @@
 
           <!-- Hero del Instructor -->
           <div class="detail-user-hero">
-            <div id="detailAvatarLarge" class="detail-avatar-large">{{ $firstInitials ?: 'MM' }}</div>
+            <div id="detailAvatarLarge" class="detail-avatar-large" style="overflow:hidden;">
+              @if(!empty($firstAvatarUrl))
+                <img src="{{ $firstAvatarUrl }}" alt="{{ $firstFullName ?? 'Instructor' }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+              @else
+                {{ $firstInitials ?: 'MM' }}
+              @endif
+            </div>
             <div style="overflow:hidden;">
               <div id="detailName" class="detail-user-name">{{ $firstFullName }}</div>
               <div id="detailDoc" class="detail-user-doc">Doc: {{ $firstDoc }}</div>
@@ -1181,7 +1196,11 @@
         if (activeRow) activeRow.classList.add('selected-row');
 
         // Actualizar datos del panel derecho
-        document.getElementById('detailAvatarLarge').innerText = data.initials || 'IN';
+        if (window.renderSigeAvatar) {
+          window.renderSigeAvatar(document.getElementById('detailAvatarLarge'), data.avatar, data.initials || 'IN', data.name);
+        } else {
+          document.getElementById('detailAvatarLarge').innerText = data.initials || 'IN';
+        }
         document.getElementById('detailName').innerText = data.name || 'Sin nombre';
         document.getElementById('detailDoc').innerText = 'Doc: ' + (data.document || 'N/A');
         document.getElementById('detailEmail').innerText = data.email || 'Sin correo';
@@ -1204,7 +1223,13 @@
         const mpEmail = document.getElementById('modalInstEmail');
         if (mpEmail) mpEmail.innerText = data.email || 'N/A';
         const mpInit = document.getElementById('modalInstInitials');
-        if (mpInit) mpInit.innerText = data.initials || 'IN';
+        if (mpInit) {
+          if (window.renderSigeAvatar) {
+            window.renderSigeAvatar(mpInit, data.avatar, data.initials || 'IN', data.name);
+          } else {
+            mpInit.innerText = data.initials || 'IN';
+          }
+        }
         const mpProg = document.getElementById('modalInstProgram');
         if (mpProg) mpProg.innerText = data.program || 'ADSO';
 

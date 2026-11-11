@@ -261,10 +261,10 @@
 
                         <!-- User / Email Input -->
                         <div class="mb-3 position-relative form-group-custom">
-                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico / Usuario</label>
+                            <label for="email" class="form-label fw-semibold text-secondary fs-7">Correo Electrónico, Usuario o N° de Documento</label>
                             <div class="position-relative">
                                 <i class="fas fa-envelope input-group-text-icon"></i>
-                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="ejemplo@sena.edu.co o usuario" required autofocus>
+                                <input type="text" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Correo, usuario o número de documento" required autofocus>
                             </div>
                         </div>
 

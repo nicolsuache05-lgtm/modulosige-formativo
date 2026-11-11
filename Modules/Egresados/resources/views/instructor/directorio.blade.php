@@ -1024,11 +1024,13 @@
                       $progRaw = ($program && $program->name) ? $program->name : '';
                       $codeRaw = ($course && $course->code) ? (string)$course->code : '';
                       $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
+                      $avatarUrl = \Modules\Egresados\Http\Controllers\EgresadosController::getAvatarUrl($person);
 
                       $jsonData = json_encode([
                           'id' => $item->id,
                           'name' => $fullName,
                           'initials' => $initials ?: 'EG',
+                          'avatar' => $avatarUrl,
                           'document' => $docRaw ?: 'N/A',
                           'document_raw' => $docRaw,
                           'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
@@ -1061,8 +1063,12 @@
 
                         <td class="py-3.5 px-4">
                           <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-[#EAF7EE] text-[#00131E] font-bold text-xs flex items-center justify-center border border-[#BBF7D0] shrink-0">
-                              {{ $initials ?: 'EG' }}
+                            <div class="w-9 h-9 rounded-xl bg-[#EAF7EE] text-[#00131E] font-bold text-xs flex items-center justify-center border border-[#BBF7D0] shrink-0 overflow-hidden">
+                              @if(!empty($avatarUrl))
+                                <img src="{{ $avatarUrl }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+                              @else
+                                {{ $initials ?: 'EG' }}
+                              @endif
                             </div>
                             <div class="overflow-hidden">
                               <div class="font-bold text-gray-900 text-sm leading-tight truncate">{{ $fullName }}</div>
@@ -1288,7 +1294,13 @@
 
         // Actualizar datos del panel derecho
         const avatar = document.getElementById('detailAvatarLarge');
-        if (avatar) avatar.innerText = data.initials || 'EG';
+        if (avatar) {
+          if (window.renderSigeAvatar) {
+            window.renderSigeAvatar(avatar, data.avatar, data.initials || 'EG', data.name);
+          } else {
+            avatar.innerText = data.initials || 'EG';
+          }
+        }
 
         const name = document.getElementById('detailName');
         if (name) name.innerText = data.name || 'Sin nombre';

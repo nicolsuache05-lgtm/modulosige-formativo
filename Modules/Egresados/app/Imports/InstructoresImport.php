@@ -78,16 +78,25 @@ class InstructoresImport
 
         // 2. Crear o Actualizar Usuario si tiene correo
         if (!empty($person->personal_email)) {
-            $user = User::firstOrNew(['email' => $person->personal_email]);
-            if (!$user->exists) {
-                $user->nickname = strtolower(str_replace(' ', '.', $firstName . '.' . $firstLastName));
+            $user = User::where('person_id', $person->id)->orWhere('email', $person->personal_email)->first();
+            if (!$user) {
+                $user = new User();
+                $baseNick = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $firstName . '.' . $firstLastName)) ?: 'instructor.' . $docNum;
+                $nick = $baseNick;
+                $c = 1;
+                while (User::where('nickname', $nick)->exists()) {
+                    $nick = $baseNick . $c++;
+                }
+                $user->nickname = $nick;
                 $user->person_id = $person->id;
-                $user->password = bcrypt('Sena12345*');
+                $user->email = $person->personal_email;
+                $user->password = \Illuminate\Support\Facades\Hash::make((string)$docNum);
                 $user->save();
             }
 
             // Asignar rol de instructor
-            $role = Role::where('slug', 'like', '%instructor%')->first();
+            $role = Role::where('slug', 'egresados.instructor')->first()
+                ?: Role::where('slug', 'like', '%instructor%')->first();
             if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
                 $user->roles()->attach($role->id);
             }

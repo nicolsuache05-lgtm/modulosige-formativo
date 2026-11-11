@@ -3855,11 +3855,18 @@
     </div>
 
     <!-- Formulario de Actualización -->
-    <form id="formActualizarPerfilEgresado" action="{{ route('egresados.perfil.actualizar') }}" method="POST" style="padding: 22px 26px;">
+    <form id="formActualizarPerfilEgresado" action="{{ route('egresados.perfil.actualizar') }}" method="POST" enctype="multipart/form-data" style="padding: 22px 26px;">
       @csrf
 
       <!-- Mensaje de Alerta en caso de errores de validación -->
       <div id="alert-profile-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px;"></div>
+
+      @include('egresados::partials._onboarding_photo_field', [
+          'fieldId' => 'prof_foto_perfil',
+          'previewId' => 'prof_foto_preview',
+          'person' => $person ?? (Auth::check() ? Auth::user()->person : null),
+          'roleLabel' => 'Egresado(a)'
+      ])
 
       <!-- Sección 1: Identificación y Nombres -->
       <div class="profile-form-section">
@@ -4019,7 +4026,7 @@
     </div>
 
     <!-- Formulario de Actualización de Contraseña con Scroll Ergonómico -->
-    <form id="formActualizarPasswordInicial" action="{{ route('egresados.cambiar_password') }}" method="POST" onsubmit="submitActualizarPasswordInicial(event)" style="display:flex; flex-direction:column; overflow:hidden; margin:0;">
+    <form id="formActualizarPasswordInicial" action="{{ route('egresados.cambiar_password') }}" method="POST" enctype="multipart/form-data" onsubmit="submitActualizarPasswordInicial(event)" style="display:flex; flex-direction:column; overflow:hidden; margin:0;">
       @csrf
 
       <div class="sofia-card-scrollable">
@@ -4101,6 +4108,14 @@
           </div>
           <div id="pwdMatchStatus" class="pwd-match-status" style="display:none; font-size:11px; margin-top:4px;"></div>
         </div>
+
+        <!-- 4. Foto Institucional del Egresado -->
+        @include('egresados::partials._onboarding_photo_field', [
+            'fieldId' => 'pwd_foto_perfil',
+            'previewId' => 'pwd_foto_preview',
+            'person' => $person ?? (Auth::check() ? Auth::user()->person : null),
+            'roleLabel' => 'Egresado(a)'
+        ])
 
         <!-- Reglas de Contraseña estilo SOFIA PLUS -->
         <div class="erp-security-tips" style="margin-bottom: 16px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:8px 12px;">
@@ -5879,6 +5894,9 @@
               const menuEmail = document.querySelector('.user-menu-email');
               if (menuEmail && body.data.email) {
                 menuEmail.textContent = body.data.email;
+              }
+              if (body.data.avatar_url && typeof window.updateTopbarAvatar === 'function') {
+                window.updateTopbarAvatar(body.data.avatar_url);
               }
             }
 

@@ -22,6 +22,9 @@
 
     $userFullName = $currentUser ? ($currentUser->full_name ?: 'Usuario') : 'Super Administrador SIGE';
     $userInitials = $currentUser ? ($currentUser->initials ?: 'SE') : 'SA';
+    $userAvatarUrl = ($currentUser && $currentUser->person)
+        ? \Modules\Egresados\Http\Controllers\EgresadosController::getAvatarUrl($currentUser->person)
+        : null;
     $userPrimaryRole = $currentUser ? ($currentUser->primary_role ?: 'Super Administrador') : 'Super Administrador';
     $userDisplayEmail = !empty($userEmail) ? $userEmail : 'superadmin.egresados@sena.edu.co';
 
@@ -113,8 +116,12 @@
   <!-- ================= MENÚ DESPLEGABLE USUARIO ================= -->
   <div class="user-dropdown-container">
     <div class="user-chip" id="userChipBtn" title="Menú de usuario" onclick="toggleUserDropdown(event)">
-      <div class="user-avatar">
-        {{ $userInitials }}
+      <div class="user-avatar" style="overflow:hidden;">
+        @if(!empty($userAvatarUrl))
+          <img src="{{ $userAvatarUrl }}" alt="{{ $userFullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+        @else
+          {{ $userInitials }}
+        @endif
       </div>
       <span>
         {{ $userFullName }}
@@ -127,8 +134,12 @@
       
       <!-- Encabezado del perfil -->
       <div class="user-menu-header">
-        <div class="user-menu-avatar">
-          {{ $userInitials }}
+        <div class="user-menu-avatar" style="overflow:hidden;">
+          @if(!empty($userAvatarUrl))
+            <img src="{{ $userAvatarUrl }}" alt="{{ $userFullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+          @else
+            {{ $userInitials }}
+          @endif
         </div>
         <div class="user-menu-info">
           <div class="user-menu-name">
@@ -1199,6 +1210,37 @@
       }, { passive: true });
     }
   });
+
+  window.renderSigeAvatar = function(el, avatarUrl, initials, altText) {
+    if (!el) return;
+    el.style.overflow = 'hidden';
+    if (avatarUrl) {
+      el.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = avatarUrl;
+      img.alt = altText || 'Avatar';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = 'inherit';
+      img.style.display = 'block';
+      img.onerror = function() {
+        el.innerHTML = '';
+        el.innerText = initials || 'SG';
+      };
+      el.appendChild(img);
+    } else {
+      el.innerHTML = '';
+      el.innerText = initials || 'SG';
+    }
+  };
+
+  window.updateTopbarAvatar = function(avatarUrl) {
+    if (!avatarUrl) return;
+    document.querySelectorAll('.user-avatar, .user-menu-avatar').forEach(function(el) {
+      window.renderSigeAvatar(el, avatarUrl, el.innerText.trim() || 'SG', 'Foto de perfil');
+    });
+  };
 </script>
 
 @include('egresados::partials._security_session')

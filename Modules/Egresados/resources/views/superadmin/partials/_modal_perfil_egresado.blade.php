@@ -199,7 +199,14 @@
         }
 
         const mpInit = document.getElementById('modalEgresadoInitials');
-        if (mpInit) mpInit.innerText = data.initials || 'EG';
+        if (mpInit) {
+            mpInit.style.overflow = 'hidden';
+            if (typeof window.renderSigeAvatar === 'function') {
+                window.renderSigeAvatar(mpInit, data.avatar, data.initials || 'EG', data.name || 'Egresado');
+            } else {
+                mpInit.innerText = data.initials || 'EG';
+            }
+        }
 
         const mpName = document.getElementById('modalEgresadoName');
         if (mpName) mpName.innerText = data.name || 'Egresado';

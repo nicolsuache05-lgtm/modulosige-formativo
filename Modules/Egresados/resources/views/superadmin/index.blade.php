@@ -1076,12 +1076,14 @@
                     $progRaw = ($program && $program->name) ? $program->name : '';
                     $codeRaw = ($course && $course->code) ? (string)$course->code : '';
                     $isApprenticeActive = !$item->trashed() && !in_array($st, ['CANCELADO', 'RETIRO VOLUNTARIO']);
+                    $avatarUrl = \Modules\Egresados\Http\Controllers\EgresadosController::getAvatarUrl($person);
 
                     // Serializar datos para JavaScript
                     $jsonData = json_encode([
                         'id' => $item->id,
                         'name' => $fullName,
                         'initials' => $initials ?: 'EG',
+                        'avatar' => $avatarUrl,
                         'document' => $docRaw ?: 'N/A',
                         'document_raw' => $docRaw,
                         'document_type' => $person->document_type ?? 'Cédula de ciudadanía',
@@ -1110,7 +1112,13 @@
 
                     <td>
                       <div class="avatar-cell">
-                        <div class="avatar-bubble">{{ $initials ?: 'EG' }}</div>
+                        <div class="avatar-bubble" style="overflow:hidden;">
+                          @if(!empty($avatarUrl))
+                            <img src="{{ $avatarUrl }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;">
+                          @else
+                            {{ $initials ?: 'EG' }}
+                          @endif
+                        </div>
                         <div>
                           <div class="name-main">{{ $fullName }}</div>
                           <div class="name-email">{{ $person->misena_email ?? $person->personal_email ?? 'Sin correo' }}</div>
@@ -1272,7 +1280,11 @@
         if (activeRow) activeRow.classList.add('selected-row');
 
         // Actualizar datos del panel derecho
-        document.getElementById('detailAvatarLarge').innerText = data.initials || 'EG';
+        if (window.renderSigeAvatar) {
+          window.renderSigeAvatar(document.getElementById('detailAvatarLarge'), data.avatar, data.initials || 'EG', data.name);
+        } else {
+          document.getElementById('detailAvatarLarge').innerText = data.initials || 'EG';
+        }
         document.getElementById('detailName').innerText = data.name || 'Sin nombre';
         document.getElementById('detailDoc').innerText = 'Doc: ' + (data.document || 'N/A');
         document.getElementById('detailEmail').innerText = data.email || 'Sin correo';

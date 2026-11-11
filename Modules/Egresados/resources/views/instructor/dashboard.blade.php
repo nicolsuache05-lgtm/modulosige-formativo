@@ -1438,7 +1438,7 @@
     </div>
 
     <!-- Formulario de Actualización de Contraseña con Scroll Ergonómico -->
-    <form id="formActualizarPasswordInicial" action="{{ route('egresados.cambiar_password') }}" method="POST" onsubmit="submitActualizarPasswordInicial(event)" style="display:flex; flex-direction:column; overflow:hidden; margin:0;">
+    <form id="formActualizarPasswordInicial" action="{{ route('egresados.cambiar_password') }}" method="POST" enctype="multipart/form-data" onsubmit="submitActualizarPasswordInicial(event)" style="display:flex; flex-direction:column; overflow:hidden; margin:0;">
       @csrf
 
       <div class="sofia-card-scrollable">
@@ -1519,6 +1519,14 @@
           <div id="pwdMatchStatus" class="pwd-match-status" style="display:none; font-size:11px; margin-top:4px;"></div>
         </div>
 
+        <!-- 4. Foto Institucional del Instructor -->
+        @include('egresados::partials._onboarding_photo_field', [
+            'fieldId' => 'pwd_foto_perfil',
+            'previewId' => 'pwd_foto_preview',
+            'person' => $person ?? (Auth::check() ? Auth::user()->person : null),
+            'roleLabel' => 'Instructor(a)'
+        ])
+
         <!-- Reglas estilo SOFIA PLUS -->
         <div class="erp-security-tips" style="margin-bottom: 16px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:8px 12px;">
           <strong style="color:#00131E; font-size:11px; display:inline-flex; align-items:center; gap:5px;">
@@ -1574,12 +1582,19 @@
     </div>
 
     <!-- Formulario de Actualización -->
-    <form id="formActualizarPerfilInstructor" action="{{ route('egresados.perfil.actualizar') }}" method="POST" onsubmit="submitActualizarPerfilInstructor(event)" style="padding: 22px 26px; display:flex; flex-direction:column; gap:0; margin:0;">
+    <form id="formActualizarPerfilInstructor" action="{{ route('egresados.perfil.actualizar') }}" method="POST" enctype="multipart/form-data" onsubmit="submitActualizarPerfilInstructor(event)" style="padding: 22px 26px; display:flex; flex-direction:column; gap:0; margin:0;">
       @csrf
 
       <!-- Mensajes de Alerta -->
       <div id="alert-instructor-profile-error" style="display:none; background:#FEF2F2; border:1px solid #FCA5A5; color:#991B1B; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px; font-weight:600;"></div>
       <div id="alert-instructor-profile-success" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; padding:12px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px; font-weight:700;"></div>
+
+      @include('egresados::partials._onboarding_photo_field', [
+          'fieldId' => 'inst_foto_perfil',
+          'previewId' => 'inst_foto_preview',
+          'person' => $person ?? (Auth::check() ? Auth::user()->person : null),
+          'roleLabel' => 'Instructor(a)'
+      ])
 
       <!-- Sección 1: Identificación y Rol Institucional -->
       <div class="profile-form-section">
@@ -1827,6 +1842,9 @@
         const userMenuName = document.querySelector('.user-menu-name');
         if (userMenuName) {
           userMenuName.textContent = nombres + ' ' + apellidos;
+        }
+        if (data.data && data.data.avatar_url && typeof window.updateTopbarAvatar === 'function') {
+          window.updateTopbarAvatar(data.data.avatar_url);
         }
 
         setTimeout(() => {

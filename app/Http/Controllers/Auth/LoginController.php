@@ -58,7 +58,8 @@ class LoginController extends Controller
                 $user = User::where('person_id', $person->id)->first()
                     ?: User::where('email', $person->misena_email)->first()
                     ?: User::where('email', $person->personal_email)->first()
-                    ?: User::where('nickname', 'egresado_' . $cleanDoc)->first();
+                    ?: User::where('nickname', 'egresado_' . $cleanDoc)->first()
+                    ?: User::where('nickname', 'instructor_' . $cleanDoc)->first();
             }
         }
 
@@ -89,6 +90,16 @@ class LoginController extends Controller
         }
 
         if ($canAuthenticate) {
+            // Validar si el egresado tiene una solicitud pendiente de aprobación institucional
+            $docCheck = $person ? (string)$person->document_number : $cleanDoc;
+            if (\Modules\Egresados\Http\Controllers\EgresadosController::isSolicitudPendiente($user ? $user->id : 0, $docCheck)) {
+                return back()
+                    ->withInput($request->only('email', 'remember', 'redirect'))
+                    ->withErrors([
+                        'email' => 'Tu solicitud de registro está en proceso de revisión y validación institucional por parte de la coordinación e instructores. Te informaremos en cuanto sea aprobada para que puedas ingresar.'
+                    ]);
+            }
+
             // Forzar cambio obligatorio de contraseña en primer ingreso con cédula
             if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
                 session(['sige_needs_password_change' => true]);
@@ -100,10 +111,19 @@ class LoginController extends Controller
                     ? $person->misena_email 
                     : (!empty($person->personal_email) ? $person->personal_email : 'egresado.' . $cleanDoc . '@sena.edu.co');
 
+                if (User::where('email', $uniqueEmail)->exists()) {
+                    $uniqueEmail = 'egresado.' . $cleanDoc . '.' . time() . '@sena.edu.co';
+                }
+
+                $nickname = 'egresado_' . $cleanDoc;
+                if (User::where('nickname', $nickname)->exists()) {
+                    $nickname = 'egresado_' . $cleanDoc . '_' . time();
+                }
+
                 $user = User::firstOrCreate(
                     ['person_id' => $person->id],
                     [
-                        'nickname' => 'egresado_' . $cleanDoc,
+                        'nickname' => $nickname,
                         'email'    => $uniqueEmail,
                         'password' => Hash::make($cleanDoc),
                     ]
@@ -137,6 +157,7 @@ class LoginController extends Controller
                     $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
                 }
             }
+            $user->load('roles');
 
             Auth::login($user, $remember);
             $request->session()->regenerate();
