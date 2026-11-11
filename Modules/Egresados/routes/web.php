@@ -9,6 +9,7 @@ use Modules\Egresados\Http\Controllers\EventosController;
 use Modules\Egresados\Http\Controllers\InstructorController;
 use Modules\Egresados\Http\Controllers\InstructorEncuestasController;
 use Modules\Egresados\Http\Controllers\NoticiasController;
+use Modules\Egresados\Http\Controllers\NotificationController;
 use Modules\Egresados\Http\Middleware\CheckEgresadosRole;
 use Modules\Egresados\Http\Middleware\PreventBackHistory;
 use Modules\Egresados\Http\Middleware\SigeSessionTimeout;
@@ -206,6 +207,6 @@ Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEg
 });
 
 // 7. GESTIÓN DE NOTIFICACIONES EN TIEMPO REAL
-Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEgresadosRole::class . ':egresado'])
-    ->post('egresados/notificaciones/marcar-leidas', [\Modules\Egresados\Http\Controllers\NotificationController::class, 'markAllRead'])
+Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class])
+    ->post('egresados/notificaciones/marcar-leidas', [NotificationController::class, 'markAllRead'])
     ->name('egresados.notificaciones.marcar_leidas');

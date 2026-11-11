@@ -23,6 +23,24 @@ class SigeSecurityTest extends TestCase
     {
         parent::setUp();
 
+        // En caso de que PHPUnit se ejecute sin el flag --env=local y utilice el fallback 'testing'
+        if (config('database.connections.mysql.database') === 'testing') {
+            $envDb = 'bderpsenaempresa';
+            $envFile = base_path('.env');
+            if (file_exists($envFile)) {
+                $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    if (str_starts_with(trim($line), 'DB_DATABASE=')) {
+                        $envDb = trim(explode('=', $line, 2)[1]);
+                        break;
+                    }
+                }
+            }
+            config(['database.connections.mysql.database' => $envDb]);
+            DB::purge('mysql');
+            DB::reconnect('mysql');
+        }
+
         // Desactivar middleware de validación CSRF para pruebas automatizadas de endpoints POST
         $this->withoutMiddleware([
             \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,

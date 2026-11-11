@@ -7,6 +7,28 @@ use App\Models\User;
 
 class EgresadosModuleTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (config('database.connections.mysql.database') === 'testing') {
+            $envDb = 'bderpsenaempresa';
+            $envFile = base_path('.env');
+            if (file_exists($envFile)) {
+                $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    if (str_starts_with(trim($line), 'DB_DATABASE=')) {
+                        $envDb = trim(explode('=', $line, 2)[1]);
+                        break;
+                    }
+                }
+            }
+            config(['database.connections.mysql.database' => $envDb]);
+            \Illuminate\Support\Facades\DB::purge('mysql');
+            \Illuminate\Support\Facades\DB::reconnect('mysql');
+        }
+    }
+
     /**
      * Prueba que las rutas públicas del módulo cargan correctamente (200 OK).
      */

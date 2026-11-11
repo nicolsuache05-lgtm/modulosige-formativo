@@ -1,24 +1,77 @@
-@php
-    $notificaciones = \Modules\Egresados\Http\Controllers\NotificationController::getAllNotificaciones();
-    $unreadCount = count(array_filter($notificaciones, fn($n) => !empty($n['unread'])));
-@endphp
+<?php
+    use Illuminate\Support\Facades\Auth;
+    use Modules\Egresados\Http\Controllers\NotificationController;
+
+    $notificacionesRaw = NotificationController::getAllNotificaciones();
+    $unreadCount = count(array_filter($notificacionesRaw, fn($n) => !empty($n['unread'])));
+    $unreadBadgeText = $unreadCount > 0 ? ($unreadCount . ' nuevas') : 'Al día';
+
+    /** @var \App\Models\User|null $currentUser */
+    $currentUser = Auth::user();
+    
+    $authAdminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
+    $authAdminNick  = strtolower((string) config('egresados.security.superadmin_nickname', 'superadmin_egresados'));
+    
+    $userEmail = $currentUser ? strtolower((string) $currentUser->email) : '';
+    $userNick  = $currentUser ? strtolower((string) $currentUser->nickname) : '';
+
+    $isSuperAdmin = $currentUser && (($userEmail === $authAdminEmail || $userNick === $authAdminNick) && ($currentUser->hasSuperAdmin() || $currentUser->hasRole('egresados.admin')));
+
+    $targetDirectorioUrl = route('egresados.dashboard_egresado');
+    if ($isSuperAdmin) {
+        $targetDirectorioUrl = route('egresados.index');
+    } elseif ($currentUser && ($currentUser->hasRole('egresados.instructor') || $currentUser->nickname === 'instructor_egresados' || str_contains($userEmail, 'instructor'))) {
+        $targetDirectorioUrl = route('egresados.instructor.directorio');
+    }
+
+    $userFullName = $currentUser ? ($currentUser->full_name ?: 'Usuario') : 'Super Administrador SIGE';
+    $userInitials = $currentUser ? ($currentUser->initials ?: 'SE') : 'SA';
+    $userPrimaryRole = $currentUser ? ($currentUser->primary_role ?: 'Super Administrador') : 'Super Administrador';
+    $userDisplayEmail = !empty($userEmail) ? $userEmail : 'superadmin.egresados@sena.edu.co';
+
+    $markReadUrl = route('egresados.notificaciones.marcar_leidas');
+    $csrfToken = csrf_token();
+    $homeUrl = route('home');
+    $logoutUrl = route('egresados.logout');
+    $welcomeUrl = route('egresados.welcome');
+    $instructorDashboardUrl = route('egresados.dashboard_instructor');
+    $notifJsonPayload = json_encode(collect($notificacionesRaw)->keyBy('id'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+
+    $notificaciones = array_map(function($notif) {
+        $tipo = (string)($notif['tipo'] ?? 'general');
+        $colorClass = 'notif-color-default';
+        if ($tipo === 'encuesta') {
+            $colorClass = 'notif-color-encuesta';
+        } elseif ($tipo === 'evento') {
+            $colorClass = 'notif-color-evento';
+        }
+        return [
+            'id' => (string)($notif['id'] ?? ''),
+            'class' => !empty($notif['unread']) ? 'unread' : 'read',
+            'icon' => $notif['icon'] ?? 'fa-solid fa-bell',
+            'colorClass' => $colorClass,
+            'tiempo' => $notif['tiempo'] ?? 'Reciente',
+            'texto' => $notif['texto'] ?? '',
+        ];
+    }, $notificacionesRaw);
+?>
 <!-- Modules/Egresados/resources/views/superadmin/partials/_topbar_right.blade.php -->
-<div class="topbar-right-wrapper" style="display:flex; align-items:center; gap:16px; position:relative;">
+<div class="topbar-right-wrapper" id="topbarRightWrapper" data-mark-read-url="{{ $markReadUrl }}" data-csrf-token="{{ $csrfToken }}">
   
   <!-- ================= NOTIFICACIONES ================= -->
-  <div class="notif-dropdown-container" style="position:relative;">
+  <div class="notif-dropdown-container">
     <button type="button" class="icon-btn notif-toggle-btn" id="notifBtn" title="Notificaciones" aria-label="Notificaciones" onclick="toggleNotificationDropdown(event)">
       <i class="fa-regular fa-bell"></i>
-      <span class="dot notif-badge-dot" id="notifBadgeDot" style="display:{{ $unreadCount > 0 ? 'flex' : 'none' }};"></span>
+      <span class="dot notif-badge-dot {{ $unreadCount > 0 ? 'has-unread' : '' }}" id="notifBadgeDot"></span>
     </button>
 
     <!-- Menú Desplegable de Notificaciones -->
-    <div id="notifDropdownMenu" class="dropdown-panel notif-dropdown-menu" style="display:none;">
+    <div id="notifDropdownMenu" class="dropdown-panel notif-dropdown-menu">
       <div class="dropdown-header">
         <div class="dropdown-header-title">
-          <i class="fa-solid fa-bell" style="color:var(--green, #39A900);"></i>
-          <span style="font-weight:700; font-size:14px; color:#001A29;">Notificaciones</span>
-          <span class="badge-count" id="notifCountBadge">{{ $unreadCount > 0 ? $unreadCount . ' nuevas' : 'Al día' }}</span>
+          <i class="fa-solid fa-bell notif-header-bell"></i>
+          <span class="notif-header-title-text">Notificaciones</span>
+          <span class="badge-count" id="notifCountBadge">{{ $unreadBadgeText }}</span>
         </div>
         <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead(event)">
           Marcar como leídas
@@ -26,33 +79,35 @@
       </div>
 
       <div class="notif-list" id="notifItemsList">
-        @forelse($notificaciones as $notif)
-          <div class="notif-item {{ !empty($notif['unread']) ? 'unread' : 'read' }}" onclick="abrirDetalleNotificacion('{{ $notif['id'] }}', this)">
-            <div class="notif-icon" style="background: {{ $notif['iconBg'] ?? '#eaf7ee' }};">
-              <i class="{{ $notif['icon'] ?? 'fa-solid fa-bell' }}" style="color: {{ $notif['iconColor'] ?? '#39A900' }};"></i>
-            </div>
-            <div class="notif-content">
-              <div class="notif-text">
-                {!! $notif['texto'] !!}
+        @if(count($notificaciones) > 0)
+          @foreach($notificaciones as $notif)
+            <div class="notif-item {{ $notif['class'] }}" data-notif-id="{{ $notif['id'] }}" onclick="abrirDetalleNotificacion(this.getAttribute('data-notif-id'), this)">
+              <div class="notif-icon {{ $notif['colorClass'] }}">
+                <i class="{{ $notif['icon'] }}"></i>
               </div>
-              <div class="notif-meta">
-                <span class="notif-time"><i class="fa-regular fa-clock"></i> {{ $notif['tiempo'] ?? 'Reciente' }}</span>
-                <span class="unread-dot"></span>
+              <div class="notif-content">
+                <div class="notif-text">
+                  {!! $notif['texto'] !!}
+                </div>
+                <div class="notif-meta">
+                  <span class="notif-time"><i class="fa-regular fa-clock"></i> {{ $notif['tiempo'] }}</span>
+                  <span class="unread-dot"></span>
+                </div>
               </div>
             </div>
-          </div>
-        @empty
-          <div style="padding: 28px 16px; text-align: center; color: #64748b; font-size: 12px; font-weight: 600;">
-            <i class="fa-solid fa-bell-slash" style="font-size: 24px; color: #94a3b8; display: block; margin-bottom: 8px;"></i>
+          @endforeach
+        @else
+          <div class="notif-empty-box">
+            <i class="fa-solid fa-bell-slash"></i>
             No hay respuestas ni notificaciones registradas.
           </div>
-        @endforelse
+        @endif
       </div>
 
       <div class="dropdown-footer">
-        <a href="{{ route('egresados.index') }}" class="dropdown-footer-link">
+        <a href="{{ $targetDirectorioUrl }}" class="dropdown-footer-link">
           <span>Ver todos los egresados y seguimientos</span>
-          <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+          <i class="fa-solid fa-chevron-right"></i>
         </a>
       </div>
     </div>
@@ -60,55 +115,35 @@
 
 
   <!-- ================= MENÚ DESPLEGABLE USUARIO ================= -->
-  <div class="user-dropdown-container" style="position:relative;">
+  <div class="user-dropdown-container">
     <div class="user-chip" id="userChipBtn" title="Menú de usuario" onclick="toggleUserDropdown(event)">
       <div class="user-avatar">
-        @auth
-          {{ Auth::user()->initials }}
-        @else
-          SA
-        @endauth
+        {{ $userInitials }}
       </div>
       <span>
-        @auth
-          {{ Auth::user()->full_name }}
-        @else
-          Super Administrador SIGE
-        @endauth
+        {{ $userFullName }}
       </span>
       <i class="fa-solid fa-chevron-down user-chevron-icon ms-1" id="userChevronIcon"></i>
     </div>
 
     <!-- Menú Desplegable del Usuario -->
-    <div id="userDropdownMenu" class="dropdown-panel user-dropdown-menu" style="display:none;">
+    <div id="userDropdownMenu" class="dropdown-panel user-dropdown-menu">
       
       <!-- Encabezado del perfil -->
       <div class="user-menu-header">
         <div class="user-menu-avatar">
-          @auth
-            {{ Auth::user()->initials }}
-          @else
-            SA
-          @endauth
+          {{ $userInitials }}
         </div>
         <div class="user-menu-info">
           <div class="user-menu-name">
-            @auth
-              {{ Auth::user()->full_name }}
-            @else
-              Super Administrador SIGE
-            @endauth
+            {{ $userFullName }}
           </div>
           <div class="user-menu-email">
-            @auth
-              {{ Auth::user()->email }}
-            @else
-              superadmin.egresados@sena.edu.co
-            @endauth
+            {{ $userDisplayEmail }}
           </div>
           <div class="user-menu-role">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>{{ Auth::check() ? (Auth::user()->primary_role ?? 'Super Administrador') : 'Super Administrador' }}</span>
+            <span>{{ $userPrimaryRole }}</span>
           </div>
         </div>
       </div>
@@ -116,13 +151,8 @@
       <!-- Opciones del Menú -->
       <div class="user-menu-body">
         
-        @php
-          $currentUser = Auth::user();
-          $isSuperAdmin = $currentUser && ($currentUser->hasSuperAdmin() || $currentUser->nickname === 'superadmin' || $currentUser->email === 'superadmin.egresados@sena.edu.co' || ($currentUser->roles && $currentUser->roles->contains('slug', 'superadmin')));
-        @endphp
-
         @if(!$isSuperAdmin)
-        <button type="button" class="user-menu-item" onclick="if(typeof openModalActualizarPerfilInstructor === 'function'){ openModalActualizarPerfilInstructor(); } else if(typeof openModalActualizarPerfilEgresado === 'function'){ openModalActualizarPerfilEgresado(); } else if(typeof openModalActualizarPasswordInicial === 'function'){ openModalActualizarPasswordInicial(); } else { window.location.href='{{ route('egresados.dashboard_instructor') }}'; }" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; font-family:inherit;">
+        <button type="button" id="btnTopbarActualizarPerfil" data-url="{{ $instructorDashboardUrl }}" class="user-menu-item user-menu-item-btn" onclick="sigeTopbarActualizarPerfil()">
           <div class="menu-item-icon bg-green-icon">
             <i class="fa-solid fa-user-pen"></i>
           </div>
@@ -133,7 +163,7 @@
         </button>
         @endif
 
-        <a href="{{ route('home') }}" class="user-menu-item">
+        <a href="{{ $homeUrl }}" class="user-menu-item">
           <div class="menu-item-icon bg-blue-icon">
             <i class="fa-solid fa-layer-group"></i>
           </div>
@@ -147,9 +177,9 @@
 
       <!-- Footer con Botón Cerrar Sesión -->
       <div class="user-menu-footer">
-        <form id="form-logout-topbar" action="{{ route('egresados.logout') }}" method="POST">
+        <form id="form-logout-topbar" action="{{ $logoutUrl }}" method="POST">
           @csrf
-          <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
+          <input type="hidden" name="redirect" value="{{ $welcomeUrl }}">
           <button type="submit" class="btn-logout-dropdown">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             <span>Cerrar Sesión</span>
@@ -163,6 +193,63 @@
 </div>
 
 <style>
+  /* Helper classes for clean HTML without inline styles */
+  .notif-dropdown-container, .user-dropdown-container {
+    position: relative !important;
+  }
+  .notif-dropdown-menu, .user-dropdown-menu {
+    display: none;
+  }
+  .notif-badge-dot {
+    display: none;
+  }
+  .notif-badge-dot.has-unread {
+    display: flex !important;
+  }
+  .notif-header-bell {
+    color: var(--green, #39A900) !important;
+  }
+  .notif-header-title-text {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #001A29 !important;
+  }
+  .notif-color-default {
+    background: #eaf7ee !important;
+    color: #39A900 !important;
+  }
+  .notif-color-encuesta {
+    background: #eff6ff !important;
+    color: #1e40af !important;
+  }
+  .notif-color-evento {
+    background: #fef3c7 !important;
+    color: #b45309 !important;
+  }
+  .notif-empty-box {
+    padding: 28px 16px !important;
+    text-align: center !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+  }
+  .notif-empty-box i {
+    font-size: 24px !important;
+    color: #94a3b8 !important;
+    display: block !important;
+    margin-bottom: 8px !important;
+  }
+  .dropdown-footer-link i {
+    font-size: 10px !important;
+  }
+  .user-menu-item-btn {
+    width: 100% !important;
+    text-align: left !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+  }
   /* ================= ESTILOS GLOBALES DE TOPBAR INSTITUCIONAL SENA ERP ================= */
   .topbar {
     background: linear-gradient(135deg, var(--sena-dark, #00131E) 0%, var(--sena-navy, #001A29) 100%) !important;
@@ -264,18 +351,7 @@
     box-shadow: 0 0 6px rgba(98, 227, 29, 0.8) !important;
   }
 
-  /* ================= VIEW TRANSITIONS & TRANSICIONES SUAVES ================= */
-  @view-transition {
-    navigation: auto;
-  }
-
-  ::view-transition-old(root) {
-    animation: 90ms ease-out both sigeFadeOut;
-  }
-  ::view-transition-new(root) {
-    animation: 140ms ease-in both sigeFadeIn;
-  }
-
+  /* ================= TRANSICIONES SUAVES ================= */
   @keyframes sigeFadeOut {
     from { opacity: 1; }
     to { opacity: 0; }
@@ -932,7 +1008,28 @@
   }
 </style>
 
+<script id="sigeNotificacionesJsonData" type="text/template">
+{!! $notifJsonPayload !!}
+</script>
+
 <script>
+  // Manejo de actualización de perfil seguro para instructores y egresados
+  function sigeTopbarActualizarPerfil() {
+    if (typeof openModalActualizarPerfilInstructor === 'function') {
+      openModalActualizarPerfilInstructor();
+    } else if (typeof openModalActualizarPerfilEgresado === 'function') {
+      openModalActualizarPerfilEgresado();
+    } else if (typeof openModalActualizarPasswordInicial === 'function') {
+      openModalActualizarPasswordInicial();
+    } else {
+      const btn = document.getElementById('btnTopbarActualizarPerfil');
+      const targetUrl = btn ? btn.getAttribute('data-url') : '';
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      }
+    }
+  }
+
   // Control interactivo de menús desplegables
   function toggleUserDropdown(event) {
     if (event) event.stopPropagation();
@@ -989,13 +1086,18 @@
     });
     updateUnreadNotificationCount();
     try {
-      fetch('{{ route("egresados.notificaciones.marcar_leidas") }}', {
-        method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-          'Content-Type': 'application/json'
-        }
-      });
+      const topbarWrapper = document.getElementById('topbarRightWrapper');
+      const markUrl = topbarWrapper ? topbarWrapper.getAttribute('data-mark-read-url') : '';
+      const csrf = topbarWrapper ? topbarWrapper.getAttribute('data-csrf-token') : '';
+      if (markUrl) {
+        fetch(markUrl, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': csrf,
+            'Content-Type': 'application/json'
+          }
+        });
+      }
     } catch (e) {}
 
   }
@@ -1021,7 +1123,8 @@
   }
 
   // ================= DICCIONARIO DE DETALLES DE NOTIFICACIONES =================
-  const sigeNotificacionesData = @json(collect($notificaciones)->keyBy('id'));
+  const sigeNotifScriptElem = document.getElementById('sigeNotificacionesJsonData');
+  const sigeNotificacionesData = sigeNotifScriptElem ? JSON.parse(sigeNotifScriptElem.textContent || '{}') : {};
 
   // Procesar clic en notificación
   function abrirDetalleNotificacion(notifKey, element) {

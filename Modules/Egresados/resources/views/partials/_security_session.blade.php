@@ -6,8 +6,25 @@
 <!-- ========================================================================= -->
 
 @auth
+@once
+<?php
+    $sigeTimeout = (int) config('egresados.security.session_timeout_seconds', 300);
+    $sigeWarning = (int) config('egresados.security.session_warning_seconds', 60);
+    $sigeCheckUrl = route('egresados.session.check');
+    $sigeKeepAliveUrl = route('egresados.session.keep_alive');
+    $sigeLoginUrl = route('egresados.login', ['inactivity' => 1]);
+    $sigeLogoutUrl = route('egresados.logout');
+    $sigeCsrfToken = csrf_token();
+?>
 <!-- Modal Accesible de Advertencia de Inactividad de Sesión -->
-<div id="sigeInactivityModal" class="sige-security-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="sigeModalTitle">
+<div id="sigeInactivityModal" class="sige-security-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="sigeModalTitle"
+    data-timeout="{{ $sigeTimeout }}"
+    data-warning="{{ $sigeWarning }}"
+    data-check-url="{{ $sigeCheckUrl }}"
+    data-keep-alive-url="{{ $sigeKeepAliveUrl }}"
+    data-login-url="{{ $sigeLoginUrl }}"
+    data-logout-url="{{ $sigeLogoutUrl }}"
+    data-csrf="{{ $sigeCsrfToken }}">
     <div class="sige-security-modal-card">
         <div class="sige-modal-header-icon">
             <i class="fa-solid fa-clock-rotate-left"></i>
@@ -228,13 +245,18 @@
 window.sigeSecurityEngine = (function() {
     'use strict';
 
-    const TIMEOUT_SECONDS = {{ (int) config('egresados.security.session_timeout_seconds', 300) }};
-    const WARNING_SECONDS = {{ (int) config('egresados.security.session_warning_seconds', 60) }};
-    const CHECK_URL = "{{ route('egresados.session.check') }}";
-    const KEEP_ALIVE_URL = "{{ route('egresados.session.keep_alive') }}";
-    const LOGIN_URL = "{{ route('egresados.login', ['inactivity' => 1]) }}";
-    const LOGOUT_URL = "{{ route('egresados.logout') }}";
-    const CSRF_TOKEN = "{{ csrf_token() }}";
+    if (window.sigeSecurityEngine) {
+        return window.sigeSecurityEngine;
+    }
+
+    const modalEl = document.getElementById('sigeInactivityModal');
+    const TIMEOUT_SECONDS = modalEl ? parseInt(modalEl.getAttribute('data-timeout') || '300', 10) : 300;
+    const WARNING_SECONDS = modalEl ? parseInt(modalEl.getAttribute('data-warning') || '60', 10) : 60;
+    const CHECK_URL = modalEl ? (modalEl.getAttribute('data-check-url') || '') : '';
+    const KEEP_ALIVE_URL = modalEl ? (modalEl.getAttribute('data-keep-alive-url') || '') : '';
+    const LOGIN_URL = modalEl ? (modalEl.getAttribute('data-login-url') || '') : '';
+    const LOGOUT_URL = modalEl ? (modalEl.getAttribute('data-logout-url') || '') : '';
+    const CSRF_TOKEN = modalEl ? (modalEl.getAttribute('data-csrf') || '') : '';
 
     const STORAGE_KEY_LAST_ACTIVITY = 'sige_last_human_interaction';
     const STORAGE_KEY_LOGOUT = 'sige_session_logout_event';
@@ -496,5 +518,6 @@ window.sigeSecurityEngine = (function() {
     };
 })();
 </script>
+@endonce
 @endauth
 
