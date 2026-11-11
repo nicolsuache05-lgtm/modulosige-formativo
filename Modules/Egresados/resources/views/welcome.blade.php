@@ -193,25 +193,29 @@
                 </div>
             </a>
 
-            <!-- Nav Links relacionados a las secciones de la página -->
-            <nav class="hidden lg:flex items-center space-x-1.5 text-xs sm:text-[13px] font-bold font-poppins">
-                <a href="#inicio" class="flex items-center space-x-1.5 bg-[#002336] text-[#62E31D] px-4 py-2 rounded-full border border-[#62E31D]/30 shadow-inner">
+            <!-- Nav Links relacionados a las secciones reales de esta página SIGE -->
+            <nav id="sigeTopNav" class="hidden lg:flex items-center space-x-1 text-xs xl:text-[13px] font-bold font-poppins">
+                <a href="#inicio" data-nav-key="inicio" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 bg-[#002336] text-[#62E31D] px-3.5 py-2 rounded-full border border-[#62E31D]/30 shadow-inner transition">
                     <i class="fa-solid fa-house text-xs"></i>
                     <span>Inicio</span>
                 </a>
-                <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
+                <a href="#servicios" data-nav-key="noticias" onclick="irASlideSige(0)" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-3.5 py-2 rounded-full transition">
                     <i class="fa-solid fa-newspaper text-xs"></i>
                     <span>Noticias</span>
                 </a>
-                <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
+                <a href="#servicios" data-nav-key="encuestas" onclick="irASlideSige(2)" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-3.5 py-2 rounded-full transition">
                     <i class="fa-solid fa-clipboard-check text-xs"></i>
                     <span>Encuestas</span>
                 </a>
-                <a href="#servicios" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
+                <a href="#servicios" data-nav-key="eventos" onclick="irASlideSige(1)" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-3.5 py-2 rounded-full transition">
                     <i class="fa-solid fa-calendar-days text-xs"></i>
                     <span>Eventos</span>
                 </a>
-                <a href="#contacto" class="flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-4 py-2 rounded-full transition">
+                <a href="#quienes-somos" data-nav-key="quienes-somos" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-3.5 py-2 rounded-full transition">
+                    <i class="fa-solid fa-users text-xs"></i>
+                    <span>¿Quiénes somos?</span>
+                </a>
+                <a href="#contacto" data-nav-key="contacto" class="sige-nav-link whitespace-nowrap flex items-center space-x-1.5 text-gray-200 hover:text-[#62E31D] hover:bg-white/5 px-3.5 py-2 rounded-full transition">
                     <i class="fa-solid fa-phone text-xs"></i>
                     <span>Contacto</span>
                 </a>
@@ -987,6 +991,26 @@
                 window.addEventListener('resize', requestRevealUpdate, { passive: true });
                 window.addEventListener('load', requestRevealUpdate, { passive: true });
                 updateRevealProgress();
+            }
+
+            // Resaltar enlace activo en la barra superior de SIGE
+            const topNavLinks = Array.from(document.querySelectorAll('#sigeTopNav .sige-nav-link'));
+            if (topNavLinks.length) {
+                const activeClasses = ['bg-[#002336]', 'text-[#62E31D]', 'border', 'border-[#62E31D]/30', 'shadow-inner'];
+                const idleClasses = ['text-gray-200', 'hover:text-[#62E31D]', 'hover:bg-white/5'];
+                const setActiveNav = (activeEl) => {
+                    topNavLinks.forEach(link => {
+                        link.classList.remove(...activeClasses);
+                        link.classList.add(...idleClasses);
+                    });
+                    if (activeEl) {
+                        activeEl.classList.remove(...idleClasses);
+                        activeEl.classList.add(...activeClasses);
+                    }
+                };
+                topNavLinks.forEach(link => {
+                    link.addEventListener('click', () => setActiveNav(link));
+                });
             }
         });
     </script>
