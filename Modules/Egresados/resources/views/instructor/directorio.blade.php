@@ -996,7 +996,6 @@
                     <th class="py-3.5 px-4">Egresado(a)</th>
                     <th class="py-3.5 px-4">Programa & Ficha</th>
                     <th class="py-3.5 px-4">Estado</th>
-                    <th class="py-3.5 px-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="egresadosTableBody" class="divide-y divide-gray-100">
@@ -1094,17 +1093,10 @@
                           </div>
                         </td>
 
-                        <td class="py-3.5 px-4 text-center">
-                          <button type="button" 
-                                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-[#39A900] hover:text-white transition inline-flex items-center justify-center text-xs" 
-                                  title="Ver detalle">
-                            <i class="fa-solid fa-eye"></i>
-                          </button>
-                        </td>
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="5" class="py-12 text-center text-gray-400">
+                      <td colspan="4" class="py-12 text-center text-gray-400">
                         <i class="fa-solid fa-user-slash text-3xl text-gray-300 mb-2 block"></i>
                         <p class="font-semibold text-gray-700 text-sm">No se encontraron egresados</p>
                         <p class="text-xs text-gray-400">Prueba cambiando los términos de búsqueda o filtros.</p>

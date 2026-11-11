@@ -78,7 +78,6 @@
                         <th class="py-3.5 px-4">Fecha</th>
                         <th class="py-3.5 px-4">Estado</th>
                         <th class="py-3.5 px-4">Registro / Cupo</th>
-                        <th class="py-3.5 px-4 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -145,27 +144,10 @@
                                 </div>
                             </td>
 
-                            <td class="py-3.5 px-4 text-center whitespace-nowrap" onclick="event.stopPropagation();">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <button type="button" 
-                                            onclick="selectEvento({{ $jsonData }}, 'evt-row-{{ $item['id'] }}'); abrirModalDetalleEvento({{ $jsonData }});" 
-                                            class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] border border-[#BBF7D0] inline-flex items-center justify-center transition cursor-pointer text-xs"
-                                            title="Ver detalle completo (SENA ERP)">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </button>
-                                    <button type="button" 
-                                            onclick="selectEvento({{ $jsonData }}, 'evt-row-{{ $item['id'] }}'); abrirModalEditarEvento({{ $jsonData }});" 
-                                            class="w-7 h-7 rounded-lg border border-gray-200 text-gray-500 hover:text-[#166534] hover:bg-[#EAF7EE] hover:border-[#BBF7D0] inline-flex items-center justify-center transition cursor-pointer text-xs"
-                                            title="Editar evento">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                </div>
-                            </td>
-
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-gray-400 text-xs sm:text-sm">
+                            <td colspan="6" class="py-8 text-center text-gray-400 text-xs sm:text-sm">
                                 No hay eventos programados en este momento.
                             </td>
                         </tr>

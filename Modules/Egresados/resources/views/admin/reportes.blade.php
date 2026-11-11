@@ -368,7 +368,6 @@
                                 <th class="py-3.5 px-4">Periodo Evaluado</th>
                                 <th class="py-3.5 px-4">Formato</th>
                                 <th class="py-3.5 px-4">MÃ©tricas Clave</th>
-                                <th class="py-3.5 px-4 text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-gray-700">
@@ -439,36 +438,10 @@
                                             <div class="{{ $barColor }} h-1.5 rounded-full" style="width: {{ min(100, max(10, $cleanRate)) }}%"></div>
                                         </div>
                                     </td>
-
-                                    <!-- Acciones HomogÃ©neas -->
-                                    <td class="py-3.5 px-4 text-center">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <button type="button" 
-                                                onclick="abrirModalVerReporte({{ json_encode($itemData) }})"
-                                                class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-[#39A900] text-[#013819] hover:text-white border border-emerald-100 flex items-center justify-center transition shadow-xs" 
-                                                title="Ver Detalle y GrÃ¡ficos">
-                                                <i class="fa-solid fa-eye text-xs"></i>
-                                            </button>
-
-                                            <button type="button" 
-                                                onclick="descargarReporteSimulado({{ json_encode($itemData) }})"
-                                                class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-[#39A900] text-[#013819] hover:text-white border border-emerald-100 flex items-center justify-center transition shadow-xs" 
-                                                title="Descargar Documento">
-                                                <i class="fa-solid fa-download text-xs"></i>
-                                            </button>
-
-                                            <button type="button" 
-                                                onclick="abrirModalEliminarReporte({{ json_encode($itemData) }})"
-                                                class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-100 flex items-center justify-center transition shadow-xs" 
-                                                title="Eliminar Reporte">
-                                                <i class="fa-solid fa-trash text-xs"></i>
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-12 text-center">
+                                    <td colspan="5" class="py-12 text-center">
                                         <div class="max-w-xs mx-auto text-center space-y-2">
                                             <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto text-lg">
                                                 <i class="fa-solid fa-file-circle-xmark"></i>

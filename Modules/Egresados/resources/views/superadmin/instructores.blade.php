@@ -999,7 +999,6 @@
                   <th>Instructor(a)</th>
                   <th>Programa / Rol</th>
                   <th>Estado</th>
-                  <th style="text-align:center;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -1064,27 +1063,10 @@
                       <span class="badge-pill status-green">ACTIVO</span>
                     </td>
 
-                    <td style="text-align:center;">
-                      <div style="display:flex; align-items:center; justify-content:center; gap:6px;" onclick="event.stopPropagation();">
-                        <button type="button" 
-                            onclick="selectInstructor({{ $jsonData }}, 'inst-row-{{ $inst->id }}')" 
-                            class="btn-circle-action" 
-                            title="Ver en Panel de Detalle">
-                          <i class="fa-solid fa-eye"></i>
-                        </button>
-                        <button type="button" 
-                            onclick="openEditarInstructorModal({{ $jsonData }})" 
-                            class="btn-circle-action" 
-                            title="Editar Instructor">
-                          <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                      </div>
-                    </td>
-
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="5" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
+                    <td colspan="4" style="text-align:center; padding:40px 20px; color:var(--ink-soft);">
                       <i class="fa-solid fa-chalkboard-user" style="font-size:32px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
                       <div style="font-weight:700; font-size:15px; color:var(--ink);">No se encontraron instructores</div>
                       <p style="font-size:12px; margin-top:4px;">Prueba cambiando los términos de búsqueda.</p>
