@@ -18,8 +18,9 @@
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Highcharts + 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts-3d.js"></script>
 
     <style>
       :root {
@@ -1036,30 +1037,26 @@
 
         <!-- Gráfica 1: Resumen del Software SIGE -->
         <div class="panel">
-          <div class="panel-head" style="margin-bottom:14px; padding-bottom:10px;">
+          <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
             <h3 class="panel-title" style="font-size:16px;">
               <i class="fa-solid fa-chart-column text-[#39A900]"></i>
               <span>Resumen del Software SIGE</span>
             </h3>
             <a href="{{ route('egresados.reportes') }}" class="panel-action">Ver reportes</a>
           </div>
-          <div class="chart-wrap-compact">
-            <canvas id="sigeResumenBarChart"></canvas>
-          </div>
+          <div id="sigeResumenBarChart" class="chart-wrap-compact"></div>
         </div>
 
         <!-- Gráfica 2: Distribución por Programa -->
         <div class="panel">
-          <div class="panel-head" style="margin-bottom:14px; padding-bottom:10px;">
+          <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
             <h3 class="panel-title" style="font-size:16px;">
               <i class="fa-solid fa-chart-pie text-[#39A900]"></i>
               <span>Egresados por Programa</span>
             </h3>
             <a href="{{ route('egresados.index') }}" class="panel-action">Ver todo</a>
           </div>
-          <div class="chart-wrap-compact">
-            <canvas id="sigeProgramasDonutChart"></canvas>
-          </div>
+          <div id="sigeProgramasDonutChart" class="chart-wrap-compact"></div>
         </div>
 
       </div>
@@ -1420,103 +1417,151 @@
       document.body.style.overflow = 'hidden';
     @endif
 
-    if (typeof Chart !== 'undefined') {
+    if (typeof Highcharts !== 'undefined') {
       const erpPalette = ['#39A900', '#001A29', '#2d8500', '#00324D', '#62E31D'];
 
-      const barCtx = document.getElementById('sigeResumenBarChart');
-      if (barCtx) {
-        new Chart(barCtx, {
-          type: 'bar',
-          data: {
-            labels: ['Egresados', 'Instructores', 'Encuestas', 'Eventos', 'Reportes'],
-            datasets: [{
-              label: 'Registros',
-              data: [
-                {{ (int) ($totalEgresados ?? 0) }},
-                {{ (int) ($totalInstructores ?? 0) }},
-                {{ (int) ($totalEncuestas ?? 0) }},
-                {{ (int) ($totalEventos ?? 0) }},
-                {{ (int) ($totalReportes ?? 0) }}
-              ],
-              backgroundColor: erpPalette,
-              borderRadius: 8,
-              maxBarThickness: 38,
-            }]
+      const barEl = document.getElementById('sigeResumenBarChart');
+      if (barEl) {
+        Highcharts.chart(barEl, {
+          chart: {
+            type: 'column',
+            backgroundColor: 'transparent',
+            height: 220,
+            margin: [22, 16, 36, 34],
+            style: { fontFamily: 'Poppins, Nunito, sans-serif' },
+            options3d: {
+              enabled: true,
+              alpha: 10,
+              beta: 14,
+              depth: 45,
+              viewDistance: 25
+            }
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: '#00131E',
-                titleColor: '#62E31D',
-                bodyColor: '#ffffff',
-                padding: 10,
-                cornerRadius: 8
-              }
+          title: { text: null },
+          credits: { enabled: false },
+          legend: { enabled: false },
+          xAxis: {
+            categories: ['Egresados', 'Instructores', 'Encuestas', 'Eventos', 'Reportes'],
+            labels: {
+              style: { color: '#00131E', fontSize: '10px', fontWeight: '600' }
             },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { precision: 0, color: '#5A6E7D', font: { family: 'Poppins', size: 11 } },
-                grid: { color: 'rgba(0, 19, 30, 0.06)' }
-              },
-              x: {
-                ticks: { color: '#00131E', font: { family: 'Poppins', size: 11, weight: '600' } },
-                grid: { display: false }
+            gridLineColor: 'rgba(0, 19, 30, 0.05)'
+          },
+          yAxis: {
+            allowDecimals: false,
+            title: { text: null },
+            labels: {
+              style: { color: '#5A6E7D', fontSize: '9.5px', fontWeight: '600' }
+            },
+            gridLineColor: 'rgba(0, 19, 30, 0.06)'
+          },
+          tooltip: {
+            backgroundColor: '#00131E',
+            borderColor: '#39A900',
+            borderRadius: 8,
+            style: { color: '#ffffff', fontSize: '11px' },
+            headerFormat: '<span style="color:#62E31D; font-weight:700; font-size:10.5px;">{point.key}</span><br/>',
+            pointFormat: 'Total: <b>{point.y}</b>'
+          },
+          plotOptions: {
+            column: {
+              depth: 32,
+              colorByPoint: true,
+              colors: erpPalette,
+              borderWidth: 0,
+              dataLabels: {
+                enabled: true,
+                y: -4,
+                style: {
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  color: '#00131E',
+                  textOutline: 'none'
+                }
               }
             }
-          }
+          },
+          series: [{
+            name: 'Registros',
+            data: [
+              {{ (int) ($totalEgresados ?? 0) }},
+              {{ (int) ($totalInstructores ?? 0) }},
+              {{ (int) ($totalEncuestas ?? 0) }},
+              {{ (int) ($totalEventos ?? 0) }},
+              {{ (int) ($totalReportes ?? 0) }}
+            ]
+          }]
         });
       }
 
-      const donutCtx = document.getElementById('sigeProgramasDonutChart');
-      if (donutCtx) {
-        new Chart(donutCtx, {
-          type: 'doughnut',
-          data: {
-            labels: @json($progLabels),
-            datasets: [{
-              data: @json($progValues),
-              backgroundColor: ['#39A900', '#001A29', '#62E31D', '#00324D'],
-              borderColor: '#ffffff',
-              borderWidth: 2,
-              hoverOffset: 4
-            }]
+      const donutEl = document.getElementById('sigeProgramasDonutChart');
+      if (donutEl) {
+        const progLabels = @json($progLabels);
+        const progValues = @json($progValues);
+        const pieData = progLabels.map((lbl, idx) => ({
+          name: lbl,
+          y: progValues[idx] || 0
+        }));
+
+        Highcharts.chart(donutEl, {
+          chart: {
+            type: 'pie',
+            backgroundColor: 'transparent',
+            height: 220,
+            margin: [6, 6, 6, 6],
+            style: { fontFamily: 'Poppins, Nunito, sans-serif' },
+            options3d: {
+              enabled: true,
+              alpha: 42,
+              beta: 0
+            }
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '64%',
-            plugins: {
-              legend: {
-                position: 'right',
-                labels: {
-                  boxWidth: 10,
-                  boxHeight: 10,
-                  usePointStyle: true,
-                  pointStyle: 'circle',
-                  color: '#00131E',
-                  font: { family: 'Poppins', size: 11, weight: '600' }
-                }
-              },
-              tooltip: {
-                backgroundColor: '#00131E',
-                titleColor: '#62E31D',
-                bodyColor: '#ffffff',
-                padding: 10,
-                cornerRadius: 8,
-                callbacks: {
-                  label: function(ctx) {
-                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0) || 1;
-                    const pct = Math.round((ctx.parsed / total) * 100);
-                    return ' ' + ctx.parsed + ' egresado(s) (' + pct + '%)';
-                  }
+          title: { text: null },
+          credits: { enabled: false },
+          tooltip: {
+            backgroundColor: '#00131E',
+            borderColor: '#39A900',
+            borderRadius: 8,
+            style: { color: '#ffffff', fontSize: '11px' },
+            pointFormat: '<b>{point.y}</b> egresado(s) ({point.percentage:.0f}%)'
+          },
+          legend: {
+            align: 'right',
+            verticalAlign: 'middle',
+            layout: 'vertical',
+            symbolRadius: 4,
+            symbolHeight: 8,
+            symbolWidth: 8,
+            itemMarginBottom: 6,
+            itemStyle: {
+              color: '#00131E',
+              fontSize: '10px',
+              fontWeight: '600'
+            }
+          },
+          plotOptions: {
+            pie: {
+              innerSize: 52,
+              depth: 26,
+              colors: ['#39A900', '#001A29', '#62E31D', '#00324D'],
+              showInLegend: true,
+              dataLabels: {
+                enabled: true,
+                distance: -16,
+                format: '{point.y}',
+                style: {
+                  fontSize: '10px',
+                  fontWeight: '800',
+                  color: '#ffffff',
+                  textOutline: '1px rgba(0, 19, 30, 0.7)'
                 }
               }
             }
-          }
+          },
+          series: [{
+            name: 'Egresados',
+            data: pieData
+          }]
         });
       }
     }
