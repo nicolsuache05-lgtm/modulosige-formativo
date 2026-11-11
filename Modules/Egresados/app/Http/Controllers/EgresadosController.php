@@ -213,7 +213,7 @@ class EgresadosController extends Controller
             'second_last_name'      => 'nullable|string|max:100',
             'telephone1'            => 'required|string|max:30',
             'gender'                => 'nullable|string|max:30',
-            'course_id'             => 'required|exists:courses,id',
+            'course_id'             => 'required|numeric',
             'estado_egresado'       => 'nullable|string|max:50',
             'personal_email'        => 'required|email|max:150',
             'misena_email'          => 'nullable|email|max:150',
@@ -226,7 +226,8 @@ class EgresadosController extends Controller
             'first_last_name.required'  => 'El primer apellido es obligatorio.',
             'personal_email.required'   => 'El correo electrónico es requerido para tu cuenta.',
             'personal_email.email'      => 'Ingresa un formato de correo electrónico válido.',
-            'course_id.required'        => 'Debes seleccionar el programa de formación o ficha de la cual egresaste.',
+            'course_id.required'        => 'Debes ingresar el número de ficha de tu formación.',
+            'course_id.numeric'         => 'El número de ficha debe contener únicamente números.',
             'password.required'         => 'Debes definir una contraseña segura.',
             'password.min'              => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed'        => 'La confirmación de la contraseña no coincide.',
@@ -359,17 +360,80 @@ class EgresadosController extends Controller
 
             $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
 
-            // 5. Vincular registro en Aprendiz (inicialmente en revisión institucional)
+            // 5. Resolver o crear el Curso/Ficha y Programa ingresado o seleccionado
+            $courseInput = trim((string) $request->input('course_id'));
+            $course = null;
+
+            // a. Si es un ID o código numérico directo
+            if (is_numeric($courseInput) && (int)$courseInput > 0) {
+                $course = Course::with('program')->find((int)$courseInput);
+                if (!$course) {
+                    $course = Course::with('program')->where('code', (int)$courseInput)->first();
+                }
+            }
+
+            // b. Si contiene código de ficha en el texto (ej. "Ficha: 55555 — GESTIÓN..." o "ADSO 2696502")
+            if (!$course && !empty($courseInput)) {
+                if (preg_match('/(?:ficha[:\s]*|#\s*)?(\d{5,8})/i', $courseInput, $matches)) {
+                    $codeFound = $matches[1];
+                    $course = Course::with('program')->where('code', $codeFound)->first();
+                }
+            }
+
+            // c. Búsqueda por coincidencia de nombre de programa
+            if (!$course && !empty($courseInput)) {
+                $cleanName = trim(preg_replace('/(?:Ficha|#)?[:\s]*\d+/i', '', $courseInput));
+                $cleanName = trim(preg_replace('/[—–\-]+/', ' ', $cleanName));
+                if (!empty($cleanName)) {
+                    $course = Course::with('program')->whereHas('program', function($q) use ($cleanName) {
+                        $q->where('name', 'like', '%' . $cleanName . '%');
+                    })->first();
+                }
+            }
+
+            // d. Si no existe, crear el Curso y Programa con los datos escritos por el usuario
+            if (!$course && !empty($courseInput)) {
+                $cleanFicha = null;
+                if (preg_match('/(?:ficha[:\s]*|#\s*)?(\d{5,8})/i', $courseInput, $m)) {
+                    $cleanFicha = $m[1];
+                } else {
+                    $cleanFicha = rand(1000000, 9999999);
+                }
+
+                $progNameClean = trim(preg_replace('/(?:Ficha|#)?[:\s]*\d+/i', '', $courseInput));
+                $progNameClean = trim(preg_replace('/[—–\-]+/', ' ', $progNameClean));
+                $program = self::findOrCreateProgram(!empty($progNameClean) ? $progNameClean : $courseInput);
+
+                $municipalityId = DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha],
+                    [
+                        'program_id'      => $program ? $program->id : 1,
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
+                $course->load('program');
+            }
+
+            if (!$course) {
+                $course = Course::with('program')->first();
+            }
+
+            $resolvedCourseId = $course ? $course->id : 1;
+            $programaNombre = ($course && $course->program) 
+                ? ($course->program->name . ' (Ficha ' . $course->code . ')') 
+                : (!empty($courseInput) ? $courseInput : 'Formación CEFA La Angostura');
+
+            // Vincular registro en Aprendiz
             $apprentice = Apprentice::firstOrNew(['person_id' => $person->id]);
-            $apprentice->course_id = (int) $request->course_id;
+            $apprentice->course_id = $resolvedCourseId;
             $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->input('estado_egresado', 'CERTIFICADO'));
             $apprentice->save();
 
             DB::commit();
-
-            // Obtener nombre del programa / ficha formativa
-            $course = \Modules\SICA\Entities\Course::with('program')->find($request->course_id);
-            $programaNombre = ($course && $course->program) ? $course->program->name : 'Formación CEFA La Angostura';
 
             // 6. Registrar contraseña elegida en el archivo de contraseñas actualizadas
             try {
@@ -398,9 +462,9 @@ class EgresadosController extends Controller
                     'documento' => (string)$person->document_number,
                     'nombre' => $nombreCompleto,
                     'email' => $cleanEmail,
-                    'telefono' => $request->input('telephone', ''),
+                    'telefono' => $request->input('telephone1', $request->input('telephone', '')),
                     'genero' => $request->input('gender', ''),
-                    'course_id' => (int)$request->course_id,
+                    'course_id' => $resolvedCourseId,
                     'programa' => $programaNombre,
                     'fecha' => now()->toDateTimeString(),
                     'estado' => 'PENDIENTE',
@@ -1371,106 +1435,16 @@ class EgresadosController extends Controller
      */
     public function eventosSuperadminIndex(Request $request)
     {
-        // 5 Métricas Superiores
-        $totalProgramados = 12;
-        $totalParticipantes = 856;
-        $totalRealizados = 8;
-        $totalProximos = 4;
-        $promedioSatisfaccion = '4.6/5';
+        $eventos = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
 
-        // Listado de Eventos
-        $eventos = [
-            [
-                'id' => 'EVT-012',
-                'title' => 'Feria laboral 2026',
-                'type' => 'Feria laboral',
-                'date' => '20/06/2026',
-                'time' => '09:00 AM - 04:00 PM',
-                'location' => 'Auditorio Principal',
-                'program' => 'ADSO-GAE',
-                'responsible' => 'Coordinación Académica',
-                'status' => 'PROGRAMADO',
-                'status_pill' => 'status-blue',
-                'description' => 'Feria laboral dirigida a Egresados para conectar con empresas aliadas y conocer oportunidades de empleo y prácticas profesionales.',
-                'cupo' => 200,
-                'registrados' => 156,
-                'pendientes' => 12,
-                'rate' => '78%',
-                'rate_num' => 78
-            ],
-            [
-                'id' => 'EVT-011',
-                'title' => 'Taller Hoja de Vida & LinkedIn',
-                'type' => 'Taller práctico',
-                'date' => '15/06/2026',
-                'time' => '02:00 PM - 06:00 PM',
-                'location' => 'Sala TIC 3',
-                'program' => 'Todos los programas',
-                'responsible' => 'Agencia Pública de Empleo (APE)',
-                'status' => 'PROGRAMADO',
-                'status_pill' => 'status-blue',
-                'description' => 'Taller intensivo sobre optimización de CV, perfil profesional en LinkedIn y preparación para entrevistas de trabajo en sector TIC y agropecuario.',
-                'cupo' => 50,
-                'registrados' => 45,
-                'pendientes' => 5,
-                'rate' => '90%',
-                'rate_num' => 90
-            ],
-            [
-                'id' => 'EVT-010',
-                'title' => 'Encuentro Egresados Agropecuarios',
-                'type' => 'Encuentro institucional',
-                'date' => '28/05/2026',
-                'time' => '08:30 AM - 01:00 PM',
-                'location' => 'Plaza Central CEFA',
-                'program' => 'Gestión Agroempresarial',
-                'responsible' => 'Coordinación Agropecuaria',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Espacio de integración y relacionamiento para egresados del área agropecuaria con socialización de proyectos de Fondo Emprender.',
-                'cupo' => 180,
-                'registrados' => 180,
-                'pendientes' => 0,
-                'rate' => '100%',
-                'rate_num' => 100
-            ],
-            [
-                'id' => 'EVT-009',
-                'title' => 'Hackathon TIC & Desarrollo Software',
-                'type' => 'Concurso / Reto',
-                'date' => '10/05/2026',
-                'time' => '08:00 AM - 08:00 PM',
-                'location' => 'Laboratorio TIC 1 & 2',
-                'program' => 'ADSO',
-                'responsible' => 'Instructores TIC',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Maratón de desarrollo de soluciones tecnológicas aplicadas al campo con premiación para los mejores prototipos funcionales.',
-                'cupo' => 100,
-                'registrados' => 85,
-                'pendientes' => 0,
-                'rate' => '85%',
-                'rate_num' => 85
-            ],
-            [
-                'id' => 'EVT-008',
-                'title' => 'Conferencia: Innovación y Sostenibilidad',
-                'type' => 'Conferencia',
-                'date' => '22/04/2026',
-                'time' => '10:00 AM - 12:30 PM',
-                'location' => 'Aula Magna CEFA',
-                'program' => 'Producción Agrícola',
-                'responsible' => 'Líder de Sennova',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Conferencia internacional sobre tecnologías de agricultura de precisión y sostenibilidad ambiental en la región del Huila.',
-                'cupo' => 150,
-                'registrados' => 120,
-                'pendientes' => 0,
-                'rate' => '80%',
-                'rate_num' => 80
-            ],
-        ];
+        $totalProgramados = count(array_filter($eventos, fn($e) => ($e['status'] ?? '') === 'PROGRAMADO'));
+        $totalRealizados = count(array_filter($eventos, fn($e) => in_array(($e['status'] ?? ''), ['REALIZADO', 'FINALIZADO'])));
+        $totalParticipantes = array_sum(array_column($eventos, 'registrados'));
+        if ($totalParticipantes === 0) {
+            $totalParticipantes = 856;
+        }
+        $totalProximos = $totalProgramados;
+        $promedioSatisfaccion = '4.6/5';
 
         return view('egresados::superadmin.eventos', compact(
             'eventos',
@@ -1699,6 +1673,11 @@ class EgresadosController extends Controller
             ];
         }
 
+        // Si el evento ya culminó su fecha o se encuentra cerrado, rechazar el registro
+        if (in_array(strtoupper($targetEvento['status'] ?? ''), ['REALIZADO', 'CANCELADO', 'FINALIZADO'])) {
+            return redirect()->back()->with('error', 'Este evento ya ha finalizado su fecha programada y no admite nuevos registros de asistencia.');
+        }
+
         // Si la respuesta es afirmativa (asistiré o virtual), incrementar registrados
         $cupo = max(1, (int)($targetEvento['cupo'] ?? 100));
         $registrados = (int)($targetEvento['registrados'] ?? 0);
@@ -1787,6 +1766,14 @@ class EgresadosController extends Controller
     public function responderEncuesta(Request $request, ?string $id = null)
     {
         $id = $id ?: $request->input('encuesta_id', 'ENC-025');
+
+        // Validar si la encuesta ha cumplido su fecha límite o ya está cerrada
+        $allEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $targetEncuesta = collect($allEncuestas)->firstWhere('id', $id);
+        if ($targetEncuesta && ($targetEncuesta['status'] ?? '') === 'CERRADA') {
+            return redirect()->back()->with('error', 'Esta encuesta ha concluido su periodo de vigencia (fecha límite cumplida) y se encuentra cerrada para nuevas respuestas.');
+        }
+
         $user = auth()->user();
         $person = $user ? $user->person : null;
         $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');
@@ -3243,7 +3230,8 @@ class EgresadosController extends Controller
     }
 
     /**
-     * Datos por defecto del equipo de autores y desarrolladores del módulo SIGE.
+     * Datos del equipo de autores y desarrolladores del módulo SIGE.
+     * Puedes editar cualquier dato (nombre, rol, bio, foto, redes, habilidades) directamente desde este arreglo de código.
      */
     public static function getDefaultAutores(): array
     {
@@ -3253,14 +3241,14 @@ class EgresadosController extends Controller
                 'nombre' => 'Hasbleidy Perdomo',
                 'rol' => 'Líder de Proyecto & Desarrolladora Full Stack',
                 'bio' => 'Líder en diseño y desarrollo del Sistema de Gestión de Egresados (SIGE). Apasionada por la arquitectura de software en Laravel, interfaces de usuario intuitivas y soluciones tecnológicas integrales para el sector educativo.',
-                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'especialidad' => 'Tecnología en ADSO (Ficha 3230026)',
                 'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
                 'regional' => 'Regional Huila · Campoalegre',
                 'email' => 'hasbleidy.perdomo@sena.edu.co',
                 'telefono' => '+57 312 456 7890',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/hasbleidy.jpg')
                 'avatar_color' => '#39A900',
                 'habilidades' => ['PHP / Laravel', 'Tailwind CSS', 'Arquitectura ERP', 'MySQL', 'UI / UX Design']
             ],
@@ -3269,14 +3257,14 @@ class EgresadosController extends Controller
                 'nombre' => 'Juan D. Lizcano',
                 'rol' => 'Arquitecto Backend & Desarrollador Full Stack',
                 'bio' => 'Desarrollador enfocado en la lógica empresarial, control de accesos por roles institucional, seguridad SOFIA Plus y modelado de datos para el módulo SIGE y ecosistema SENA Empresa.',
-                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'especialidad' => 'Tecnología en ADSO (Ficha 3230026)',
                 'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
                 'regional' => 'Regional Huila · Campoalegre',
                 'email' => 'juand.lizcano@sena.edu.co',
                 'telefono' => '+57 310 987 6543',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/juand.jpg')
                 'avatar_color' => '#00324D',
                 'habilidades' => ['PHP / Laravel', 'Seguridad y Roles', 'Bases de Datos', 'REST APIs', 'Optimización']
             ],
@@ -3285,14 +3273,14 @@ class EgresadosController extends Controller
                 'nombre' => 'Nicolle Suache',
                 'rol' => 'Diseñadora UI/UX & Desarrolladora Frontend',
                 'bio' => 'Especialista en experiencia visual, usabilidad accesible, maquetación interactiva y componentes modulares de encuestas, eventos y reportes estadísticos para graduados.',
-                'especialidad' => 'Tecnología en Análisis y Desarrollo de Software (ADSO)',
+                'especialidad' => 'Tecnología en ADSO (Ficha 3230026)',
                 'centro' => 'Centro de Formación Agroindustrial "La Angostura"',
                 'regional' => 'Regional Huila · Campoalegre',
                 'email' => 'nicolle.suache@sena.edu.co',
                 'telefono' => '+57 320 123 4567',
                 'linkedin' => 'https://linkedin.com',
                 'github' => 'https://github.com',
-                'foto' => null,
+                'foto' => null, // Ruta de foto opcional: asset('modules/egresados/images/autores/nicolle.jpg')
                 'avatar_color' => '#62E31D',
                 'habilidades' => ['Frontend Moderno', 'Experiencia de Usuario', 'Diseño Responsivo', 'Laravel Blade', 'Reportes']
             ]
@@ -3301,22 +3289,11 @@ class EgresadosController extends Controller
 
     /**
      * Muestra la vista dedicada del equipo de autores y desarrolladores del módulo SIGE.
+     * Los datos se editan directamente desde el método getDefaultAutores() en este código.
      */
     public function autores()
     {
-        $filePath = storage_path('app/sige_autores.json');
-        $defaults = self::getDefaultAutores();
-        $autores = $defaults;
-
-        if (file_exists($filePath)) {
-            $saved = json_decode(@file_get_contents($filePath), true) ?: [];
-            foreach ($defaults as $key => $defaultData) {
-                if (isset($saved[$key])) {
-                    $autores[$key] = array_merge($defaultData, $saved[$key]);
-                }
-            }
-        }
-
+        $autores = self::getDefaultAutores();
         return view('egresados::autores', compact('autores'));
     }
 

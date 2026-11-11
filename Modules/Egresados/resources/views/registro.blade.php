@@ -387,27 +387,39 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                             
-                            <!-- Programa / Ficha de Formación -->
+                            <!-- Ficha de Formación -->
                             <div class="sm:col-span-8">
                                 <label for="course_id" class="form-label-compact">
-                                    Programa de Formación / Ficha <span class="text-red-500">*</span>
+                                    Ficha de Formación (Solo Números) <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
-                                    <select id="course_id" name="course_id" required class="form-input-compact pl-9">
-                                        <option value="">-- Selecciona tu programa / ficha --</option>
+                                    <input type="text" 
+                                           id="course_id" 
+                                           name="course_id" 
+                                           list="courses_list" 
+                                           value="{{ old('course_id') }}" 
+                                           required 
+                                           inputmode="numeric"
+                                           pattern="[0-9]+"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                           placeholder="Ingresa el número de ficha (Ej: 2696502)..." 
+                                           class="form-input-compact pl-9"
+                                           autocomplete="off">
+                                    <i class="fa-solid fa-graduation-cap absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                                    <datalist id="courses_list">
                                         @if(isset($courses) && count($courses) > 0)
                                             @foreach($courses as $course)
-                                                <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                                                    Ficha: {{ $course->code }} — {{ $course->program ? $course->program->name : 'Formación CEFA' }}
-                                                </option>
+                                                <option value="{{ $course->code }}">{{ $course->code }} — {{ $course->program ? $course->program->name : 'Formación CEFA' }}</option>
                                             @endforeach
                                         @else
-                                            <option value="1">ADSO - Análisis y Desarrollo de Software (Ficha 598369)</option>
-                                            <option value="2">Gestión de Empresas Agropecuarias (Ficha 55555)</option>
+                                            <option value="598369">598369 — ADSO (Análisis y Desarrollo de Software)</option>
+                                            <option value="55555">55555 — Gestión de Empresas Agropecuarias</option>
                                         @endif
-                                    </select>
-                                    <i class="fa-solid fa-graduation-cap absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                                    </datalist>
                                 </div>
+                                <span class="text-[10.5px] text-gray-500 mt-1 block">
+                                    <i class="fa-solid fa-hashtag text-[#39A900] mr-0.5"></i> Ingresa solo los números de tu ficha. Puedes escribirla o seleccionar una sugerida.
+                                </span>
                             </div>
 
                             <!-- Estado Actual de Graduación -->

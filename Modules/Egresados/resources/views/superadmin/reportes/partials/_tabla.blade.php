@@ -78,7 +78,6 @@
                         <th class="py-3.5 px-4">Generado por</th>
                         <th class="py-3.5 px-4">Formato</th>
                         <th class="py-3.5 px-4">Estado</th>
-                        <th class="py-3.5 px-4 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-gray-700">
@@ -133,41 +132,10 @@
                                 </span>
                             </td>
 
-                            <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation();">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <button type="button" 
-                                            onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}')" 
-                                            class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition cursor-pointer" 
-                                            title="Ver Detalle">
-                                        <i class="fa-solid fa-eye text-xs"></i>
-                                    </button>
-                                    <button type="button" 
-                                            onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}'); abrirModalGraficas({{ $jsonData }});" 
-                                            class="w-7 h-7 rounded-lg bg-[#001A29] hover:bg-[#00283d] text-[#62E31D] flex items-center justify-center transition shadow-2xs cursor-pointer" 
-                                            title="Ver Gráficas e Indicadores (SIGE ERP)">
-                                        <i class="fa-solid fa-chart-pie text-xs"></i>
-                                    </button>
-                                    @if(strtoupper($item['format'] ?? '') === 'PDF')
-                                        <button type="button" 
-                                                onclick="selectReporte({{ $jsonData }}, 'rep-row-{{ $item['id'] }}'); descargarReportePDF({{ $jsonData }});" 
-                                                class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 flex items-center justify-center transition cursor-pointer" 
-                                                title="Descargar Reporte (PDF)">
-                                            <i class="fa-solid fa-file-pdf text-xs"></i>
-                                        </button>
-                                    @else
-                                        <a href="{{ route('egresados.superadmin.reportes.exportar', ['id' => $item['id'], 'formato' => 'excel']) }}?title={{ urlencode($item['full_title'] ?? $item['title']) }}&program={{ urlencode($item['program'] ?? '') }}" 
-                                           class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition cursor-pointer" 
-                                           title="Descargar Excel"
-                                           download>
-                                            <i class="fa-solid fa-download text-xs"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-gray-400">
+                            <td colspan="6" class="py-8 text-center text-gray-400">
                                 <i class="fa-solid fa-folder-open text-2xl mb-2 text-gray-300"></i>
                                 <div>No se han generado reportes institucionales todavía.</div>
                             </td>

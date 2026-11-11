@@ -217,7 +217,6 @@
                                 <th class="py-3.5 px-4">Programa / Ficha</th>
                                 <th class="py-3.5 px-4">Contacto</th>
                                 <th class="py-3.5 px-4">Estado Ocupacional</th>
-                                <th class="py-3.5 px-4 text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-gray-700">
@@ -261,17 +260,10 @@
                                             {{ $st }}
                                         </span>
                                     </td>
-                                    <td class="py-3.5 px-4 text-center">
-                                        <button type="button" onclick="alert('Registrando seguimiento para {{ $egresado->person ? $egresado->person->first_name : 'Egresado' }}');" 
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold transition">
-                                            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
-                                            <span>Seguimiento</span>
-                                        </button>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-8 text-center text-gray-400">
+                                    <td colspan="5" class="py-8 text-center text-gray-400">
                                         <i class="fa-solid fa-folder-open text-2xl mb-2 text-gray-300"></i>
                                         <div>No se encontraron registros de egresados para los criterios seleccionados.</div>
                                     </td>

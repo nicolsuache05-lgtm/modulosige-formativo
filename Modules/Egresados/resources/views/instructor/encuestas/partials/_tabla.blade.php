@@ -68,7 +68,6 @@
                         <th class="py-3.5 px-4">Generado por</th>
                         <th class="py-3.5 px-4">Población</th>
                         <th class="py-3.5 px-4">Estado</th>
-                        <th class="py-3.5 px-4 text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-gray-700">
@@ -127,6 +126,11 @@
                                         <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                                         CERRADA
                                     </span>
+                                    @if($item['auto_cerrada'] ?? false)
+                                        <span class="block text-[9.5px] text-gray-400 font-medium mt-0.5" title="Cerrada automáticamente al cumplirse la fecha límite">
+                                            <i class="fa-solid fa-calendar-xmark text-[8.5px]"></i> Por fecha límite
+                                        </span>
+                                    @endif
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
@@ -135,36 +139,10 @@
                                 @endif
                             </td>
 
-                            <!-- Acciones con estilo ERP -->
-                            <td class="py-3.5 px-4 text-center whitespace-nowrap" onclick="event.stopPropagation();">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <button type="button" 
-                                            onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}')" 
-                                            class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition cursor-pointer" 
-                                            title="Ver Detalle">
-                                        <i class="fa-solid fa-eye text-xs"></i>
-                                    </button>
-                                    <button type="button" 
-                                            onclick="selectEncuesta({{ $jsonData }}, 'survey-row-{{ $item['id'] }}'); abrirResultadosModal({{ $jsonData }});" 
-                                            class="w-7 h-7 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-[#62E31D] flex items-center justify-center transition cursor-pointer shadow-xs" 
-                                            title="Ver Gráficas y Resultados">
-                                        <i class="fa-solid fa-chart-pie text-xs"></i>
-                                    </button>
-                                    @if(!empty($item['url']))
-                                        <a href="{{ $item['url'] }}" 
-                                           target="_blank" 
-                                           class="w-7 h-7 rounded-lg bg-[#EAF7EE] hover:bg-[#d8f3de] text-[#166534] flex items-center justify-center transition" 
-                                           title="Abrir Cuestionario">
-                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
-
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-10 px-4 text-gray-500">
+                            <td colspan="6" class="text-center py-10 px-4 text-gray-500">
                                 <i class="fa-regular fa-folder-open text-3xl text-gray-300 mb-2 block"></i>
                                 <span class="font-bold text-gray-700 block">No se encontraron encuestas registradas</span>
                                 <span class="text-xs text-gray-400">Haga clic en "+ Crear Encuesta" para registrar una nueva.</span>

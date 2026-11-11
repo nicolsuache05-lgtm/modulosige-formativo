@@ -113,10 +113,30 @@ class AuthController extends Controller
                     $user = User::where('nickname', 'egresado_' . $cleanDoc)->first();
                 }
 
+                // Cargar archivo persistente de contraseñas actualizadas
+                $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+                $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+                    ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+                    : [];
+
+                $hasExplicitlyChanged = $user && (isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]));
+
+                // El Super Admin debe ingresar únicamente con sus credenciales ya establecidas (su contraseña real)
+                $isSuperAdminUser = $user && ($user->hasSuperAdmin() || 
+                    $user->roles->contains('slug', 'superadmin') || 
+                    $user->nickname === 'superadmin' || 
+                    $user->nickname === 'superadmin_egresados' || 
+                    $user->email === 'superadmin.egresados@sena.edu.co');
+
+                // Si ya actualizó su contraseña previamente o si es Super Admin, NO se permite ingresar con el documento como clave
+                if ($isSuperAdminUser || $hasExplicitlyChanged) {
+                    $isDocPassword = false;
+                }
+
                 $canAuthenticate = false;
-                if ($isDocPassword) {
+                if ($user && Hash::check($password, $user->password)) {
                     $canAuthenticate = true;
-                } elseif ($user && Hash::check($password, $user->password)) {
+                } elseif (!$isSuperAdminUser && !$hasExplicitlyChanged && $isDocPassword) {
                     $canAuthenticate = true;
                 }
 
@@ -145,48 +165,88 @@ class AuthController extends Controller
                         $user->email = $uniqueEmail;
                     }
 
-                    /** @var User $user */
-                    if (!$user->exists || empty($user->password)) {
-                        $user->password = Hash::make($cleanDoc);
-                    } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
-                        $user->password = Hash::make($cleanDoc);
-                    }
-                    $user->person_id = $person->id;
-                    $user->save();
-
                     // Detectar si requiere actualizar la contraseña inicial
                     $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
                     $passwordsActualizados = file_exists($passwordsActualizadosFile) 
                         ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
                         : [];
                     
-                    $hasExplicitlyChanged = isset($passwordsActualizados[$user->id]) || isset($passwordsActualizados[$cleanDoc]);
-                    $isUsingDocAsPassword = Hash::check($cleanDoc, $user->password) || $isDocPassword;
-                    
-                    if ($isUsingDocAsPassword && !$hasExplicitlyChanged) {
+                    $hasExplicitlyChanged = ($user->exists && isset($passwordsActualizados[$user->id])) || isset($passwordsActualizados[$cleanDoc]);
+                    $isUsingDocAsPassword = ($user->exists && Hash::check($cleanDoc, $user->password)) || $isDocPassword;
+
+                    // Solo asignar el documento como clave si es un usuario nuevo y aún no ha actualizado clave (NUNCA a superadmin)
+                    if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
+                        if (!$user->exists || empty($user->password)) {
+                            $user->password = Hash::make($cleanDoc);
+                        } elseif ($isDocPassword && !Hash::check($cleanDoc, $user->password)) {
+                            $user->password = Hash::make($cleanDoc);
+                        }
+                    }
+                    $user->person_id = $person->id;
+                    $user->save();
+
+                    // Forzar cambio obligatorio de contraseña en primer ingreso con cédula para Instructor o Egresado
+                    if (!$isSuperAdminUser && !$hasExplicitlyChanged) {
                         session(['sige_needs_password_change' => true]);
                     } else {
                         session()->forget('sige_needs_password_change');
                     }
 
+                    // Sincronizar rol según el perfil en el ERP (Admin, Instructor o Egresado)
+                    $isSuperAdmin = $user->hasSuperAdmin() || 
+                        $user->roles->contains('slug', 'egresados.admin') || 
+                        $user->roles->contains('slug', 'superadmin') || 
+                        $user->nickname === 'superadmin' || 
+                        $user->nickname === 'admin';
+
+                    $isInstructor = !$isSuperAdmin && (
+                        $user->roles->contains('slug', 'egresados.instructor') || 
+                        $user->roles->contains('slug', 'sigac.instructor') || 
+                        $user->roles->contains('slug', 'agrocefa.trainer') || 
+                        $user->roles->contains('slug', 'sica.instructor') ||
+                        $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer')) ||
+                        ($person && \Modules\SICA\Entities\Course::where('person_id', $person->id)->exists())
+                    );
+
                     try {
-                        $roleEgresado = Role::where('slug', 'egresados.egresado')->first();
-                        if (!$roleEgresado) {
-                            $appEgresados = DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
-                            $appId = $appEgresados ? $appEgresados->id : 30;
-                            $roleEgresado = Role::firstOrCreate(
-                                ['slug' => 'egresados.egresado'],
-                                [
-                                    'name' => 'Egresado',
-                                    'description' => 'Graduado / Egresado de formación profesional del CEFA',
-                                    'description_english' => 'Graduate / Alumni of vocational training at CEFA',
-                                    'full_access' => 'No',
-                                    'app_id' => $appId,
-                                ]
-                            );
-                        }
-                        if ($roleEgresado && method_exists($user, 'roles')) {
-                            $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                        if ($isInstructor) {
+                            $roleInst = \Modules\SICA\Entities\Role::where('slug', 'egresados.instructor')->first();
+                            if (!$roleInst) {
+                                $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                                $appId = $appEgresados ? $appEgresados->id : 30;
+                                $roleInst = \Modules\SICA\Entities\Role::firstOrCreate(
+                                    ['slug' => 'egresados.instructor'],
+                                    [
+                                        'name' => 'Instructor Egresados',
+                                        'description' => 'Instructor / Coordinador de seguimiento a egresados',
+                                        'description_english' => 'Instructor / Coordinator alumni tracking',
+                                        'full_access' => 'No',
+                                        'app_id' => $appId,
+                                    ]
+                                );
+                            }
+                            if ($roleInst && method_exists($user, 'roles')) {
+                                $user->roles()->syncWithoutDetaching([$roleInst->id]);
+                            }
+                        } elseif (!$isSuperAdmin) {
+                            $roleEgresado = \Modules\SICA\Entities\Role::where('slug', 'egresados.egresado')->first();
+                            if (!$roleEgresado) {
+                                $appEgresados = \DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+                                $appId = $appEgresados ? $appEgresados->id : 30;
+                                $roleEgresado = \Modules\SICA\Entities\Role::firstOrCreate(
+                                    ['slug' => 'egresados.egresado'],
+                                    [
+                                        'name' => 'Egresado',
+                                        'description' => 'Graduado / Egresado de formación profesional del CEFA',
+                                        'description_english' => 'Graduate / Alumni of vocational training at CEFA',
+                                        'full_access' => 'No',
+                                        'app_id' => $appId,
+                                    ]
+                                );
+                            }
+                            if ($roleEgresado && method_exists($user, 'roles')) {
+                                $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
+                            }
                         }
                     } catch (\Throwable $e) {
                     }
@@ -202,14 +262,9 @@ class AuthController extends Controller
                         'sige_user_id'              => $user->id,
                     ]);
 
-                    SigeSecurityLogger::log('LOGIN_SUCCESS', "Inicio de sesión exitoso como egresado por documento ({$cleanDoc})", $request, $user);
+                    SigeSecurityLogger::log('LOGIN_SUCCESS', "Inicio de sesión exitoso por documento ({$cleanDoc})", $request, $user);
 
-                    return redirect()->route('egresados.dashboard_egresado')
-                        ->with('success', '¡Bienvenido(a) a tu Portal de Egresados, ' . ($user->full_name ?: $person->full_name) . '!')
-                        ->withHeaders([
-                            'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
-                            'Pragma'        => 'no-cache',
-                        ]);
+                    return $this->redirectByRole($user);
                 }
             }
         }
@@ -230,18 +285,19 @@ class AuthController extends Controller
                 ]);
         }
 
-        // Si la contraseña coincide con el documento de la persona vinculada
-        if ($user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
+        // Cargar registro de contraseñas actualizadas
+        $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
+        $passwordsActualizados = file_exists($passwordsActualizadosFile) 
+            ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
+            : [];
+        $hasAlreadyUpdated = $user && (isset($passwordsActualizados[$user->id]) || ($user->person && isset($passwordsActualizados[(string)$user->person->document_number])));
+
+        // Si la contraseña coincide con el documento de la persona vinculada (SOLO si no ha cambiado clave y no es SuperAdmin)
+        if (!$hasAlreadyUpdated && $user && $user->person && !$user->hasSuperAdmin() && (string)$user->person->document_number === $password) {
             $user->password = Hash::make($password);
             $user->save();
 
-            $passwordsActualizadosFile = storage_path('app/sige_passwords_actualizados.json');
-            $passwordsActualizados = file_exists($passwordsActualizadosFile) 
-                ? (json_decode(@file_get_contents($passwordsActualizadosFile), true) ?: []) 
-                : [];
-            if (!isset($passwordsActualizados[$user->id]) && !isset($passwordsActualizados[(string)$user->person->document_number])) {
-                session(['sige_needs_password_change' => true]);
-            }
+            session(['sige_needs_password_change' => true]);
 
             RateLimiter::clear($throttleKey);
             Auth::login($user, $remember);
@@ -371,7 +427,16 @@ class AuthController extends Controller
             $user->email === 'instructor.egresados@sena.edu.co' || 
             $user->hasRole('egresados.instructor') || 
             $user->hasRole('sigac.instructor') || 
-            $user->hasRole('agrocefa.trainer')) {
+            $user->hasRole('agrocefa.trainer') ||
+            $user->hasRole('sica.instructor') ||
+            ($user->roles && (
+                $user->roles->contains('slug', 'egresados.instructor') || 
+                $user->roles->contains('slug', 'sigac.instructor') || 
+                $user->roles->contains('slug', 'agrocefa.trainer') ||
+                $user->roles->contains('slug', 'sica.instructor') ||
+                $user->roles->some(fn($r) => str_contains($r->slug, 'instructor') || str_contains($r->slug, 'trainer'))
+            )) ||
+            ($user->person_id && \Modules\SICA\Entities\Course::where('person_id', $user->person_id)->exists())) {
             return redirect()->route('egresados.dashboard_instructor')
                 ->with('success', '¡Bienvenido(a) al Panel de Seguimiento de Egresados, ' . $user->full_name . '!')
                 ->withHeaders([

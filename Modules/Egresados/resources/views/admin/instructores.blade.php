@@ -354,7 +354,6 @@
                                 <th class="py-3.5 px-6">Instructor(a)</th>
                                 <th class="py-3.5 px-6">Rol / Asignación</th>
                                 <th class="py-3.5 px-6">Estado</th>
-                                <th class="py-3.5 px-6 text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-xs text-gray-700">
@@ -415,28 +414,10 @@
                                             Activo
                                         </span>
                                     </td>
-
-                                    <!-- Acciones Homogéneas con tooltips -->
-                                    <td class="py-3.5 px-6 text-center">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <button type="button" 
-                                                onclick="verDetalleInstructor('{{ addslashes($fullName) }}', '{{ $docType }} {{ $docNumber }}', '{{ $email }}', '{{ $phone }}', '{{ $initials }}')"
-                                                class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-[#39A900] text-[#013819] hover:text-white border border-emerald-100 flex items-center justify-center transition shadow-xs" 
-                                                title="Ver Ficha del Instructor">
-                                                <i class="fa-solid fa-eye text-xs"></i>
-                                            </button>
-                                            <button type="button" 
-                                                onclick="abrirModalAsignar('{{ addslashes($fullName) }}', '{{ $docType }} {{ $docNumber }}')"
-                                                class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-800 hover:text-white border border-blue-100 flex items-center justify-center transition shadow-xs" 
-                                                title="Asignar Ficha / Programa">
-                                                <i class="fa-solid fa-user-pen text-xs"></i>
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-12 text-center">
+                                    <td colspan="4" class="py-12 text-center">
                                         <div class="max-w-xs mx-auto text-center space-y-2">
                                             <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto text-lg">
                                                 <i class="fa-solid fa-user-slash"></i>
