@@ -139,12 +139,11 @@
         }
 
         .sige-mv-card {
-            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease, border-color 0.35s ease;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
         }
         .sige-mv-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 24px 48px -12px rgba(0, 26, 41, 0.45), 0 0 28px rgba(98, 227, 29, 0.2);
-            border-color: rgba(98, 227, 29, 0.7);
+            box-shadow: 0 24px 48px -12px rgba(0, 26, 41, 0.35), 0 0 28px rgba(57, 169, 0, 0.28);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -491,12 +490,16 @@
         $misionPalabras = preg_split('/\s+/', 'Fortalecer el vínculo entre los egresados del Centro de Formación Agroindustrial La Angostura y el sector productivo mediante una plataforma tecnológica innovadora que permita centralizar información, realizar seguimiento laboral y facilitar el acceso a oportunidades de empleo, capacitaciones, eventos y noticias, contribuyendo al crecimiento personal y profesional de nuestra comunidad de egresados.');
         $visionPalabras = preg_split('/\s+/', 'Para el año 2030, consolidar a SIGE como una plataforma tecnológica de referencia en la gestión y seguimiento de egresados del Centro de Formación Agroindustrial La Angostura, destacándose por su innovación, accesibilidad y eficiencia en la conexión entre egresados, institución y sector productivo, promoviendo la empleabilidad, la formación continua y el desarrollo profesional.');
     @endphp
-    <section id="quienes-somos" class="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-100 overflow-hidden">
-        <div class="max-w-7xl mx-auto">
+    <section id="quienes-somos" class="relative py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[#001A29]/[0.07] via-[#F7FBF8] to-[#39A900]/[0.14] border-t border-gray-100 overflow-hidden">
+        <!-- Halo ambiental suave con los colores oficiales del ERP fuera de las tarjetas -->
+        <div class="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#001A29]/10 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-[#39A900]/15 blur-3xl"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
 
             <!-- Encabezado Grande con Revelado al Bajar -->
             <div class="sige-reveal-block text-center max-w-3xl mx-auto mb-12 space-y-3" data-sige-reveal="heading">
-                <span class="inline-flex items-center gap-2 bg-[#EAF7EE] text-[#2a7c00] border border-[#39A900]/30 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest font-poppins shadow-xs">
+                <span class="inline-flex items-center gap-2 bg-white text-[#2a7c00] border border-[#39A900]/35 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest font-poppins shadow-xs">
                     <i class="fa-solid fa-seedling text-[#39A900]"></i>
                     <span>Identidad Institucional · SIGE CEFA</span>
                 </span>
@@ -507,61 +510,65 @@
                     @endforeach
                 </h2>
 
-                <div class="w-24 h-1.5 rounded-full bg-[#39A900] mx-auto"></div>
+                <div class="w-24 h-1.5 rounded-full bg-gradient-to-r from-[#001A29] via-[#39A900] to-[#62E31D] mx-auto"></div>
             </div>
 
-            <!-- 2 Cuadros con Colores Fijos y Bordes Oficiales del ERP (Misión y Visión) -->
+            <!-- 2 Cuadros claros por dentro con borde exterior en degradado oficial del ERP (Misión y Visión) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 items-stretch">
 
                 <!-- Cuadro 1: MISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#001A29] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#39A900] flex flex-col justify-between" data-sige-reveal="card">
-                    <div class="relative z-10 space-y-5">
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-md shrink-0 border-2 border-[#62E31D]">
-                                    <i class="fa-solid fa-bullseye"></i>
+                <article class="sige-reveal-block sige-mv-card relative p-[3.5px] rounded-[26px] bg-gradient-to-br from-[#001A29] via-[#004258] to-[#39A900] shadow-[0_18px_40px_-14px_rgba(0,26,41,0.30)] flex flex-col" data-sige-reveal="card">
+                    <div class="rounded-[22.5px] bg-[#F8FAFB] p-8 sm:p-10 h-full flex flex-col justify-between space-y-5">
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-sm shrink-0">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#2a7c00] font-poppins block">Propósito SIGE</span>
+                                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Misión</h3>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#62E31D] font-poppins block">Propósito SIGE</span>
-                                    <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">Misión</h3>
-                                </div>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white text-[#001A29] border border-[#001A29]/25 font-poppins shadow-2xs">CEFA La Angostura</span>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#002336] text-[#62E31D] border border-[#39A900] font-poppins">CEFA La Angostura</span>
+
+                            <div class="h-[1.5px] w-full bg-[#39A900]/40"></div>
+
+                            <p class="font-sans text-[15px] sm:text-base text-slate-700 leading-relaxed font-medium text-justify">
+                                @foreach($misionPalabras as $idx => $palabra)
+                                    <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                                @endforeach
+                            </p>
                         </div>
-
-                        <div class="h-0.5 w-full bg-[#39A900]"></div>
-
-                        <p class="font-sans text-[15px] sm:text-base text-slate-100 leading-relaxed font-medium text-justify">
-                            @foreach($misionPalabras as $idx => $palabra)
-                                <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
-                            @endforeach
-                        </p>
                     </div>
                 </article>
 
                 <!-- Cuadro 2: VISIÓN -->
-                <article class="sige-reveal-block sige-mv-card relative rounded-3xl bg-[#2a7c00] p-8 sm:p-10 text-white shadow-xl border-[3px] border-[#001A29] flex flex-col justify-between" style="transition-delay: 100ms;" data-sige-reveal="card">
-                    <div class="relative z-10 space-y-5">
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-[#001A29] text-[#62E31D] border-2 border-[#62E31D] flex items-center justify-center text-xl shadow-md shrink-0">
-                                    <i class="fa-solid fa-eye"></i>
+                <article class="sige-reveal-block sige-mv-card relative p-[3.5px] rounded-[26px] bg-gradient-to-br from-[#39A900] via-[#62E31D] to-[#001A29] shadow-[0_18px_40px_-14px_rgba(57,169,0,0.28)] flex flex-col" style="transition-delay: 100ms;" data-sige-reveal="card">
+                    <div class="rounded-[22.5px] bg-[#E8F8EC] p-8 sm:p-10 h-full flex flex-col justify-between space-y-5">
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-sm shrink-0">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#2a7c00] font-poppins block">Proyección Estratégica</span>
+                                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Visión</h3>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#d9ffbf] font-poppins block">Proyección Estratégica</span>
-                                    <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">Visión</h3>
-                                </div>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/80 text-[#1e5c00] border border-[#39A900]/40 font-poppins shadow-2xs">Horizonte 2030</span>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#001A29] text-[#62E31D] border border-[#62E31D] font-poppins">Horizonte 2030</span>
+
+                            <div class="h-[1.5px] w-full bg-[#39A900]/45"></div>
+
+                            <p class="font-sans text-[15px] sm:text-base text-slate-800 leading-relaxed font-medium text-justify">
+                                @foreach($visionPalabras as $idx => $palabra)
+                                    <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
+                                @endforeach
+                            </p>
                         </div>
-
-                        <div class="h-0.5 w-full bg-[#001A29]"></div>
-
-                        <p class="font-sans text-[15px] sm:text-base text-white leading-relaxed font-medium text-justify">
-                            @foreach($visionPalabras as $idx => $palabra)
-                                <span class="sige-word">{{ $palabra }}</span>{{ !$loop->last ? ' ' : '' }}
-                            @endforeach
-                        </p>
                     </div>
                 </article>
 
