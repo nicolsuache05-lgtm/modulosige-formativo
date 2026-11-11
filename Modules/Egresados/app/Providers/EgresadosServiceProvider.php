@@ -43,6 +43,13 @@ class EgresadosServiceProvider extends ModuleServiceProvider
         Route::middleware('web')
             ->group(module_path($this->name, '/routes/web.php'));
 
+        if (file_exists(module_path($this->name, '/routes/api.php'))) {
+            Route::middleware('api')
+                ->prefix('api')
+                ->name('api.')
+                ->group(module_path($this->name, '/routes/api.php'));
+        }
+
         \Illuminate\Pagination\Paginator::defaultView('egresados::partials.pagination');
     }
 

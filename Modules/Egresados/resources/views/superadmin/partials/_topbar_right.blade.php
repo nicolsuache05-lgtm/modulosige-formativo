@@ -147,7 +147,7 @@
 
       <!-- Footer con Botón Cerrar Sesión -->
       <div class="user-menu-footer">
-        <form id="form-logout-topbar" action="{{ route('logout') }}" method="POST">
+        <form id="form-logout-topbar" action="{{ route('egresados.logout') }}" method="POST">
           @csrf
           <input type="hidden" name="redirect" value="{{ route('egresados.welcome') }}">
           <button type="submit" class="btn-logout-dropdown">
@@ -1101,3 +1101,5 @@
     }
   });
 </script>
+
+@include('egresados::partials._security_session')

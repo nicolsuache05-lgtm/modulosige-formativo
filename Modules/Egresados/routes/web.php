@@ -10,6 +10,8 @@ use Modules\Egresados\Http\Controllers\InstructorController;
 use Modules\Egresados\Http\Controllers\InstructorEncuestasController;
 use Modules\Egresados\Http\Controllers\NoticiasController;
 use Modules\Egresados\Http\Middleware\CheckEgresadosRole;
+use Modules\Egresados\Http\Middleware\PreventBackHistory;
+use Modules\Egresados\Http\Middleware\SigeSessionTimeout;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,21 +26,15 @@ Route::get('egresados/welcome', [EgresadosController::class, 'welcome'])->name('
 Route::get('egresados/autores', [EgresadosController::class, 'autores'])->name('egresados.autores');
 Route::post('egresados/autores/guardar', [EgresadosController::class, 'guardarAutor'])->name('egresados.autores.guardar');
 
-// 2. Autenticación Institucional Centralizada del ERP
-Route::get('egresados/login', function (\Illuminate\Http\Request $request) {
-    if (\Illuminate\Support\Facades\Auth::check()) {
-        return app(\Modules\Egresados\Http\Controllers\AuthController::class)->redirectByRole(\Illuminate\Support\Facades\Auth::user());
-    }
-    $redirect = $request->query('redirect', route('egresados.home'));
-    return redirect()->route('login', ['redirect' => $redirect]);
-})->name('egresados.login');
-
+// 2. Autenticación Institucional Segura del Módulo SIGE
+Route::get('egresados/login', [AuthController::class, 'showLoginForm'])->name('egresados.login');
 Route::post('egresados/login', [AuthController::class, 'login'])->name('egresados.login.post');
+Route::match(['get', 'post'], 'egresados/logout', [AuthController::class, 'logout'])->name('egresados.logout');
 
-Route::match(['get', 'post'], 'egresados/logout', function (\Illuminate\Http\Request $request) {
-    $redirect = $request->input('redirect', $request->query('redirect', route('egresados.welcome')));
-    return redirect()->route('logout', ['redirect' => $redirect]);
-})->name('egresados.logout');
+// Control de Sesión, Inactividad y Límite entre Módulos
+Route::get('egresados/session/check', [AuthController::class, 'checkSession'])->name('egresados.session.check');
+Route::post('egresados/session/keep-alive', [AuthController::class, 'keepAlive'])->name('egresados.session.keep_alive');
+Route::match(['get', 'post'], 'egresados/salir-modulo', [AuthController::class, 'salirModulo'])->name('egresados.salir_modulo');
 
 // Actualización de contraseña inicial obligatoria para primer ingreso
 Route::post('egresados/cambiar-password', [AuthController::class, 'cambiarPassword'])->name('egresados.cambiar_password');
@@ -75,7 +71,7 @@ Route::get('egresados/assets/images/{filename}', function ($filename) {
 // --------------------------------------------------------------------------
 // 4. ÁREA SUPERADMINISTRADOR / ADMINISTRADOR DE EGRESADOS (Datos Confidenciales)
 // --------------------------------------------------------------------------
-Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function () {
+Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEgresadosRole::class . ':superadmin'])->group(function () {
     // Dashboard general y métricas
     Route::get('egresados/dashboard', [EgresadosController::class, 'dashboard'])->name('egresados.dashboard');
     Route::get('egresados/superadmin/dashboard', [EgresadosController::class, 'dashboard'])->name('egresados.superadmin.dashboard');
@@ -151,7 +147,7 @@ Route::middleware([CheckEgresadosRole::class . ':superadmin'])->group(function (
 // --------------------------------------------------------------------------
 // 5. ÁREA INSTRUCTOR / EVALUADOR DE SEGUIMIENTO
 // --------------------------------------------------------------------------
-Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function () {
+Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEgresadosRole::class . ':instructor'])->group(function () {
     Route::get('egresados/dashboard-instructor', [InstructorController::class, 'dashboard'])->name('egresados.dashboard_instructor');
     Route::get('egresados/instructor', [InstructorController::class, 'dashboard'])->name('egresados.instructor');
     Route::get('egresados/instructor/dashboard', [InstructorController::class, 'dashboard'])->name('egresados.instructor.dashboard');
@@ -200,7 +196,7 @@ Route::middleware([CheckEgresadosRole::class . ':instructor'])->group(function (
 // --------------------------------------------------------------------------
 // 6. PORTAL PERSONAL DEL EGRESADO (Protección de Datos Privados)
 // --------------------------------------------------------------------------
-Route::middleware([CheckEgresadosRole::class . ':egresado'])->group(function () {
+Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEgresadosRole::class . ':egresado'])->group(function () {
     Route::get('egresados/dashboard-egresado', [EgresadosController::class, 'dashboardEgresado'])->name('egresados.dashboard_egresado');
     Route::get('egresados/encuestas-egresado', [EgresadosController::class, 'encuestasEgresado'])->name('egresados.encuestas_egresado');
     Route::get('egresados/oportunidades-egresado', [EgresadosController::class, 'oportunidadesEgresado'])->name('egresados.oportunidades_egresado');
@@ -210,4 +206,6 @@ Route::middleware([CheckEgresadosRole::class . ':egresado'])->group(function () 
 });
 
 // 7. GESTIÓN DE NOTIFICACIONES EN TIEMPO REAL
-Route::post('egresados/notificaciones/marcar-leidas', [\Modules\Egresados\Http\Controllers\NotificationController::class, 'markAllRead'])->name('egresados.notificaciones.marcar_leidas');
+Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEgresadosRole::class . ':egresado'])
+    ->post('egresados/notificaciones/marcar-leidas', [\Modules\Egresados\Http\Controllers\NotificationController::class, 'markAllRead'])
+    ->name('egresados.notificaciones.marcar_leidas');

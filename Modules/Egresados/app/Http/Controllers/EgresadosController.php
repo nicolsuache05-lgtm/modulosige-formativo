@@ -240,6 +240,13 @@ class EgresadosController extends Controller
             return redirect()->back()->with('error', 'El número de documento debe contener solo dígitos válidos (mínimo 5 dígitos).')->withInput();
         }
 
+        // 0. SEGURIDAD INSTITUCIONAL: Prohibir registro público con correo de Superadministrador
+        $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
+        if ($cleanEmail === $authorizedSuperadminEmail) {
+            \Modules\Egresados\Services\SigeSecurityLogger::log('REGISTRATION_HIJACK_ATTEMPT', "Intento de registro público con correo reservado de Superadministrador: {$cleanEmail}", $request);
+            return redirect()->back()->with('error', 'El correo ingresado está reservado para la administración institucional y no puede ser utilizado para registro público.')->withInput();
+        }
+
         // 1. SEGURIDAD: Verificar si el documento ya está registrado como egresado
         $existingApprentice = Apprentice::whereHas('person', function($q) use ($docNumber) {
             $q->where('document_number', $docNumber);
@@ -2538,6 +2545,26 @@ class EgresadosController extends Controller
     {
         $apprentice = Apprentice::with(['person', 'course.program'])->findOrFail($id);
 
+        // Control estricto contra manipulación de identificadores en URL (Protección IDOR)
+        $user = auth()->user();
+        if ($user) {
+            $isSuper = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
+            $isInstructor = ($user->hasRole('egresados.instructor') || $user->hasRole('sigac.instructor') || $user->nickname === 'instructor_egresados');
+
+            // Un egresado no puede consultar la información confidencial de otros egresados
+            if (!$isSuper && !$isInstructor) {
+                if (!$user->person_id || (int) $apprentice->person_id !== (int) $user->person_id) {
+                    \Modules\Egresados\Services\SigeSecurityLogger::log(
+                        'IDOR_ATTEMPT_BLOCKED',
+                        "Intento de egresado {$user->email} de consultar registro ajeno ID: {$id}",
+                        request(),
+                        $user
+                    );
+                    abort(403, 'Acceso denegado: No estás autorizado para consultar la información privada de otros egresados.');
+                }
+            }
+        }
+
         return view('egresados::superadmin.perfil', compact('apprentice'));
     }
 
@@ -2660,6 +2687,26 @@ class EgresadosController extends Controller
         ]);
 
         $apprentice = Apprentice::withTrashed()->with(['person', 'course.program'])->findOrFail($id);
+
+        // Control estricto contra manipulación de identificadores en URL (Protección IDOR)
+        $user = auth()->user();
+        if ($user) {
+            $isSuper = ($user->hasSuperAdmin() || $user->hasRole('egresados.admin') || $user->hasRole('superadmin'));
+            $isInstructor = ($user->hasRole('egresados.instructor') || $user->hasRole('sigac.instructor') || $user->nickname === 'instructor_egresados');
+
+            if (!$isSuper && !$isInstructor) {
+                if (!$user->person_id || (int) $apprentice->person_id !== (int) $user->person_id) {
+                    \Modules\Egresados\Services\SigeSecurityLogger::log(
+                        'IDOR_ATTEMPT_BLOCKED',
+                        "Intento de egresado {$user->email} de modificar registro ajeno ID: {$id}",
+                        $request,
+                        $user
+                    );
+                    abort(403, 'Acceso denegado: No tienes autorización para modificar la información de otros egresados.');
+                }
+            }
+        }
+
         $person = $apprentice->person;
 
         $cleanDoc = (int) preg_replace('/\D/', '', (string)$request->documento);
@@ -2958,6 +3005,10 @@ class EgresadosController extends Controller
 
         // SEGURIDAD: 2. Unicidad estricta del correo electrónico (nada de correos duplicados)
         $cleanEmail = strtolower(filter_var(trim($request->correo), FILTER_SANITIZE_EMAIL));
+        $authorizedSuperadminEmail = strtolower((string) config('egresados.security.superadmin_email', 'superadmin.egresados@sena.edu.co'));
+        if ($cleanEmail === $authorizedSuperadminEmail) {
+            return redirect()->back()->with('error', 'El correo ingresado está reservado para la administración institucional y no puede asignarse a un nuevo egresado.')->withInput();
+        }
         $personWithEmail = Person::where(function($q) use ($cleanEmail) {
             $q->where('personal_email', $cleanEmail)->orWhere('misena_email', $cleanEmail);
         })->where('document_number', '!=', $docNumber)->first();
