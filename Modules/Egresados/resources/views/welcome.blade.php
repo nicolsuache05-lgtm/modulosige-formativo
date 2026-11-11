@@ -189,7 +189,7 @@
                 @include('egresados::partials._sidebar_brand_logo')
                 <div>
                     <span class="text-2xl font-black tracking-wider leading-none text-white font-poppins">SIGE</span>
-                    <p class="text-[11px] text-[#62E31D] font-bold font-sans mt-0.5">Centro de Formación Agroindustrial</p>
+                    <p class="text-[11px] text-[#62E31D] font-bold font-sans mt-0.5">Sistema de Gestión de Egresados</p>
                 </div>
             </a>
 
