@@ -111,7 +111,7 @@
             <!-- Badge Superior -->
             <div class="inline-flex items-center gap-2 bg-white/10 border border-[#62E31D]/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-[#62E31D] mb-6 shadow-sm">
                 <i class="fa-solid fa-users-gear text-sm"></i>
-                <span>SENA EMPRESA CEFA · TECNOLOGÍA EN ADSO</span>
+                <span>TECNOLOGÍA EN ADSO · FICHA 3230026</span>
             </div>
 
             <!-- Título Principal -->
@@ -119,27 +119,9 @@
                 Equipo de <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#62E31D] via-white to-[#62E31D]">Autores & Desarrolladores</span>
             </h1>
 
-            <p class="max-w-3xl mx-auto text-sm sm:text-base text-gray-300 font-normal leading-relaxed mb-8">
-                Conoce a los creadores de <strong>SIGE</strong>: aprendices tecnólogos de la ficha de <strong>Análisis y Desarrollo de Software (ADSO)</strong> del Centro de Formación Agroindustrial "La Angostura", quienes lideraron la arquitectura, diseño, lógica institucional e interactividad del sistema.
+            <p class="max-w-3xl mx-auto text-sm sm:text-base text-gray-300 font-normal leading-relaxed">
+                Conoce a los creadores de <strong>SIGE</strong>: aprendices tecnólogos de la ficha <strong>3230026</strong> de <strong>Análisis y Desarrollo de Software (ADSO)</strong> del Centro de Formación Agroindustrial "La Angostura", quienes lideraron la arquitectura, diseño, lógica institucional e interactividad del sistema.
             </p>
-
-            <!-- Pill Info del Proyecto -->
-            <div class="inline-flex flex-wrap items-center justify-center gap-4 text-xs text-gray-300 bg-white/5 border border-white/10 px-5 py-2.5 rounded-2xl backdrop-blur-sm">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-code text-[#62E31D]"></i>
-                    <span>Módulo SIGE — Egresados</span>
-                </div>
-                <span class="text-white/30 hidden sm:inline">•</span>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-building-columns text-[#62E31D]"></i>
-                    <span>CEFA La Angostura</span>
-                </div>
-                <span class="text-white/30 hidden sm:inline">•</span>
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-map-pin text-[#62E31D]"></i>
-                    <span>Campoalegre, Huila</span>
-                </div>
-            </div>
 
         </div>
     </section>
@@ -218,7 +200,7 @@
                             <!-- Insignia Tecnólogo -->
                             <div class="text-right">
                                 <span class="inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                    ADSO
+                                    ADSO · 3230026
                                 </span>
                             </div>
                         </div>
