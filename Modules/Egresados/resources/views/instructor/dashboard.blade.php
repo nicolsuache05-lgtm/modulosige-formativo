@@ -18,6 +18,10 @@
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Highcharts + 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.8/highcharts-3d.js"></script>
+
     <style>
       :root {
         /* PALETA INSTITUCIONAL SENA EMPRESA ERP */
@@ -428,16 +432,21 @@
       /* Lower section: activity + progress */
       .lower-grid {
         display: grid;
-        grid-template-columns: 1.55fr 1fr;
-        gap: 24px;
+        grid-template-columns: 1.05fr 1.15fr;
+        gap: 20px;
       }
 
       .panel {
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 16px;
-        padding: 24px 26px;
+        padding: 20px 22px;
         box-shadow: 0 4px 14px rgba(0, 19, 30, 0.03);
+      }
+      .chart-wrap-compact {
+        position: relative;
+        height: 225px;
+        width: 100%;
       }
       .panel-head {
         display: flex;
@@ -1351,111 +1360,44 @@
 
       </div>
 
-      <!-- Lower Grid: Actividad Reciente + Avance por Programa -->
+      <!-- Lower Grid: Gráficas Resumidas 3D del Software (Colores ERP) -->
+      @php
+        $progLabels = [];
+        $progValues = [];
+        if (isset($programStats) && count($programStats) > 0) {
+            foreach ($programStats as $prog) {
+                $progLabels[] = \Illuminate\Support\Str::limit($prog->name, 26);
+                $progValues[] = (int) $prog->total;
+            }
+        } else {
+            $progLabels = ['Gestión Agroempresarial', 'ADSO', 'Producción Acuícola'];
+            $progValues = [3, 2, 1];
+        }
+      @endphp
       <div class="lower-grid">
-        
-        <!-- Panel Izquierdo: Actividad Reciente de Egresados en Fichas -->
+
+        <!-- Gráfica 1: Estadísticas de SIGE -->
         <div class="panel">
-          <div class="panel-head">
-            <h3 class="panel-title">
-              <i class="fa-solid fa-bolt text-[#39A900]"></i>
-              <span>Actividad reciente</span>
+          <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
+            <h3 class="panel-title" style="font-size:16px;">
+              <i class="fa-solid fa-chart-column text-[#39A900]"></i>
+              <span>Estadísticas de SIGE</span>
+            </h3>
+            <a href="{{ route('egresados.instructor.reportes.index') }}" class="panel-action">Ver reportes</a>
+          </div>
+          <div id="instResumenBarChart" class="chart-wrap-compact"></div>
+        </div>
+
+        <!-- Gráfica 2: Estadísticas por Programa -->
+        <div class="panel">
+          <div class="panel-head" style="margin-bottom:10px; padding-bottom:10px;">
+            <h3 class="panel-title" style="font-size:16px;">
+              <i class="fa-solid fa-chart-pie text-[#39A900]"></i>
+              <span>Estadísticas por Programa</span>
             </h3>
             <a href="{{ route('egresados.instructor.directorio') }}" class="panel-action">Ver todo</a>
           </div>
-
-          @forelse($recentEgresados as $item)
-            @php
-              $p = $item->person;
-              $fullName = $p ? trim($p->first_name . ' ' . $p->first_last_name) : 'Aprendiz SENA';
-              $progName = $item->course && $item->course->program ? $item->course->program->name : 'Formación SENA';
-              $isUpdated = $item->updated_at && $item->created_at && ($item->updated_at->timestamp > $item->created_at->timestamp + 60);
-              $timeDiff = $item->updated_at ? $item->updated_at->diffForHumans() : ($item->created_at ? $item->created_at->diffForHumans() : 'Recientemente');
-            @endphp
-            <div class="activity-row">
-              <div class="activity-dot" style="{{ $isUpdated ? 'background:#e0f2fe; color:#0284c7;' : 'background:#dcfce7; color:#166534;' }}">
-                <i class="fa-solid {{ $isUpdated ? 'fa-user-pen' : 'fa-user-plus' }}"></i>
-              </div>
-              <div style="flex:1;">
-                <div class="activity-text">
-                  @if($isUpdated)
-                    Se actualizaron los datos de <b>{{ $fullName }}</b> ({{ $progName }})
-                  @else
-                    Nuevo egresado registrado: <b>{{ $fullName }}</b> ({{ $progName }})
-                  @endif
-                </div>
-                <div class="activity-time" style="display:flex; align-items:center; gap:8px;">
-                  <span>{{ $timeDiff }}</span>
-                  <span style="font-size:10px; padding:1px 6px; border-radius:999px; background:rgba(0,19,30,0.06); font-weight:600;">{{ $item->apprentice_status }}</span>
-                </div>
-              </div>
-            </div>
-          @empty
-            <div style="text-align:center; padding: 28px 16px; color: var(--ink-soft); font-size:13px;">
-              <i class="fa-regular fa-clock" style="font-size:24px; margin-bottom:8px; display:block; opacity:0.4;"></i>
-              No hay actividades registradas recientemente en tus fichas.
-            </div>
-          @endforelse
-        </div>
-
-        <!-- Panel Derecho: Avance por Programa -->
-        <div class="panel">
-          <div class="panel-head">
-            <h3 class="panel-title">
-              <i class="fa-solid fa-chart-simple text-[#39A900]"></i>
-              <span>Avance por programa</span>
-            </h3>
-          </div>
-
-          @if(isset($programStats) && count($programStats) > 0)
-            @php
-              $maxTotal = $programStats->max('total') ?: 1;
-            @endphp
-            @foreach($programStats as $prog)
-              @php
-                $pct = round(($prog->total / $maxTotal) * 100);
-              @endphp
-              <div class="progress-item">
-                <div class="progress-label">
-                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;" title="{{ $prog->name }}">
-                    {{ $prog->name }}
-                  </span>
-                  <span>{{ $prog->total }} egresados ({{ $pct }}%)</span>
-                </div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: {{ $pct }}%"></div>
-                </div>
-              </div>
-            @endforeach
-          @else
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Gestión de Empresas Agropecuarias</span>
-                <span>3 egresados (100%)</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 100%"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Análisis y Desarrollo de Software (ADSO)</span>
-                <span>2 egresados (66%)</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 66%"></div>
-              </div>
-            </div>
-            <div class="progress-item">
-              <div class="progress-label">
-                <span>Producción Acuícola</span>
-                <span>1 egresado (33%)</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: 33%"></div>
-              </div>
-            </div>
-          @endif
+          <div id="instProgramasDonutChart" class="chart-wrap-compact"></div>
         </div>
 
       </div>
@@ -2088,6 +2030,161 @@
       document.body.style.overflow = 'hidden';
       openModalActualizarPasswordInicial();
     @endif
+
+    if (typeof Highcharts !== 'undefined') {
+      const erpPalette = ['#39A900', '#001A29', '#2d8500', '#00324D', '#62E31D'];
+
+      const barEl = document.getElementById('instResumenBarChart');
+      if (barEl) {
+        Highcharts.chart(barEl, {
+          chart: {
+            type: 'column',
+            backgroundColor: 'transparent',
+            height: 225,
+            margin: [22, 16, 36, 34],
+            style: { fontFamily: 'Poppins, Nunito, sans-serif' },
+            options3d: {
+              enabled: true,
+              alpha: 10,
+              beta: 14,
+              depth: 45,
+              viewDistance: 25
+            }
+          },
+          title: { text: null },
+          credits: { enabled: false },
+          legend: { enabled: false },
+          xAxis: {
+            categories: ['Egresados', 'Fichas', 'Encuestas', 'Eventos', 'Reportes'],
+            labels: {
+              style: { color: '#00131E', fontSize: '10px', fontWeight: '600' }
+            },
+            gridLineColor: 'rgba(0, 19, 30, 0.05)'
+          },
+          yAxis: {
+            allowDecimals: false,
+            title: { text: null },
+            labels: {
+              style: { color: '#5A6E7D', fontSize: '9.5px', fontWeight: '600' }
+            },
+            gridLineColor: 'rgba(0, 19, 30, 0.06)'
+          },
+          tooltip: {
+            backgroundColor: '#00131E',
+            borderColor: '#39A900',
+            borderRadius: 8,
+            style: { color: '#ffffff', fontSize: '11px' },
+            headerFormat: '<span style="color:#62E31D; font-weight:700; font-size:10.5px;">{point.key}</span><br/>',
+            pointFormat: 'Total: <b>{point.y}</b>'
+          },
+          plotOptions: {
+            column: {
+              depth: 32,
+              colorByPoint: true,
+              colors: erpPalette,
+              borderWidth: 0,
+              dataLabels: {
+                enabled: true,
+                y: -4,
+                style: {
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  color: '#00131E',
+                  textOutline: 'none'
+                }
+              }
+            }
+          },
+          series: [{
+            name: 'Registros',
+            data: [
+              {{ (int) ($totalEgresados ?? 0) }},
+              {{ (int) ($totalFichas ?? 0) }},
+              {{ (int) ($totalEncuestas ?? 0) }},
+              {{ (int) ($totalEventos ?? 0) }},
+              {{ (int) ($totalReportes ?? 0) }}
+            ]
+          }]
+        });
+      }
+
+      const donutEl = document.getElementById('instProgramasDonutChart');
+      if (donutEl) {
+        const progLabels = @json($progLabels);
+        const progValues = @json($progValues);
+        const pieData = progLabels.map((lbl, idx) => ({
+          name: lbl,
+          y: progValues[idx] || 0
+        }));
+
+        Highcharts.chart(donutEl, {
+          chart: {
+            type: 'pie',
+            backgroundColor: 'transparent',
+            height: 225,
+            spacing: [8, 8, 8, 8],
+            style: { fontFamily: 'Poppins, Nunito, sans-serif' },
+            options3d: {
+              enabled: true,
+              alpha: 42,
+              beta: 0
+            }
+          },
+          title: { text: null },
+          credits: { enabled: false },
+          tooltip: {
+            backgroundColor: '#00131E',
+            borderColor: '#39A900',
+            borderRadius: 8,
+            style: { color: '#ffffff', fontSize: '11px' },
+            pointFormat: '<b>{point.y}</b> egresado(s) ({point.percentage:.0f}%)'
+          },
+          legend: {
+            align: 'right',
+            verticalAlign: 'middle',
+            layout: 'vertical',
+            margin: 24,
+            padding: 6,
+            symbolRadius: 4,
+            symbolHeight: 8,
+            symbolWidth: 8,
+            symbolPadding: 8,
+            itemMarginTop: 4,
+            itemMarginBottom: 8,
+            itemStyle: {
+              color: '#00131E',
+              fontSize: '10px',
+              fontWeight: '600'
+            }
+          },
+          plotOptions: {
+            pie: {
+              center: ['50%', '50%'],
+              size: '86%',
+              innerSize: '50%',
+              depth: 26,
+              colors: ['#39A900', '#001A29', '#62E31D', '#00324D'],
+              showInLegend: true,
+              dataLabels: {
+                enabled: true,
+                distance: -16,
+                format: '{point.y}',
+                style: {
+                  fontSize: '9.5px',
+                  fontWeight: '800',
+                  color: '#ffffff',
+                  textOutline: '1px rgba(0, 19, 30, 0.7)'
+                }
+              }
+            }
+          },
+          series: [{
+            name: 'Egresados',
+            data: pieData
+          }]
+        });
+      }
+    }
   });
 </script>
 </body>
