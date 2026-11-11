@@ -16,6 +16,26 @@ class EncuestasController extends Controller
     }
 
     /**
+     * Parsea la fecha límite o de cierre de una encuesta para determinar su vigencia.
+     */
+    public static function parseSurveyClosingDate(?string $dateStr): ?\Carbon\Carbon
+    {
+        if (empty($dateStr)) return null;
+        $dateStr = trim($dateStr);
+        try {
+            if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $dateStr, $m)) {
+                return \Carbon\Carbon::createFromDate((int)$m[3], (int)$m[2], (int)$m[1])->endOfDay();
+            }
+            if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateStr, $m)) {
+                return \Carbon\Carbon::createFromDate((int)$m[1], (int)$m[2], (int)$m[3])->endOfDay();
+            }
+            return \Carbon\Carbon::parse($dateStr)->endOfDay();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
      * Listado base predeterminado de encuestas institucionales del sistema.
      */
     public static function getDefaultEncuestas(): array
@@ -26,8 +46,8 @@ class EncuestasController extends Controller
                 'title' => 'Inserción Laboral ADSO',
                 'full_title' => 'Encuesta Inserción Laboral 2026',
                 'description' => 'Diagnóstico de inserción y estabilidad en el mercado de software para egresados ADSO.',
-                'date' => '12/06/2026',
-                'fecha_cierre' => '12/06/2026',
+                'date' => '01/11/2026',
+                'fecha_cierre' => '30/11/2026',
                 'status' => 'ACTIVA',
                 'status_pill' => 'status-green',
                 'target' => 'Egresado ADSO',
@@ -42,11 +62,11 @@ class EncuestasController extends Controller
             ],
             [
                 'id' => 'ENC-024',
-                'title' => 'Impacto y Empleabilidad 2025',
-                'full_title' => 'Seguimiento Impacto Productivo 2025',
+                'title' => 'Impacto y Empleabilidad 2026',
+                'full_title' => 'Seguimiento Impacto Productivo 2026',
                 'description' => 'Evaluación de competencias técnicas y salariales en el sector agroindustrial.',
-                'date' => '05/05/2026',
-                'fecha_cierre' => '05/05/2026',
+                'date' => '25/10/2026',
+                'fecha_cierre' => '20/11/2026',
                 'status' => 'ACTIVA',
                 'status_pill' => 'status-green',
                 'target' => 'Egresados Tecnólogos',
@@ -64,10 +84,10 @@ class EncuestasController extends Controller
                 'title' => 'Satisfacción Formativa CEFA',
                 'full_title' => 'Evaluación de Calidad Formativa CEFA',
                 'description' => 'Percepción de egresados sobre la pertinencia de las instalaciones y docentes del CEFA.',
-                'date' => '20/04/2026',
-                'fecha_cierre' => '20/04/2026',
-                'status' => 'ACTIVA',
-                'status_pill' => 'status-green',
+                'date' => '10/10/2026',
+                'fecha_cierre' => '31/10/2026',
+                'status' => 'CERRADA',
+                'status_pill' => 'status-gray',
                 'target' => 'Todas las Especialidades',
                 'creado_por' => 'Coordinación Académica (Super Admin)',
                 'enviadas' => 150,
@@ -215,10 +235,19 @@ class EncuestasController extends Controller
 
         $all = array_values(array_merge($custom, $filteredDefaults));
 
+        $now = \Carbon\Carbon::now();
         foreach ($all as &$enc) {
             if (in_array($enc['id'], $todasCerradas)) {
                 $enc['status'] = 'CERRADA';
                 $enc['status_pill'] = 'status-gray';
+            } else {
+                // Cierre automático si la fecha límite de la encuesta ya venció
+                $cierreCarbon = self::parseSurveyClosingDate($enc['fecha_cierre'] ?? ($enc['date'] ?? null));
+                if ($cierreCarbon && $cierreCarbon->lessThanOrEqualTo($now)) {
+                    $enc['status'] = 'CERRADA';
+                    $enc['status_pill'] = 'status-gray';
+                    $enc['auto_cerrada'] = true;
+                }
             }
         }
         unset($enc);

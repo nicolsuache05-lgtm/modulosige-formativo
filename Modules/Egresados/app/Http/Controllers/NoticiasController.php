@@ -9,6 +9,43 @@ use Carbon\Carbon;
 class NoticiasController extends Controller
 {
     /**
+     * Parsea la fecha de vigencia o límite temporal de una noticia para verificar si ha expirado.
+     */
+    public static function parseNoticiaExpiry(?string $vigenciaStr, ?string $dateStr = null): ?\Carbon\Carbon
+    {
+        if (!empty($vigenciaStr)) {
+            $vigenciaStr = trim($vigenciaStr);
+            try {
+                if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $vigenciaStr, $m)) {
+                    return \Carbon\Carbon::createFromDate((int)$m[3], (int)$m[2], (int)$m[1])->endOfDay();
+                }
+                if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $vigenciaStr, $m)) {
+                    return \Carbon\Carbon::createFromDate((int)$m[1], (int)$m[2], (int)$m[3])->endOfDay();
+                }
+                return \Carbon\Carbon::parse($vigenciaStr)->endOfDay();
+            } catch (\Throwable $e) {}
+        }
+
+        // Si no se definió fecha explícita, se calcula 30 días a partir de la fecha de publicación
+        if (!empty($dateStr)) {
+            try {
+                if (preg_match('/^(\d{1,2})\s+([A-Za-zñáéíóú]+)\s+(\d{4})$/u', trim($dateStr), $m)) {
+                    $meses = [
+                        'ene' => 1, 'feb' => 2, 'mar' => 3, 'abr' => 4, 'may' => 5, 'jun' => 6,
+                        'jul' => 7, 'ago' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dic' => 12
+                    ];
+                    $subMes = mb_strtolower(mb_substr($m[2], 0, 3));
+                    $mesNum = $meses[$subMes] ?? 11;
+                    return \Carbon\Carbon::createFromDate((int)$m[3], $mesNum, (int)$m[1])->addDays(30)->endOfDay();
+                }
+                return \Carbon\Carbon::parse($dateStr)->addDays(30)->endOfDay();
+            } catch (\Throwable $e) {}
+        }
+
+        return null;
+    }
+
+    /**
      * Lista base de noticias institucionales del CEFA.
      */
     private function getDefaultNoticias(): array
@@ -24,6 +61,7 @@ class NoticiasController extends Controller
                 'author' => 'Centro de Desarrollo Empresarial SBDC',
                 'author_role' => 'Coordinación Fondo Emprender',
                 'date' => '04 Nov 2026',
+                'fecha_vigencia' => '15/12/2026',
                 'status' => 'DESTACADA',
                 'status_pill' => 'status-blue',
                 'views_count' => 542,
@@ -43,6 +81,7 @@ class NoticiasController extends Controller
                 'author' => 'Agencia Pública de Empleo (APE)',
                 'author_role' => 'Líder de Intermediación Laboral',
                 'date' => '02 Nov 2026',
+                'fecha_vigencia' => '02/12/2026',
                 'status' => 'PUBLICADA',
                 'status_pill' => 'status-green',
                 'views_count' => 389,
@@ -62,6 +101,7 @@ class NoticiasController extends Controller
                 'author' => 'Líder ECCL - CEFA',
                 'author_role' => 'Certificación de Competencias',
                 'date' => '29 Oct 2026',
+                'fecha_vigencia' => '29/11/2026',
                 'status' => 'PUBLICADA',
                 'status_pill' => 'status-green',
                 'views_count' => 274,
@@ -81,8 +121,9 @@ class NoticiasController extends Controller
                 'author' => 'Subdirección de Centro CEFA',
                 'author_role' => 'Comunicaciones Institucionales',
                 'date' => '24 Oct 2026',
-                'status' => 'PUBLICADA',
-                'status_pill' => 'status-green',
+                'fecha_vigencia' => '05/11/2026',
+                'status' => 'EXPIRADA',
+                'status_pill' => 'status-gray',
                 'views_count' => 415,
                 'target' => 'Comunidad CEFA',
                 'icon' => 'fa-solid fa-microscope',
@@ -100,8 +141,9 @@ class NoticiasController extends Controller
                 'author' => 'Bienestar al Aprendiz & Egresados',
                 'author_role' => 'Coordinación de Egresados',
                 'date' => '18 Oct 2026',
-                'status' => 'PUBLICADA',
-                'status_pill' => 'status-green',
+                'fecha_vigencia' => '01/11/2026',
+                'status' => 'EXPIRADA',
+                'status_pill' => 'status-gray',
                 'views_count' => 198,
                 'target' => 'Egresados con Experiencia',
                 'icon' => 'fa-solid fa-users-rays',
@@ -119,6 +161,7 @@ class NoticiasController extends Controller
                 'author' => 'Área de Relaciones Corporativas',
                 'author_role' => 'Convenios Institucionales',
                 'date' => '12 Oct 2026',
+                'fecha_vigencia' => '25/11/2026',
                 'status' => 'BORRADOR',
                 'status_pill' => 'status-amber',
                 'views_count' => 86,
@@ -225,7 +268,8 @@ class NoticiasController extends Controller
     }
 
     /**
-     * Obtiene la lista combinada de noticias (sesión + predeterminadas).
+     * Obtiene la lista combinada de noticias (sesión + predeterminadas),
+     * aplicando la verificación de fecha de vigencia/expiración automática.
      */
     public static function getAllNoticias(): array
     {
@@ -235,7 +279,23 @@ class NoticiasController extends Controller
         $customIds = array_column($custom, 'id');
         $filteredDefaults = array_filter($defaults, fn($d) => !in_array($d['id'], $customIds));
 
-        return array_values(array_merge($custom, $filteredDefaults));
+        $all = array_values(array_merge($custom, $filteredDefaults));
+
+        $now = \Carbon\Carbon::now();
+        foreach ($all as &$n) {
+            $statusCurrent = strtoupper($n['status'] ?? 'PUBLICADA');
+            if ($statusCurrent !== 'BORRADOR') {
+                $expiry = self::parseNoticiaExpiry($n['fecha_vigencia'] ?? null, $n['date'] ?? null);
+                if ($expiry && $expiry->lessThanOrEqualTo($now)) {
+                    $n['status'] = 'EXPIRADA';
+                    $n['status_pill'] = 'status-gray';
+                    $n['auto_expirada'] = true;
+                }
+            }
+        }
+        unset($n);
+
+        return $all;
     }
 
     /**
@@ -308,6 +368,7 @@ class NoticiasController extends Controller
             'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
             'target' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
+            'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_url' => 'nullable|string|max:1000',
         ]);
@@ -339,6 +400,17 @@ class NoticiasController extends Controller
 
         $uploadedImage = $this->processUploadedImage($request);
 
+        $fechaVigencia = null;
+        if (!empty($validated['fecha_vigencia'])) {
+            try {
+                $fechaVigencia = \Carbon\Carbon::parse($validated['fecha_vigencia'])->format('d/m/Y');
+            } catch (\Throwable $e) {
+                $fechaVigencia = trim($validated['fecha_vigencia']);
+            }
+        } else {
+            $fechaVigencia = \Carbon\Carbon::now()->addDays(30)->format('d/m/Y');
+        }
+
         $newNoticia = [
             'id' => 'NOT-' . str_pad((count($this->getAllNoticias()) + 1), 3, '0', STR_PAD_LEFT),
             'title' => $validated['title'],
@@ -349,6 +421,7 @@ class NoticiasController extends Controller
             'author' => !empty($validated['author']) ? $validated['author'] : (auth()->check() ? (auth()->user()->name ?? 'Administración CEFA') : 'Super Administrador SIGE'),
             'author_role' => 'Administración CEFA La Angostura',
             'date' => Carbon::now()->locale('es')->isoFormat('D MMM Y'),
+            'fecha_vigencia' => $fechaVigencia,
             'status' => $validated['status'],
             'status_pill' => $statusPillMap[$validated['status']] ?? 'status-green',
             'views_count' => 1,
@@ -377,6 +450,7 @@ class NoticiasController extends Controller
             'content' => 'required|string',
             'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
             'target' => 'nullable|string|max:255',
+            'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_url' => 'nullable|string|max:1000',
         ]);
@@ -409,6 +483,14 @@ class NoticiasController extends Controller
         $targetNoticia['status_pill'] = $statusPillMap[$validated['status']] ?? 'status-green';
         if (!empty($validated['target'])) {
             $targetNoticia['target'] = $validated['target'];
+        }
+
+        if (!empty($validated['fecha_vigencia'])) {
+            try {
+                $targetNoticia['fecha_vigencia'] = \Carbon\Carbon::parse($validated['fecha_vigencia'])->format('d/m/Y');
+            } catch (\Throwable $e) {
+                $targetNoticia['fecha_vigencia'] = trim($validated['fecha_vigencia']);
+            }
         }
 
         if ($uploadedImage = $this->processUploadedImage($request)) {
@@ -518,6 +600,7 @@ class NoticiasController extends Controller
             'status' => 'nullable|string|in:PUBLICADA,BORRADOR,DESTACADA',
             'target' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
+            'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_url' => 'nullable|string|max:1000',
         ]);
@@ -553,6 +636,17 @@ class NoticiasController extends Controller
 
         $uploadedImage = $this->processUploadedImage($request);
 
+        $fechaVigencia = null;
+        if (!empty($validated['fecha_vigencia'])) {
+            try {
+                $fechaVigencia = \Carbon\Carbon::parse($validated['fecha_vigencia'])->format('d/m/Y');
+            } catch (\Throwable $e) {
+                $fechaVigencia = trim($validated['fecha_vigencia']);
+            }
+        } else {
+            $fechaVigencia = \Carbon\Carbon::now()->addDays(30)->format('d/m/Y');
+        }
+
         $newNoticia = [
             'id' => 'NOT-' . str_pad((count(self::getAllNoticias()) + 1), 3, '0', STR_PAD_LEFT),
             'title' => $validated['title'],
@@ -563,6 +657,7 @@ class NoticiasController extends Controller
             'author' => $author,
             'author_role' => 'Instructor / Seguimiento a Egresados',
             'date' => Carbon::now()->locale('es')->isoFormat('D MMM Y'),
+            'fecha_vigencia' => $fechaVigencia,
             'status' => $status,
             'status_pill' => $statusPillMap[$status] ?? 'status-green',
             'views_count' => 1,
@@ -591,6 +686,7 @@ class NoticiasController extends Controller
             'content' => 'required|string',
             'status' => 'required|string|in:PUBLICADA,BORRADOR,DESTACADA',
             'target' => 'nullable|string|max:255',
+            'fecha_vigencia' => 'nullable|string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'image_url' => 'nullable|string|max:1000',
         ]);
@@ -623,6 +719,14 @@ class NoticiasController extends Controller
         $targetNoticia['status_pill'] = $statusPillMap[$validated['status']] ?? 'status-green';
         if (!empty($validated['target'])) {
             $targetNoticia['target'] = $validated['target'];
+        }
+
+        if (!empty($validated['fecha_vigencia'])) {
+            try {
+                $targetNoticia['fecha_vigencia'] = \Carbon\Carbon::parse($validated['fecha_vigencia'])->format('d/m/Y');
+            } catch (\Throwable $e) {
+                $targetNoticia['fecha_vigencia'] = trim($validated['fecha_vigencia']);
+            }
         }
 
         if ($uploadedImage = $this->processUploadedImage($request)) {

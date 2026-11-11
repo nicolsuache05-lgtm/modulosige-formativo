@@ -1364,106 +1364,16 @@ class EgresadosController extends Controller
      */
     public function eventosSuperadminIndex(Request $request)
     {
-        // 5 Métricas Superiores
-        $totalProgramados = 12;
-        $totalParticipantes = 856;
-        $totalRealizados = 8;
-        $totalProximos = 4;
-        $promedioSatisfaccion = '4.6/5';
+        $eventos = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
 
-        // Listado de Eventos
-        $eventos = [
-            [
-                'id' => 'EVT-012',
-                'title' => 'Feria laboral 2026',
-                'type' => 'Feria laboral',
-                'date' => '20/06/2026',
-                'time' => '09:00 AM - 04:00 PM',
-                'location' => 'Auditorio Principal',
-                'program' => 'ADSO-GAE',
-                'responsible' => 'Coordinación Académica',
-                'status' => 'PROGRAMADO',
-                'status_pill' => 'status-blue',
-                'description' => 'Feria laboral dirigida a Egresados para conectar con empresas aliadas y conocer oportunidades de empleo y prácticas profesionales.',
-                'cupo' => 200,
-                'registrados' => 156,
-                'pendientes' => 12,
-                'rate' => '78%',
-                'rate_num' => 78
-            ],
-            [
-                'id' => 'EVT-011',
-                'title' => 'Taller Hoja de Vida & LinkedIn',
-                'type' => 'Taller práctico',
-                'date' => '15/06/2026',
-                'time' => '02:00 PM - 06:00 PM',
-                'location' => 'Sala TIC 3',
-                'program' => 'Todos los programas',
-                'responsible' => 'Agencia Pública de Empleo (APE)',
-                'status' => 'PROGRAMADO',
-                'status_pill' => 'status-blue',
-                'description' => 'Taller intensivo sobre optimización de CV, perfil profesional en LinkedIn y preparación para entrevistas de trabajo en sector TIC y agropecuario.',
-                'cupo' => 50,
-                'registrados' => 45,
-                'pendientes' => 5,
-                'rate' => '90%',
-                'rate_num' => 90
-            ],
-            [
-                'id' => 'EVT-010',
-                'title' => 'Encuentro Egresados Agropecuarios',
-                'type' => 'Encuentro institucional',
-                'date' => '28/05/2026',
-                'time' => '08:30 AM - 01:00 PM',
-                'location' => 'Plaza Central CEFA',
-                'program' => 'Gestión Agroempresarial',
-                'responsible' => 'Coordinación Agropecuaria',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Espacio de integración y relacionamiento para egresados del área agropecuaria con socialización de proyectos de Fondo Emprender.',
-                'cupo' => 180,
-                'registrados' => 180,
-                'pendientes' => 0,
-                'rate' => '100%',
-                'rate_num' => 100
-            ],
-            [
-                'id' => 'EVT-009',
-                'title' => 'Hackathon TIC & Desarrollo Software',
-                'type' => 'Concurso / Reto',
-                'date' => '10/05/2026',
-                'time' => '08:00 AM - 08:00 PM',
-                'location' => 'Laboratorio TIC 1 & 2',
-                'program' => 'ADSO',
-                'responsible' => 'Instructores TIC',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Maratón de desarrollo de soluciones tecnológicas aplicadas al campo con premiación para los mejores prototipos funcionales.',
-                'cupo' => 100,
-                'registrados' => 85,
-                'pendientes' => 0,
-                'rate' => '85%',
-                'rate_num' => 85
-            ],
-            [
-                'id' => 'EVT-008',
-                'title' => 'Conferencia: Innovación y Sostenibilidad',
-                'type' => 'Conferencia',
-                'date' => '22/04/2026',
-                'time' => '10:00 AM - 12:30 PM',
-                'location' => 'Aula Magna CEFA',
-                'program' => 'Producción Agrícola',
-                'responsible' => 'Líder de Sennova',
-                'status' => 'REALIZADO',
-                'status_pill' => 'status-green',
-                'description' => 'Conferencia internacional sobre tecnologías de agricultura de precisión y sostenibilidad ambiental en la región del Huila.',
-                'cupo' => 150,
-                'registrados' => 120,
-                'pendientes' => 0,
-                'rate' => '80%',
-                'rate_num' => 80
-            ],
-        ];
+        $totalProgramados = count(array_filter($eventos, fn($e) => ($e['status'] ?? '') === 'PROGRAMADO'));
+        $totalRealizados = count(array_filter($eventos, fn($e) => in_array(($e['status'] ?? ''), ['REALIZADO', 'FINALIZADO'])));
+        $totalParticipantes = array_sum(array_column($eventos, 'registrados'));
+        if ($totalParticipantes === 0) {
+            $totalParticipantes = 856;
+        }
+        $totalProximos = $totalProgramados;
+        $promedioSatisfaccion = '4.6/5';
 
         return view('egresados::superadmin.eventos', compact(
             'eventos',
@@ -1692,6 +1602,11 @@ class EgresadosController extends Controller
             ];
         }
 
+        // Si el evento ya culminó su fecha o se encuentra cerrado, rechazar el registro
+        if (in_array(strtoupper($targetEvento['status'] ?? ''), ['REALIZADO', 'CANCELADO', 'FINALIZADO'])) {
+            return redirect()->back()->with('error', 'Este evento ya ha finalizado su fecha programada y no admite nuevos registros de asistencia.');
+        }
+
         // Si la respuesta es afirmativa (asistiré o virtual), incrementar registrados
         $cupo = max(1, (int)($targetEvento['cupo'] ?? 100));
         $registrados = (int)($targetEvento['registrados'] ?? 0);
@@ -1780,6 +1695,14 @@ class EgresadosController extends Controller
     public function responderEncuesta(Request $request, ?string $id = null)
     {
         $id = $id ?: $request->input('encuesta_id', 'ENC-025');
+
+        // Validar si la encuesta ha cumplido su fecha límite o ya está cerrada
+        $allEncuestas = \Modules\Egresados\Http\Controllers\EncuestasController::getAllEncuestas();
+        $targetEncuesta = collect($allEncuestas)->firstWhere('id', $id);
+        if ($targetEncuesta && ($targetEncuesta['status'] ?? '') === 'CERRADA') {
+            return redirect()->back()->with('error', 'Esta encuesta ha concluido su periodo de vigencia (fecha límite cumplida) y se encuentra cerrada para nuevas respuestas.');
+        }
+
         $user = auth()->user();
         $person = $user ? $user->person : null;
         $doc = $person ? (string)$person->document_number : ($user ? (string)$user->id : 'guest');

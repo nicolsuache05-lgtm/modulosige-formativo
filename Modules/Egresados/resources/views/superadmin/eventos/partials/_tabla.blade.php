@@ -126,6 +126,11 @@
                                 <span class="inline-block px-2.5 py-1 rounded-full text-[10.5px] font-extrabold border {{ $statusClass }}">
                                     {{ $item['status'] }}
                                 </span>
+                                @if($item['auto_cerrado'] ?? false)
+                                    <span class="block text-[9.5px] text-gray-400 font-medium mt-0.5" title="Concluido automáticamente según calendario">
+                                        <i class="fa-solid fa-clock-rotate-left text-[8.5px]"></i> Concluido
+                                    </span>
+                                @endif
                             </td>
 
                             <td class="py-3.5 px-4 min-w-[120px]">

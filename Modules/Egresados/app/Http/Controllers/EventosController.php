@@ -113,6 +113,49 @@ class EventosController extends Controller
     }
 
     /**
+     * Parsea la fecha y rango horario de un evento para determinar su fecha y hora límite de culminación.
+     */
+    public static function parseEventDateTime(?string $dateStr, ?string $timeStr = null): ?\Carbon\Carbon
+    {
+        if (empty($dateStr)) return null;
+        $dateStr = trim($dateStr);
+
+        $endTime = null;
+        if (!empty($timeStr)) {
+            if (preg_match('/-\s*(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?)/i', $timeStr, $matches)) {
+                $endTime = trim($matches[1]);
+            } elseif (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?)/i', $timeStr, $matches)) {
+                $endTime = trim($matches[1]);
+            }
+        }
+
+        try {
+            if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $dateStr, $m)) {
+                $carbon = \Carbon\Carbon::createFromDate((int)$m[3], (int)$m[2], (int)$m[1]);
+            } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateStr, $m)) {
+                $carbon = \Carbon\Carbon::createFromDate((int)$m[1], (int)$m[2], (int)$m[3]);
+            } else {
+                $carbon = \Carbon\Carbon::parse($dateStr);
+            }
+
+            if ($endTime) {
+                try {
+                    $timeCarbon = \Carbon\Carbon::parse($endTime);
+                    $carbon->setTime($timeCarbon->hour, $timeCarbon->minute, 0);
+                } catch (\Throwable $e) {
+                    $carbon->endOfDay();
+                }
+            } else {
+                $carbon->endOfDay();
+            }
+
+            return $carbon;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
      * Retorna la lista estática de eventos por defecto.
      */
     public static function getDefaultEventosList(): array
@@ -122,7 +165,7 @@ class EventosController extends Controller
                 'id' => 'EVT-012',
                 'title' => 'Feria laboral 2026',
                 'type' => 'Feria laboral',
-                'date' => '20/06/2026',
+                'date' => '25/11/2026',
                 'time' => '09:00 AM - 04:00 PM',
                 'location' => 'Auditorio Principal',
                 'program' => 'ADSO - GAE',
@@ -140,7 +183,7 @@ class EventosController extends Controller
                 'id' => 'EVT-011',
                 'title' => 'Taller Hoja de Vida & LinkedIn',
                 'type' => 'Taller práctico',
-                'date' => '15/06/2026',
+                'date' => '20/11/2026',
                 'time' => '02:00 PM - 06:00 PM',
                 'location' => 'Sala TIC 3',
                 'program' => 'Todos los programas',
@@ -158,7 +201,7 @@ class EventosController extends Controller
                 'id' => 'EVT-010',
                 'title' => 'Encuentro Egresados Agropecuarios',
                 'type' => 'Encuentro institucional',
-                'date' => '28/05/2026',
+                'date' => '28/10/2026',
                 'time' => '08:30 AM - 01:00 PM',
                 'location' => 'Plaza Central CEFA',
                 'program' => 'Gestión Agroempresarial',
@@ -176,7 +219,7 @@ class EventosController extends Controller
                 'id' => 'EVT-009',
                 'title' => 'Hackathon TIC & Desarrollo Software',
                 'type' => 'Concurso / Hackathon',
-                'date' => '10/05/2026',
+                'date' => '10/10/2026',
                 'time' => '08:00 AM - 08:00 PM',
                 'location' => 'Laboratorio TIC 1 & 2',
                 'program' => 'ADSO',
@@ -194,7 +237,7 @@ class EventosController extends Controller
                 'id' => 'EVT-008',
                 'title' => 'Conferencia: Innovación y Sostenibilidad',
                 'type' => 'Conferencia / Charla',
-                'date' => '22/04/2026',
+                'date' => '22/09/2026',
                 'time' => '10:00 AM - 12:30 PM',
                 'location' => 'Aula Magna CEFA',
                 'program' => 'Producción Agrícola',
@@ -285,7 +328,8 @@ class EventosController extends Controller
     }
 
     /**
-     * Obtiene todos los eventos combinando personalizados y predeterminados.
+     * Obtiene todos los eventos combinando personalizados y predeterminados,
+     * aplicando el cierre automático cuando la fecha y horario hayan transcurrido.
      */
     public static function getAllEventos(): array
     {
@@ -295,7 +339,24 @@ class EventosController extends Controller
         $customIds = array_column($custom, 'id');
         $filteredDefaults = array_filter($defaults, fn($d) => !in_array($d['id'], $customIds));
 
-        return array_values(array_merge($custom, $filteredDefaults));
+        $all = array_values(array_merge($custom, $filteredDefaults));
+
+        // Validación y transición automática: si la fecha y horario ya pasaron, se cierra como REALIZADO
+        $now = \Carbon\Carbon::now();
+        foreach ($all as &$e) {
+            $statusCurrent = strtoupper($e['status'] ?? 'PROGRAMADO');
+            if (in_array($statusCurrent, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN'])) {
+                $eventExpiry = self::parseEventDateTime($e['date'] ?? null, $e['time'] ?? null);
+                if ($eventExpiry && $eventExpiry->lessThanOrEqualTo($now)) {
+                    $e['status'] = 'REALIZADO';
+                    $e['status_pill'] = 'status-green';
+                    $e['auto_cerrado'] = true;
+                }
+            }
+        }
+        unset($e);
+
+        return $all;
     }
 
     /**

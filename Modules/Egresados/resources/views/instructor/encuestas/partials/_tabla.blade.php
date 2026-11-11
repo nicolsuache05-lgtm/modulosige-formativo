@@ -127,6 +127,11 @@
                                         <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                                         CERRADA
                                     </span>
+                                    @if($item['auto_cerrada'] ?? false)
+                                        <span class="block text-[9.5px] text-gray-400 font-medium mt-0.5" title="Cerrada automáticamente al cumplirse la fecha límite">
+                                            <i class="fa-solid fa-calendar-xmark text-[8.5px]"></i> Por fecha límite
+                                        </span>
+                                    @endif
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>

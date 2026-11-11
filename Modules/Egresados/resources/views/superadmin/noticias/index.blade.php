@@ -583,6 +583,7 @@
                       <option value="PUBLICADA" {{ ($filterStatus ?? '') == 'PUBLICADA' ? 'selected' : '' }}>Publicadas</option>
                       <option value="DESTACADA" {{ ($filterStatus ?? '') == 'DESTACADA' ? 'selected' : '' }}>Destacadas</option>
                       <option value="BORRADOR" {{ ($filterStatus ?? '') == 'BORRADOR' ? 'selected' : '' }}>Borrador</option>
+                      <option value="EXPIRADA" {{ ($filterStatus ?? '') == 'EXPIRADA' ? 'selected' : '' }}>Expiradas (Vencidas)</option>
                   </select>
 
                   <button type="submit" class="px-4 py-2 bg-gray-800 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer">
@@ -633,9 +634,22 @@
                                   <i class="fa-regular fa-calendar text-[11px]"></i>
                                   <span>{{ $item['date'] }}</span>
                               </div>
-                              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                                  {{ $item['status'] ?? 'PUBLICADA' }}
-                              </span>
+                              @if(($item['status'] ?? '') === 'EXPIRADA')
+                                  <span class="text-[11px] font-extrabold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                      <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> EXPIRADA
+                                  </span>
+                              @else
+                                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                      {{ $item['status'] ?? 'PUBLICADA' }}
+                                  </span>
+                              @endif
+                          </div>
+                      @endif
+
+                      @if(!empty($item['fecha_vigencia']))
+                          <div class="flex items-center gap-1 text-[11px] {{ ($item['status'] ?? '') === 'EXPIRADA' ? 'text-gray-400 font-medium' : 'text-emerald-700 font-semibold' }} mb-2">
+                              <i class="fa-regular fa-clock text-[10px]"></i>
+                              <span>Vigencia: hasta {{ $item['fecha_vigencia'] }}</span>
                           </div>
                       @endif
 
@@ -750,8 +764,8 @@
                            class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                 </div>
 
-                <!-- Categoría y Estado -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Categoría, Estado y Fecha de Vigencia -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Categoría <span class="text-red-500">*</span>
@@ -764,13 +778,21 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                            Estado de Publicación <span class="text-red-500">*</span>
+                            Estado <span class="text-red-500">*</span>
                         </label>
                         <select name="status" required class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                             <option value="PUBLICADA">Publicada Inmediata</option>
                             <option value="DESTACADA">Destacada (Prioridad)</option>
                             <option value="BORRADOR">Guardar como Borrador</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Límite / Vigencia
+                        </label>
+                        <input type="date" name="fecha_vigencia" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
+                        <span class="text-[10px] text-gray-400">Caduca automáticamente en esta fecha.</span>
                     </div>
                 </div>
 
@@ -997,7 +1019,7 @@
                            class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Categoría *</label>
                         <select name="category" required x-model="noticiaActiva.category" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
@@ -1012,7 +1034,13 @@
                             <option value="PUBLICADA">Publicada</option>
                             <option value="DESTACADA">Destacada</option>
                             <option value="BORRADOR">Borrador</option>
+                            <option value="EXPIRADA">Expirada (Cerrada)</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Vigencia / Fecha Límite</label>
+                        <input type="text" name="fecha_vigencia" x-model="noticiaActiva.fecha_vigencia" placeholder="DD/MM/AAAA o AAAA-MM-DD" class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none transition font-medium">
+                        <span class="text-[10px] text-gray-400">Fecha límite de vigencia.</span>
                     </div>
                 </div>
 
