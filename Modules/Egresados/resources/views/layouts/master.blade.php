@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('general/assets/img/cefaempresa.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <style>
         :root {
@@ -141,8 +142,8 @@
             
             <!-- Left Branding -->
             <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('egresados.index') }}" class="text-white text-decoration-none d-flex align-items-center gap-2">
-                    <img src="{{ asset('general/assets/img/cefaempresa.png') }}" alt="SENA Empresa" class="logo-img">
+                <a href="{{ route('egresados.index') }}" class="brand text-white text-decoration-none d-flex align-items-center gap-2">
+                    @include('egresados::partials._sidebar_brand_logo')
                     <div>
                         <span class="fs-6 fw-bold d-block text-white">SENA EMPRESA</span>
                         <small class="text-white-50 fs-8">Procesos de Apoyo • <strong style="color: var(--sena-neon);">SIGE</strong></small>

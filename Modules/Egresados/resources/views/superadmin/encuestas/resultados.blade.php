@@ -7,8 +7,8 @@
     <title>SIGE · Resultados de Encuesta {{ $encuesta['id'] ?? 'ENC-025' }} — CEFA La Angostura</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -420,7 +420,7 @@
           <!-- Encabezado Institucional Exclusivo para el PDF -->
           <div class="hidden print-header mb-4 p-5 bg-white rounded-2xl border border-gray-200 text-center shadow-xs">
               <div class="flex items-center justify-center gap-3 mb-2">
-                  <img src="{{ route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA" style="width: 36px; height: 36px; object-fit: contain;">
+                  <img src="{{ route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}" alt="Logo SIGE Egresado CEFA" style="width: 48px; height: 44px; object-fit: contain;">
                   <div class="text-left">
                       <h2 class="text-lg font-bold text-[#001A29] font-editorial leading-tight">SENA Empresa · CEFA La Angostura</h2>
                       <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Sistema de Gestión de Egresados (SIGE)</p>

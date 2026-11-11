@@ -14,8 +14,8 @@
     <title>SIGE · Sistema de Gestión de Egresados — CEFA La Angostura</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <!-- Google Fonts: Poppins & Nunito (Tipografía Oficial SENA Empresa ERP) + Caveat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -588,11 +588,11 @@
                 <!-- Columna 1: SENA / CEFA -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-full overflow-hidden shadow-md flex items-center justify-center border-2 border-[#62E31D]/80 bg-white shrink-0 p-1">
-                            <img src="{{ route('egresados.assets.image', 'sena-empresa-logo.png') }}" alt="Logo SENA Empresa" class="w-full h-full object-contain">
+                        <div class="shrink-0 flex items-center justify-center">
+                            @include('egresados::partials._sidebar_brand_logo')
                         </div>
                         <div>
-                            <h4 class="font-poppins font-black text-base text-white leading-tight">SENA Empresa</h4>
+                            <h4 class="font-poppins font-black text-base text-white leading-tight">SIGE Egresados</h4>
                             <span class="text-xs text-[#62E31D] font-bold font-poppins">CEFA La Angostura</span>
                         </div>
                     </div>

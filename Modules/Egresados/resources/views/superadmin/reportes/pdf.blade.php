@@ -1,5 +1,5 @@
 @php
-    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sena-logo.png');
+    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sige-egresado-logo-transparent.png');
     $senaLogoBase64 = file_exists($senaLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($senaLogoPath)) : '';
 @endphp
 <!DOCTYPE html>
@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ $reportTitle }} · SIGE CEFA</title>
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; font-size: 10px; color: #1e293b; margin: 0; padding: 15px; background: #f8fafc; }
@@ -42,7 +42,7 @@
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td style="width: 42px; vertical-align: middle;">
-                        <img src="{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}" style="width: 36px; height: 36px; object-fit: contain; background: white; border-radius: 6px; padding: 2px;">
+                        <img src="{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}" style="width: 46px; height: 42px; object-fit: contain;">
                     </td>
                     <td style="vertical-align: middle; padding-left: 10px;">
                         <div style="font-size: 7.5px; font-weight: 800; color: #62E31D; text-transform: uppercase; letter-spacing: 0.8px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>

@@ -58,7 +58,7 @@
 </style>
 @endonce
 <span class="sige-brand-logo-wrap">
-  <img src="{{ route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}"
+  <img src="{{ route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}?v=2"
        alt="Logo SIGE Egresado CEFA"
        class="sige-brand-logo-img">
 </span>

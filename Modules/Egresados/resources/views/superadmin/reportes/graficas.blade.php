@@ -6,8 +6,8 @@
     <title>SIGE · Gráficas e Indicadores del Reporte — CEFA La Angostura</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1,5 +1,5 @@
 @php
-    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sena-logo.png');
+    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sige-egresado-logo-transparent.png');
     $senaLogoBase64 = file_exists($senaLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($senaLogoPath)) : '';
 @endphp
 <!DOCTYPE html>
@@ -11,8 +11,8 @@
     <title>SIGE · Gestión de Reportes — CEFA La Angostura</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -619,7 +619,7 @@
         if (btnText) btnText.innerText = 'Generando PDF...';
         if (btn) btn.disabled = true;
 
-        const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}";
+        const senaLogo = "{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}";
 
         const numTotal = Math.max(1, parseInt(totalVal) || 1);
         const numEmp = parseInt(empVal) || 0;
@@ -699,7 +699,7 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                         <td style="width: 42px; vertical-align: middle;">
-                            <img src="${senaLogo}" style="width: 36px; height: 36px; object-fit: contain; background: white; border-radius: 6px; padding: 2px;">
+                            <img src="${senaLogo}" style="width: 44px; height: 40px; object-fit: contain;">
                         </td>
                         <td style="vertical-align: middle; padding-left: 10px;">
                             <div style="font-size: 7.5px; font-weight: bold; color: #62E31D; text-transform: uppercase; letter-spacing: 0.8px;">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>

@@ -1,5 +1,5 @@
 @php
-    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sena-logo.png');
+    $senaLogoPath = base_path('Modules/Egresados/resources/assets/images/sige-egresado-logo-transparent.png');
     $senaLogoBase64 = file_exists($senaLogoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($senaLogoPath)) : '';
 @endphp
 
@@ -63,7 +63,7 @@
             <div id="modalPrintHeader" class="hidden bg-white rounded-2xl border-2 border-gray-200 overflow-hidden mb-2 shadow-xs" style="page-break-inside: avoid; break-inside: avoid;">
                 <div class="bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] p-3.5 text-white flex items-center justify-between border-b-2 border-[#39A900]">
                     <div class="flex items-center gap-3">
-                        <img src="{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sena-logo.png') }}" alt="Logo SENA" style="width: 38px; height: 38px; object-fit: contain; background: white; border-radius: 10px; padding: 3px;">
+                        <img src="{{ $senaLogoBase64 ?: route('egresados.assets.image', 'sige-egresado-logo-transparent.png') }}" alt="Logo SIGE Egresado CEFA" style="width: 46px; height: 42px; object-fit: contain;">
                         <div>
                             <div class="text-[8.5px] font-extrabold text-[#62E31D] uppercase tracking-wider">SERVICIO NACIONAL DE APRENDIZAJE · SENA EMPRESA</div>
                             <h2 class="text-sm font-black text-white leading-tight">Centro de Formación Agroindustrial La Angostura — CEFA</h2>

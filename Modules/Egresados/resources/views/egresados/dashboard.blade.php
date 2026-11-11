@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGE · Portal del Egresado · SENA CEFA</title>
-  <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+  <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
   <!-- Google Fonts: Poppins & Nunito (Tipografía Institucional SENA Empresa ERP) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

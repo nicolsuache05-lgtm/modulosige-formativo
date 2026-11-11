@@ -6,8 +6,8 @@
     <title>Equipo de Autores y Desarrolladores · SIGE — SENA Empresa CEFA</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sena-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
     <!-- Google Fonts: Poppins & Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -253,8 +253,8 @@
             
             <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 rounded-2xl bg-white p-2.5 shrink-0 flex items-center justify-center shadow-lg">
-                        <img src="{{ route('egresados.assets.image', 'sena-empresa-logo.png') }}" alt="SENA Empresa Logo" class="w-full h-full object-contain">
+                    <div class="shrink-0 flex items-center justify-center scale-110">
+                        @include('egresados::partials._sidebar_brand_logo')
                     </div>
                     <div>
                         <h3 class="font-poppins font-black text-xl text-white mb-1">

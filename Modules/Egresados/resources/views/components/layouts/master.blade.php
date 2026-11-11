@@ -8,6 +8,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
         <title>Egresados Module - {{ config('app.name', 'Laravel') }}</title>
+        <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
+        <link rel="shortcut icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
 
         <meta name="description" content="{{ $description ?? '' }}">
         <meta name="keywords" content="{{ $keywords ?? '' }}">
