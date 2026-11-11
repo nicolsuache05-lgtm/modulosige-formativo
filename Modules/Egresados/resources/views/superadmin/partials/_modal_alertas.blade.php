@@ -302,8 +302,8 @@
 <div id="senaModalSuccessAlert" 
      class="sena-modal-alert-backdrop fixed inset-0 z-[100] overflow-y-auto bg-gray-900/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" 
      x-show="openSuccessModal" 
-     @open-success-modal.window="openSuccessModal = true; if($event.detail?.title) document.getElementById('modalSuccessTitle').innerText = $event.detail.title; if($event.detail?.message) document.getElementById('modalSuccessMessage').innerText = $event.detail.message;"
-     @close-success-modal.window="openSuccessModal = false"
+     @open-success-modal.window="openSuccessModal = true; $el.classList.add('show-alert'); $el.style.display = 'flex'; if($event.detail?.title) document.getElementById('modalSuccessTitle').innerText = $event.detail.title; if($event.detail?.message) document.getElementById('modalSuccessMessage').innerText = $event.detail.message; if($event.detail?.badge && document.getElementById('modalSuccessBadgeText')) document.getElementById('modalSuccessBadgeText').innerText = $event.detail.badge;"
+     @close-success-modal.window="openSuccessModal = false; $el.classList.remove('show-alert'); $el.style.display = 'none';"
      style="position: fixed; inset: 0; z-index: 99999; background: rgba(0, 19, 30, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
@@ -364,7 +364,7 @@
         <!-- Badge de Confirmación y Verificación Institucional -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 16px; color: #166534; font-size: 12.5px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
             <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 14px;"></i>
-            <span>{{ $badgeText }}</span>
+            <span id="modalSuccessBadgeText">{{ $badgeText }}</span>
         </div>
 
         <!-- Botón de Acción Principal SENA ERP -->
@@ -497,7 +497,7 @@
         }
     }
 
-    window.showSuccessAlert = function(title, message) {
+    window.showSuccessAlert = function(title, message, badge) {
         const modal = document.getElementById('senaModalSuccessAlert');
         if (modal) {
             modal.classList.add('show-alert');
@@ -509,8 +509,11 @@
         if (message && document.getElementById('modalSuccessMessage')) {
             document.getElementById('modalSuccessMessage').innerText = message;
         }
+        if (badge && document.getElementById('modalSuccessBadgeText')) {
+            document.getElementById('modalSuccessBadgeText').innerText = badge;
+        }
         window.dispatchEvent(new CustomEvent('open-success-modal', {
-            detail: { title: title, message: message }
+            detail: { title: title, message: message, badge: badge }
         }));
         const progressBar = document.querySelector('.sena-alert-progress');
         if (progressBar) {

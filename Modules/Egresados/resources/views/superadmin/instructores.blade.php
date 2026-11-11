@@ -1396,13 +1396,21 @@
         <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-5">
             <form id="form-asignar-ficha" 
                   @submit.prevent="
-                    openModalAsignarFicha = false; 
-                    window.dispatchEvent(new CustomEvent('open-success-modal', { 
-                        detail: { 
-                            title: '¡Seguimiento a Egresados Asignado!', 
-                            message: 'Se ha asignado exitosamente la ficha al docente para el seguimiento y monitoreo exclusivo de egresados.' 
-                        } 
-                    }));
+                    const selectFicha = $el.querySelector('select');
+                    const fichaNombre = selectFicha?.options?.[selectFicha.selectedIndex]?.text?.trim() || 'la ficha seleccionada';
+                    const docLabel = document.getElementById('assignInstructorNameLabel')?.innerText?.trim() || 'el instructor';
+                    openModalAsignarFicha = false;
+                    $el.reset();
+                    const payload = {
+                        title: '¡Seguimiento Registrado Correctamente!',
+                        message: 'Se ha registrado correctamente el seguimiento de ' + fichaNombre + ' para ' + docLabel + '.',
+                        badge: 'Seguimiento asignado y registrado correctamente en el sistema'
+                    };
+                    if (typeof window.showSuccessAlert === 'function') {
+                        window.showSuccessAlert(payload.title, payload.message, payload.badge);
+                    } else {
+                        window.dispatchEvent(new CustomEvent('open-success-modal', { detail: payload }));
+                    }
                   " 
                   class="space-y-4">
                 <input type="hidden" id="assignInstructorId" value="1">
