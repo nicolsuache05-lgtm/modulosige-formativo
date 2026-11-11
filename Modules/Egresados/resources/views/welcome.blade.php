@@ -525,18 +525,7 @@
                 <article class="sige-reveal-block sige-mv-card relative p-[3.5px] rounded-[26px] bg-gradient-to-br from-[#001A29] via-[#004258] to-[#39A900] shadow-[0_18px_40px_-14px_rgba(0,26,41,0.30)] flex flex-col" data-sige-reveal="card">
                     <div class="rounded-[22.5px] bg-[#F8FAFB] p-8 sm:p-10 h-full flex flex-col justify-between space-y-5">
                         <div class="space-y-5">
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-sm shrink-0">
-                                        <i class="fa-solid fa-bullseye"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#2a7c00] font-poppins block">Propósito SIGE</span>
-                                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Misión</h3>
-                                    </div>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white text-[#001A29] border border-[#001A29]/25 font-poppins shadow-2xs">CEFA La Angostura</span>
-                            </div>
+                            <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Misión</h3>
 
                             <div class="h-[1.5px] w-full bg-[#39A900]/40"></div>
 
@@ -553,18 +542,7 @@
                 <article class="sige-reveal-block sige-mv-card relative p-[3.5px] rounded-[26px] bg-gradient-to-br from-[#39A900] via-[#62E31D] to-[#001A29] shadow-[0_18px_40px_-14px_rgba(57,169,0,0.28)] flex flex-col" style="transition-delay: 100ms;" data-sige-reveal="card">
                     <div class="rounded-[22.5px] bg-[#E8F8EC] p-8 sm:p-10 h-full flex flex-col justify-between space-y-5">
                         <div class="space-y-5">
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-12 h-12 rounded-2xl bg-[#39A900] text-white flex items-center justify-center text-xl shadow-sm shrink-0">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10.5px] font-extrabold uppercase tracking-widest text-[#2a7c00] font-poppins block">Proyección Estratégica</span>
-                                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Visión</h3>
-                                    </div>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/80 text-[#1e5c00] border border-[#39A900]/40 font-poppins shadow-2xs">Horizonte 2030</span>
-                            </div>
+                            <h3 class="font-poppins text-2xl sm:text-3xl font-black text-[#00131E] tracking-tight leading-none">Visión</h3>
 
                             <div class="h-[1.5px] w-full bg-[#39A900]/45"></div>
 
