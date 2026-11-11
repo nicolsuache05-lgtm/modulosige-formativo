@@ -27,17 +27,10 @@ Route::post('egresados/autores/guardar', [EgresadosController::class, 'guardarAu
 // 2. Autenticación Institucional Centralizada del ERP
 Route::get('egresados/login', function (\Illuminate\Http\Request $request) {
     if (\Illuminate\Support\Facades\Auth::check()) {
-        $user = \Illuminate\Support\Facades\Auth::user();
-        if ($user->nickname === 'egresado_sige' || $user->email === 'egresado.sige@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.egresado'))) {
-            return redirect()->route('egresados.dashboard_egresado');
-        }
-        if ($user->nickname === 'instructor_egresados' || $user->email === 'instructor.egresados@sena.edu.co' || ($user->roles && $user->roles->contains('slug', 'egresados.instructor'))) {
-            return redirect()->route('egresados.dashboard_instructor');
-        }
-        return redirect()->route('egresados.dashboard');
+        return app(\Modules\Egresados\Http\Controllers\AuthController::class)->redirectByRole(\Illuminate\Support\Facades\Auth::user());
     }
-    $redirect = $request->query('redirect', '');
-    return redirect()->route('login', $redirect ? ['redirect' => $redirect] : []);
+    $redirect = $request->query('redirect', route('egresados.home'));
+    return redirect()->route('login', ['redirect' => $redirect]);
 })->name('egresados.login');
 
 Route::post('egresados/login', [AuthController::class, 'login'])->name('egresados.login.post');

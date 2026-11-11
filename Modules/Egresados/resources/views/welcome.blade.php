@@ -183,6 +183,11 @@
                             <span class="hidden sm:inline">Salir</span>
                         </button>
                     </form>
+                @else
+                    <a href="{{ route('egresados.login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-md shadow-[#39A900]/30 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        <span>Ingresar</span>
+                    </a>
                 @endauth
             </div>
 
@@ -219,7 +224,7 @@
                             <span>Ir a mi Panel ({{ Auth::user()->primary_role }})</span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
+                        <a href="{{ route('egresados.login') }}" class="bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#2d8500] hover:to-[#226700] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-lg shadow-[#39A900]/30 hover:shadow-xl hover:-translate-y-0.5 transition flex items-center space-x-2.5">
                             <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
                             <span>Iniciar sesión</span>
                         </a>

@@ -18,7 +18,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());
         }
-        $redirect = $request->query('redirect', route('egresados.dashboard_egresado'));
+        $redirect = $request->query('redirect', route('egresados.home'));
         return redirect()->route('login', ['redirect' => $redirect]);
     }
 
