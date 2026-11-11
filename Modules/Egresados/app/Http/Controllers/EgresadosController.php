@@ -781,13 +781,31 @@ class EgresadosController extends Controller
         }));
         $noticiaDestacada = !empty($noticiasPublicadas) ? $noticiasPublicadas[0] : ($todasNoticias[0] ?? null);
 
+        $todosEventos = \Modules\Egresados\Http\Controllers\EventosController::getAllEventos();
+        $eventosVisibles = array_values(array_filter($todosEventos, function ($e) {
+            $status = strtoupper(trim($e['status'] ?? 'PROGRAMADO'));
+            return !in_array($status, ['CANCELADO', 'ANULADO', 'INACTIVO', 'BORRADOR', 'SUSPENDIDO']);
+        }));
+        $eventosProgramados = array_values(array_filter($eventosVisibles, function ($e) {
+            $status = strtoupper(trim($e['status'] ?? 'PROGRAMADO'));
+            return in_array($status, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
+        }));
+        $eventosRecientes = array_values(array_filter($eventosVisibles, function ($e) {
+            $status = strtoupper(trim($e['status'] ?? 'PROGRAMADO'));
+            return !in_array($status, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
+        }));
+        $eventosActivos = array_values(array_merge($eventosProgramados, $eventosRecientes));
+        $eventoDestacado = !empty($eventosActivos) ? $eventosActivos[0] : ($todosEventos[0] ?? null);
+
         return view('egresados::welcome', compact(
             'totalEgresados',
             'totalEmpleados',
             'totalEmprendedores',
             'totalEstudiantes',
             'noticiaDestacada',
-            'noticiasPublicadas'
+            'noticiasPublicadas',
+            'eventoDestacado',
+            'eventosActivos'
         ));
     }
 

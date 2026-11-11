@@ -1,10 +1,17 @@
 <?php
     /** @var array<string, mixed>|null $noticiaDestacada */
     /** @var array<int, mixed>|null $noticiasPublicadas */
+    /** @var array<string, mixed>|null $eventoDestacado */
+    /** @var array<int, mixed>|null $eventosActivos */
     use Illuminate\Support\Facades\Auth;
 
     $destacadaId = (string)(isset($noticiaDestacada['id']) ? $noticiaDestacada['id'] : 'NOT-001');
     $noticiasJson = json_encode(isset($noticiasPublicadas) ? $noticiasPublicadas : [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+
+    $eventoDestacadoId = (string)(isset($eventoDestacado['id']) ? $eventoDestacado['id'] : 'EVT-012');
+    $eventosLista = isset($eventosActivos) && is_array($eventosActivos) ? $eventosActivos : [];
+    $eventosAgenda = array_slice($eventosLista, 0, 6);
+    $eventosJson = json_encode($eventosLista, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -394,19 +401,51 @@
                     </div>
 
                     <!-- SLIDE 1: EVENTOS Y TALLERES -->
+                    @php
+                        $eventoDestEstado = strtoupper(trim($eventoDestacado['status'] ?? 'PROGRAMADO'));
+                        $eventoDestEsProximo = in_array($eventoDestEstado, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
+                    @endphp
                     <div id="sigeSlide-1" onclick="clickSlideSige(1)" class="sige-slide absolute w-[290px] sm:w-[420px] md:w-[480px] h-[360px] sm:h-[400px] md:h-[440px] rounded-3xl overflow-hidden bg-slate-900 shadow-2xl transition-all duration-500 ease-out cursor-pointer select-none">
-                        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80" alt="Eventos Institucionales" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/40 to-transparent"></div>
-                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                        <img src="{{ $eventoDestacado['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $eventoDestacado['title'] ?? 'Eventos Institucionales' }}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/45 to-transparent"></div>
+                        <div class="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 pointer-events-none">
                             <span class="bg-blue-600 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider font-poppins shadow-md">
                                 <i class="fa-solid fa-calendar-days mr-1"></i> Eventos
                             </span>
+                            <div class="flex items-center gap-1.5">
+                                @if(!empty($eventoDestacado['date']))
+                                <span class="bg-black/55 backdrop-blur-md text-blue-200 text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/15 font-mono shadow-sm">
+                                    <i class="fa-regular fa-calendar mr-1 text-[9px]"></i>{{ $eventoDestacado['date'] }}
+                                </span>
+                                @endif
+                                <span class="{{ $eventoDestEsProximo ? 'bg-[#39A900] text-white' : 'bg-white/20 text-gray-100' }} text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide font-poppins shadow-sm">
+                                    {{ $eventoDestEstado }}
+                                </span>
+                            </div>
                         </div>
                         <div class="absolute bottom-5 left-5 right-5 text-left text-white">
-                            <div class="text-xs text-blue-300 font-bold font-sans">Sede La Angostura</div>
-                            <h3 class="font-poppins text-lg sm:text-xl md:text-2xl font-black leading-tight mt-1">Encuentros, Ferias y Capacitaciones</h3>
-                            <p class="font-sans text-xs sm:text-sm text-gray-200 mt-1.5 line-clamp-2 font-medium">Jornadas de actualización técnica, ruedas de oportunidades y el gran reencuentro de egresados.</p>
-                            
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="text-xs text-blue-300 font-bold font-sans">
+                                    <i class="fa-solid fa-location-dot mr-1"></i>{{ $eventoDestacado['location'] ?? 'Sede La Angostura' }}
+                                </span>
+                                @if(!empty($eventoDestacado['type']))
+                                <span class="text-[10px] text-gray-200 bg-white/10 px-2 py-0.5 rounded-full font-mono line-clamp-1">
+                                    {{ $eventoDestacado['type'] }}
+                                </span>
+                                @endif
+                            </div>
+                            <h3 class="font-poppins text-lg sm:text-xl md:text-2xl font-black leading-tight mt-1 line-clamp-2 drop-shadow-md">
+                                {{ $eventoDestacado['title'] ?? 'Encuentros, Ferias y Capacitaciones' }}
+                            </h3>
+                            <p class="font-sans text-xs sm:text-sm text-gray-200 mt-1.5 line-clamp-2 font-medium">
+                                {{ $eventoDestacado['description'] ?? 'Jornadas de actualización técnica, ruedas de oportunidades y el gran reencuentro de egresados.' }}
+                            </p>
+                            <div class="mt-3 flex items-center gap-2">
+                                <button type="button" data-evento-id="{{ $eventoDestacadoId }}" onclick="event.stopPropagation(); abrirModalEvento(this.getAttribute('data-evento-id'))" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 hover:text-white bg-[#001A29]/85 hover:bg-blue-600 px-3.5 py-1.5 rounded-full border border-blue-400/40 transition shadow-sm font-poppins">
+                                    <span>Ver detalles del evento</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -481,6 +520,78 @@
                 <button type="button" onclick="irASlideSige(3)" class="sige-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/60 transition-all" title="Ir a Emprendimiento"></button>
                 <button type="button" onclick="irASlideSige(4)" class="sige-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/60 transition-all" title="Ir a Red de Egresados"></button>
             </div>
+
+            <!-- AGENDA EN VIVO: EVENTOS CREADOS EN LOS MÓDULOS DE EVENTOS -->
+            @if(!empty($eventosAgenda))
+            <div id="agenda-eventos-inicio" class="mt-14 pt-10 border-t border-white/10">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+                    <div>
+                        <span class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#62E31D] font-poppins">
+                            <span class="w-2 h-2 rounded-full bg-[#62E31D] animate-pulse"></span>
+                            Agenda Institucional En Vivo
+                        </span>
+                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white mt-1">
+                            Eventos SIGE Programados y Recientes
+                        </h3>
+                    </div>
+                    <button type="button" onclick="irASlideSige(1)" class="self-start sm:self-auto inline-flex items-center gap-2 text-xs font-bold text-[#62E31D] hover:text-white bg-white/5 hover:bg-[#39A900] border border-[#62E31D]/30 px-4 py-2 rounded-full transition font-poppins">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Ver evento destacado en carrusel</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                    @foreach($eventosAgenda as $ev)
+                        @php
+                            $evStatus = strtoupper(trim($ev['status'] ?? 'PROGRAMADO'));
+                            $evActivo = in_array($evStatus, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
+                        @endphp
+                        <div data-evento-id="{{ $ev['id'] ?? '' }}" onclick="abrirModalEvento(this.getAttribute('data-evento-id'))" class="group rounded-2xl bg-[#00131E]/85 hover:bg-[#001E2E] border {{ $evActivo ? 'border-[#39A900]/45' : 'border-white/10' }} hover:border-[#62E31D]/70 p-5 text-left transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 font-poppins">
+                                        <i class="fa-solid fa-calendar-days text-[9px]"></i>
+                                        {{ $ev['type'] ?? 'Evento' }}
+                                    </span>
+                                    <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full font-poppins {{ $evActivo ? 'bg-[#39A900] text-white shadow-sm' : 'bg-white/10 text-gray-300 border border-white/15' }}">
+                                        {{ $evStatus }}
+                                    </span>
+                                </div>
+
+                                <h4 class="font-poppins font-extrabold text-base sm:text-lg text-white group-hover:text-[#62E31D] transition leading-snug line-clamp-2">
+                                    {{ $ev['title'] ?? 'Evento Institucional SIGE' }}
+                                </h4>
+
+                                <p class="font-sans text-xs sm:text-sm text-gray-300 mt-2 line-clamp-2 leading-relaxed">
+                                    {{ $ev['description'] ?? 'Participa en las actividades de actualización y encuentro de egresados CEFA.' }}
+                                </p>
+                            </div>
+
+                            <div class="mt-4 pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-300 font-sans">
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                    @if(!empty($ev['date']))
+                                    <span class="inline-flex items-center gap-1 font-semibold text-[#62E31D]">
+                                        <i class="fa-regular fa-calendar text-[10px]"></i>
+                                        {{ $ev['date'] }}
+                                    </span>
+                                    @endif
+                                    @if(!empty($ev['location']))
+                                    <span class="inline-flex items-center gap-1 text-gray-300">
+                                        <i class="fa-solid fa-location-dot text-blue-400 text-[10px]"></i>
+                                        <span class="line-clamp-1 max-w-[140px]">{{ $ev['location'] }}</span>
+                                    </span>
+                                    @endif
+                                </div>
+                                <span class="inline-flex items-center gap-1 font-bold text-[#62E31D] group-hover:translate-x-0.5 transition font-poppins">
+                                    <span>Detalles</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
         </div>
     </section>
@@ -729,10 +840,112 @@
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- MODAL DETALLE DE EVENTO INSTITUCIONAL (SENA ERP) -->
+    <!-- ============================================== -->
+    <div id="modalVerEventoLanding" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity duration-300" onclick="if(event.target === this) cerrarModalEvento()">
+        <div class="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-gray-200">
+            
+            <!-- Header Modal con Gradiente SENA ERP -->
+            <div class="bg-gradient-to-r from-[#00131E] via-[#001A29] to-[#002336] px-6 py-4 flex items-center justify-between border-b-2 border-[#39A900] text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300">
+                        <i class="fa-solid fa-calendar-days text-base"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="modalEventoType" class="text-[11px] font-bold text-[#62E31D] uppercase tracking-wider font-mono">Evento</span>
+                            <span id="modalEventoStatus" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#39A900] text-white font-poppins">PROGRAMADO</span>
+                        </div>
+                        <h4 class="font-poppins font-black text-base sm:text-lg text-white leading-tight">Agenda Institucional SIGE</h4>
+                    </div>
+                </div>
+                <button type="button" onclick="cerrarModalEvento()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition" title="Cerrar ventana">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo Modal con Scroll -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-5">
+                
+                <!-- Banner del Evento -->
+                <div class="relative h-48 sm:h-56 rounded-2xl overflow-hidden bg-slate-900 border border-gray-100 shadow-md">
+                    <img id="modalEventoImg" src="" alt="Imagen Evento" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-4 flex flex-wrap items-center justify-between gap-2 text-white text-xs">
+                        <span id="modalEventoDate" class="bg-black/65 backdrop-blur-md px-3 py-1 rounded-full font-mono text-[11px] text-blue-200 border border-white/20"></span>
+                        <span id="modalEventoLocation" class="bg-blue-600/90 px-3 py-1 rounded-full font-bold text-[11px] text-white shadow-sm font-sans"></span>
+                    </div>
+                </div>
+
+                <!-- Título y Metadatos -->
+                <div>
+                    <h3 id="modalEventoTitle" class="font-poppins font-black text-xl sm:text-2xl text-[#00131E] leading-snug"></h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3 text-xs text-gray-600 font-sans">
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-2">
+                            <i class="fa-regular fa-clock text-[#39A900]"></i>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-gray-400">Horario</span>
+                                <span id="modalEventoTime" class="font-bold text-[#00131E]"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-2">
+                            <i class="fa-solid fa-graduation-cap text-blue-600"></i>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-gray-400">Programas</span>
+                                <span id="modalEventoProgram" class="font-bold text-[#00131E]"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-2">
+                            <i class="fa-solid fa-user-tie text-[#39A900]"></i>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-gray-400">Responsable</span>
+                                <span id="modalEventoResponsible" class="font-bold text-[#00131E]"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-2">
+                            <i class="fa-solid fa-users text-blue-600"></i>
+                            <div>
+                                <span class="block text-[10px] uppercase font-bold text-gray-400">Cupos / Inscritos</span>
+                                <span id="modalEventoCapacity" class="font-bold text-[#00131E]"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción del Evento -->
+                <div class="bg-[#EAF7EE]/70 border-l-4 border-[#39A900] p-4 rounded-r-2xl">
+                    <p class="text-[11px] font-black uppercase tracking-wider text-[#2a7c00] mb-1 font-poppins">Descripción del evento</p>
+                    <p id="modalEventoDescription" class="text-xs sm:text-sm text-gray-800 font-medium leading-relaxed"></p>
+                </div>
+
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-gray-50 px-6 py-3.5 border-t border-gray-200 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs text-gray-500 font-medium">SIGE · CEFA La Angostura</span>
+                <div class="flex items-center gap-2">
+                    <a href="{{ Auth::check() ? route('egresados.egresado.eventos') : route('egresados.login') }}" class="px-4 py-2 rounded-xl bg-[#39A900] hover:bg-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-to-bracket text-[11px]"></i>
+                        <span>{{ Auth::check() ? 'Ir a Eventos' : 'Ingresar a SIGE' }}</span>
+                    </a>
+                    <button type="button" onclick="cerrarModalEvento()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#001A29] to-[#002336] hover:from-[#39A900] hover:to-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- SCRIPT DEL CARRUSEL DE IMÁGENES "¿QUÉ ENCUENTRAS EN SIGE?" -->
     <!-- ============================================== -->
     <script id="sigeNoticiasPublicadasData" type="text/template" data-destacada-id="<?php echo $destacadaId; ?>">
 <?php echo $noticiasJson; ?>
+    </script>
+
+    <script id="sigeEventosActivosData" type="text/template" data-destacado-id="<?php echo $eventoDestacadoId; ?>">
+<?php echo $eventosJson; ?>
     </script>
 
     <script>
@@ -743,6 +956,60 @@
         const sigeNoticiasScriptEl = document.getElementById('sigeNoticiasPublicadasData');
         const sigeNoticiasPublicadas = sigeNoticiasScriptEl ? JSON.parse(sigeNoticiasScriptEl.textContent || '[]') : [];
         const sigeNoticiaDestacadaId = sigeNoticiasScriptEl ? (sigeNoticiasScriptEl.getAttribute('data-destacada-id') || 'NOT-001') : 'NOT-001';
+
+        const sigeEventosScriptEl = document.getElementById('sigeEventosActivosData');
+        const sigeEventosActivos = sigeEventosScriptEl ? JSON.parse(sigeEventosScriptEl.textContent || '[]') : [];
+        const sigeEventoDestacadoId = sigeEventosScriptEl ? (sigeEventosScriptEl.getAttribute('data-destacado-id') || 'EVT-012') : 'EVT-012';
+
+        function abrirModalEvento(id) {
+            let evento = sigeEventosActivos.find(e => String(e.id) === String(id));
+            if (!evento && sigeEventosActivos.length > 0) {
+                evento = sigeEventosActivos[0];
+            }
+            if (!evento) return;
+
+            const statusStr = String(evento.status || 'PROGRAMADO').toUpperCase();
+            const esActivo = ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN'].includes(statusStr);
+
+            document.getElementById('modalEventoImg').src = evento.image || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80';
+            document.getElementById('modalEventoType').textContent = evento.type || 'Evento Institucional';
+            const statusEl = document.getElementById('modalEventoStatus');
+            statusEl.textContent = statusStr;
+            statusEl.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded-full font-poppins ' + (esActivo ? 'bg-[#39A900] text-white' : 'bg-white/20 text-gray-200');
+            document.getElementById('modalEventoTitle').textContent = evento.title || 'Evento Institucional SIGE';
+            document.getElementById('modalEventoDate').textContent = evento.date ? ('Fecha: ' + evento.date) : 'Por definir';
+            document.getElementById('modalEventoLocation').textContent = evento.location || 'Sede La Angostura';
+            document.getElementById('modalEventoTime').textContent = evento.time || 'Horario por confirmar';
+            document.getElementById('modalEventoProgram').textContent = evento.program || 'Todos los programas';
+            document.getElementById('modalEventoResponsible').textContent = evento.responsible || 'Coordinación Académica & Egresados';
+            const reg = Number(evento.registrados || 0);
+            const cupo = Number(evento.cupo || 0);
+            document.getElementById('modalEventoCapacity').textContent = cupo > 0 ? `${reg} / ${cupo} participantes` : `${reg} registrados`;
+            document.getElementById('modalEventoDescription').textContent = evento.description || 'Evento institucional organizado para la comunidad de egresados CEFA La Angostura.';
+
+            const modal = document.getElementById('modalVerEventoLanding');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalEvento() {
+            const modal = document.getElementById('modalVerEventoLanding');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModalNoticia();
+                cerrarModalEvento();
+            }
+        });
 
         function abrirModalNoticia(id) {
             let noticia = sigeNoticiasPublicadas.find(n => n.id === id);
@@ -862,6 +1129,8 @@
                 irASlideSige(idx);
             } else if (idx === 0) {
                 abrirModalNoticia(sigeNoticiaDestacadaId);
+            } else if (idx === 1) {
+                abrirModalEvento(sigeEventoDestacadoId);
             }
         }
 
