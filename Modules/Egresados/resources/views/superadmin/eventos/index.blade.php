@@ -566,6 +566,10 @@
         const descInput = document.getElementById('edit_description');
         if (descInput) descInput.value = data.description || '';
 
+        if (typeof window.sigeEventoImgSet === 'function') {
+            window.sigeEventoImgSet('edit_evt_img', data.image || '');
+        }
+
         window.dispatchEvent(new CustomEvent('abrir-modal-editar-evento'));
     }
 

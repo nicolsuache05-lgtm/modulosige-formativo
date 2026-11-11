@@ -41,7 +41,7 @@
 
         <!-- Cuerpo del Formulario con Scroll Suave -->
         <div class="px-6 sm:px-8 py-5 overflow-y-auto space-y-6 bg-[#f8fafc]/80">
-            <form id="form-editar-evento" action="#" method="POST" class="space-y-5">
+            <form id="form-editar-evento" action="#" method="POST" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 @method('PUT')
                 
@@ -185,6 +185,8 @@
                         </div>
                     </div>
                 </div>
+
+                @include('egresados::partials._evento_image_field', ['idPrefix' => 'edit_evt_img', 'fieldLabel' => 'Foto / Portada del Evento'])
             </form>
         </div>
 

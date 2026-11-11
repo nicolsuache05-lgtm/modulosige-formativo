@@ -464,6 +464,32 @@ class EventosController extends Controller
     }
 
     /**
+     * Procesa y guarda una foto subida para el evento (archivo o URL).
+     */
+    public static function processUploadedImage(Request $request): ?string
+    {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension() ?: 'jpg';
+            $filename = 'evento_' . time() . '_' . uniqid() . '.' . $extension;
+
+            $destinationPath = public_path('storage/eventos');
+            if (!file_exists($destinationPath)) {
+                @mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            return '/storage/eventos/' . $filename;
+        }
+
+        if ($imageUrl = trim((string) $request->input('image_url', ''))) {
+            return $imageUrl;
+        }
+
+        return null;
+    }
+
+    /**
      * Guarda un nuevo evento programado.
      */
     public function store(Request $request)
@@ -476,6 +502,8 @@ class EventosController extends Controller
             'cupo_total' => 'required|integer|min:1',
             'programas_dirigidos' => 'nullable',
             'descripcion' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'image_url' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -508,6 +536,8 @@ class EventosController extends Controller
 
         $cupo = (int) $request->cupo_total;
 
+        $uploadedImage = self::processUploadedImage($request);
+
         $nuevoEvento = [
             'id' => $newId,
             'title' => $request->nombre_evento,
@@ -525,6 +555,7 @@ class EventosController extends Controller
             'pendientes' => 0,
             'rate' => '0%',
             'rate_num' => 0,
+            'image' => $uploadedImage ?: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80',
         ];
 
         $this->saveEventoInSession($nuevoEvento);
@@ -603,6 +634,9 @@ class EventosController extends Controller
             'cupo' => 'required|integer|min:1',
             'description' => 'required|string',
             'status' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'image_url' => 'nullable|string|max:1000',
+            'remove_image' => 'nullable',
         ]);
 
         $evento = $this->findEvento($id) ?? [
@@ -636,6 +670,12 @@ class EventosController extends Controller
                 'CANCELADO' => 'status-red',
                 default => 'status-gray',
             };
+        }
+
+        if ($uploadedImage = self::processUploadedImage($request)) {
+            $evento['image'] = $uploadedImage;
+        } elseif ($request->boolean('remove_image')) {
+            $evento['image'] = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80';
         }
 
         $evento['rate'] = $rateNum . '%';

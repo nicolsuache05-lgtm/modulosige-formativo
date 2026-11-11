@@ -491,7 +491,13 @@ class InstructorController extends Controller
             return redirect()->back()->withErrors(['nombre_evento' => 'Nombre y Lugar son campos obligatorios.']);
         }
 
+        $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'image_url' => 'nullable|string|max:1000',
+        ]);
+
         $tipoLabel = EventosController::resolveEventTypeLabel($tipo);
+        $uploadedImage = \Modules\Egresados\Http\Controllers\EventosController::processUploadedImage($request);
 
         $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
         $count = count($customEventos) + 13;
@@ -519,7 +525,8 @@ class InstructorController extends Controller
             'registrados' => 0,
             'pendientes' => 0,
             'rate' => '0%',
-            'rate_num' => 0
+            'rate_num' => 0,
+            'image' => $uploadedImage ?: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80',
         ];
 
         array_unshift($customEventos, $nuevo);
@@ -536,6 +543,15 @@ class InstructorController extends Controller
      */
     public function updateEvento(Request $request, string $id)
     {
+        $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'image_url' => 'nullable|string|max:1000',
+        ]);
+
+        $uploadedImage = \Modules\Egresados\Http\Controllers\EventosController::processUploadedImage($request);
+        $removeImage = $request->boolean('remove_image');
+        $defaultImg = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80';
+
         $customEventos = session('custom_instructor_eventos', session('custom_eventos', []));
         $found = false;
         $eventoGuardar = null;
@@ -549,8 +565,16 @@ class InstructorController extends Controller
                 $evt['time'] = $request->input('time', $evt['time']);
                 $evt['cupo'] = (int)$request->input('cupo', $evt['cupo']);
                 $evt['description'] = $request->input('description', $evt['description']);
+                if ($request->filled('program')) {
+                    $evt['program'] = $request->input('program');
+                }
                 if ($request->filled('status')) {
                     $evt['status'] = strtoupper($request->status);
+                }
+                if ($uploadedImage) {
+                    $evt['image'] = $uploadedImage;
+                } elseif ($removeImage) {
+                    $evt['image'] = $defaultImg;
                 }
                 $found = true;
                 $eventoGuardar = $evt;
@@ -560,24 +584,33 @@ class InstructorController extends Controller
         unset($evt);
 
         if (!$found) {
-            $nuevoModificado = [
+            $existing = \Modules\Egresados\Http\Controllers\EventosController::findEvento($id) ?? [];
+            $nuevoModificado = array_merge([
                 'id' => $id,
-                'title' => $request->input('title', 'Evento Actualizado'),
-                'type' => $request->input('type', 'Feria laboral'),
-                'location' => $request->input('location', 'Auditorio CEFA'),
-                'date' => $request->input('date', date('d/m/Y')),
-                'time' => $request->input('time', '08:00 AM - 04:00 PM'),
-                'cupo' => (int)$request->input('cupo', 100),
-                'registrados' => 10,
+                'registrados' => 0,
                 'pendientes' => 0,
-                'rate' => '10%',
-                'rate_num' => 10,
-                'description' => $request->input('description', 'Evento modificado.'),
-                'status' => strtoupper($request->input('status', 'PROGRAMADO')),
+                'rate' => '0%',
+                'rate_num' => 0,
                 'status_pill' => 'status-blue',
                 'program' => 'Todos los Programas',
-                'responsible' => 'Instructor CEFA'
-            ];
+                'responsible' => 'Instructor CEFA',
+            ], $existing, [
+                'id' => $id,
+                'title' => $request->input('title', $existing['title'] ?? 'Evento Actualizado'),
+                'type' => $request->input('type', $existing['type'] ?? 'Feria laboral'),
+                'location' => $request->input('location', $existing['location'] ?? 'Auditorio CEFA'),
+                'date' => $request->input('date', $existing['date'] ?? date('d/m/Y')),
+                'time' => $request->input('time', $existing['time'] ?? '08:00 AM - 04:00 PM'),
+                'cupo' => (int)$request->input('cupo', $existing['cupo'] ?? 100),
+                'description' => $request->input('description', $existing['description'] ?? 'Evento modificado.'),
+                'program' => $request->input('program', $existing['program'] ?? 'Todos los Programas'),
+                'status' => strtoupper($request->input('status', $existing['status'] ?? 'PROGRAMADO')),
+            ]);
+            if ($uploadedImage) {
+                $nuevoModificado['image'] = $uploadedImage;
+            } elseif ($removeImage || empty($nuevoModificado['image'])) {
+                $nuevoModificado['image'] = $defaultImg;
+            }
             array_unshift($customEventos, $nuevoModificado);
             $eventoGuardar = $nuevoModificado;
         }

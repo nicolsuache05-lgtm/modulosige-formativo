@@ -546,16 +546,20 @@
                             $evStatus = strtoupper(trim($ev['status'] ?? 'PROGRAMADO'));
                             $evActivo = in_array($evStatus, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
                         @endphp
-                        <div data-evento-id="{{ $ev['id'] ?? '' }}" onclick="abrirModalEvento(this.getAttribute('data-evento-id'))" class="group rounded-2xl bg-[#00131E]/85 hover:bg-[#001E2E] border {{ $evActivo ? 'border-[#39A900]/45' : 'border-white/10' }} hover:border-[#62E31D]/70 p-5 text-left transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1 flex flex-col justify-between">
+                        <div data-evento-id="{{ $ev['id'] ?? '' }}" onclick="abrirModalEvento(this.getAttribute('data-evento-id'))" class="group rounded-2xl overflow-hidden bg-[#00131E]/85 hover:bg-[#001E2E] border {{ $evActivo ? 'border-[#39A900]/45' : 'border-white/10' }} hover:border-[#62E31D]/70 p-5 text-left transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1 flex flex-col justify-between">
                             <div>
-                                <div class="flex items-center justify-between gap-2 mb-3">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 font-poppins">
-                                        <i class="fa-solid fa-calendar-days text-[9px]"></i>
-                                        {{ $ev['type'] ?? 'Evento' }}
-                                    </span>
-                                    <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full font-poppins {{ $evActivo ? 'bg-[#39A900] text-white shadow-sm' : 'bg-white/10 text-gray-300 border border-white/15' }}">
-                                        {{ $evStatus }}
-                                    </span>
+                                <div class="relative h-40 -mx-5 -mt-5 mb-4 overflow-hidden bg-slate-900">
+                                    <img src="{{ $ev['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $ev['title'] ?? 'Evento Institucional SIGE' }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/25 to-transparent"></div>
+                                    <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-600/90 text-white shadow-sm font-poppins backdrop-blur-xs">
+                                            <i class="fa-solid fa-calendar-days text-[9px]"></i>
+                                            {{ $ev['type'] ?? 'Evento' }}
+                                        </span>
+                                        <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full font-poppins {{ $evActivo ? 'bg-[#39A900] text-white shadow-sm' : 'bg-black/65 text-gray-200 border border-white/15 backdrop-blur-xs' }}">
+                                            {{ $evStatus }}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <h4 class="font-poppins font-extrabold text-base sm:text-lg text-white group-hover:text-[#62E31D] transition leading-snug line-clamp-2">
