@@ -140,6 +140,7 @@ class LoginController extends Controller
 
             Auth::login($user, $remember);
             $request->session()->regenerate();
+            session(['sige_last_activity' => now()->timestamp]);
 
             $redirectUrl = $request->input('redirect');
             if (!empty($redirectUrl) && (str_starts_with($redirectUrl, '/') || str_starts_with($redirectUrl, url('/')))) {

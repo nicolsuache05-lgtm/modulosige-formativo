@@ -18,7 +18,7 @@ use Modules\SICA\Entities\Role;
 class AuthController extends Controller
 {
     /**
-     * Muestra el formulario de inicio de sesión institucional o redirige al panel si ya está autenticado.
+     * Redirige al login unificado del ERP o directo al panel si ya está autenticado.
      */
     public function showLoginForm(Request $request)
     {
@@ -28,13 +28,22 @@ class AuthController extends Controller
             return $this->redirectByRole($user);
         }
 
-        $redirect = $request->query('redirect', route('egresados.dashboard'));
+        // Preservar mensajes flash y banderas (ej: expiración por inactividad) al pasar al login central ERP
+        session()->reflash();
+        if ($request->boolean('inactivity') && !session()->has('warning')) {
+            session()->flash('warning', 'Tu sesión ha expirado por inactividad. Inicia sesión nuevamente.');
+        }
 
-        return response()
-            ->view('egresados::login', compact('redirect'))
-            ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
+        $redirect = $request->query('redirect', route('egresados.home'));
+
+        return redirect()->route('login', array_filter([
+            'redirect'   => $redirect,
+            'inactivity' => $request->query('inactivity'),
+        ]))->withHeaders([
+            'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+            'Pragma'        => 'no-cache',
+            'Expires'       => 'Sun, 02 Jan 1990 00:00:00 GMT',
+        ]);
     }
 
     /**

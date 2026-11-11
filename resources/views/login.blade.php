@@ -213,6 +213,20 @@
                 <div>
                     <div class="text-center text-lg-start mb-4">
                     <!-- Flash messages & Alerts -->
+                    @if(session('warning') || request('inactivity'))
+                        <div class="alert alert-warning border-0 rounded-3 shadow-sm d-flex align-items-center gap-2 mb-3 py-2 px-3 fs-7" role="alert">
+                            <i class="fas fa-exclamation-triangle text-warning fs-6"></i>
+                            <div>{{ session('warning') ?? 'Tu sesión ha expirado por inactividad. Inicia sesión nuevamente.' }}</div>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger border-0 rounded-3 shadow-sm d-flex align-items-center gap-2 mb-3 py-2 px-3 fs-7" role="alert">
+                            <i class="fas fa-times-circle text-danger fs-6"></i>
+                            <div>{{ session('error') }}</div>
+                        </div>
+                    @endif
+
                     @if(session('info'))
                         <div class="alert alert-info border-0 rounded-3 shadow-sm d-flex align-items-center gap-2 mb-3 py-2 px-3 fs-7" role="alert">
                             <i class="fas fa-info-circle text-info fs-6"></i>
