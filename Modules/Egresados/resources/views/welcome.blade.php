@@ -581,11 +581,11 @@
                 <!-- Columna 1: SENA / CEFA -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="shrink-0 flex items-center justify-center">
-                            @include('egresados::partials._sidebar_brand_logo')
+                        <div class="w-12 h-12 rounded-full overflow-hidden shadow-md flex items-center justify-center border-2 border-[#62E31D]/80 bg-white shrink-0 p-1">
+                            <img src="{{ route('egresados.assets.image', 'sena-empresa-logo.png') }}" alt="Logo SENA Empresa" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h4 class="font-poppins font-black text-base text-white leading-tight">SIGE Egresados</h4>
+                            <h4 class="font-poppins font-black text-base text-white leading-tight">SENA Empresa</h4>
                             <span class="text-xs text-[#62E31D] font-bold font-poppins">CEFA La Angostura</span>
                         </div>
                     </div>
