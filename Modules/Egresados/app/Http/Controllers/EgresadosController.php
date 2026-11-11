@@ -213,7 +213,7 @@ class EgresadosController extends Controller
             'second_last_name'      => 'nullable|string|max:100',
             'telephone1'            => 'required|string|max:30',
             'gender'                => 'nullable|string|max:30',
-            'course_id'             => 'required|exists:courses,id',
+            'course_id'             => 'required|string|max:255',
             'estado_egresado'       => 'nullable|string|max:50',
             'personal_email'        => 'required|email|max:150',
             'misena_email'          => 'nullable|email|max:150',
@@ -352,17 +352,80 @@ class EgresadosController extends Controller
 
             $user->roles()->syncWithoutDetaching([$roleEgresado->id]);
 
-            // 5. Vincular registro en Aprendiz (inicialmente en revisión institucional)
+            // 5. Resolver o crear el Curso/Ficha y Programa ingresado o seleccionado
+            $courseInput = trim((string) $request->input('course_id'));
+            $course = null;
+
+            // a. Si es un ID o código numérico directo
+            if (is_numeric($courseInput) && (int)$courseInput > 0) {
+                $course = Course::with('program')->find((int)$courseInput);
+                if (!$course) {
+                    $course = Course::with('program')->where('code', (int)$courseInput)->first();
+                }
+            }
+
+            // b. Si contiene código de ficha en el texto (ej. "Ficha: 55555 — GESTIÓN..." o "ADSO 2696502")
+            if (!$course && !empty($courseInput)) {
+                if (preg_match('/(?:ficha[:\s]*|#\s*)?(\d{5,8})/i', $courseInput, $matches)) {
+                    $codeFound = $matches[1];
+                    $course = Course::with('program')->where('code', $codeFound)->first();
+                }
+            }
+
+            // c. Búsqueda por coincidencia de nombre de programa
+            if (!$course && !empty($courseInput)) {
+                $cleanName = trim(preg_replace('/(?:Ficha|#)?[:\s]*\d+/i', '', $courseInput));
+                $cleanName = trim(preg_replace('/[—–\-]+/', ' ', $cleanName));
+                if (!empty($cleanName)) {
+                    $course = Course::with('program')->whereHas('program', function($q) use ($cleanName) {
+                        $q->where('name', 'like', '%' . $cleanName . '%');
+                    })->first();
+                }
+            }
+
+            // d. Si no existe, crear el Curso y Programa con los datos escritos por el usuario
+            if (!$course && !empty($courseInput)) {
+                $cleanFicha = null;
+                if (preg_match('/(?:ficha[:\s]*|#\s*)?(\d{5,8})/i', $courseInput, $m)) {
+                    $cleanFicha = $m[1];
+                } else {
+                    $cleanFicha = rand(1000000, 9999999);
+                }
+
+                $progNameClean = trim(preg_replace('/(?:Ficha|#)?[:\s]*\d+/i', '', $courseInput));
+                $progNameClean = trim(preg_replace('/[—–\-]+/', ' ', $progNameClean));
+                $program = self::findOrCreateProgram(!empty($progNameClean) ? $progNameClean : $courseInput);
+
+                $municipalityId = DB::table('municipalities')->value('id') ?? 1;
+                $course = Course::firstOrCreate(
+                    ['code' => $cleanFicha],
+                    [
+                        'program_id'      => $program ? $program->id : 1,
+                        'municipality_id' => $municipalityId,
+                        'start_date'      => now()->subYears(2)->toDateString(),
+                        'end_date'        => now()->toDateString(),
+                        'status'          => 'Activo',
+                    ]
+                );
+                $course->load('program');
+            }
+
+            if (!$course) {
+                $course = Course::with('program')->first();
+            }
+
+            $resolvedCourseId = $course ? $course->id : 1;
+            $programaNombre = ($course && $course->program) 
+                ? ($course->program->name . ' (Ficha ' . $course->code . ')') 
+                : (!empty($courseInput) ? $courseInput : 'Formación CEFA La Angostura');
+
+            // Vincular registro en Aprendiz
             $apprentice = Apprentice::firstOrNew(['person_id' => $person->id]);
-            $apprentice->course_id = (int) $request->course_id;
+            $apprentice->course_id = $resolvedCourseId;
             $apprentice->apprentice_status = self::normalizeApprenticeStatus($request->input('estado_egresado', 'CERTIFICADO'));
             $apprentice->save();
 
             DB::commit();
-
-            // Obtener nombre del programa / ficha formativa
-            $course = \Modules\SICA\Entities\Course::with('program')->find($request->course_id);
-            $programaNombre = ($course && $course->program) ? $course->program->name : 'Formación CEFA La Angostura';
 
             // 6. Registrar contraseña elegida en el archivo de contraseñas actualizadas
             try {
@@ -391,9 +454,9 @@ class EgresadosController extends Controller
                     'documento' => (string)$person->document_number,
                     'nombre' => $nombreCompleto,
                     'email' => $cleanEmail,
-                    'telefono' => $request->input('telephone', ''),
+                    'telefono' => $request->input('telephone1', $request->input('telephone', '')),
                     'genero' => $request->input('gender', ''),
-                    'course_id' => (int)$request->course_id,
+                    'course_id' => $resolvedCourseId,
                     'programa' => $programaNombre,
                     'fecha' => now()->toDateTimeString(),
                     'estado' => 'PENDIENTE',

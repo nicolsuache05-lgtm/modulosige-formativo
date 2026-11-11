@@ -393,21 +393,33 @@
                                     Programa de Formación / Ficha <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
-                                    <select id="course_id" name="course_id" required class="form-input-compact pl-9">
-                                        <option value="">-- Selecciona tu programa / ficha --</option>
+                                    <input type="text" 
+                                           id="course_id" 
+                                           name="course_id" 
+                                           list="courses_list" 
+                                           value="{{ old('course_id') }}" 
+                                           required 
+                                           placeholder="Escribe o selecciona tu programa / ficha formativa..." 
+                                           class="form-input-compact pl-9 pr-8"
+                                           autocomplete="off">
+                                    <i class="fa-solid fa-graduation-cap absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                                    <span class="absolute right-3 top-2.5 text-gray-400 pointer-events-none text-xs">
+                                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                    </span>
+                                    <datalist id="courses_list">
                                         @if(isset($courses) && count($courses) > 0)
                                             @foreach($courses as $course)
-                                                <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                                                    Ficha: {{ $course->code }} — {{ $course->program ? $course->program->name : 'Formación CEFA' }}
-                                                </option>
+                                                <option value="Ficha: {{ $course->code }} — {{ $course->program ? $course->program->name : 'Formación CEFA' }}">
                                             @endforeach
                                         @else
-                                            <option value="1">ADSO - Análisis y Desarrollo de Software (Ficha 598369)</option>
-                                            <option value="2">Gestión de Empresas Agropecuarias (Ficha 55555)</option>
+                                            <option value="ADSO - Análisis y Desarrollo de Software (Ficha 598369)">
+                                            <option value="Gestión de Empresas Agropecuarias (Ficha 55555)">
                                         @endif
-                                    </select>
-                                    <i class="fa-solid fa-graduation-cap absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                                    </datalist>
                                 </div>
+                                <span class="text-[10.5px] text-gray-500 mt-1 block">
+                                    <i class="fa-solid fa-pen-to-square text-[#39A900] mr-0.5"></i> Puedes escribir directamente tu programa y ficha, o elegir uno sugerido de la lista.
+                                </span>
                             </div>
 
                             <!-- Estado Actual de Graduación -->
