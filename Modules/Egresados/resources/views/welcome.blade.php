@@ -686,7 +686,7 @@
             <!-- Bottom Copyright -->
             <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4 font-sans font-medium text-center sm:text-left">
                 <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                    <p>© {{ date('Y') }} <strong class="text-white font-poppins">SIGE — Sistema de Gestión de Egresados</strong> • SENA Empresa. Todos los derechos reservados a</p>
+                    <p>© {{ date('Y') }} <strong class="text-white font-poppins">SIGE — Sistema de Gestión de Egresados</strong> • SENA Empresa. Todos los derechos reservados a los</p>
                     <a href="{{ route('egresados.autores') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#39A900] to-[#2d8500] hover:from-[#43be04] hover:to-[#39A900] text-white font-poppins font-bold text-xs shadow-md transition-all duration-200 hover:scale-105 border border-[#62E31D]/40 group" title="Ver equipo de desarrolladores de SIGE">
                         <i class="fa-solid fa-users text-[#62E31D] group-hover:text-white transition"></i>
                         <span>Desarrolladores</span>
