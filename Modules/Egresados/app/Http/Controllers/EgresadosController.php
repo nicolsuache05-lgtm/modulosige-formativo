@@ -1744,11 +1744,28 @@ class EgresadosController extends Controller
             return redirect()->back()->with('error', 'Este evento ya ha finalizado su fecha programada y no admite nuevos registros de asistencia.');
         }
 
-        // Si la respuesta es afirmativa (asistiré o virtual), incrementar registrados
+        // Evitar duplicar el conteo si el egresado ya estaba inscrito en este evento
+        $rsvpFile = storage_path('app/sige_eventos_rsvp.json');
+        $allRsvps = [];
+        $yaInscrito = false;
+        if (file_exists($rsvpFile)) {
+            $allRsvps = json_decode(@file_get_contents($rsvpFile), true) ?: [];
+            foreach ($allRsvps as $prev) {
+                $sameEvt = (string)($prev['evento_id'] ?? '') === (string)$id;
+                $sameUser = ($doc && (string)($prev['documento'] ?? '') === (string)$doc)
+                    || ($email && strcasecmp((string)($prev['email'] ?? ''), (string)$email) === 0);
+                if ($sameEvt && $sameUser) {
+                    $yaInscrito = true;
+                    break;
+                }
+            }
+        }
+
+        // Si la respuesta es afirmativa (asistiré o virtual), incrementar registrados (solo la primera vez)
         $cupo = max(1, (int)($targetEvento['cupo'] ?? 100));
         $registrados = (int)($targetEvento['registrados'] ?? 0);
 
-        if ($asistencia === 'si' || $asistencia === 'virtual' || $asistencia === 'confirmado') {
+        if (!$yaInscrito && ($asistencia === 'si' || $asistencia === 'virtual' || $asistencia === 'confirmado')) {
             $registrados++;
         }
 
@@ -1773,13 +1790,10 @@ class EgresadosController extends Controller
         ];
 
         try {
-            $rsvpFile = storage_path('app/sige_eventos_rsvp.json');
-            $allRsvps = [];
-            if (file_exists($rsvpFile)) {
-                $allRsvps = json_decode(@file_get_contents($rsvpFile), true) ?: [];
+            if (!$yaInscrito) {
+                $allRsvps[] = $rsvpData;
+                @file_put_contents($rsvpFile, json_encode($allRsvps, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             }
-            $allRsvps[] = $rsvpData;
-            @file_put_contents($rsvpFile, json_encode($allRsvps, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         // Notificar en tiempo real al Superadministrador e Instructores
         try {

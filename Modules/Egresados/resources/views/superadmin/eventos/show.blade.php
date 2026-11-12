@@ -87,6 +87,11 @@
         <!-- Tarjeta Hero de Información Principal -->
         <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 shadow-xs relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-50/50 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="mb-6 relative h-56 sm:h-72 rounded-2xl overflow-hidden bg-slate-900 border border-gray-200 shadow-sm z-10">
+                <img src="{{ $evento['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $evento['title'] ?? 'Evento Institucional' }}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#00131E]/65 via-transparent to-transparent"></div>
+            </div>
             
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 relative z-10">
                 <div class="space-y-3 max-w-3xl">

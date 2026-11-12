@@ -929,9 +929,13 @@
             <div class="bg-gray-50 px-6 py-3.5 border-t border-gray-200 flex flex-wrap items-center justify-between gap-2">
                 <span class="text-xs text-gray-500 font-medium">SIGE · CEFA La Angostura</span>
                 <div class="flex items-center gap-2">
-                    <a href="{{ Auth::check() ? route('egresados.egresado.eventos') : route('egresados.login') }}" class="px-4 py-2 rounded-xl bg-[#39A900] hover:bg-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-right-to-bracket text-[11px]"></i>
-                        <span>{{ Auth::check() ? 'Ir a Eventos' : 'Ingresar a SIGE' }}</span>
+                    <a id="modalEventoActionLink"
+                       data-logged-in="{{ Auth::check() ? '1' : '0' }}"
+                       data-base-url="{{ Auth::check() ? route('egresados.dashboard_egresado') : route('egresados.login') }}"
+                       href="{{ Auth::check() ? route('egresados.dashboard_egresado') . '?section=eventos' : route('egresados.login') }}"
+                       class="px-4 py-2 rounded-xl bg-[#39A900] hover:bg-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-ticket text-[11px]"></i>
+                        <span id="modalEventoActionLabel">{{ Auth::check() ? 'Inscribirme en el Evento' : 'Ingresar para Inscribirme' }}</span>
                     </a>
                     <button type="button" onclick="cerrarModalEvento()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#001A29] to-[#002336] hover:from-[#39A900] hover:to-[#2d8500] text-white text-xs font-bold transition shadow-sm font-poppins">
                         Cerrar
@@ -990,6 +994,22 @@
             const cupo = Number(evento.cupo || 0);
             document.getElementById('modalEventoCapacity').textContent = cupo > 0 ? `${reg} / ${cupo} participantes` : `${reg} registrados`;
             document.getElementById('modalEventoDescription').textContent = evento.description || 'Evento institucional organizado para la comunidad de egresados CEFA La Angostura.';
+
+            const actionLink = document.getElementById('modalEventoActionLink');
+            const actionLabel = document.getElementById('modalEventoActionLabel');
+            if (actionLink) {
+                const isLogged = actionLink.getAttribute('data-logged-in') === '1';
+                const baseUrl = actionLink.getAttribute('data-base-url') || '';
+                if (isLogged && baseUrl) {
+                    const evtIdParam = evento.id ? ('&evento=' + encodeURIComponent(evento.id)) : '';
+                    actionLink.href = baseUrl + '?section=eventos' + evtIdParam;
+                    if (actionLabel) {
+                        actionLabel.textContent = esActivo ? 'Inscribirme en el Evento' : 'Ver Eventos en SIGE';
+                    }
+                } else if (actionLabel) {
+                    actionLabel.textContent = esActivo ? 'Ingresar para Inscribirme' : 'Ingresar a SIGE';
+                }
+            }
 
             const modal = document.getElementById('modalVerEventoLanding');
             if (modal) {

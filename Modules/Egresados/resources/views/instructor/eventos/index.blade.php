@@ -479,6 +479,14 @@
         const tituloElem = document.getElementById('modalDetalleTitulo');
         if (tituloElem) tituloElem.innerText = data.title || 'Evento Institucional';
 
+        const imgWrap = document.getElementById('modalDetalleImgWrap');
+        const imgElem = document.getElementById('modalDetalleImg');
+        if (imgWrap && imgElem) {
+            const evtImg = (data.image || '').trim() || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80';
+            imgElem.src = evtImg;
+            imgWrap.classList.remove('hidden');
+        }
+
         const cupoElem = document.getElementById('modalDetalleCupo');
         if (cupoElem) cupoElem.innerText = data.cupo || 0;
 

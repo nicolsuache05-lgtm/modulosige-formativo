@@ -43,6 +43,17 @@
         <!-- Cuerpo del Modal con Scroll Suave -->
         <div class="px-6 sm:px-8 py-5 overflow-y-auto space-y-5 bg-[#f8fafc]/80">
             
+            <!-- 0. Foto / Portada del Evento -->
+            <div id="modalDetalleImgWrap" class="hidden relative h-48 sm:h-56 rounded-2xl overflow-hidden bg-slate-900 border border-gray-200 shadow-sm">
+                <img id="modalDetalleImg" src="" alt="Foto del Evento" class="w-full h-full object-cover" onerror="document.getElementById('modalDetalleImgWrap').classList.add('hidden')">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#00131E]/75 via-transparent to-transparent"></div>
+                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-[11px]">
+                    <span class="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full font-bold border border-white/15">
+                        <i class="fa-solid fa-image text-[#62E31D] mr-1"></i> Portada del Evento
+                    </span>
+                </div>
+            </div>
+
             <!-- 1. Tarjetas de Estadísticas de Aforo y Participación -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">

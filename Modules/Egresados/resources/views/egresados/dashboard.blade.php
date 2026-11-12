@@ -3182,6 +3182,9 @@
                   <i class="fa-solid fa-calendar-check"></i>
                 </div>
                 <div class="card-body-content">
+                  <div style="width: 100%; height: 170px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid #E2E8F0; background: #00131E; position: relative;">
+                    <img src="{{ $invItem['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $invItem['title'] ?? 'Evento Institucional' }}" class="event-card-img" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                  </div>
                   <div class="card-top-header">
                     <div>
                       <h3 class="card-title-text">{{ $invItem['title'] ?? 'Evento Institucional' }}</h3>
@@ -3217,23 +3220,35 @@
             @foreach($eventosDisponibles as $ev)
               @php
                 $evIdClean = 'event-' . preg_replace('/[^a-zA-Z0-9_\-]/', '', $ev['id'] ?? uniqid());
+                $evStatusUpper = strtoupper(trim($ev['status'] ?? 'PROGRAMADO'));
+                $evCerrado = in_array($evStatusUpper, ['REALIZADO', 'CANCELADO', 'FINALIZADO']);
               @endphp
               <div class="portal-item-card event-card-item" data-event-id="{{ $evIdClean }}">
-                <div class="card-icon-pill {{ ($ev['status'] ?? '') === 'PROGRAMADO' ? 'green' : 'blue' }}">
+                <div class="card-icon-pill {{ !$evCerrado ? 'green' : 'blue' }}">
                   <i class="fa-solid fa-calendar-check"></i>
                 </div>
                 <div class="card-body-content">
+                  <div style="width: 100%; height: 170px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 1px solid #E2E8F0; background: #00131E; position: relative;">
+                    <img src="{{ $ev['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $ev['title'] ?? 'Evento Institucional' }}" class="event-card-img" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                  </div>
                   <div class="card-top-header">
                     <div>
                       <h3 class="card-title-text">{{ $ev['title'] ?? 'Evento Institucional' }}</h3>
-                      <span class="card-tag-badge {{ ($ev['status'] ?? '') === 'PROGRAMADO' ? '' : 'blue' }}">
-                        {{ $ev['type'] ?? 'Institucional' }} · {{ $ev['status'] ?? 'PROGRAMADO' }}
+                      <span class="card-tag-badge {{ !$evCerrado ? '' : 'blue' }}">
+                        {{ $ev['type'] ?? 'Institucional' }} · {{ $evStatusUpper }}
                       </span>
                     </div>
-                    <button type="button" class="btn-green-submit" id="btn-inscribir-{{ $evIdClean }}" onclick="openInscripcionModal('{{ addslashes($ev['title'] ?? 'Evento') }}', this, '{{ $evIdClean }}')">
-                      <i class="fa-solid fa-ticket"></i>
-                      <span>Inscribirme</span>
-                    </button>
+                    @if($evCerrado)
+                      <button type="button" disabled style="padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                        <span>Evento Finalizado</span>
+                      </button>
+                    @else
+                      <button type="button" class="btn-green-submit" id="btn-inscribir-{{ $evIdClean }}" onclick="openInscripcionModal('{{ addslashes($ev['title'] ?? 'Evento') }}', this, '{{ $evIdClean }}')">
+                        <i class="fa-solid fa-ticket"></i>
+                        <span>Inscribirme</span>
+                      </button>
+                    @endif
                   </div>
                   <div class="card-meta-list">
                     <span><i class="fa-regular fa-calendar"></i> {{ $ev['date'] ?? 'Próximamente' }}</span>
@@ -3604,6 +3619,11 @@
 
     <!-- Contenido Principal del Modal -->
     <div style="padding: 24px 28px;">
+
+      <!-- IMAGEN DE PORTADA DEL EVENTO -->
+      <div id="modal-event-img-wrap" style="display: none; width: 100%; height: 195px; border-radius: 14px; overflow: hidden; margin-bottom: 18px; border: 1px solid #E2E8F0; background: #00131E;">
+        <img id="modal-event-img" src="" alt="Foto del Evento" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+      </div>
 
       <!-- FICHA TÉCNICA E INFORMACIÓN DETALLADA DEL EVENTO -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 18px 20px; margin-bottom: 22px;">
@@ -4988,7 +5008,8 @@
       program: 'Comunidad de Egresados SENA',
       responsible: 'Coordinación Académica & Egresados',
       description: 'Participa en esta actividad oficial diseñada para el fortalecimiento profesional, inserción laboral y networking de la comunidad de egresados del CEFA.',
-      cupo: 'Cupo: 200 asistentes'
+      cupo: 'Cupo: 200 asistentes',
+      image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80'
     };
 
     // 1. Buscar en arreglo backend de eventos
@@ -5005,10 +5026,15 @@
       if (foundEvt.responsible) eventData.responsible = foundEvt.responsible;
       if (foundEvt.description) eventData.description = foundEvt.description;
       if (foundEvt.cupo) eventData.cupo = 'Cupo Máximo: ' + foundEvt.cupo + ' asistentes';
+      if (foundEvt.image) eventData.image = foundEvt.image;
     }
 
     // 2. Extraer del DOM de la tarjeta (si está en pantalla)
     if (card) {
+      const cardImg = card.querySelector('.event-card-img');
+      if (cardImg && cardImg.getAttribute('src')) {
+        eventData.image = cardImg.getAttribute('src');
+      }
       const titleEl = card.querySelector('.card-title-text');
       if (titleEl && titleEl.textContent.trim()) {
         eventData.title = titleEl.textContent.trim();
@@ -5067,9 +5093,40 @@
     const cupoEl = document.getElementById('modal-event-cupo-text');
     if (cupoEl) cupoEl.textContent = eventData.cupo;
 
+    const imgWrapEl = document.getElementById('modal-event-img-wrap');
+    const imgEl = document.getElementById('modal-event-img');
+    if (imgWrapEl && imgEl) {
+      if (eventData.image) {
+        imgEl.src = eventData.image;
+        imgWrapEl.style.display = 'block';
+      } else {
+        imgWrapEl.style.display = 'none';
+      }
+    }
+
     const modal = document.getElementById('inscripcionModal');
     if (modal) modal.classList.add('active');
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const sec = params.get('section');
+      const evtId = params.get('evento');
+      if (sec === 'eventos' && typeof showSection === 'function') {
+        showSection('eventos');
+        if (evtId) {
+          const cleanEvt = String(evtId).replace(/^event-/, '');
+          const match = EVENTOS_LIST_DATA.find(e => String(e.id) === cleanEvt);
+          const cardId = 'event-' + cleanEvt.replace(/[^a-zA-Z0-9_\-]/g, '');
+          const btn = document.getElementById('btn-inscribir-' + cardId);
+          setTimeout(function() {
+            openInscripcionModal(match ? match.title : 'Evento Institucional', btn, cardId);
+          }, 120);
+        }
+      }
+    } catch (e) {}
+  });
 
   function closeInscripcionModal() {
     const modal = document.getElementById('inscripcionModal');
