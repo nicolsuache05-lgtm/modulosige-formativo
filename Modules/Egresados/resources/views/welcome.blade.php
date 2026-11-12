@@ -10,7 +10,6 @@
 
     $eventoDestacadoId = (string)(isset($eventoDestacado['id']) ? $eventoDestacado['id'] : 'EVT-012');
     $eventosLista = isset($eventosActivos) && is_array($eventosActivos) ? $eventosActivos : [];
-    $eventosAgenda = array_slice($eventosLista, 0, 6);
     $eventosJson = json_encode($eventosLista, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
@@ -520,82 +519,6 @@
                 <button type="button" onclick="irASlideSige(3)" class="sige-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/60 transition-all" title="Ir a Emprendimiento"></button>
                 <button type="button" onclick="irASlideSige(4)" class="sige-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-white/60 transition-all" title="Ir a Red de Egresados"></button>
             </div>
-
-            <!-- AGENDA EN VIVO: EVENTOS CREADOS EN LOS MÓDULOS DE EVENTOS -->
-            @if(!empty($eventosAgenda))
-            <div id="agenda-eventos-inicio" class="mt-14 pt-10 border-t border-white/10">
-                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
-                    <div>
-                        <span class="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#62E31D] font-poppins">
-                            <span class="w-2 h-2 rounded-full bg-[#62E31D] animate-pulse"></span>
-                            Agenda Institucional En Vivo
-                        </span>
-                        <h3 class="font-poppins text-2xl sm:text-3xl font-black text-white mt-1">
-                            Eventos SIGE Programados y Recientes
-                        </h3>
-                    </div>
-                    <button type="button" onclick="irASlideSige(1)" class="self-start sm:self-auto inline-flex items-center gap-2 text-xs font-bold text-[#62E31D] hover:text-white bg-white/5 hover:bg-[#39A900] border border-[#62E31D]/30 px-4 py-2 rounded-full transition font-poppins">
-                        <i class="fa-solid fa-calendar-check"></i>
-                        <span>Ver evento destacado en carrusel</span>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                    @foreach($eventosAgenda as $ev)
-                        @php
-                            $evStatus = strtoupper(trim($ev['status'] ?? 'PROGRAMADO'));
-                            $evActivo = in_array($evStatus, ['PROGRAMADO', 'EN CURSO', 'EN PREPARACIÓN']);
-                        @endphp
-                        <div data-evento-id="{{ $ev['id'] ?? '' }}" onclick="abrirModalEvento(this.getAttribute('data-evento-id'))" class="group rounded-2xl overflow-hidden bg-[#00131E]/85 hover:bg-[#001E2E] border {{ $evActivo ? 'border-[#39A900]/45' : 'border-white/10' }} hover:border-[#62E31D]/70 p-5 text-left transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1 flex flex-col justify-between">
-                            <div>
-                                <div class="relative h-40 -mx-5 -mt-5 mb-4 overflow-hidden bg-slate-900">
-                                    <img src="{{ $ev['image'] ?? 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $ev['title'] ?? 'Evento Institucional SIGE' }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#00131E] via-[#00131E]/25 to-transparent"></div>
-                                    <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-600/90 text-white shadow-sm font-poppins backdrop-blur-xs">
-                                            <i class="fa-solid fa-calendar-days text-[9px]"></i>
-                                            {{ $ev['type'] ?? 'Evento' }}
-                                        </span>
-                                        <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full font-poppins {{ $evActivo ? 'bg-[#39A900] text-white shadow-sm' : 'bg-black/65 text-gray-200 border border-white/15 backdrop-blur-xs' }}">
-                                            {{ $evStatus }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <h4 class="font-poppins font-extrabold text-base sm:text-lg text-white group-hover:text-[#62E31D] transition leading-snug line-clamp-2">
-                                    {{ $ev['title'] ?? 'Evento Institucional SIGE' }}
-                                </h4>
-
-                                <p class="font-sans text-xs sm:text-sm text-gray-300 mt-2 line-clamp-2 leading-relaxed">
-                                    {{ $ev['description'] ?? 'Participa en las actividades de actualización y encuentro de egresados CEFA.' }}
-                                </p>
-                            </div>
-
-                            <div class="mt-4 pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-300 font-sans">
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    @if(!empty($ev['date']))
-                                    <span class="inline-flex items-center gap-1 font-semibold text-[#62E31D]">
-                                        <i class="fa-regular fa-calendar text-[10px]"></i>
-                                        {{ $ev['date'] }}
-                                    </span>
-                                    @endif
-                                    @if(!empty($ev['location']))
-                                    <span class="inline-flex items-center gap-1 text-gray-300">
-                                        <i class="fa-solid fa-location-dot text-blue-400 text-[10px]"></i>
-                                        <span class="line-clamp-1 max-w-[140px]">{{ $ev['location'] }}</span>
-                                    </span>
-                                    @endif
-                                </div>
-                                <span class="inline-flex items-center gap-1 font-bold text-[#62E31D] group-hover:translate-x-0.5 transition font-poppins">
-                                    <span>Detalles</span>
-                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                                </span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
 
         </div>
     </section>
