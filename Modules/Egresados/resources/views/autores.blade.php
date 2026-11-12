@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipo de Autores y Desarrolladores · SIGE — SENA Empresa CEFA</title>
+    <title>Equipo de Desarrolladores · SIGE — SENA Empresa CEFA</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ route('egresados.assets.image', 'sige-egresado-favicon.png') }}">
@@ -108,7 +108,7 @@
 
             <!-- Título Principal -->
             <h1 class="text-3xl sm:text-5xl font-black font-poppins text-white tracking-tight mb-5 leading-tight">
-                Equipo de <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#62E31D] via-white to-[#62E31D]">Autores & Desarrolladores</span>
+                Equipo de <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#62E31D] via-white to-[#62E31D]">Desarrolladores</span>
             </h1>
 
             <p class="max-w-3xl mx-auto text-sm sm:text-base text-gray-300 font-normal leading-relaxed">

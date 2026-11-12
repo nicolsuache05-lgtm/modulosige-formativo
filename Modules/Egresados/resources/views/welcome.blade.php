@@ -341,10 +341,6 @@
             
             <!-- Encabezado de Sección estilo ERP -->
             <div class="text-center max-w-3xl mx-auto mb-10">
-                <span class="inline-flex items-center gap-2 bg-[#EAF7EE]/10 text-[#62E31D] border border-[#62E31D]/30 text-xs font-black tracking-widest uppercase px-3.5 py-1 rounded-full mb-3 font-poppins">
-                    <span class="w-2 h-2 rounded-full bg-[#62E31D] animate-pulse"></span>
-                    Ecosistema Institucional
-                </span>
                 <h2 class="font-poppins text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
                     ¿Qué encuentras en SIGE?
                 </h2>
@@ -693,7 +689,6 @@
                         <i class="fa-solid fa-arrow-right text-[10px] opacity-80"></i>
                     </a>
                 </div>
-                <p class="text-[#62E31D] font-bold font-poppins shrink-0">Centro de Formación Agroindustrial "La Angostura"</p>
             </div>
 
         </div>
