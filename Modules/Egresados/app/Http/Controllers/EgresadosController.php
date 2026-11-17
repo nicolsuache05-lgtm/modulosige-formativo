@@ -769,7 +769,7 @@ class EgresadosController extends Controller
      */
     public function welcome()
     {
-        $totalEgresados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEgresados = Apprentice::whereHas('person')->count();
         $totalEmpleados = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
         $totalEmprendedores = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
         $totalEstudiantes = Apprentice::where('apprentice_status', 'EN FORMACIÓN')->count();
@@ -814,11 +814,7 @@ class EgresadosController extends Controller
      */
     public function dashboard()
     {
-        $baseQuery = Apprentice::withTrashed()->where(function($q) {
-            $q->whereHas('person.users.roles', function($rq) {
-                $rq->where('slug', 'egresados.egresado');
-            })->orWhere('apprentice_status', 'CERTIFICADO');
-        });
+        $baseQuery = Apprentice::withTrashed()->whereHas('person');
 
         $totalEgresados = (clone $baseQuery)->count();
         $totalActivos = (clone $baseQuery)->whereNull('apprentices.deleted_at')
@@ -865,17 +861,6 @@ class EgresadosController extends Controller
             ->join('courses', 'programs.id', '=', 'courses.program_id')
             ->join('apprentices', 'courses.id', '=', 'apprentices.course_id')
             ->whereNull('apprentices.deleted_at')
-            ->where(function($q) {
-                $q->whereExists(function($sub) {
-                    $sub->select(DB::raw(1))
-                        ->from('people')
-                        ->join('users', 'people.id', '=', 'users.person_id')
-                        ->join('role_user', 'users.id', '=', 'role_user.user_id')
-                        ->join('roles', 'role_user.role_id', '=', 'roles.id')
-                        ->whereColumn('people.id', 'apprentices.person_id')
-                        ->where('roles.slug', 'egresados.egresado');
-                })->orWhere('apprentices.apprentice_status', 'CERTIFICADO');
-            })
             ->select('programs.name', DB::raw('count(apprentices.id) as total'))
             ->groupBy('programs.id', 'programs.name')
             ->orderByDesc('total')
@@ -2134,14 +2119,10 @@ class EgresadosController extends Controller
      */
     public function index(Request $request)
     {
-        // Consulta base: Egresados vinculados a SIGE o con estado CERTIFICADO (incluyendo soft-deleted del módulo para permitir activar/desactivar)
+        // Consulta base: Egresados y Aprendices registrados en el ERP
         $query = Apprentice::withTrashed()
             ->with(['person.users.roles', 'course.program'])
-            ->where(function($q) {
-                $q->whereHas('person.users.roles', function($rq) {
-                    $rq->where('slug', 'egresados.egresado');
-                })->orWhere('apprentice_status', 'CERTIFICADO');
-            });
+            ->whereHas('person');
 
         // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
@@ -2171,11 +2152,7 @@ class EgresadosController extends Controller
         $egresados = $query->orderBy('id', 'desc')->paginate(10);
 
         // Estadísticas de egresados de este módulo
-        $baseCount = Apprentice::withTrashed()->where(function($q) {
-            $q->whereHas('person.users.roles', function($rq) {
-                $rq->where('slug', 'egresados.egresado');
-            })->orWhere('apprentice_status', 'CERTIFICADO');
-        });
+        $baseCount = Apprentice::withTrashed()->whereHas('person');
 
         $totalEgresados = (clone $baseCount)->count();
         $totalActivos = (clone $baseCount)->whereNull('deleted_at')->whereNotIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO'])->count();
@@ -2209,11 +2186,7 @@ class EgresadosController extends Controller
     {
         $query = Apprentice::withTrashed()
             ->with(['person.users.roles', 'course.program'])
-            ->where(function($q) {
-                $q->whereHas('person.users.roles', function($rq) {
-                    $rq->where('slug', 'egresados.egresado');
-                })->orWhere('apprentice_status', 'CERTIFICADO');
-            });
+            ->whereHas('person');
 
         // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
@@ -3289,6 +3262,26 @@ class EgresadosController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error en sincronizarSicefa: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Ocurrió un error al sincronizar con SIGE: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sincroniza instructores institucionales desde la API de SIGE.
+     */
+    public function sincronizarInstructores(Request $request, \Modules\Egresados\Services\SigeSyncService $syncService)
+    {
+        try {
+            $resultado = $syncService->syncInstructores();
+            if ($resultado['success']) {
+                $total = $resultado['total_procesados'];
+                $paginas = $resultado['paginas'];
+                return redirect()->back()->with('success', "¡Sincronización de Instructores ejecutada exitosamente! Se procesaron {$total} registros en {$paginas} lotes sin duplicados.");
+            } else {
+                return redirect()->back()->with('warning', 'La sincronización finalizó con observaciones: ' . ($resultado['error'] ?? 'Sin datos recibidos.'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error en sincronizarInstructores: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocurrió un error al sincronizar instructores: ' . $e->getMessage());
         }
     }
 

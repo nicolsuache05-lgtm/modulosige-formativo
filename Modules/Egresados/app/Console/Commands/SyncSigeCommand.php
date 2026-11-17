@@ -16,6 +16,7 @@ class SyncSigeCommand extends Command
                             {--page=1 : Página de inicio para la consulta}
                             {--limit=500 : Tamaño del lote por página}
                             {--max-pages= : Límite máximo de páginas a consultar}
+                            {--type=all : Tipo de datos a sincronizar (all, egresados, instructores)}
                             {--mock : Ejecuta una prueba local masiva de rendimiento con registros sintéticos}
                             {--count=5000 : Cantidad de registros para la prueba mock (ej. 5000 o 10000)}';
 
@@ -67,12 +68,36 @@ class SyncSigeCommand extends Command
             $bar->finish();
             $this->newLine(2);
         } else {
-            $this->comment("📡 Consultando API de SIGE en lotes de {$limit} registros...");
-            
-            $bar = null;
-            $resultado = $service->syncAll(function ($pagina, $procesadosLote, $totalSoFar) {
-                $this->line("   📦 Página {$pagina}: {$procesadosLote} registros procesados con UPSERT SQL (Total acumulado: {$totalSoFar})");
-            }, $limit, $maxPages);
+            $type = strtolower((string) $this->option('type'));
+            $resultado = ['success' => true, 'total_procesados' => 0, 'paginas' => 0];
+
+            if ($type === 'instructores') {
+                $this->comment("📡 Consultando API de SIGE (Instructores) en lotes de {$limit} registros...");
+                $resultado = $service->syncInstructores(function ($pagina, $procesadosLote, $totalSoFar) {
+                    $this->line("   👨‍🏫 Lote {$pagina}: {$procesadosLote} instructores procesados con UPSERT SQL (Total: {$totalSoFar})");
+                }, $limit, $maxPages);
+            } elseif ($type === 'egresados') {
+                $this->comment("📡 Consultando API de SIGE (Egresados) en lotes de {$limit} registros...");
+                $resultado = $service->syncAll(function ($pagina, $procesadosLote, $totalSoFar) {
+                    $this->line("   📦 Lote {$pagina}: {$procesadosLote} egresados procesados con UPSERT SQL (Total: {$totalSoFar})");
+                }, $limit, $maxPages);
+            } else {
+                $this->comment("📡 Consultando API de SIGE (Egresados e Instructores) en lotes de {$limit} registros...");
+                $resEgresados = $service->syncAll(function ($pagina, $procesadosLote, $totalSoFar) {
+                    $this->line("   🎓 [Egresados] Lote {$pagina}: {$procesadosLote} procesados (Total: {$totalSoFar})");
+                }, $limit, $maxPages);
+
+                $resInstructores = $service->syncInstructores(function ($pagina, $procesadosLote, $totalSoFar) {
+                    $this->line("   👨‍🏫 [Instructores] Lote {$pagina}: {$procesadosLote} procesados (Total: {$totalSoFar})");
+                }, $limit, $maxPages);
+
+                $resultado = [
+                    'success'          => ($resEgresados['success'] ?? false) || ($resInstructores['success'] ?? false),
+                    'total_procesados' => ($resEgresados['total_procesados'] ?? 0) + ($resInstructores['total_procesados'] ?? 0),
+                    'paginas'          => ($resEgresados['paginas'] ?? 0) + ($resInstructores['paginas'] ?? 0),
+                    'error'            => trim(($resEgresados['error'] ?? '') . ' ' . ($resInstructores['error'] ?? '')),
+                ];
+            }
 
             $this->newLine();
         }

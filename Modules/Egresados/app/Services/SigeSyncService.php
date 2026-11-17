@@ -193,6 +193,286 @@ class SigeSyncService
     }
 
     /**
+     * Sincroniza instructores desde la API de SIGE en lotes iterativos.
+     * Mapea estrictamente a las tablas nativas del ERP: people, users, role_user y courses.
+     *
+     * @param callable|null $onProgress Callback invocado por cada lote
+     * @param int|null $perPage Tamaño de cada página consultada
+     * @param int|null $maxPages Límite opcional de páginas
+     * @return array Resumen de la sincronización
+     */
+    public function syncInstructores(?callable $onProgress = null, ?int $perPage = null, ?int $maxPages = null): array
+    {
+        @set_time_limit(600);
+
+        $pagina = 1;
+        $porPagina = $perPage ?: $this->defaultPerPage;
+        $totalProcesados = 0;
+        $hayMasPaginas = true;
+
+        $this->preloadMasterData();
+
+        while ($hayMasPaginas) {
+            if ($maxPages !== null && $pagina > $maxPages) {
+                break;
+            }
+
+            $endpoint = rtrim($this->baseUrl, '/') . '/instructores';
+            $client = Http::timeout($this->timeout);
+
+            if (!empty($this->token)) {
+                $client = $client->withToken($this->token);
+            }
+
+            try {
+                $response = $client->get($endpoint, [
+                    'page'     => $pagina,
+                    'per_page' => $porPagina,
+                    'limit'    => $porPagina,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error("Excepción de red al conectar con API SIGE /instructores en página {$pagina}: " . $e->getMessage());
+                return [
+                    'success'          => false,
+                    'error'            => 'Error de conexión con la API de SIGE (Instructores): ' . $e->getMessage(),
+                    'total_procesados' => $totalProcesados,
+                    'paginas'          => $pagina - 1,
+                ];
+            }
+
+            if ($response->failed()) {
+                Log::error("Error HTTP en API SIGE /instructores en página {$pagina}", [
+                    'status' => $response->status(),
+                    'error'  => $response->body(),
+                ]);
+                return [
+                    'success'          => false,
+                    'error'            => "Respuesta HTTP {$response->status()} en página {$pagina}",
+                    'total_procesados' => $totalProcesados,
+                    'paginas'          => $pagina - 1,
+                ];
+            }
+
+            $datos = $response->json('data') ?? $response->json('instructores') ?? $response->json() ?? [];
+
+            if (!is_array($datos) || empty($datos)) {
+                $hayMasPaginas = false;
+                break;
+            }
+
+            if (isset($datos['data']) && is_array($datos['data'])) {
+                $datos = $datos['data'];
+            }
+
+            $procesadosEnLote = $this->upsertInstructoresChunk($datos);
+            $totalProcesados += $procesadosEnLote;
+
+            if ($onProgress) {
+                $onProgress($pagina, $procesadosEnLote, $totalProcesados);
+            }
+
+            $meta = $response->json('meta');
+            if ($meta && isset($meta['last_page'])) {
+                $hayMasPaginas = $pagina < (int) $meta['last_page'];
+            } elseif ($meta && isset($meta['total_pages'])) {
+                $hayMasPaginas = $pagina < (int) $meta['total_pages'];
+            } elseif ($response->json('next_page_url')) {
+                $hayMasPaginas = true;
+            } else {
+                $hayMasPaginas = count($datos) >= $porPagina;
+            }
+
+            unset($datos, $response);
+            $pagina++;
+        }
+
+        return [
+            'success'          => true,
+            'total_procesados' => $totalProcesados,
+            'paginas'          => $pagina - 1,
+        ];
+    }
+
+    /**
+     * Procesa un lote de instructores mediante UPSERT SQL masivo en las tablas nativas
+     * del ERP (people, users, role_user, courses) sin crear tablas redundantes.
+     *
+     * @param array $items Registros de instructores recibidos
+     * @return int Cantidad de instructores procesados
+     */
+    public function upsertInstructoresChunk(array $items): int
+    {
+        if (empty($items)) {
+            return 0;
+        }
+
+        $this->preloadMasterData();
+
+        $mapDocTypes = [
+            'CC'                             => 'Cédula de ciudadanía',
+            'CEDULA'                         => 'Cédula de ciudadanía',
+            'CEDULA DE CIUDADANIA'           => 'Cédula de ciudadanía',
+            'CE'                             => 'Cédula de extranjería',
+            'TI'                             => 'Tarjeta de identidad',
+            'PAS'                            => 'Pasaporte',
+            'PASAPORTE'                      => 'Pasaporte',
+            'DNI'                            => 'Documento nacional de identidad',
+            'PEP'                            => 'Permiso de Protección Temporal',
+            'PPT'                            => 'Permiso de Protección Temporal',
+        ];
+
+        $now = now()->toDateTimeString();
+        $peopleBatch = [];
+        $itemsByDoc = [];
+        $seenEmailsInBatch = [];
+        $seenTelsInBatch = [];
+
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+
+            $rawDoc = $item['numero_documento'] ?? $item['documento'] ?? $item['identificacion'] ?? $item['document_number'] ?? null;
+            if ($rawDoc === null) continue;
+
+            $docNum = (int) preg_replace('/[^0-9]/', '', (string) $rawDoc);
+            if ($docNum <= 0) continue;
+
+            $rawDocType = strtoupper(trim((string) ($item['tipo_documento'] ?? $item['tipo'] ?? 'CC')));
+            $cleanDocTypeKey = str_replace(['Á','É','Í','Ó','Ú'], ['A','E','I','O','U'], $rawDocType);
+            $docType = $mapDocTypes[$cleanDocTypeKey] ?? 'Cédula de ciudadanía';
+
+            $rawFirstName = trim((string) ($item['nombres'] ?? $item['first_name'] ?? ''));
+            $rawLastName  = trim((string) ($item['apellidos'] ?? $item['first_last_name'] ?? ''));
+
+            if ($rawFirstName === '' && !empty($item['nombre_completo'])) {
+                $partes = preg_split('/\s+/', trim((string) $item['nombre_completo']));
+                $rawFirstName = $partes[0] ?? 'Instructor';
+                $rawLastName  = isset($partes[1]) ? implode(' ', array_slice($partes, 1)) : 'SENA';
+            }
+
+            $firstName = $rawFirstName !== '' ? substr($rawFirstName, 0, 100) : 'Instructor';
+            $firstLastName = $rawLastName !== '' ? substr($rawLastName, 0, 100) : 'SENA';
+            $secondLastName = !empty($item['segundo_apellido']) ? substr(trim((string) $item['segundo_apellido']), 0, 100) : null;
+
+            $rawEmail = strtolower(trim((string) ($item['correo'] ?? $item['email'] ?? $item['correo_electronico'] ?? '')));
+            $cleanEmail = filter_var($rawEmail, FILTER_VALIDATE_EMAIL) ? substr($rawEmail, 0, 150) : null;
+            if ($cleanEmail) {
+                if (isset($seenEmailsInBatch[$cleanEmail]) && $seenEmailsInBatch[$cleanEmail] !== $docNum) {
+                    $cleanEmail = null;
+                } else {
+                    $seenEmailsInBatch[$cleanEmail] = $docNum;
+                }
+            }
+
+            $rawTel = preg_replace('/[^0-9]/', '', (string) ($item['telefono'] ?? $item['celular'] ?? ''));
+            $cleanTel = ($rawTel !== '' && strlen($rawTel) >= 7 && strlen($rawTel) <= 15) ? (int) substr($rawTel, 0, 15) : null;
+            if ($cleanTel) {
+                if (isset($seenTelsInBatch[$cleanTel]) && $seenTelsInBatch[$cleanTel] !== $docNum) {
+                    $cleanTel = null;
+                } else {
+                    $seenTelsInBatch[$cleanTel] = $docNum;
+                }
+            }
+
+            $peopleBatch[$docNum] = [
+                'document_type'        => $docType,
+                'document_number'      => $docNum,
+                'first_name'           => $firstName,
+                'first_last_name'      => $firstLastName,
+                'second_last_name'     => $secondLastName,
+                'personal_email'       => $cleanEmail,
+                'misena_email'         => $cleanEmail,
+                'telephone1'           => $cleanTel,
+                'eps_id'               => $this->defaultEpsId,
+                'population_group_id'  => $this->defaultPopulationGroupId,
+                'pension_entity_id'    => $this->defaultPensionEntityId,
+                'created_at'           => $now,
+                'updated_at'           => $now,
+            ];
+
+            $itemsByDoc[$docNum] = $item;
+        }
+
+        if (empty($peopleBatch)) return 0;
+
+        // 1. UPSERT masivo en la tabla `people`
+        DB::table('people')->upsert(
+            array_values($peopleBatch),
+            ['document_number'],
+            ['document_type', 'first_name', 'first_last_name', 'second_last_name', 'personal_email', 'misena_email', 'telephone1', 'updated_at']
+        );
+
+        // 2. Mapear person_ids generados / existentes
+        $docNumbers = array_keys($peopleBatch);
+        $personIdMap = DB::table('people')
+            ->whereIn('document_number', $docNumbers)
+            ->pluck('id', 'document_number')
+            ->toArray();
+
+        // 3. Crear / vincular en `users` y asignar rol `egresados.instructor`
+        $roleInstructor = DB::table('roles')->where('slug', 'egresados.instructor')->first();
+        if (!$roleInstructor) {
+            $app = DB::table('apps')->where('name', 'like', '%Egresados%')->orWhere('url', 'like', '%egresados%')->first();
+            $roleId = DB::table('roles')->insertGetId([
+                'slug'                => 'egresados.instructor',
+                'name'                => 'Instructor Egresados',
+                'description'         => 'Docente o evaluador de seguimiento a egresados en CEFA La Angostura',
+                'description_english' => 'Instructor / Trainer tracking graduates at CEFA',
+                'full_access'         => 'No',
+                'app_id'              => $app ? $app->id : 30,
+                'created_at'          => $now,
+                'updated_at'          => $now,
+            ]);
+            $roleInstructor = (object) ['id' => $roleId];
+        }
+
+        foreach ($personIdMap as $docNum => $pId) {
+            $user = DB::table('users')->where('person_id', $pId)->first();
+            $item = $itemsByDoc[$docNum] ?? [];
+            $personData = $peopleBatch[$docNum] ?? [];
+            $cleanEmail = $personData['personal_email'] ?? "instructor.{$docNum}@sena.edu.co";
+
+            if (!$user) {
+                $baseNickname = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', ($personData['first_name'] ?? 'inst') . '.' . ($personData['first_last_name'] ?? 'sena')));
+                $nickname = $baseNickname ?: 'instructor.' . $docNum;
+                $userId = DB::table('users')->insertGetId([
+                    'email'      => $cleanEmail,
+                    'nickname'   => $nickname,
+                    'password'   => \Illuminate\Support\Facades\Hash::make((string)$docNum),
+                    'person_id'  => $pId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            } else {
+                $userId = $user->id;
+            }
+
+            // Asignar rol institucional de instructor en ERP
+            $hasRole = DB::table('role_user')->where('user_id', $userId)->where('role_id', $roleInstructor->id)->exists();
+            if (!$hasRole) {
+                DB::table('role_user')->insert([
+                    'role_id'    => $roleInstructor->id,
+                    'user_id'    => $userId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+
+            // 4. Si viene ficha asignada, vincular en courses.person_id
+            $rawFicha = preg_replace('/[^0-9]/', '', (string) ($item['ficha'] ?? $item['codigo_ficha'] ?? ''));
+            if (!empty($rawFicha)) {
+                DB::table('courses')->where('code', $rawFicha)->update([
+                    'person_id'  => $pId,
+                    'updated_at' => $now,
+                ]);
+            }
+        }
+
+        $count = count($peopleBatch);
+        unset($peopleBatch, $itemsByDoc, $docNumbers, $personIdMap);
+        return $count;
+    }
+
+    /**
      * Procesa un lote (chunk de 500 registros) mediante UPSERT SQL masivo en las tablas
      * nativas del ERP (people y apprentices), eliminando consultas 1 a 1 y N+1.
      *

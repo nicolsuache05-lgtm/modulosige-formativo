@@ -17,12 +17,12 @@ class ReportesController extends Controller
     public function index(Request $request)
     {
         // Métricas reales y dinámicas
-        $totalEgresadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmpleadosCount = $totalEgresadosCount;
-        $totalEmprendedoresCount = 0;
-        $totalDesempleadosCount = 0;
+        $totalEgresadosCount = Apprentice::whereHas('person')->count();
+        $totalEmpleadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalEmprendedoresCount = Apprentice::where('apprentice_status', 'INDUCCIÓN')->count();
+        $totalDesempleadosCount = max(0, $totalEgresadosCount - $totalEmpleadosCount - $totalEmprendedoresCount);
         
-        $rateValue = $totalEgresadosCount > 0 ? 100 : 0;
+        $rateValue = $totalEgresadosCount > 0 ? round(($totalEmpleadosCount / $totalEgresadosCount) * 100) : 0;
         $tasaEmpleabilidad = $rateValue . '%';
 
         $totalGenerados = session('custom_reports') ? count(session('custom_reports')) + 5 : 5;

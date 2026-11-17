@@ -87,6 +87,7 @@ Route::middleware([PreventBackHistory::class, SigeSessionTimeout::class, CheckEg
 
     // Sincronización SICEFA e Importación Masiva Excel
     Route::post('egresados/superadmin/sincronizar', [EgresadosController::class, 'sincronizarSicefa'])->name('egresados.superadmin.sincronizar');
+    Route::post('egresados/superadmin/sincronizar-instructores', [EgresadosController::class, 'sincronizarInstructores'])->name('egresados.superadmin.sincronizar_instructores');
     Route::post('egresados/superadmin/importar', [EgresadosController::class, 'importarExcel'])->name('egresados.superadmin.importar');
 
     // Gestión de instructores y evaluadores

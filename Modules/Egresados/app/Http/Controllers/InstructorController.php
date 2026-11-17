@@ -19,18 +19,7 @@ class InstructorController extends Controller
         $courses = Course::with('program')->get();
         $totalFichas = $courses->count() ?: 6;
 
-        $baseQuery = Apprentice::whereNull('apprentices.deleted_at')
-            ->where(function($q) {
-                $q->whereExists(function($sub) {
-                    $sub->select(DB::raw(1))
-                        ->from('people')
-                        ->join('users', 'people.id', '=', 'users.person_id')
-                        ->join('role_user', 'users.id', '=', 'role_user.user_id')
-                        ->join('roles', 'role_user.role_id', '=', 'roles.id')
-                        ->whereColumn('people.id', 'apprentices.person_id')
-                        ->where('roles.slug', 'egresados.egresado');
-                })->orWhere('apprentices.apprentice_status', 'CERTIFICADO');
-            });
+        $baseQuery = Apprentice::whereNull('apprentices.deleted_at')->whereHas('person');
 
         $totalEgresados = (clone $baseQuery)->count();
         $totalActivos = $totalEgresados;
@@ -110,14 +99,10 @@ class InstructorController extends Controller
      */
     public function directorio(Request $request)
     {
-        // Consulta base: Egresados vinculados a SIGE o con estado CERTIFICADO (incluyendo soft-deleted del módulo para permitir activar/desactivar)
+        // Consulta base: Egresados y Aprendices registrados en el ERP
         $query = Apprentice::withTrashed()
             ->with(['person.users.roles', 'course.program'])
-            ->where(function($q) {
-                $q->whereHas('person.users.roles', function($rq) {
-                    $rq->where('slug', 'egresados.egresado');
-                })->orWhere('apprentice_status', 'CERTIFICADO');
-            });
+            ->whereHas('person');
 
         // Búsqueda por nombre, apellido o número de documento
         if ($request->filled('search')) {
@@ -154,11 +139,7 @@ class InstructorController extends Controller
         $apprentices = $egresados;
 
         // Estadísticas de egresados de este módulo
-        $baseCount = Apprentice::withTrashed()->where(function($q) {
-            $q->whereHas('person.users.roles', function($rq) {
-                $rq->where('slug', 'egresados.egresado');
-            })->orWhere('apprentice_status', 'CERTIFICADO');
-        });
+        $baseCount = Apprentice::withTrashed()->whereHas('person');
 
         $totalEgresados = (clone $baseCount)->count() ?: 6;
         $totalActivos = (clone $baseCount)->whereNull('deleted_at')->whereNotIn('apprentice_status', ['CANCELADO', 'RETIRO VOLUNTARIO'])->count() ?: $totalEgresados;
@@ -195,9 +176,9 @@ class InstructorController extends Controller
      */
     public function reportes(Request $request)
     {
-        $totalEgresadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
-        $totalEmpleadosCount = $totalEgresadosCount;
-        $totalDesempleadosCount = 0;
+        $totalEgresadosCount = Apprentice::whereHas('person')->count();
+        $totalEmpleadosCount = Apprentice::where('apprentice_status', 'CERTIFICADO')->count();
+        $totalDesempleadosCount = max(0, $totalEgresadosCount - $totalEmpleadosCount);
         
         $rateValue = $totalEgresadosCount > 0 ? 100 : 0;
         $tasaEmpleabilidad = $rateValue . '%';
