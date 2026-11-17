@@ -1,5 +1,20 @@
-<!-- Modules/Egresados/Resources/views/superadmin/encuestas/partials/_modal_crear.blade.php -->
+<!-- Modules/Egresados/Resources/views/instructor/encuestas/partials/_modal_crear.blade.php -->
 <!-- MODAL DE CREACIÓN / CONSTRUCTOR DE ENCUESTAS INSTITUCIONALES SENA ERP -->
+@php
+    if (!isset($courses) || empty($courses) || (is_object($courses) && $courses->isEmpty())) {
+        try {
+            $courses = \Modules\SICA\Entities\Course::with('program')
+                ->whereHas('apprentices')
+                ->orderBy('code')
+                ->get();
+            if ($courses->isEmpty()) {
+                $courses = \Modules\SICA\Entities\Course::with('program')->orderBy('code')->get();
+            }
+        } catch (\Throwable $e) {
+            $courses = collect([]);
+        }
+    }
+@endphp
 
 <div x-show="openModal" 
      style="display: none;"
@@ -27,6 +42,57 @@
             preguntas: [
                 { id: Date.now(), texto: '', tipo: 'opcion_multiple', opciones: ['Totalmente de acuerdo', 'De acuerdo', 'En desacuerdo'], obligatoria: true }
             ],
+            publicoObjetivo: 'Todos los Egresados (General CEFA)',
+            publicoError: '',
+            codigosFichas: {{ json_encode($courses->pluck('code')->map(fn($c) => (string)$c)->toArray()) }},
+            labelsFichas: {{ json_encode($courses->map(fn($c) => 'Ficha ' . $c->code . ' - ' . ($c->program ? $c->program->name : 'General'))->toArray()) }},
+            
+            validarPublico() {
+                const v = (this.publicoObjetivo || '').trim();
+                if (!v) {
+                    this.publicoError = 'Digite un dato correcto. Debe indicar el público objetivo.';
+                    return false;
+                }
+                const lower = v.toLowerCase();
+                // Cobertura general para todos los egresados
+                if (lower.includes('todos los egresados') || lower.includes('todas las especialidades') || lower === 'todos' || lower === 'general') {
+                    this.publicoError = '';
+                    return true;
+                }
+                // Si escribió el código exacto de la ficha (Ej: 3312595) o contiene la ficha
+                const codeFound = this.codigosFichas.find(c => c === v || (v.length >= 4 && v.includes(c)));
+                if (codeFound) {
+                    const fullMatch = this.labelsFichas.find(l => l.includes(codeFound));
+                    if (fullMatch && (v === codeFound || v === 'Ficha ' + codeFound)) {
+                        this.publicoObjetivo = fullMatch;
+                    }
+                    this.publicoError = '';
+                    return true;
+                }
+                // Si coincide con el label completo o parte del nombre
+                const labelFound = this.labelsFichas.find(l => l.toLowerCase() === lower || (lower.startsWith('ficha ') && l.toLowerCase().includes(lower)));
+                if (labelFound) {
+                    this.publicoObjetivo = labelFound;
+                    this.publicoError = '';
+                    return true;
+                }
+
+                this.publicoError = 'Digite un dato correcto. Debe seleccionar \'Todos los Egresados\' o una ficha válida registrada en el sistema.';
+                return false;
+            },
+
+            validarFormulario(e) {
+                if (!this.validarPublico()) {
+                    e.preventDefault();
+                    const inputEl = document.getElementById('input_publico_objetivo_inst');
+                    if (inputEl) {
+                        inputEl.focus();
+                        inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return false;
+                }
+                return true;
+            },
             agregarPregunta() {
                 this.preguntas.push({ 
                     id: Date.now() + Math.random(), 
@@ -71,7 +137,11 @@
 
         <!-- Cuerpo del Formulario con Scroll Suave -->
         <div class="px-6 sm:px-8 py-6 overflow-y-auto space-y-6 bg-[#f8fafc]/80">
-            <form id="form-crear-encuesta" action="{{ route('egresados.instructor.encuestas.store') }}" method="POST" class="space-y-6">
+            <form id="form-crear-encuesta" 
+                  action="{{ route('egresados.instructor.encuestas.store') }}" 
+                  method="POST" 
+                  @submit="validarFormulario($event)"
+                  class="space-y-6">
                 @csrf
                 
                 <!-- Input serializado con las preguntas para el backend -->
@@ -114,29 +184,76 @@
                     </div>
 
                     <!-- Parámetros en 2 columnas -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                        <div>
-                            <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-users text-[#39A900]"></i>
-                                <span>Público Objetivo (Egresados)</span>
-                                <span class="text-red-500">*</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                        <!-- PÚBLICO OBJETIVO: TODOS LOS EGRESADOS O FICHA DE APRENDICES -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-users text-[#39A900]"></i>
+                                    <span>PÚBLICO OBJETIVO (EGRESADOS)</span>
+                                    <span class="text-red-500">*</span>
+                                </span>
+                                <span class="text-[10px] text-gray-400 font-normal">Escribe la ficha o escoge del listado</span>
                             </label>
-                            <input type="text"
-                                   name="publico_objetivo"
-                                   list="publicoObjetivoSugeridoInstructor"
-                                   required
-                                   placeholder="Escribe el público objetivo (Ej. Todos los Egresados, ADSO)..."
-                                   class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
-                            <datalist id="publicoObjetivoSugeridoInstructor">
-                                <option value="Todos los Egresados (General CEFA)">
-                                <option value="Egresados ADSO (Software)">
-                                <option value="Egresados Gestión Agroempresarial">
-                                <option value="Egresados con Unidades Productivas">
-                                <option value="Docentes / Coordinadores de Seguimiento">
+
+                            <!-- Campo donde se puede escribir la ficha o seleccionar de la ventanita -->
+                            <div class="relative">
+                                <input type="text"
+                                       name="publico_objetivo"
+                                       id="input_publico_objetivo_inst"
+                                       list="listaPublicoObjetivoFichasInst"
+                                       x-model="publicoObjetivo"
+                                       @input="validarPublico()"
+                                       @change="validarPublico()"
+                                       @blur="validarPublico()"
+                                       required
+                                       autocomplete="off"
+                                       placeholder="Escribe la ficha (Ej. 3312595) o selecciona 'Todos los Egresados'..."
+                                       class="w-full pl-3.5 pr-8 py-2.5 text-xs sm:text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition"
+                                       :class="publicoError ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : ''">
+
+                                <!-- Icono indicador / desplegar ventanita -->
+                                <div class="absolute right-3 top-3 pointer-events-none text-gray-400 text-xs">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <!-- Ventanita / Datalist con "Todos los Egresados" y todas las fichas del software -->
+                            <datalist id="listaPublicoObjetivoFichasInst">
+                                <option value="Todos los Egresados (General CEFA)">Todos los Egresados (General CEFA)</option>
+                                @foreach($courses as $c)
+                                    @php
+                                        $fCode = $c->code;
+                                        $pName = $c->program ? $c->program->name : 'Programa General';
+                                        $apprCount = method_exists($c, 'apprentices') ? $c->apprentices->count() : 0;
+                                        $val = "Ficha {$fCode} - {$pName}";
+                                    @endphp
+                                    <option value="{{ $val }}">Ficha {{ $fCode }} — {{ $pName }} @if($apprCount > 0) ({{ $apprCount }} aprendices) @endif</option>
+                                @endforeach
                             </datalist>
+
+                            <div class="text-[10.5px] text-gray-400 mt-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info text-[#39A900]"></i>
+                                <span>Puedes digitar el número de ficha o seleccionar 'Todos los Egresados' en la ventanita desplegable.</span>
+                            </div>
+
+                            <!-- Mensaje de Validación de Error si ingresa un dato que no es correcto -->
+                            <div x-show="publicoError" style="display:none;" class="p-2.5 bg-red-50 border border-red-300 rounded-xl text-red-700 text-xs font-bold mt-2 flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm flex-shrink-0"></i>
+                                <span x-text="publicoError"></span>
+                            </div>
+
+                            @error('publico_objetivo')
+                                <div class="p-2.5 bg-red-50 border border-red-300 rounded-xl text-red-700 text-xs font-bold mt-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm flex-shrink-0"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                            @enderror
                         </div>
+
+                        <!-- FECHA LÍMITE DE RESPUESTA -->
                         <div>
-                            <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+                            <label class="block text-xs font-bold text-[#00131E] uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                 <i class="fa-regular fa-calendar-check text-[#39A900]"></i>
                                 <span>Fecha Límite de Respuesta</span>
                                 <span class="text-red-500">*</span>
@@ -144,7 +261,10 @@
                             <input type="date" 
                                    name="fecha_cierre" 
                                    required 
+                                   min="{{ date('Y-m-d') }}"
+                                   value="{{ date('Y-m-d', strtotime('+15 days')) }}"
                                    class="w-full px-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition">
+                            <span class="text-[11px] text-gray-400 mt-1 block">La encuesta se cerrará automáticamente al vencer esta fecha.</span>
                         </div>
                     </div>
                 </div>

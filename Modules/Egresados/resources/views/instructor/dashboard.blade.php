@@ -1431,7 +1431,7 @@
         CAMBIO OBLIGATORIO DE CONTRASEÑA
       </h2>
       <p style="font-size: 11.5px; color: rgba(255, 255, 255, 0.85); margin: 0; line-height: 1.35;">
-        Requerimiento de seguridad institucional de primer ingreso al sistema (estilo SOFIA Plus).
+        Requerimiento de seguridad institucional de primer ingreso al sistema.
       </p>
     </div>
 
@@ -1721,7 +1721,7 @@
     }
     const errBox = document.getElementById('alert-password-error');
     if (errBox) {
-      errBox.innerHTML = '<i class="fa-solid fa-lock"></i> Por seguridad institucional (tipo SOFIA Plus), el cambio de contraseña es obligatorio para continuar.';
+      errBox.innerHTML = '<i class="fa-solid fa-lock"></i> Por seguridad institucional, el cambio de contraseña es obligatorio para continuar.';
       errBox.style.display = 'block';
     }
   }

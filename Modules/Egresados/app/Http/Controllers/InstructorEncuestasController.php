@@ -32,8 +32,22 @@ class InstructorEncuestasController extends Controller
 
         $tasaRespuestaGeneral = $totalEnviadas > 0 ? round(($totalRespondidas / $totalEnviadas) * 100) . '%' : '75%';
 
+        // Cursos / Fichas con aprendices en el ERP SENA
+        try {
+            $courses = \Modules\SICA\Entities\Course::with('program')
+                ->whereHas('apprentices')
+                ->orderBy('code')
+                ->get();
+            if ($courses->isEmpty()) {
+                $courses = \Modules\SICA\Entities\Course::with('program')->orderBy('code')->get();
+            }
+        } catch (\Throwable $e) {
+            $courses = collect([]);
+        }
+
         return view('egresados::instructor.encuestas.index', compact(
             'encuestas',
+            'courses',
             'totalCreadas',
             'totalEnviadas',
             'totalPendientes',
@@ -53,7 +67,18 @@ class InstructorEncuestasController extends Controller
             'publico_objetivo' => 'required|string|max:200',
             'fecha_cierre' => 'required|date',
             'estructura_preguntas' => 'nullable|string',
+        ], [
+            'titulo.required' => 'El título de la encuesta es obligatorio.',
+            'publico_objetivo.required' => 'Debe indicar el público objetivo.',
+            'fecha_cierre.required' => 'Debe definir la fecha de cierre.',
         ]);
+
+        // Validación de público objetivo: Todos los egresados o ficha ERP válida
+        if (!\Modules\Egresados\Http\Controllers\EncuestasController::isValidPublicoObjetivo($request->publico_objetivo)) {
+            return redirect()->back()
+                ->withErrors(['publico_objetivo' => 'Digite un dato correcto. Debe seleccionar "Todos los Egresados" o una ficha de formación válida registrada en el sistema.'])
+                ->withInput();
+        }
 
         // Determinar autor autenticado
         $creadorNombre = 'Carlos Mendoza (Instructor)';
@@ -70,6 +95,49 @@ class InstructorEncuestasController extends Controller
             $preguntas = json_decode($request->estructura_preguntas, true) ?: [];
         }
 
+        // Calcular aprendices convocados según la ficha seleccionada o el total del ERP
+        $targetInput = trim($request->publico_objetivo);
+        $targetLower = mb_strtolower($targetInput);
+        $enviadas = 0;
+
+        if (
+            str_contains($targetLower, 'todos los egresados') ||
+            str_contains($targetLower, 'todas las especialidades') ||
+            $targetLower === 'todos' ||
+            $targetLower === 'general'
+        ) {
+            $targetLabel = 'Todos los Egresados';
+            try {
+                $enviadas = \Modules\SICA\Entities\Apprentice::count() ?: 120;
+            } catch (\Throwable $e) {
+                $enviadas = 120;
+            }
+        } elseif (preg_match('/\b(\d{4,8})\b/', $targetInput, $mFicha)) {
+            $code = $mFicha[1];
+            try {
+                $courseMatch = \Modules\SICA\Entities\Course::with('program')->where('code', $code)->first();
+                if ($courseMatch) {
+                    $progName = $courseMatch->program ? $courseMatch->program->name : 'General';
+                    $targetLabel = "Ficha {$courseMatch->code} - {$progName}";
+                    $enviadas = $courseMatch->apprentices()->count();
+                } else {
+                    $targetLabel = $targetInput;
+                }
+            } catch (\Throwable $e) {
+                $targetLabel = $targetInput;
+            }
+        } else {
+            $targetLabel = $targetInput;
+        }
+
+        if ($enviadas <= 0) {
+            try {
+                $enviadas = \Modules\SICA\Entities\Apprentice::count() ?: 120;
+            } catch (\Throwable $e) {
+                $enviadas = 120;
+            }
+        }
+
         $nuevaEncuesta = [
             'id' => $newId,
             'title' => $request->titulo,
@@ -79,11 +147,11 @@ class InstructorEncuestasController extends Controller
             'fecha_cierre' => $request->fecha_cierre,
             'status' => 'ACTIVA',
             'status_pill' => 'status-green',
-            'target' => $request->publico_objetivo,
+            'target' => $targetLabel,
             'creado_por' => $creadorNombre,
-            'enviadas' => rand(30, 100),
+            'enviadas' => $enviadas,
             'respondidas' => 0,
-            'pendientes' => rand(30, 100),
+            'pendientes' => $enviadas,
             'rate' => '0%',
             'rate_num' => 0,
             'url' => '',

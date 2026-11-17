@@ -256,6 +256,48 @@ class EncuestasController extends Controller
     }
 
     /**
+     * Valida si el público objetivo corresponde a "Todos los Egresados" o a una ficha existente en el ERP SENA.
+     */
+    public static function isValidPublicoObjetivo(?string $target): bool
+    {
+        if (empty($target)) {
+            return false;
+        }
+        $trimmed = trim($target);
+        $lower = mb_strtolower($trimmed);
+
+        // Cobertura general para todos los egresados
+        if (
+            str_contains($lower, 'todos los egresados') ||
+            str_contains($lower, 'todas las especialidades') ||
+            $lower === 'todos' ||
+            $lower === 'general'
+        ) {
+            return true;
+        }
+
+        // Si especifica número de ficha (Ej: "Ficha 2692924 - ADSO", "Ficha 3312595", etc.)
+        if (preg_match('/\b(\d{4,8})\b/', $trimmed, $matches)) {
+            $code = $matches[1];
+            try {
+                if (\Modules\SICA\Entities\Course::where('code', $code)->exists()) {
+                    return true;
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // Si coincide con el nombre de algún programa de formación del ERP
+        try {
+            $programExists = \Modules\SICA\Entities\Program::where('name', 'LIKE', '%' . $trimmed . '%')->exists();
+            if ($programExists && mb_strlen($trimmed) >= 4) {
+                return true;
+            }
+        } catch (\Throwable $e) {}
+
+        return false;
+    }
+
+    /**
      * Muestra la vista principal de Gestión de Encuestas para el Superadmin.
      */
     public function index(Request $request)
@@ -279,8 +321,22 @@ class EncuestasController extends Controller
 
         $tasaRespuestaGeneral = $totalEnviadas > 0 ? round(($totalRespondidas / $totalEnviadas) * 100) . '%' : '75%';
 
+        // Obtener cursos/fichas con aprendices en el ERP SENA
+        try {
+            $courses = \Modules\SICA\Entities\Course::with('program')
+                ->whereHas('apprentices')
+                ->orderBy('code')
+                ->get();
+            if ($courses->isEmpty()) {
+                $courses = \Modules\SICA\Entities\Course::with('program')->orderBy('code')->get();
+            }
+        } catch (\Throwable $e) {
+            $courses = collect([]);
+        }
+
         return view('egresados::superadmin.encuestas.index', compact(
             'encuestas',
+            'courses',
             'totalCreadas',
             'totalEnviadas',
             'totalPendientes',
@@ -308,15 +364,55 @@ class EncuestasController extends Controller
             'url_formulario.url'        => 'El enlace del formulario debe ser una URL válida.',
         ]);
 
-        $publicoLabels = [
-            'TODOS'         => 'Todos los Egresados',
-            'ADSO'          => 'Egresados ADSO',
-            'GAE'           => 'Egresados Gestión Agroempresarial',
-            'EMPRENDEDORES' => 'Egresados Emprendedores',
-            'INSTRUCTORES'  => 'Instructores / Seguimiento',
-        ];
+        // Validación estricta del público objetivo: Todos los egresados o ficha ERP válida
+        if (!self::isValidPublicoObjetivo($request->publico_objetivo)) {
+            return redirect()->back()
+                ->withErrors(['publico_objetivo' => 'Digite un dato correcto. Debe seleccionar "Todos los Egresados" o una ficha de formación válida registrada en el sistema.'])
+                ->withInput();
+        }
 
-        $targetLabel = $publicoLabels[$request->publico_objetivo] ?? $request->publico_objetivo;
+        $targetInput = trim($request->publico_objetivo);
+        $targetLower = mb_strtolower($targetInput);
+        $enviadas = 0;
+
+        if (
+            str_contains($targetLower, 'todos los egresados') ||
+            str_contains($targetLower, 'todas las especialidades') ||
+            $targetLower === 'todos' ||
+            $targetLower === 'general'
+        ) {
+            $targetLabel = 'Todos los Egresados';
+            try {
+                $enviadas = \Modules\SICA\Entities\Apprentice::count() ?: 120;
+            } catch (\Throwable $e) {
+                $enviadas = 120;
+            }
+        } elseif (preg_match('/\b(\d{4,8})\b/', $targetInput, $mFicha)) {
+            $code = $mFicha[1];
+            try {
+                $courseMatch = \Modules\SICA\Entities\Course::with('program')->where('code', $code)->first();
+                if ($courseMatch) {
+                    $progName = $courseMatch->program ? $courseMatch->program->name : 'General';
+                    $targetLabel = "Ficha {$courseMatch->code} - {$progName}";
+                    $enviadas = $courseMatch->apprentices()->count();
+                } else {
+                    $targetLabel = $targetInput;
+                }
+            } catch (\Throwable $e) {
+                $targetLabel = $targetInput;
+            }
+        } else {
+            $targetLabel = $targetInput;
+        }
+
+        if ($enviadas <= 0) {
+            try {
+                $enviadas = \Modules\SICA\Entities\Apprentice::count() ?: 120;
+            } catch (\Throwable $e) {
+                $enviadas = 120;
+            }
+        }
+
         $allCurrent = self::getAllEncuestas();
         $newId = 'ENC-' . str_pad(count($allCurrent) + 26, 3, '0', STR_PAD_LEFT);
 
@@ -345,9 +441,9 @@ class EncuestasController extends Controller
             'status_pill' => 'status-green',
             'target'      => $targetLabel,
             'creado_por'  => $creadorNombre,
-            'enviadas'    => rand(40, 150),
+            'enviadas'    => $enviadas,
             'respondidas' => 0,
-            'pendientes'  => rand(40, 150),
+            'pendientes'  => $enviadas,
             'rate'        => '0%',
             'rate_num'    => 0,
             'url'         => $request->url_formulario ?? '',

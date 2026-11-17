@@ -28,10 +28,11 @@
                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Público Objetivo</label>
                 <select id="surveyTargetFilter" onchange="filterSurveysTable()" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:bg-white focus:border-[#39A900] outline-none transition">
                     <option value="">Todos los públicos</option>
-                    <option value="ADSO">Egresados ADSO</option>
-                    <option value="Tecnólogos">Egresados Tecnólogos</option>
-                    <option value="Todas">Todas las Especialidades</option>
-                    <option value="Emprendedores">Egresados Emprendedores</option>
+                    <option value="Todos los Egresados">Todos los Egresados (General)</option>
+                    <option value="Ficha">Por Ficha Específica</option>
+                    <option value="ADSO">Egresados ADSO / Software</option>
+                    <option value="Agroempresarial">Gestión Agroempresarial</option>
+                    <option value="Ganadera">Producción Ganadera</option>
                 </select>
             </div>
 
