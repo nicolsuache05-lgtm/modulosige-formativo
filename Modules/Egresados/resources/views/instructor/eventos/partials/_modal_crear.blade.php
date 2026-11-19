@@ -171,13 +171,39 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[11px] font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-clock text-[#39A900]"></i>
-                                <span>Fecha y Hora de Inicio</span>
-                                <span class="text-red-500">*</span>
+                            <label class="block text-[11px] font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-clock text-[#39A900]"></i>
+                                    <span>Fecha y Hora de Inicio</span>
+                                    <span class="text-red-500">*</span>
+                                </span>
+                                <span class="text-[10px] text-gray-400 font-semibold lowercase">Desde hoy en adelante</span>
                             </label>
-                            <input type="datetime-local" name="fecha_inicio" required 
+                            <input type="datetime-local" 
+                                   name="fecha_inicio" 
+                                   id="fecha_inicio"
+                                   required 
+                                   min="{{ date('Y-m-d\T00:00') }}"
+                                   x-init="
+                                       const d = new Date();
+                                       const pad = n => String(n).padStart(2, '0');
+                                       const hoyMin = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T00:00`;
+                                       $el.min = hoyMin;
+                                   "
+                                   @change="
+                                       const d = new Date();
+                                       const pad = n => String(n).padStart(2, '0');
+                                       const hoyMin = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T00:00`;
+                                       if ($el.value && $el.value < hoyMin) {
+                                           alert('No se pueden seleccionar fechas anteriores al día de hoy.');
+                                           $el.value = '';
+                                       }
+                                   "
                                    class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] focus:ring-2 focus:ring-[#39A900]/20 outline-none transition">
+                            <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-calendar-check text-[9px] text-[#39A900]"></i>
+                                Solo puede programar eventos a partir de la fecha de hoy.
+                            </p>
                         </div>
 
                         <div>

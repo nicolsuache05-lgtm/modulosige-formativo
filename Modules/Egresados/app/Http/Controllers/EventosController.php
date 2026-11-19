@@ -521,6 +521,11 @@ class EventosController extends Controller
 
         try {
             $fechaCarbon = Carbon::parse($request->fecha_inicio);
+            if ($fechaCarbon->format('Y-m-d') < Carbon::today()->format('Y-m-d')) {
+                return redirect()->back()
+                    ->withErrors(['fecha_inicio' => 'No se pueden programar eventos con fechas anteriores al día de hoy.'])
+                    ->withInput();
+            }
             $fechaStr = $fechaCarbon->format('d/m/Y');
             $horaStr = $fechaCarbon->format('h:i A');
         } catch (\Exception $e) {

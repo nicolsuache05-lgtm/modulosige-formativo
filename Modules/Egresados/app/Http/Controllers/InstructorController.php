@@ -485,6 +485,12 @@ class InstructorController extends Controller
         $newId = 'EVT-' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
         try {
+            $parsedDate = date('Y-m-d', strtotime($fecha));
+            if ($parsedDate < date('Y-m-d')) {
+                return redirect()->back()
+                    ->withErrors(['fecha_inicio' => 'No se pueden programar eventos con fechas anteriores al día de hoy.'])
+                    ->withInput();
+            }
             $fechaFormatted = date('d/m/Y', strtotime($fecha));
         } catch (\Throwable $e) {
             $fechaFormatted = date('d/m/Y');
