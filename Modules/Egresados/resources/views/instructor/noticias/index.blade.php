@@ -579,15 +579,13 @@
                       @endforeach
                   </select>
 
-                  <button type="submit" class="px-4 py-2 bg-gray-800 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer">
-                      <i class="fa-solid fa-filter mr-1"></i> Filtrar
+                  <button type="submit" class="px-4 py-2 bg-gray-800 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Filtrar noticias">
+                      <i class="fa-solid fa-filter"></i> <span>Filtrar</span>
                   </button>
 
-                  @if(!empty($filterSearch) || (!empty($filterCategory) && $filterCategory !== 'Todas') || (!empty($filterStatus) && $filterStatus !== 'Todos'))
-                      <a href="{{ route('egresados.instructor.noticias.index') }}" class="p-2 text-gray-400 hover:text-red-600 rounded-xl transition text-xs" title="Limpiar filtros">
-                          <i class="fa-solid fa-xmark text-sm"></i>
-                      </a>
-                  @endif
+                  <a href="{{ route('egresados.instructor.noticias.index') }}" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Limpiar y restablecer filtros">
+                      <i class="fa-solid fa-rotate-left"></i> <span>Limpiar</span>
+                  </a>
               </div>
           </form>
       </div>

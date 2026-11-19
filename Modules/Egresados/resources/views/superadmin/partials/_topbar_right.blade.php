@@ -197,6 +197,69 @@
     </div>
   </div>
 
+  <!-- ================= MODAL DETALLE DE NOTIFICACIÓN (IDENTIDAD SENA ERP) ================= -->
+  <div id="sigeNotifDetailModal" class="sige-notif-modal-backdrop" style="display: none;" onclick="cerrarDetalleNotificacion(event)">
+    <div class="sige-notif-modal-card" onclick="event.stopPropagation()">
+      <!-- Encabezado con Identidad SENA ERP -->
+      <div class="sige-notif-modal-header">
+        <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+          <div class="sige-notif-modal-icon" id="notifModalIcon">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <div style="min-width: 0;">
+            <div style="font-size: 9.5px; font-weight: 800; color: #62E31D; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px;">GESTIÓN DE EGRESADOS · SIGE ERP</div>
+            <span class="sige-notif-pill" id="notifModalCategory">NOTIFICACIÓN</span>
+            <h3 class="sige-notif-modal-title" id="notifModalTitle" style="margin-top: 2px;">Detalle de Notificación</h3>
+          </div>
+        </div>
+        <button type="button" class="sige-notif-close-btn" onclick="cerrarDetalleNotificacion()" title="Cerrar ventana">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="sige-notif-modal-body">
+        <!-- Caja de Resumen Destacado -->
+        <div class="sige-notif-summary-box" style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(57, 169, 0, 0.15); color: #39A900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;">
+              <i class="fa-solid fa-circle-info" style="font-size: 14px;"></i>
+            </div>
+            <div style="font-size: 13px; color: #1e293b; line-height: 1.5; font-weight: 500;" id="notifModalSummary">
+              Descripción detallada de la notificación.
+            </div>
+          </div>
+        </div>
+
+        <!-- Título de sección de información -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0;">
+          <span style="font-size: 11px; font-weight: 700; color: #00131E; text-transform: uppercase; letter-spacing: 0.5px;">
+            <i class="fa-solid fa-id-card-clip" style="color: #39A900; margin-right: 5px;"></i>
+            Información del Registro
+          </span>
+          <span style="font-size: 11px; color: #64748b; font-weight: 600;" id="notifModalTiempo">Hace unos instantes</span>
+        </div>
+
+        <!-- Cuadrícula de Campos Dinámicos -->
+        <div class="sige-notif-grid-fields" id="notifModalFieldsGrid">
+          <!-- Se inyecta dinámicamente con JS -->
+        </div>
+      </div>
+
+      <!-- Pie de Acción -->
+      <div class="sige-notif-modal-footer">
+        <button type="button" class="sige-notif-btn-secondary" onclick="cerrarDetalleNotificacion()">
+          <i class="fa-solid fa-check"></i>
+          <span>Cerrar</span>
+        </button>
+        <a href="#" id="notifModalActionBtn" class="sige-notif-btn-primary" style="display: inline-flex;">
+          <i class="fa-solid fa-arrow-up-right-from-square" id="notifModalActionIcon"></i>
+          <span id="notifModalActionText">Ver en el sistema</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <style>
@@ -1133,7 +1196,7 @@
   const sigeNotifScriptElem = document.getElementById('sigeNotificacionesJsonData');
   const sigeNotificacionesData = sigeNotifScriptElem ? JSON.parse(sigeNotifScriptElem.textContent || '{}') : {};
 
-  // Procesar clic en notificación
+  // Procesar clic en notificación -> Abre el Modal Detallado Interactivo
   function abrirDetalleNotificacion(notifKey, element) {
     if (element) {
       element.classList.remove('unread');
@@ -1149,19 +1212,128 @@
     const notif = sigeNotificacionesData[notifKey];
     if (!notif) return;
 
-    if (notif.accionUrl) {
-      if (notif.accionUrl.startsWith('#') || notif.accionUrl.includes('#solicitudes-pendientes')) {
-        const target = document.getElementById('solicitudes-pendientes');
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          target.style.transition = 'all 0.3s ease';
-          target.style.transform = 'scale(1.015)';
-          setTimeout(() => { target.style.transform = ''; }, 600);
-          return;
+    const modal = document.getElementById('sigeNotifDetailModal');
+    if (!modal) return;
+
+    // 1. Categoría y Pill
+    const catElem = document.getElementById('notifModalCategory');
+    if (catElem) {
+      catElem.textContent = (notif.categoria || 'NOTIFICACIÓN').toUpperCase();
+    }
+
+    // 2. Título
+    const titleElem = document.getElementById('notifModalTitle');
+    if (titleElem) {
+      titleElem.textContent = notif.titulo || 'Detalle de Notificación';
+    }
+
+    // 3. Ícono y color temático SENA
+    const iconContainer = document.getElementById('notifModalIcon');
+    if (iconContainer) {
+      iconContainer.innerHTML = '<i class="' + (notif.icon || 'fa-solid fa-bell') + '"></i>';
+      if (notif.iconBg) iconContainer.style.background = notif.iconBg;
+      if (notif.iconColor) iconContainer.style.color = notif.iconColor;
+    }
+
+    // 4. Resumen
+    const summaryElem = document.getElementById('notifModalSummary');
+    if (summaryElem) {
+      summaryElem.innerHTML = notif.resumen || notif.texto || 'Sin detalles adicionales registrados.';
+    }
+
+    // 5. Tiempo
+    const tiempoElem = document.getElementById('notifModalTiempo');
+    if (tiempoElem) {
+      tiempoElem.textContent = notif.tiempo || 'Reciente';
+    }
+
+    // 6. Cuadrícula de Campos
+    const gridElem = document.getElementById('notifModalFieldsGrid');
+    if (gridElem) {
+      gridElem.innerHTML = '';
+      const campos = Array.isArray(notif.campos) ? notif.campos : [];
+      if (campos.length > 0) {
+        campos.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'sige-notif-field-card';
+          card.innerHTML = '<div class="sige-notif-field-label">' + escapeHtml(c.etiqueta || '') + '</div>' +
+                           '<div class="sige-notif-field-value">' + escapeHtml(c.valor || 'N/D') + '</div>';
+          gridElem.appendChild(card);
+        });
+      } else {
+        if (notif.egresado_nombre) {
+          gridElem.innerHTML += '<div class="sige-notif-field-card"><div class="sige-notif-field-label">Egresado</div><div class="sige-notif-field-value">' + escapeHtml(notif.egresado_nombre) + '</div></div>';
+        }
+        if (notif.egresado_doc) {
+          gridElem.innerHTML += '<div class="sige-notif-field-card"><div class="sige-notif-field-label">Documento</div><div class="sige-notif-field-value">' + escapeHtml(notif.egresado_doc) + '</div></div>';
+        }
+        if (notif.egresado_email) {
+          gridElem.innerHTML += '<div class="sige-notif-field-card"><div class="sige-notif-field-label">Correo</div><div class="sige-notif-field-value">' + escapeHtml(notif.egresado_email) + '</div></div>';
+        }
+        if (notif.tiempo) {
+          gridElem.innerHTML += '<div class="sige-notif-field-card"><div class="sige-notif-field-label">Fecha</div><div class="sige-notif-field-value">' + escapeHtml(notif.tiempo) + '</div></div>';
         }
       }
-      window.location.href = notif.accionUrl;
     }
+
+    // 7. Botón de Acción Dinámico
+    const actionBtn = document.getElementById('notifModalActionBtn');
+    const actionText = document.getElementById('notifModalActionText');
+    const actionIcon = document.getElementById('notifModalActionIcon');
+
+    if (actionBtn && notif.accionUrl) {
+      actionBtn.style.display = 'inline-flex';
+      let targetUrl = notif.accionUrl;
+      try {
+        if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+          const parsed = new URL(targetUrl);
+          targetUrl = parsed.pathname + parsed.search + parsed.hash;
+        }
+      } catch (err) {}
+
+      actionBtn.href = targetUrl;
+      if (actionText) actionText.textContent = notif.accionTexto || 'Ver en el sistema';
+      if (actionIcon && notif.accionIcon) actionIcon.className = notif.accionIcon;
+
+      actionBtn.onclick = function(e) {
+        if (targetUrl.startsWith('#') || targetUrl.includes('#solicitudes-pendientes')) {
+          const target = document.getElementById('solicitudes-pendientes');
+          if (target) {
+            e.preventDefault();
+            cerrarDetalleNotificacion();
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.style.transition = 'all 0.3s ease';
+            target.style.transform = 'scale(1.015)';
+            setTimeout(() => { target.style.transform = ''; }, 600);
+          } else {
+            actionBtn.href = '{{ route("egresados.index") }}#solicitudes-pendientes';
+          }
+        }
+      };
+    } else if (actionBtn) {
+      actionBtn.style.display = 'none';
+    }
+
+    // Abrir Modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarDetalleNotificacion(e) {
+    if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('sige-notif-close-btn') && !e.target.closest('.sige-notif-close-btn')) {
+      return;
+    }
+    const modal = document.getElementById('sigeNotifDetailModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
+  function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
   }
 
   // Cerrar menús al hacer click fuera o presionar Escape
@@ -1184,6 +1356,7 @@
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      cerrarDetalleNotificacion();
       const userMenu = document.getElementById('userDropdownMenu');
       const notifMenu = document.getElementById('notifDropdownMenu');
       const chevron = document.getElementById('userChevronIcon');

@@ -526,6 +526,14 @@
         }
     }
 
+    // Limpiar filtros de encuestas
+    function clearSurveysFilter() {
+        if (document.getElementById('surveySearchInput')) document.getElementById('surveySearchInput').value = '';
+        if (document.getElementById('surveyStatusFilter')) document.getElementById('surveyStatusFilter').value = '';
+        if (document.getElementById('surveyTargetFilter')) document.getElementById('surveyTargetFilter').value = '';
+        filterSurveysTable();
+    }
+
     // Filtrado interactivo en tabla
     function filterSurveysTable() {
         const query = (document.getElementById('surveySearchInput')?.value || '').toLowerCase();

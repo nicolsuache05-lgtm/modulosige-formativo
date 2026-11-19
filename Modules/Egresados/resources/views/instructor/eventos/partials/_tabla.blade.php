@@ -53,6 +53,18 @@
                 </select>
             </div>
         </div>
+
+        <!-- Botones Filtrar y Limpiar -->
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+            <button type="button" onclick="filterEventsTable()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00131E] hover:bg-[#39A900] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i>
+                <span>Filtrar</span>
+            </button>
+            <button type="button" onclick="clearEventsFilter()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs cursor-pointer" title="Limpiar y restablecer filtros">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Limpiar</span>
+            </button>
+        </div>
     </div>
 
     <!-- Tabla Principal de Eventos -->

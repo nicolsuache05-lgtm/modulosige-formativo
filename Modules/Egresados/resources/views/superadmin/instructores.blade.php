@@ -504,6 +504,28 @@
         box-shadow: 0 4px 14px rgba(57, 169, 0, 0.3);
       }
 
+      .btn-clean-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 15px;
+        background: #f1f5f9;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .btn-clean-filter:hover {
+        background: #e2e8f0;
+        color: #0f172a !important;
+        border-color: #94a3b8;
+      }
+
       /* Instructores Table */
       .instructores-table {
         width: 100%;
@@ -877,7 +899,18 @@
           <p class="page-desc">Consulta, seguimiento y actualización de información de instructores del CEFA.</p>
         </div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <!-- Botón Sincronizar con SICEFA -->
+          <form action="{{ route('egresados.superadmin.sincronizar_instructores') }}" method="POST" style="margin:0;" onsubmit="const btn = this.querySelector('button'); btn.disabled = true; btn.style.opacity = '0.75'; this.querySelector('.sync-icon').classList.add('fa-spin'); this.querySelector('.sync-text').innerText = 'Sincronizando con SICEFA...';">
+            @csrf
+            <button type="submit" 
+                    title="Sincronizar instructores institucionales con SICEFA / SICA" 
+                    style="display:inline-flex; align-items:center; justify-content:center; padding:9px 16px; background:#ffffff; color:#00131E; font-size:12px; font-weight:700; border-radius:12px; border:1px solid #cbd5e1; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 4px rgba(0,0,0,0.04);">
+              <i class="fa-solid fa-arrows-rotate sync-icon" style="color:#39A900; margin-right:8px; font-size:12px;"></i>
+              <span class="sync-text">Sincronizar con SICEFA</span>
+            </button>
+          </form>
+
           <button type="button" @click="openModalNuevoInstructor = true" class="btn-primary-green" style="border:none; cursor:pointer;">
             <i class="fa-solid fa-plus text-xs"></i>
             <span>Nuevo Instructor</span>
@@ -977,15 +1010,15 @@
               <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar instructor por documento o nombre...">
             </div>
 
-            <button type="submit" class="btn-filter">
-              Buscar
+            <button type="submit" class="btn-filter" title="Filtrar instructores">
+              <i class="fa-solid fa-filter"></i>
+              <span>Filtrar</span>
             </button>
 
-            @if(request('search'))
-              <a href="{{ route('egresados.instructores') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar búsqueda">
-                <i class="fa-solid fa-xmark"></i>
-              </a>
-            @endif
+            <a href="{{ route('egresados.instructores') }}" class="btn-clean-filter" title="Limpiar y restablecer filtros">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Limpiar</span>
+            </a>
           </form>
 
           <!-- Tabla de Instructores -->

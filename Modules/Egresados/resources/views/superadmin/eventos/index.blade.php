@@ -660,6 +660,14 @@
         if (modalCancelTitle) modalCancelTitle.innerText = data.title || 'Evento Institucional';
     }
 
+    // Limpiar filtros de la tabla de eventos
+    function clearEventsFilter() {
+        if (document.getElementById('eventSearchInput')) document.getElementById('eventSearchInput').value = '';
+        if (document.getElementById('eventStatusFilter')) document.getElementById('eventStatusFilter').value = '';
+        if (document.getElementById('eventTypeFilter')) document.getElementById('eventTypeFilter').value = '';
+        filterEventsTable();
+    }
+
     // Filtrado interactivo en tabla
     function filterEventsTable() {
         const query = (document.getElementById('eventSearchInput')?.value || '').toLowerCase();

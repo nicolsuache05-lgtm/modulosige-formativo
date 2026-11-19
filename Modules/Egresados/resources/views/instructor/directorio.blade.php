@@ -831,7 +831,18 @@
           <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Botón Sincronizar con SICEFA -->
+          <form action="{{ route('egresados.instructor.sincronizar') }}" method="POST" class="inline m-0" onsubmit="const btn = this.querySelector('button'); btn.disabled = true; btn.classList.add('opacity-75', 'cursor-not-allowed'); this.querySelector('.sync-icon').classList.add('fa-spin'); this.querySelector('.sync-text').innerText = 'Sincronizando con SICEFA...';">
+            @csrf
+            <button type="submit" 
+                    title="Sincronizar egresados y fichas con el sistema SICEFA / SICA" 
+                    class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-emerald-50 text-[#00131E] hover:text-[#166534] text-xs font-bold rounded-xl border border-gray-300 hover:border-[#39A900] transition shadow-xs hover:shadow-md hover:-translate-y-0.5 cursor-pointer">
+              <i class="fa-solid fa-arrows-rotate text-[#39A900] mr-2 text-xs sync-icon"></i>
+              <span class="sync-text">Sincronizar con SICEFA</span>
+            </button>
+          </form>
+
           <button @click="openModal = true" 
                   type="button" 
                   class="inline-flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
@@ -961,6 +972,18 @@
                   <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs sm:text-sm"></i>
                 </div>
               </div>
+            </div>
+
+            <!-- Botones Filtrar y Limpiar -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+              <button type="button" onclick="filterDirectorioLive()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#00131E] hover:bg-[#39A900] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i>
+                <span>Filtrar</span>
+              </button>
+              <button type="button" onclick="limpiarFiltrosDirectorio()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs cursor-pointer" title="Limpiar y restablecer filtros">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Limpiar</span>
+              </button>
             </div>
           </div>
 
@@ -1226,6 +1249,14 @@
 </div>
 
 <script>
+    // Limpiar todos los filtros y restablecer el listado
+    function limpiarFiltrosDirectorio() {
+        if (document.getElementById('filterText')) document.getElementById('filterText').value = '';
+        if (document.getElementById('filterPrograma')) document.getElementById('filterPrograma').value = '';
+        if (document.getElementById('filterEstado')) document.getElementById('filterEstado').value = '';
+        filterDirectorioLive();
+    }
+
     // Filtrado interactivo en tiempo real sin recargar página
     function filterDirectorioLive() {
         const textVal = (document.getElementById('filterText')?.value || '').trim().toLowerCase();

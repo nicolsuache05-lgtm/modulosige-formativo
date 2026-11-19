@@ -1645,13 +1645,21 @@
             <label>Correo MiSENA / Alternativo (Opcional)</label>
             <input type="email" name="misena_email" id="inst_misena_email" value="{{ old('misena_email', $person->misena_email ?? '') }}" placeholder="cmendoza@misena.edu.co">
           </div>
+          @php
+            $rawInstTel1 = old('telefono', $person->telephone1 ?? '3124567890');
+            $displayInstTel1 = ($rawInstTel1 && $rawInstTel1 != '0') ? $rawInstTel1 : '';
+            $rawInstTel2 = old('telefono2', $person->telephone2 ?? '');
+            $displayInstTel2 = ($rawInstTel2 && $rawInstTel2 != '0') ? $rawInstTel2 : '';
+          @endphp
           <div class="profile-input-group">
-            <label>Celular / WhatsApp de Contacto <span style="color:#ef4444;">*</span></label>
-            <input type="tel" name="telefono" id="inst_telefono" required value="{{ old('telefono', $person->telephone1 ?? '3124567890') }}" placeholder="Ej. 3124567890">
+            <label>Celular / WhatsApp de Contacto <span style="color:#059669; font-size:11px; font-weight:600;">(Recomendado)</span></label>
+            <input type="tel" name="telefono" id="inst_telefono" value="{{ $displayInstTel1 }}" placeholder="Ej. 3124567890"
+                   minlength="7" maxlength="20" oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')">
           </div>
           <div class="profile-input-group">
             <label>Teléfono Fijo / Extensión SENA (Opcional)</label>
-            <input type="tel" name="telefono2" id="inst_telefono2" value="{{ old('telefono2', $person->telephone2 ?? '') }}" placeholder="Ej. Ext 82345">
+            <input type="tel" name="telefono2" id="inst_telefono2" value="{{ $displayInstTel2 }}" placeholder="Ej. 3101234567"
+                   maxlength="20" oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')">
           </div>
           <div class="profile-input-group" style="grid-column: 1 / -1;">
             <label>Sede o Dirección de Residencia Actual</label>

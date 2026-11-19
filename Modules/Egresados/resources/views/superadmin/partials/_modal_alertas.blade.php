@@ -124,9 +124,9 @@
         $tagLabel = 'GESTIÓN DE INSTRUCTORES SIGE';
     } elseif ($isSync) {
         $successTitle = '¡Sincronización Completada!';
-        $badgeText = 'Datos sincronizados exitosamente con SICA';
+        $badgeText = 'Datos sincronizados exitosamente con SICEFA';
         $tagIcon = 'fa-rotate';
-        $tagLabel = 'SINCRONIZACIÓN SICA - ERP';
+        $tagLabel = 'SINCRONIZACIÓN SICEFA - ERP';
     } elseif ($isImport) {
         $successTitle = '¡Importación Exitosa!';
         $badgeText = 'Egresados cargados y registrados en la base de datos';

@@ -347,16 +347,15 @@
                             <option value="EXCEL" {{ request('format') == 'EXCEL' ? 'selected' : '' }}>📊 Solo Excel</option>
                         </select>
 
-                        <button type="submit" class="px-3.5 py-2 bg-[#39A900] hover:bg-[#2a7c00] text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5">
+                        <button type="submit" class="px-3.5 py-2 bg-[#39A900] hover:bg-[#2a7c00] text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5" title="Filtrar reportes">
                             <i class="fa-solid fa-filter text-[10px]"></i>
                             <span>Filtrar</span>
                         </button>
 
-                        @if(request()->anyFilled(['search', 'type', 'format']))
-                            <a href="{{ route('egresados.reportes') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
-                                <i class="fa-solid fa-xmark"></i> Limpiar
-                            </a>
-                        @endif
+                        <a href="{{ route('egresados.reportes') }}" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5" title="Limpiar y restablecer filtros">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                            <span>Limpiar</span>
+                        </a>
                     </form>
                 </div>
 

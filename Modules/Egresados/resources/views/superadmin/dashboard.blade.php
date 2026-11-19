@@ -820,9 +820,22 @@
           <p class="page-desc">Desde aquí puedes gestionar y hacer seguimiento a los egresados del centro.</p>
         </div>
 
-        <div class="period-pill">
-          <i class="fa-regular fa-calendar-days"></i>
-          <span>{{ ucfirst(\Carbon\Carbon::now()->locale('es')->translatedFormat('F Y')) }}</span>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <!-- Botón Sincronizar con SICEFA -->
+          <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" style="margin:0;" onsubmit="const btn = this.querySelector('button'); btn.disabled = true; btn.style.opacity = '0.75'; this.querySelector('.sync-icon').classList.add('fa-spin'); this.querySelector('.sync-text').innerText = 'Sincronizando con SICEFA...';">
+            @csrf
+            <button type="submit" 
+                    title="Sincronizar egresados, aprendices y datos con SICEFA / SICA" 
+                    style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; background:#ffffff; color:#00131E; font-size:12px; font-weight:700; border-radius:12px; border:1px solid #cbd5e1; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 4px rgba(0,0,0,0.04);">
+              <i class="fa-solid fa-arrows-rotate sync-icon" style="color:#39A900; font-size:12px;"></i>
+              <span class="sync-text">Sincronizar con SICEFA</span>
+            </button>
+          </form>
+
+          <div class="period-pill">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span>{{ ucfirst(\Carbon\Carbon::now()->locale('es')->translatedFormat('F Y')) }}</span>
+          </div>
         </div>
       </div>
 

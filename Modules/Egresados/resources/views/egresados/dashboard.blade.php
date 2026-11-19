@@ -3940,13 +3940,27 @@
             <label>Correo MiSENA / Institucional (Opcional)</label>
             <input type="email" name="misena_email" id="prof_misena_email" value="{{ old('misena_email', $person->misena_email ?? '') }}" placeholder="usuario@misena.edu.co">
           </div>
+          @php
+            $rawTel1 = old('telefono', $person->telephone1 ?? '');
+            $displayTel1 = ($rawTel1 && $rawTel1 != '0') ? $rawTel1 : '';
+            $rawTel2 = old('telefono2', $person->telephone2 ?? '');
+            $displayTel2 = ($rawTel2 && $rawTel2 != '0') ? $rawTel2 : '';
+          @endphp
           <div class="profile-input-group">
-            <label>Celular / WhatsApp Principal <span style="color:#ef4444;">*</span></label>
-            <input type="tel" name="telefono" id="prof_telefono" required value="{{ old('telefono', $person->telephone1 ?? '') }}" placeholder="Ej. 3123456789">
+            <label>Celular / WhatsApp Principal <span style="color:#059669; font-size:11px; font-weight:600;">(Recomendado)</span></label>
+            <input type="tel" name="telefono" id="prof_telefono" value="{{ $displayTel1 }}" placeholder="Ej. 3123456789"
+                   minlength="7" maxlength="20" oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')">
+            <small style="color:#64748b; font-size:11px; margin-top:3px; display:block;">
+              <i class="fa-solid fa-circle-info" style="color:var(--sena-green);"></i> Mínimo 7 dígitos numéricos (ej. 3123456789)
+            </small>
           </div>
           <div class="profile-input-group">
             <label>Teléfono Alternativo / Fijo (Opcional)</label>
-            <input type="tel" name="telefono2" id="prof_telefono2" value="{{ old('telefono2', $person->telephone2 ?? '') }}" placeholder="Ej. 3001234567">
+            <input type="tel" name="telefono2" id="prof_telefono2" value="{{ $displayTel2 }}" placeholder="Ej. 3001234567"
+                   maxlength="20" oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')">
+            <small style="color:#64748b; font-size:11px; margin-top:3px; display:block;">
+              Opcional para contacto secundario
+            </small>
           </div>
           <div class="profile-input-group" style="grid-column: 1 / -1;">
             <label>Dirección de Residencia Actual</label>

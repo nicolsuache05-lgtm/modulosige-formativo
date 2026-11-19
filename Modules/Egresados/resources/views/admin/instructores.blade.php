@@ -331,16 +331,15 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
                         </div>
 
-                        <button type="submit" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+                        <button type="submit" class="bg-[#39A900] hover:bg-[#2a7c00] text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5" title="Filtrar instructores">
                             <i class="fa-solid fa-filter text-[10px]"></i>
                             <span>Filtrar</span>
                         </button>
 
-                        @if(request('search'))
-                            <a href="{{ route('egresados.instructores') }}" class="text-xs text-gray-500 hover:text-red-500 font-semibold px-2 py-2 flex items-center gap-1" title="Limpiar filtros">
-                                <i class="fa-solid fa-xmark"></i> Limpiar
-                            </a>
-                        @endif
+                        <a href="{{ route('egresados.instructores') }}" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Limpiar y restablecer filtros">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                            <span>Limpiar</span>
+                        </a>
                     </form>
                 </div>
 

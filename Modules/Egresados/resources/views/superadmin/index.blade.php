@@ -513,6 +513,28 @@
         background: var(--green);
       }
 
+      .btn-clean-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 15px;
+        background: #f1f5f9;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .btn-clean-filter:hover {
+        background: #e2e8f0;
+        color: #0f172a !important;
+        border-color: #94a3b8;
+      }
+
       .btn-export-excel {
         display: inline-flex;
         align-items: center;
@@ -937,7 +959,18 @@
           <p class="page-desc">Consulta, seguimiento y actualización de información de egresados institucionales del CEFA.</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Botón Sincronizar con SICEFA -->
+          <form action="{{ route('egresados.superadmin.sincronizar') }}" method="POST" class="inline m-0" onsubmit="const btn = this.querySelector('button'); btn.disabled = true; btn.classList.add('opacity-75', 'cursor-not-allowed'); this.querySelector('.sync-icon').classList.add('fa-spin'); this.querySelector('.sync-text').innerText = 'Sincronizando con SICEFA...';">
+            @csrf
+            <button type="submit" 
+                    title="Sincronizar egresados y fichas con el sistema SICEFA / SICA" 
+                    class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-emerald-50 text-[#00131E] hover:text-[#166534] text-xs font-bold rounded-xl border border-gray-300 hover:border-[#39A900] transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 cursor-pointer">
+              <i class="fa-solid fa-arrows-rotate text-[#39A900] mr-2 text-xs sync-icon"></i>
+              <span class="sync-text">Sincronizar con SICEFA</span>
+            </button>
+          </form>
+
           <!-- Botón Nuevo Egresado (Verde Principal Institucional SENA) -->
           <button @click="openModal = true" type="button" class="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-[#39A900] to-[#2e8b00] hover:from-[#2e8b00] hover:to-[#247000] text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-md shadow-[#39A900]/25 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer border-0">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -1018,20 +1051,19 @@
               <option value="RETIRO VOLUNTARIO" {{ request('apprentice_status') == 'RETIRO VOLUNTARIO' ? 'selected' : '' }}>Retiro Voluntario</option>
             </select>
 
-            <button type="submit" class="btn-filter">
+            <button type="submit" class="btn-filter" title="Filtrar egresados">
               Filtrar
             </button>
+
+            <a href="{{ route('egresados.index') }}" class="btn-clean-filter" title="Limpiar y restablecer filtros">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Limpiar</span>
+            </a>
 
             <a href="{{ route('egresados.superadmin.exportar', request()->query()) }}" class="btn-export-excel" title="Exportar listado a Excel">
               <i class="fa-solid fa-file-excel"></i>
               <span>Exportar Excel</span>
             </a>
-
-            @if(request('search') || (request('apprentice_status') && request('apprentice_status') !== 'TODOS'))
-              <a href="{{ route('egresados.index') }}" style="color:var(--ink-soft); text-decoration:none; font-size:12px; font-weight:600; padding:8px;" title="Limpiar">
-                <i class="fa-solid fa-xmark"></i>
-              </a>
-            @endif
           </form>
 
           <!-- Contenido de Tabla -->

@@ -122,6 +122,25 @@ class NotificationController extends Controller
                 if (!$exists) {
                     $asis = strtolower($rsvp['asistencia'] ?? 'si');
                     $asiste = in_array($asis, ['si', 'virtual', 'confirmado']);
+                    
+                    $evtId = $rsvp['evento_id'] ?? 'Evento CEFA';
+                    $targetEvt = \Modules\Egresados\Http\Controllers\EventosController::findEvento($evtId);
+                    $evtTitulo = $targetEvt['title'] ?? $evtId;
+
+                    $nom = trim($rsvp['nombre'] ?? '');
+                    if (empty($nom) || strtolower($nom) === 'egresado') {
+                        $doc = $rsvp['documento'] ?? '';
+                        if (!empty($doc)) {
+                            try {
+                                $person = \Modules\SICA\Entities\Person::where('document_number', $doc)->first();
+                                if ($person && !empty($person->full_name)) {
+                                    $nom = $person->full_name;
+                                }
+                            } catch (\Throwable $e) {}
+                        }
+                    }
+                    if (empty($nom)) $nom = 'Egresado SENA';
+
                     $notificaciones[] = [
                         'id' => $notifId,
                         'tipo' => 'evento',
@@ -129,18 +148,18 @@ class NotificationController extends Controller
                         'icon' => 'fa-solid fa-calendar-check',
                         'iconColor' => '#b45309',
                         'iconBg' => '#fef3c7',
-                        'titulo' => 'Confirmación de Asistencia a Evento',
-                        'texto' => '<strong>' . htmlspecialchars($rsvp['nombre'] ?? 'Egresado') . '</strong> ' . ($asiste ? 'confirmó asistencia' : 'respondió') . ' al evento <em>"' . htmlspecialchars($rsvp['evento_id'] ?? 'Evento CEFA') . '"</em>.',
-                        'resumen' => 'El egresado(a) ' . ($rsvp['nombre'] ?? 'Egresado') . ' ha registrado su respuesta para la convocatoria del evento institucional.',
-                        'egresado_nombre' => $rsvp['nombre'] ?? 'Egresado',
-                        'egresado_doc' => $rsvp['documento'] ?? 'N/D',
+                        'titulo' => 'Confirmación: ' . $evtTitulo,
+                        'texto' => '<strong>' . htmlspecialchars($nom) . '</strong> ' . ($asiste ? 'confirmó asistencia' : 'respondió') . ' al evento <em>"' . htmlspecialchars($evtTitulo) . '"</em>.',
+                        'resumen' => 'El egresado(a) ' . $nom . ' (Doc: ' . ($rsvp['documento'] ?? 'N/D') . ') ha registrado su respuesta para la convocatoria del evento institucional.',
+                        'egresado_nombre' => $nom,
+                        'egresado_doc' => (string)($rsvp['documento'] ?? 'N/D'),
                         'egresado_email' => $rsvp['email'] ?? 'egresado@sena.edu.co',
                         'created_at' => $rsvp['created_at'] ?? now()->toDateTimeString(),
                         'unread' => true,
                         'campos' => [
-                            ['etiqueta' => 'Egresado', 'valor' => $rsvp['nombre'] ?? 'Egresado'],
+                            ['etiqueta' => 'Egresado', 'valor' => $nom],
                             ['etiqueta' => 'Documento', 'valor' => (string)($rsvp['documento'] ?? 'N/D')],
-                            ['etiqueta' => 'Evento Institucional', 'valor' => $rsvp['evento_id'] ?? 'Evento CEFA'],
+                            ['etiqueta' => 'Evento Institucional', 'valor' => $evtTitulo],
                             ['etiqueta' => 'Confirmación', 'valor' => $asiste ? 'Asistirá (' . ($rsvp['modalidad'] ?? 'Presencial') . ')' : 'No podrá asistir'],
                             ['etiqueta' => 'Observaciones', 'valor' => !empty($rsvp['comentario']) ? $rsvp['comentario'] : 'Sin comentarios adicionales'],
                             ['etiqueta' => 'Fecha de Respuesta', 'valor' => isset($rsvp['created_at']) ? Carbon::parse($rsvp['created_at'])->format('d/m/Y h:i A') : now()->format('d/m/Y h:i A')]
