@@ -95,33 +95,11 @@
             validarPublico() {
                 const v = (this.publicoObjetivo || '').trim();
                 if (!v) {
-                    this.publicoError = 'Digite un dato correcto. Debe indicar el público objetivo.';
+                    this.publicoError = 'Debe indicar o seleccionar el público objetivo.';
                     return false;
                 }
-                const lower = v.toLowerCase();
-                // Cobertura general para todos los egresados
-                if (lower.includes('todos') || lower.includes('general')) {
-                    this.publicoError = '';
-                    return true;
-                }
-                // Si escribió el código exacto de la ficha (Ej: 3312595) o contiene la ficha
-                const matchDigit = v.match(/\b\d{4,8}\b/);
-                if (matchDigit) {
-                    const found = this.fichasLista.find(f => f.code === matchDigit[0]);
-                    if (found) {
-                        this.publicoError = '';
-                        return true;
-                    }
-                }
-                // Si coincide con alguna de las opciones
-                const foundAny = this.fichasLista.find(f => f.label.toLowerCase().includes(lower) || (f.value && f.value.toLowerCase().includes(lower)) || f.search.includes(lower));
-                if (foundAny) {
-                    this.publicoError = '';
-                    return true;
-                }
-
-                this.publicoError = 'Digite un dato correcto. Debe seleccionar \'Todos los Egresados\' o una ficha válida registrada en el sistema.';
-                return false;
+                this.publicoError = '';
+                return true;
             },
 
             validarFormulario(e) {

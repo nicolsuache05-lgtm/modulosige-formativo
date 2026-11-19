@@ -256,7 +256,8 @@ class EncuestasController extends Controller
     }
 
     /**
-     * Valida si el público objetivo corresponde a "Todos los Egresados" o a una ficha existente en el ERP SENA.
+     * Valida si el público objetivo corresponde a "Todos los Egresados" o a cualquier ficha/programa de formación.
+     * Permite seleccionar cualquier ficha del listado o digitar una ficha válida.
      */
     public static function isValidPublicoObjetivo(?string $target): bool
     {
@@ -264,37 +265,7 @@ class EncuestasController extends Controller
             return false;
         }
         $trimmed = trim($target);
-        $lower = mb_strtolower($trimmed);
-
-        // Cobertura general para todos los egresados
-        if (
-            str_contains($lower, 'todos los egresados') ||
-            str_contains($lower, 'todas las especialidades') ||
-            $lower === 'todos' ||
-            $lower === 'general'
-        ) {
-            return true;
-        }
-
-        // Si especifica número de ficha (Ej: "Ficha 2692924 - ADSO", "Ficha 3312595", etc.)
-        if (preg_match('/\b(\d{4,8})\b/', $trimmed, $matches)) {
-            $code = $matches[1];
-            try {
-                if (\Modules\SICA\Entities\Course::where('code', $code)->exists()) {
-                    return true;
-                }
-            } catch (\Throwable $e) {}
-        }
-
-        // Si coincide con el nombre de algún programa de formación del ERP
-        try {
-            $programExists = \Modules\SICA\Entities\Program::where('name', 'LIKE', '%' . $trimmed . '%')->exists();
-            if ($programExists && mb_strlen($trimmed) >= 4) {
-                return true;
-            }
-        } catch (\Throwable $e) {}
-
-        return false;
+        return mb_strlen($trimmed) >= 2;
     }
 
     /**

@@ -522,6 +522,7 @@ class AuthController extends Controller
         // 3. Egresado -> Portal del Egresado
         return redirect()->route('egresados.dashboard_egresado')
             ->with('success', '¡Bienvenido(a) a tu Portal de Egresado, ' . ($user->full_name ?: 'Egresado') . '!')
+            ->with('sige_bienvenida', true)
             ->withHeaders([
                 'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
                 'Pragma'        => 'no-cache',
@@ -766,6 +767,9 @@ class AuthController extends Controller
 
         // Quitar la bandera de la sesión
         session()->forget('sige_needs_password_change');
+
+        session()->flash('sige_bienvenida', true);
+        session()->flash('success', '¡Contraseña actualizada con éxito! Bienvenido(a) al Sistema de Gestión de Egresados (SIGE).');
 
         SigeSecurityLogger::log('PASSWORD_CHANGED', "Contraseña actualizada exitosamente para el usuario {$user->email}", $request, $user);
 

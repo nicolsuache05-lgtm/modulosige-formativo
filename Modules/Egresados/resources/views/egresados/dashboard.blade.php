@@ -1907,6 +1907,16 @@
     .modal-backdrop.active .success-modal-card {
       transform: scale(1);
     }
+    .success-modal-card.modal-bienvenida-wide {
+      max-width: 540px !important;
+      padding: 38px 36px 32px 36px !important;
+    }
+    @media (max-width: 640px) {
+      .success-modal-card.modal-bienvenida-wide {
+        max-width: 95% !important;
+        padding: 28px 20px 24px 20px !important;
+      }
+    }
 
     /* Contenedor del Chulito Animado SENA ERP */
     .sena-chulito-container {
@@ -4343,6 +4353,68 @@
 </div>
 
 <!-- ========================================================
+     MODAL DE BIENVENIDA A SIGE (MÁS ANCHO Y DISEÑO OFICIAL SENA ERP)
+     ======================================================== -->
+<div class="modal-backdrop" id="modalBienvenidaSige" onclick="if(event.target===this)closeModalBienvenidaSige()">
+  <div class="success-modal-card modal-bienvenida-wide">
+    <!-- Botón cerrar (X) en esquina superior derecha -->
+    <button type="button" 
+            onclick="closeModalBienvenidaSige()" 
+            style="position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #64748B; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;"
+            onmouseover="this.style.background='#E2E8F0'; this.style.color='#00131E';"
+            onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';"
+            title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- CHULITO ANIMADO SENA (IDÉNTICO AL DASHBOARD DE SUPERADMIN) -->
+    <div class="sena-chulito-container">
+      <div class="sena-chulito-glow"></div>
+      <div class="sena-chulito-badge">
+        <svg class="sena-chulito-svg" viewBox="0 0 36 36">
+          <path class="sena-chulito-path" d="M8 18.5L14.5 25L28 11.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Encabezado / Tag Oficial -->
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: #EAF7EE; border: 1px solid #BBF7D0; color: #166534; font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; margin: 0 auto 12px auto;">
+      <i class="fa-solid fa-graduation-cap" style="font-size: 11px; color: #39A900;"></i>
+      <span>PORTAL DE EGRESADOS · SIGE ERP</span>
+    </div>
+
+    <!-- Título Principal ("Bienvenidos a SIGE") -->
+    <h3 style="font-family:'Poppins', 'Nunito', sans-serif; font-size:24px; font-weight:800; color:#00131E; margin:0 0 8px 0; letter-spacing:-0.3px; line-height:1.25;">
+      ¡Bienvenidos a SIGE!
+    </h3>
+
+    <!-- Mensaje Detallado -->
+    <p style="font-size:14.5px; font-weight:500; color:#5A6E7D; line-height:1.55; margin:0 0 16px 0;">
+      ¡Te damos la más cordial bienvenida al Sistema de Información y Gestión de Egresados del CEFA La Angostura! Tu cuenta está lista para responder encuestas institucionales, consultar ofertas laborales y acceder a todos los beneficios de la comunidad SENA.
+    </p>
+
+    <!-- Badge de Confirmación y Verificación Institucional -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(234, 247, 238, 0.95) 0%, rgba(220, 252, 231, 0.7) 100%); border: 1px solid #BBF7D0; border-radius: 14px; padding: 12px 18px; color: #166534; font-size: 13px; font-weight: 700; margin-bottom: 22px; line-height: 1.4;">
+      <i class="fa-solid fa-circle-check" style="color: #39A900; font-size: 15px;"></i>
+      <span>Sesión institucional activa y plataforma disponible para egresados</span>
+    </div>
+
+    <!-- Botón de Acción Principal SENA ERP -->
+    <div style="margin-top: 6px;">
+      <button type="button" class="btn-modal-accept" onclick="closeModalBienvenidaSige()" style="font-size: 15px; padding: 14px 24px;">
+        <i class="fa-solid fa-check" style="font-size: 14px;"></i>
+        <span>Aceptar y Continuar</span>
+      </button>
+    </div>
+
+    <!-- Barra temporizada de autocierre con degradado SENA -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 5px; overflow: hidden;">
+      <div class="sena-alert-progress"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
      ALERTA TOAST FLOTANTE HORIZONTAL EN EL CENTRO
      ======================================================== -->
 <div class="toast-alert" id="toastAlert">
@@ -6156,6 +6228,7 @@
     .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
     .then(({ status, ok, data }) => {
       if (ok && data.success) {
+        sessionStorage.setItem('mostrar_bienvenida_sige', '1');
         sucBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.message || '¡Contraseña actualizada con éxito! Entrando al sistema...');
         sucBox.style.display = 'block';
         errBox.style.display = 'none';
@@ -6170,7 +6243,7 @@
         }
 
         setTimeout(() => {
-          window.location.href = "{{ route('egresados.dashboard_egresado') }}";
+          window.location.href = "{{ route('egresados.dashboard_egresado') }}?bienvenida=1";
         }, 700);
       } else {
         btn.disabled = false;
@@ -6185,6 +6258,68 @@
       form.submit();
     });
   }
+
+  /* ========================================================
+     CONTROL DEL MODAL INSTITUCIONAL DE BIENVENIDA A SIGE (PORTAL EGRESADO)
+     ======================================================== */
+  let timerAutocierreBienvenida = null;
+
+  function openModalBienvenidaSige() {
+    const modal = document.getElementById('modalBienvenidaSige');
+    if (modal) {
+      modal.classList.add('active');
+      // Autocierre pasivo sincronizado con la barra de progreso (7.5s)
+      timerAutocierreBienvenida = setTimeout(() => {
+        closeModalBienvenidaSige();
+      }, 7500);
+    }
+  }
+
+  function closeModalBienvenidaSige() {
+    if (timerAutocierreBienvenida) {
+      clearTimeout(timerAutocierreBienvenida);
+      timerAutocierreBienvenida = null;
+    }
+    const modal = document.getElementById('modalBienvenidaSige');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+    sessionStorage.removeItem('mostrar_bienvenida_sige');
+    sessionStorage.setItem('sige_bienvenida_modal_vista', '1');
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const cardBienvenida = document.querySelector('.modal-bienvenida-wide');
+    if (cardBienvenida) {
+      cardBienvenida.addEventListener('mouseenter', function() {
+        if (timerAutocierreBienvenida) {
+          clearTimeout(timerAutocierreBienvenida);
+          timerAutocierreBienvenida = null;
+        }
+      });
+    }
+
+    const hasFlashBienvenida = {{ (session('sige_bienvenida') || session('success')) ? 'true' : 'false' }};
+    const hasQueryBienvenida = window.location.search.includes('bienvenida');
+    const hasSessionStoragePrompt = sessionStorage.getItem('mostrar_bienvenida_sige') === '1';
+    const yaVistaEnSesion = sessionStorage.getItem('sige_bienvenida_modal_vista') === '1';
+
+    // Abrir modal si viene de login, cambio de contraseña, parámetro URL o primera entrada a la sesión
+    if (hasFlashBienvenida || hasQueryBienvenida || hasSessionStoragePrompt || !yaVistaEnSesion) {
+      setTimeout(() => {
+        openModalBienvenidaSige();
+      }, 350);
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('modalBienvenidaSige');
+      if (modal && modal.classList.contains('active')) {
+        closeModalBienvenidaSige();
+      }
+    }
+  });
 </script>
 
 </body>
