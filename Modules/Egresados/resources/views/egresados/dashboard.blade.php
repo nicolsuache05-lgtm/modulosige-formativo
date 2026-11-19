@@ -4390,7 +4390,7 @@
 
     <!-- Mensaje Detallado -->
     <p style="font-size:14.5px; font-weight:500; color:#5A6E7D; line-height:1.55; margin:0 0 16px 0;">
-      ¡Te damos la más cordial bienvenida al Sistema de Información y Gestión de Egresados del CEFA La Angostura! Tu cuenta está lista para responder encuestas institucionales, consultar ofertas laborales y acceder a todos los beneficios de la comunidad SENA.
+      ¡Te damos la más cordial bienvenida al Sistema de Información y Gestión de Egresados del CEFA La Angostura! Tu cuenta está lista para responder encuestas institucionales, participar en eventos y acceder a todos los beneficios de la comunidad SENA.
     </p>
 
     <!-- Badge de Confirmación y Verificación Institucional -->
