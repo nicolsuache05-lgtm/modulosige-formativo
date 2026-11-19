@@ -14,6 +14,31 @@
             $courses = collect([]);
         }
     }
+
+    $fichasOptions = [];
+    $fichasOptions[] = [
+        'code' => 'TODOS',
+        'program' => 'General CEFA',
+        'label' => 'Todos los Egresados (General CEFA)',
+        'value' => 'Todos los Egresados (General CEFA)',
+        'search' => 'todos los egresados general cefa',
+        'count' => 0
+    ];
+    if (isset($courses)) {
+        foreach($courses as $c) {
+            $fCode = (string)$c->code;
+            $pName = $c->program ? $c->program->name : 'Programa General';
+            $apprCount = method_exists($c, 'apprentices') ? $c->apprentices->count() : 0;
+            $fichasOptions[] = [
+                'code' => $fCode,
+                'program' => $pName,
+                'label' => "Ficha {$fCode} — {$pName}",
+                'value' => "Ficha {$fCode} - {$pName}",
+                'search' => strtolower("{$fCode} {$pName} ficha"),
+                'count' => $apprCount
+            ];
+        }
+    }
 @endphp
 
 <div x-show="openModal" 
@@ -42,10 +67,30 @@
             preguntas: [
                 { id: Date.now(), texto: '', tipo: 'opcion_multiple', opciones: ['Totalmente de acuerdo', 'De acuerdo', 'En desacuerdo'], obligatoria: true }
             ],
+            fichasLista: {{ json_encode($fichasOptions) }},
+            dropdownOpen: false,
             publicoObjetivo: 'Todos los Egresados (General CEFA)',
             publicoError: '',
-            codigosFichas: {{ json_encode($courses->pluck('code')->map(fn($c) => (string)$c)->toArray()) }},
-            labelsFichas: {{ json_encode($courses->map(fn($c) => 'Ficha ' . $c->code . ' - ' . ($c->program ? $c->program->name : 'General'))->toArray()) }},
+
+            get fichasFiltradas() {
+                const q = (this.publicoObjetivo || '').trim().toLowerCase();
+                if (!q) {
+                    return this.fichasLista;
+                }
+                return this.fichasLista.filter(item => {
+                    return item.search.includes(q) || item.label.toLowerCase().includes(q) || (item.value && item.value.toLowerCase().includes(q));
+                });
+            },
+
+            seleccionarOpcion(item) {
+                this.publicoObjetivo = item.value || item.label;
+                this.dropdownOpen = false;
+                this.publicoError = '';
+            },
+
+            toggleDropdown() {
+                this.dropdownOpen = !this.dropdownOpen;
+            },
             
             validarPublico() {
                 const v = (this.publicoObjetivo || '').trim();
@@ -55,24 +100,22 @@
                 }
                 const lower = v.toLowerCase();
                 // Cobertura general para todos los egresados
-                if (lower.includes('todos los egresados') || lower.includes('todas las especialidades') || lower === 'todos' || lower === 'general') {
+                if (lower.includes('todos') || lower.includes('general')) {
                     this.publicoError = '';
                     return true;
                 }
                 // Si escribió el código exacto de la ficha (Ej: 3312595) o contiene la ficha
-                const codeFound = this.codigosFichas.find(c => c === v || (v.length >= 4 && v.includes(c)));
-                if (codeFound) {
-                    const fullMatch = this.labelsFichas.find(l => l.includes(codeFound));
-                    if (fullMatch && (v === codeFound || v === 'Ficha ' + codeFound)) {
-                        this.publicoObjetivo = fullMatch;
+                const matchDigit = v.match(/\b\d{4,8}\b/);
+                if (matchDigit) {
+                    const found = this.fichasLista.find(f => f.code === matchDigit[0]);
+                    if (found) {
+                        this.publicoError = '';
+                        return true;
                     }
-                    this.publicoError = '';
-                    return true;
                 }
-                // Si coincide con el label completo o parte del nombre
-                const labelFound = this.labelsFichas.find(l => l.toLowerCase() === lower || (lower.startsWith('ficha ') && l.toLowerCase().includes(lower)));
-                if (labelFound) {
-                    this.publicoObjetivo = labelFound;
+                // Si coincide con alguna de las opciones
+                const foundAny = this.fichasLista.find(f => f.label.toLowerCase().includes(lower) || (f.value && f.value.toLowerCase().includes(lower)) || f.search.includes(lower));
+                if (foundAny) {
                     this.publicoError = '';
                     return true;
                 }
@@ -196,45 +239,76 @@
                                 <span class="text-[10px] text-gray-400 font-normal">Escribe la ficha o escoge del listado</span>
                             </label>
 
-                            <!-- Campo donde se puede escribir la ficha o seleccionar de la ventanita -->
-                            <div class="relative">
-                                <input type="text"
-                                       name="publico_objetivo"
-                                       id="input_publico_objetivo_inst"
-                                       list="listaPublicoObjetivoFichasInst"
-                                       x-model="publicoObjetivo"
-                                       @input="validarPublico()"
-                                       @change="validarPublico()"
-                                       @blur="validarPublico()"
-                                       required
-                                       autocomplete="off"
-                                       placeholder="Escribe la ficha (Ej. 3312595) o selecciona 'Todos los Egresados'..."
-                                       class="w-full pl-3.5 pr-8 py-2.5 text-xs sm:text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition"
-                                       :class="publicoError ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : ''">
+                            <!-- Campo interactivo: permite escribir para filtrar y desplegar la lista con clic -->
+                            <div class="relative" @click.away="dropdownOpen = false">
+                                <div class="relative flex items-center">
+                                    <input type="text"
+                                           name="publico_objetivo"
+                                           id="input_publico_objetivo_inst"
+                                           x-model="publicoObjetivo"
+                                           @focus="dropdownOpen = true"
+                                           @click="dropdownOpen = true"
+                                           @input="dropdownOpen = true; publicoError = ''"
+                                           @blur="setTimeout(() => validarPublico(), 250)"
+                                           required
+                                           autocomplete="off"
+                                           placeholder="Escribe la ficha (Ej. 694778) o selecciona del desplegable..."
+                                           class="w-full pl-3.5 pr-10 py-2.5 text-xs sm:text-sm bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#39A900]/20 focus:border-[#39A900] outline-none font-medium text-gray-800 transition"
+                                           :class="publicoError ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : ''">
 
-                                <!-- Icono indicador / desplegar ventanita -->
-                                <div class="absolute right-3 top-3 pointer-events-none text-gray-400 text-xs">
-                                    <i class="fa-solid fa-chevron-down"></i>
+                                    <!-- Botón interactivo para desplegar/ocultar con un clic -->
+                                    <button type="button" 
+                                            @click.prevent="toggleDropdown()"
+                                            class="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-gray-400 hover:text-[#39A900] transition cursor-pointer"
+                                            title="Desplegar listado de fichas">
+                                        <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" :class="dropdownOpen ? 'rotate-180 text-[#39A900]' : ''"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Menú Desplegable Flotante Elegante -->
+                                <div x-show="dropdownOpen"
+                                     style="display: none;"
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 -translate-y-1 scale-98"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 -translate-y-1 scale-98"
+                                     class="absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden max-h-60 flex flex-col">
+                                    
+                                    <div class="px-3 py-2 bg-gray-50 border-b border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-semibold">
+                                        <span class="flex items-center gap-1.5">
+                                            <i class="fa-solid fa-list-check text-[#39A900]"></i>
+                                            <span>Fichas y Públicos Disponibles</span>
+                                        </span>
+                                        <span class="text-[10px] text-gray-400" x-text="fichasFiltradas.length + ' opciones'"></span>
+                                    </div>
+
+                                    <div class="overflow-y-auto divide-y divide-gray-50 max-h-48">
+                                        <template x-for="item in fichasFiltradas" :key="item.code">
+                                            <button type="button" 
+                                                    @click="seleccionarOpcion(item)"
+                                                    class="w-full text-left px-3.5 py-2.5 hover:bg-emerald-50/60 transition flex items-center justify-between gap-2 group cursor-pointer"
+                                                    :class="(publicoObjetivo === (item.value || item.label)) ? 'bg-emerald-50 font-bold text-[#166534]' : 'text-gray-700'">
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <i class="fa-solid text-xs" :class="item.code === 'TODOS' ? 'fa-users text-[#39A900]' : 'fa-id-card text-gray-400 group-hover:text-[#39A900]'"></i>
+                                                    <span class="text-xs truncate" x-text="item.label"></span>
+                                                </div>
+                                                <span x-show="item.count > 0" class="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-medium group-hover:bg-[#39A900] group-hover:text-white transition" x-text="item.count + ' aprendices'"></span>
+                                            </button>
+                                        </template>
+
+                                        <div x-show="fichasFiltradas.length === 0" class="p-4 text-center text-xs text-gray-400">
+                                            <i class="fa-solid fa-magnifying-glass text-gray-300 text-base mb-1 block"></i>
+                                            <span>No se encontró ninguna ficha con ese criterio. Puedes seguir digitando o seleccionar 'Todos los Egresados'.</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Ventanita / Datalist con "Todos los Egresados" y todas las fichas del software -->
-                            <datalist id="listaPublicoObjetivoFichasInst">
-                                <option value="Todos los Egresados (General CEFA)">Todos los Egresados (General CEFA)</option>
-                                @foreach($courses as $c)
-                                    @php
-                                        $fCode = $c->code;
-                                        $pName = $c->program ? $c->program->name : 'Programa General';
-                                        $apprCount = method_exists($c, 'apprentices') ? $c->apprentices->count() : 0;
-                                        $val = "Ficha {$fCode} - {$pName}";
-                                    @endphp
-                                    <option value="{{ $val }}">Ficha {{ $fCode }} — {{ $pName }} @if($apprCount > 0) ({{ $apprCount }} aprendices) @endif</option>
-                                @endforeach
-                            </datalist>
-
                             <div class="text-[10.5px] text-gray-400 mt-1 flex items-center gap-1.5">
                                 <i class="fa-solid fa-circle-info text-[#39A900]"></i>
-                                <span>Puedes digitar el número de ficha o seleccionar 'Todos los Egresados' en la ventanita desplegable.</span>
+                                <span>Puedes hacer clic en la flecha para ver el listado o escribir directamente el número de ficha o programa para filtrar.</span>
                             </div>
 
                             <!-- Mensaje de Validación de Error si ingresa un dato que no es correcto -->
