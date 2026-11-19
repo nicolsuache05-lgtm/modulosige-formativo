@@ -399,6 +399,18 @@ class EventosController extends Controller
 
         $programsList = Program::orderBy('name')->pluck('name')->toArray();
 
+        try {
+            $courses = \Modules\SICA\Entities\Course::with('program')
+                ->whereHas('apprentices')
+                ->orderBy('code')
+                ->get();
+            if ($courses->isEmpty()) {
+                $courses = \Modules\SICA\Entities\Course::with('program')->orderBy('code')->get();
+            }
+        } catch (\Throwable $e) {
+            $courses = collect([]);
+        }
+
         $egresadosList = Apprentice::with(['person', 'course.program'])
             ->where(function($q) {
                 $q->whereHas('person.users.roles', function($rq) {
@@ -431,6 +443,7 @@ class EventosController extends Controller
 
         return view('egresados::superadmin.eventos.index', compact(
             'eventos',
+            'courses',
             'egresadosList',
             'programsList',
             'totalProgramados',

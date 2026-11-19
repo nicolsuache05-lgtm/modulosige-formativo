@@ -1,4 +1,70 @@
 {{-- Modal para Crear / Programar Nuevo Evento (Identidad SENA ERP) --}}
+@php
+    if (!isset($courses) || empty($courses) || (is_object($courses) && $courses->isEmpty())) {
+        try {
+            $courses = \Modules\SICA\Entities\Course::with('program')
+                ->whereHas('apprentices')
+                ->orderBy('code')
+                ->get();
+            if ($courses->isEmpty()) {
+                $courses = \Modules\SICA\Entities\Course::with('program')->orderBy('code')->get();
+            }
+        } catch (\Throwable $e) {
+            $courses = collect([]);
+        }
+    }
+
+    $fichasEventos = [];
+    $fichasEventos[] = [
+        'code' => 'TODOS',
+        'program' => 'General CEFA',
+        'label' => 'Todos los Programas / Egresados (General CEFA)',
+        'value' => 'Todos los Programas'
+    ];
+    $fichasEventos[] = [
+        'code' => 'TODOS_EGRESADOS',
+        'program' => 'General CEFA',
+        'label' => 'Todos los Egresados (General CEFA)',
+        'value' => 'Todos los Egresados'
+    ];
+
+    $knownCodes = [];
+    if (isset($courses) && count($courses) > 0) {
+        foreach($courses as $c) {
+            $fCode = (string)$c->code;
+            if (empty($fCode)) continue;
+            $knownCodes[] = $fCode;
+            $pName = $c->program ? $c->program->name : 'Programa General';
+            $fichasEventos[] = [
+                'code' => $fCode,
+                'program' => $pName,
+                'label' => "Ficha {$fCode} — {$pName}",
+                'value' => "Ficha {$fCode} - {$pName}"
+            ];
+        }
+    }
+
+    $fichasFrecuentes = [
+        ['code' => '3230026', 'program' => 'ADSO (Análisis y Desarrollo de Software)'],
+        ['code' => '2692924', 'program' => 'Análisis y Desarrollo de Software (ADSO)'],
+        ['code' => '3312595', 'program' => 'ADSO - Sistemas'],
+        ['code' => '2847291', 'program' => 'Gestión Agroempresarial'],
+        ['code' => '2918374', 'program' => 'Producción Ganadera'],
+        ['code' => '694778',  'program' => 'Producción Agropecuaria'],
+        ['code' => '735783',  'program' => 'Sistemas Agropecuarios EC'],
+    ];
+    foreach ($fichasFrecuentes as $ff) {
+        if (!in_array($ff['code'], $knownCodes)) {
+            $fichasEventos[] = [
+                'code' => $ff['code'],
+                'program' => $ff['program'],
+                'label' => "Ficha {$ff['code']} — {$ff['program']}",
+                'value' => "Ficha {$ff['code']} - {$ff['program']}"
+            ];
+            $knownCodes[] = $ff['code'];
+        }
+    }
+@endphp
 <div x-show="openModal" 
      style="display: none;"
      x-transition:enter="transition ease-out duration-300"
@@ -126,31 +192,119 @@
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-graduation-cap text-[#39A900]"></i>
-                                <span>Programas Dirigidos</span>
+                            <label class="block text-[11px] font-bold text-[#00131E] uppercase tracking-wide mb-1.5 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-graduation-cap text-[#39A900]"></i>
+                                    <span>Programas Dirigidos</span>
+                                </span>
+                                <span class="text-[10px] text-gray-400 font-semibold lowercase">Escribe la ficha o selecciona</span>
                             </label>
-                            <div class="relative">
-                                <input type="text" 
-                                       name="programas_dirigidos" 
-                                       id="programas_dirigidos"
-                                       list="programas_sugeridos"
-                                       class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] focus:ring-2 focus:ring-[#39A900]/20 outline-none transition" 
-                                       placeholder="Escriba el programa (ej. ADSO, Gestión Agroempresarial, Todos...)"
-                                       value="Todos los Programas">
+
+                            <div class="relative" 
+                                 x-data="{
+                                    dropdownOpen: false,
+                                    fichasLista: {{ json_encode($fichasEventos) }},
+                                    programaSeleccionado: 'Todos los Programas',
+                                    get fichasFiltradas() {
+                                        const q = (this.programaSeleccionado || '').trim().toLowerCase();
+                                        if (!q || q === 'todos los programas') {
+                                            return this.fichasLista;
+                                        }
+                                        return this.fichasLista.filter(item => {
+                                            const s = item.search || (item.code + ' ' + item.label).toLowerCase();
+                                            return s.includes(q) || item.label.toLowerCase().includes(q) || (item.value && item.value.toLowerCase().includes(q));
+                                        });
+                                    },
+                                    seleccionarOpcion(item) {
+                                        this.programaSeleccionado = item.value || item.label;
+                                        this.dropdownOpen = false;
+                                    },
+                                    toggleDropdown() {
+                                        this.dropdownOpen = !this.dropdownOpen;
+                                    }
+                                 }"
+                                 @click.away="dropdownOpen = false">
+
+                                <div class="relative flex items-center">
+                                    <input type="text" 
+                                           name="programas_dirigidos" 
+                                           id="programas_dirigidos"
+                                           x-model="programaSeleccionado"
+                                           @focus="dropdownOpen = true"
+                                           @click="dropdownOpen = true"
+                                           @input="dropdownOpen = true"
+                                           list="programas_sugeridos"
+                                           autocomplete="off"
+                                           class="w-full pl-3.5 pr-10 py-2.5 text-xs sm:text-sm bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-800 focus:bg-white focus:border-[#39A900] focus:ring-2 focus:ring-[#39A900]/20 outline-none transition" 
+                                           placeholder="Escriba la ficha o programa (ej. 3230026, ADSO, Todos...)">
+
+                                    <button type="button" 
+                                            @click.prevent="toggleDropdown()"
+                                            class="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-gray-400 hover:text-[#39A900] transition cursor-pointer"
+                                            title="Desplegar listado de fichas y programas">
+                                        <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" :class="dropdownOpen ? 'rotate-180 text-[#39A900]' : ''"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Menú Desplegable Flotante con Todas las Fichas del SENA -->
+                                <div x-show="dropdownOpen"
+                                     style="display: none;"
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 -translate-y-1 scale-98"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 -translate-y-1 scale-98"
+                                     class="absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden max-h-60 flex flex-col">
+                                    
+                                    <div class="px-3 py-2 bg-gray-50 border-b border-gray-100 flex items-center justify-between text-[11px] text-gray-500 font-semibold">
+                                        <span class="flex items-center gap-1.5">
+                                            <i class="fa-solid fa-list-check text-[#39A900]"></i>
+                                            <span>Fichas y Programas Disponibles</span>
+                                        </span>
+                                        <span class="text-[10px] text-gray-400" x-text="fichasFiltradas.length + ' opciones'"></span>
+                                    </div>
+
+                                    <div class="overflow-y-auto divide-y divide-gray-50 max-h-48">
+                                        <template x-for="item in fichasFiltradas" :key="item.code">
+                                            <button type="button" 
+                                                    @click="seleccionarOpcion(item)"
+                                                    class="w-full text-left px-3.5 py-2.5 hover:bg-emerald-50/60 transition flex items-center justify-between gap-2 group cursor-pointer"
+                                                    :class="(programaSeleccionado === (item.value || item.label)) ? 'bg-emerald-50 font-bold text-[#166534]' : 'text-gray-700'">
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <i class="fa-solid text-xs" :class="item.code === 'TODOS' || item.code === 'TODOS_EGRESADOS' ? 'fa-users text-[#39A900]' : 'fa-id-card text-gray-400 group-hover:text-[#39A900]'"></i>
+                                                    <span class="text-xs truncate" x-text="item.label"></span>
+                                                </div>
+                                            </button>
+                                        </template>
+
+                                        <div x-show="fichasFiltradas.length === 0" class="p-4 text-center text-xs text-gray-400">
+                                            <i class="fa-solid fa-magnifying-glass text-gray-300 text-base mb-1 block"></i>
+                                            <span>No se encontró ninguna ficha con ese criterio. Puedes seguir digitando o seleccionar 'Todos los Programas'.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <datalist id="programas_sugeridos">
-                                    <option value="Todos los Programas">
-                                    <option value="Análisis y Desarrollo de Software (ADSO)">
-                                    <option value="Gestión Agroempresarial">
-                                    <option value="Producción Ganadera">
-                                    <option value="Producción Agrícola">
-                                    <option value="Contabilización de Operaciones Comerciales y Financieras">
-                                    <option value="Mantenimiento de Equipos de Cómputo">
+                                    <option value="Todos los Programas">Todos los Programas (General CEFA)</option>
+                                    <option value="Todos los Egresados">Todos los Egresados (General CEFA)</option>
+                                    @foreach($fichasEventos as $item)
+                                        @if($item['code'] !== 'TODOS' && $item['code'] !== 'TODOS_EGRESADOS')
+                                            <option value="{{ $item['value'] }}">{{ $item['label'] }}</option>
+                                            <option value="{{ $item['code'] }}">{{ $item['label'] }}</option>
+                                        @endif
+                                    @endforeach
+                                    <option value="Análisis y Desarrollo de Software (ADSO)">Análisis y Desarrollo de Software (ADSO)</option>
+                                    <option value="Gestión Agroempresarial">Gestión Agroempresarial</option>
+                                    <option value="Producción Ganadera">Producción Ganadera</option>
+                                    <option value="Producción Agrícola">Producción Agrícola</option>
+                                    <option value="Contabilización de Operaciones Comerciales y Financieras">Contabilización de Operaciones Comerciales y Financieras</option>
+                                    <option value="Mantenimiento de Equipos de Cómputo">Mantenimiento de Equipos de Cómputo</option>
                                 </datalist>
                             </div>
                             <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
                                 <i class="fa-solid fa-pen text-[9px] text-[#39A900]"></i>
-                                Puede escribir libremente el nombre del programa o seleccionarlo de las sugerencias.
+                                Puedes hacer clic en la flecha para ver el listado o escribir directamente el número de ficha o programa para filtrar.
                             </p>
                         </div>
 
